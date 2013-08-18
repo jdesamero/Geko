@@ -1,0 +1,130 @@
+.bg {
+	background-color: lightgray;
+}
+
+.geko-form-items {
+
+}
+
+.geko-form-item {
+	background-color: #f1f1f1;
+	background-image: -moz-linear-gradient( center top, #f9f9f9, #ececec );
+	height: 32px;
+	cursor: move;
+	border: solid 1px #dfdfdf;
+	box-shadow: 0 1px 0 #fff inset;
+	border-radius: 3px;
+}
+
+.geko-form-item .label {
+	display: inline-block;
+	margin: 6px 3px;
+	float: left;
+}
+
+.geko-form-icon {
+	display: inline-block;
+	margin: 3px;
+	float: left;
+	width: 26px;
+	height: 26px;
+	background-image: url( '../images/form_item_icons.png' );
+}
+
+.geko-form-icon-text {
+
+}
+
+.geko-form-icon-textarea {
+	background-position: 0 -26px;
+}
+
+.geko-form-icon-radio {
+	background-position: 0 -52px;
+}
+
+.geko-form-icon-checkbox,
+.geko-form-icon-checkbox_multi {
+	background-position: 0 -78px;
+}
+
+.geko-form-icon-select {
+	background-position: 0 -104px;
+}
+
+.geko-form-icon-select_multi {
+	background-position: 0 -130px;
+}
+
+.geko-form-icon-file {
+	background-position: -26px 0;
+}
+
+.geko-form-icon-password {
+	background-position: -26px -26px;
+}
+
+.geko-form-icon-plain_text {
+	background-position: -26px -52px;
+}
+
+.geko-form-icon-date {
+	background-position: -26px -78px;
+}
+
+.geko-form-icon-email {
+	background-position: -26px -104px;
+}
+
+.geko-form-icon-email {
+	background-position: -26px -130px;
+}
+
+.geko-form-icon-image {
+	background-position: -52px 0;
+}
+
+.geko-form-icon-telephone {
+	background-position: -52px -26px;
+}
+
+.geko-form-icon-logo {
+	background-position: -52px -52px;
+}
+
+.geko-form-icon-submit {
+	background-position: -52px -78px;
+}
+
+.geko-form-icon-captcha {
+	background-position: -52px -104px;
+}
+
+.geko-form-icon-footer {
+	background-position: -52px -130px;
+}
+
+.geko-form-icon-header {
+	background-position: -78px 0;
+}
+
+.geko-form-icon-spacer {
+	background-position: -78px -26px;
+}
+
+.geko-form-icon-break {
+	background-position: -78px -52px;
+}
+
+.geko-form-icon-number {
+	background-position: -78px -78px;
+}
+
+.geko-form-icon-heading {
+	background-position: -78px -104px;
+}
+
+.geko-form-icon-regex {
+	background-position: -78px -130px;
+}
+
