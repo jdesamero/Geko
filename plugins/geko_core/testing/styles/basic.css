@@ -1,0 +1,74 @@
+body, body * {
+	font-family: 'Helvetica', 'Arial', 'sans-serif';
+}
+
+a { text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+td {
+	vertical-align: top;
+}
+
+a.whiteout {
+	color: #fff;
+}
+
+a.whiteout:hover {
+	color: #000;
+}
+
+
+table {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-collapse: collapse;
+}
+
+table tr th,
+table > tbody > tr > td {
+	border-top: solid 1px #000;
+	border-left: solid 1px #000;
+	vertical-align: top;
+	padding: 3px 6px;
+	white-space: nowrap;
+}
+
+table tr th:last-child,
+table > tbody > tr > td:last-child {
+	border-right: solid 1px #000;
+}
+
+table > tbody > tr:last-child > td {
+	border-bottom: solid 1px #000;
+}
+
+table > tbody > tr:nth-child(odd) > td {
+	background-color: #fff;
+}
+
+table > tbody > tr:nth-child(even) > td {
+	background-color: #ddd;
+}
+
+table tr th {
+	background: #333;
+	color: #fff;
+}
+
+em.missing {
+	color: red;
+}
+
+table.geko_phpunit tr.error td.message,
+table.geko_phpunit td.error {
+	color: red;
+}
+
+hr {
+	border: none;
+	height: 1px;
+	background: #000;
+}
+
+

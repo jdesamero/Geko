@@ -1,0 +1,153 @@
+/* ------ mobilymap -----------------------------------------------*/
+
+.mobilymap .loader {
+	background:url( 'images/loader.gif' ) no-repeat center #fff;
+}
+
+.mobilymap .imgCaption {
+	bottom: 0;
+	left: 0;
+	color: #fff;
+	opacity: .6;
+	background: #333;
+	padding: 10px;
+	width: 940px;
+	text-align: center;
+	font-size: 16px;
+	text-transform: uppercase;
+	text-shadow: 1px 1px 0 #111;
+	font-weight: bold;
+}
+
+.mobilymap .bubble .close {
+	display: block;
+	text-indent: -9999px;
+	position: absolute;
+	top: -6px;
+	right: -6px;
+	width: 16px;
+	height: 16px;
+	outline: none;
+	background: url( 'images/close.png' ) no-repeat;
+	cursor: pointer;
+}
+
+.mobilymap .mapNav {
+	width: 84px;
+	height: 84px;
+}
+
+.mobilymap .navBtn {
+	position: absolute;
+	background-repeat: no-repeat;
+	width: 32px;
+	height: 32px;
+	outline: none;
+	text-indent: -9999px;
+	display: block;
+	z-index: 7px;
+}
+
+.mobilymap .navBtn0 {
+	top: 0;
+	left: 26px;
+	background-image: url( 'images/navtop.png' );
+}
+
+.mobilymap .navBtn1 {
+	top: 26px;
+	right: 0;
+	background-image: url( 'images/navright.png' );
+}
+
+.mobilymap .navBtn2 {
+	bottom: 0;
+	left: 26px;
+	background-image: url( 'images/navbottom.png' );
+}
+
+.mobilymap .navBtn3 {
+	top: 26px;
+	left: 0;
+	background-image: url( 'images/navleft.png' );
+}
+
+/* ------ example1 -----------------------------------------------*/
+
+.mobilymap .point {
+	display: block;
+	text-indent: -9999px;
+	width: 32px;
+	height: 44px;
+	outline: none;
+	background: url( 'images/marker.png' ) no-repeat;
+	cursor: pointer;
+}
+
+.mobilymap .bubble {
+	padding: 7px 10px;
+	background: #333;
+	color: #fff;
+	width: 240px;
+	font-size: 11px;
+	/*-- css3 --*/
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+	-moz-box-shadow: 0 0 20px #999;
+	-webkit-box-shadow: 0 0 20px #999;
+}
+
+.mobilymap .bubble p {
+	margin: 5px 0;
+}
+
+.mobilymap .bubble span {
+	display: block;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.mobilymap .bubble img {
+	vertical-align: bottom;
+}
+
+.mobilymap ul.map_buttons,
+.mobilymap ul.map_buttons li {
+	display: block;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.mobilymap ul.map_buttons li {
+	float: left;
+}
+
+.mobilymap .map_buttons a {
+	background: #ededed;
+	color: #111;
+	display: block;
+	float: left;
+	font-size: 11px;
+	line-height: 28px;
+	margin-right: 4px;
+	outline: none;
+	padding: 0 15px;
+	text-decoration: none;
+	/*-- css3 --*/
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+}
+
+.mobilymap .map_buttons a:hover {
+	background: #111;
+	color: #fff;
+}
+
+.mobilymap a {
+	color: #fff;
+}
+
+

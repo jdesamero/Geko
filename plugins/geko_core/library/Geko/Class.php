@@ -1,0 +1,98 @@
+<?php
+
+class Geko_Class
+{
+	
+	//
+	protected static $_aResolveCache = array();
+	
+	
+	// prevent instantiation
+	private function __construct() {
+		// do nothing
+	}
+	
+	// Change SomeClass::someMethod to SomeClass->someMethod
+	// $sMethod value is typically __METHOD__
+	public static function formatMethod( $sMethod ) {
+		return str_replace( '::', '->', $sMethod );
+	}
+	
+	//
+	public static function isSubclassOf( $mCheck, $sClassName ) {
+		
+		if ( is_object( $mCheck ) ) {
+			return is_subclass_of( $mCheck, $sClassName );
+		} else {
+			if ( class_exists( $mCheck ) ) {
+				$oReflect = new ReflectionClass( $mCheck );
+				return (
+					is_subclass_of( $mCheck, $sClassName ) ||
+					$oReflect->implementsInterface( $sClassName )
+				);
+			} else {
+				return FALSE;
+			}
+		}
+	}
+	
+	// return the first class that exists from argument list
+	public static function existsCoalesce() {
+		$aArgs = func_get_args();		
+		foreach ( $aArgs as $mValue ) {
+			if ( TRUE == is_array( $mValue ) ) {
+				$mValRec = self::existsCoalesce( $mValue );		// recursive
+				if ( @class_exists( $mValRec ) ) return $mValRec;
+			} else {
+				if ( @class_exists( $mValue ) ) return $mValue;
+			}
+		}
+		return '';
+	}
+	
+	//
+	public static function resolveRelatedClass( $mBaseClass, $sBaseSuffix, $sRelatedSuffix, $sResolvedClass = '' ) {
+		
+		if ( $sResolvedClass ) return $sResolvedClass;
+		
+		$sBaseClass = ( is_object( $mBaseClass ) ) ? get_class( $mBaseClass ) : $mBaseClass;
+		
+		$sResolveKey = $sBaseClass . '|' . $sBaseSuffix . '|' . $sRelatedSuffix;
+		
+		if ( !isset( self::$_aResolveCache[ $sResolveKey ] ) ) {
+			
+			if ( $sBaseSuffix ) {
+				
+				$iBaseClassLen = strlen( $sBaseClass );
+				$iBaseSuffixLen = strlen( $sBaseSuffix );
+				
+				if ( '*' == substr( $sBaseSuffix, $iBaseSuffixLen - 1, 1 ) ) {
+					$sBaseSuffix = substr( $sBaseSuffix, 0, $iBaseSuffixLen - 1 );
+					$sBaseSuffix = substr( $sBaseClass, strrpos( $sBaseClass, $sBaseSuffix ) );
+					$iBaseSuffixLen = strlen( $sBaseSuffix );
+				}
+				
+				if (
+					( strrpos( $sBaseClass, $sBaseSuffix ) ) != 
+					( $iLen = $iBaseClassLen - $iBaseSuffixLen )
+				) {
+					return FALSE;
+				} else {
+					$sBaseClass = substr( $sBaseClass, 0, $iLen );
+				}
+			}
+			
+			$sRelatedClass = $sBaseClass . $sRelatedSuffix;
+			
+			self::$_aResolveCache[ $sResolveKey ] = ( @class_exists( $sRelatedClass ) ) ?
+				$sRelatedClass : FALSE
+			;
+			
+		}
+
+		return self::$_aResolveCache[ $sResolveKey ];
+	}
+		
+}
+
+

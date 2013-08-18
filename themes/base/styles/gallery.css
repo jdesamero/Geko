@@ -1,0 +1,186 @@
+.gallery,
+.gallery .gly_item,
+.gallery .gly_item img.gly_bg,
+.gallery .gly_controls {
+	width: 999px;
+	height: 245px;
+}
+
+.gallery {
+	position: relative;
+	margin-top: 10px;
+	margin-right: auto;
+	margin-bottom: 0;
+	margin-left: auto;
+}
+
+
+
+.gly_item {
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+.gly_item table.ovly {
+	width: 477px;
+	padding: 0;
+	margin: 0;
+	border: 0;
+	border-collapse: collapse;
+	position: absolute;
+	right: 60px;
+	top: 30px;
+}
+
+.gly_item table.ovly td {
+	margin: 0;
+	border: 0;
+}
+
+.gly_item table.ovly td.top,
+.gly_item table.ovly td.top img,
+.gly_item table.ovly td.bottom,
+.gly_item table.ovly td.bottom img {
+	width: 477px;
+	height: 11px;
+}
+
+.gly_item table.ovly td.top {
+	padding: 0;
+	background: url('../images/ovly_top.png');
+}
+
+.gly_item table.ovly td.bottom {
+	padding: 0;
+	background: url('../images/ovly_bottom.png');		
+}
+
+.gly_item table.ovly td.inner {
+	background: url('../images/ovly_bg.png');
+	color: white;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	padding: 0 12px;
+	line-height:18px;
+	vertical-align: top;
+}
+
+.gly_item table.ovly td.inner h1 {
+	font-size: 18px;
+}
+
+.gallery .gly_ctls {
+	float: right;
+}
+
+.gallery .gly_ctls .gly_btn {
+	width: 16px;
+	height: 16px;
+	background-color: #4d5259;
+	cursor: pointer;
+	margin-right: 10px;
+	float: left;
+}
+
+.gallery .gly_ctls .gly_btn.gly_cur {
+	background-color: #fff;
+}
+
+
+
+
+
+/* start test gallery */
+
+.gallery2 .gly_controls div.inner {
+	position: absolute;
+	bottom: 30px;
+	left: 32px;
+}
+
+.gallery2 .gly_controls div.inner .gly_btn {
+	width: 16px;
+	height: 16px;
+	background-color: pink;
+	cursor: pointer;
+	margin-right: 10px;
+	float: left;
+}
+
+.gallery2 .gly_controls div.inner .gly_btn.sel {
+	background-color: red;
+}
+
+.gal_itom {
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+.gal_itom table.ovly {
+	width: 477px;
+	height: 143px;
+	padding: 0;
+	margin: 0;
+	border: 0;
+	border-collapse: collapse;
+	position: absolute;
+	right: 65px;
+	top: 45px;
+}
+
+.gal_itom table.ovly td {
+	margin: 0;
+	border: 0;
+}
+
+.gal_itom table.ovly td.top,
+.gal_itom table.ovly td.top img,
+.gal_itom table.ovly td.bottom,
+.gal_itom table.ovly td.bottom img {
+	width: 477px;
+	height: 11px;
+}
+
+.gal_itom table.ovly td.top {
+	padding: 0;
+	background: url('../images/ovly_top.png');
+}
+
+.gal_itom table.ovly td.bottom {
+	padding: 0;
+	background: url('../images/ovly_bottom.png');		
+}
+
+.gal_itom table.ovly td.inner {
+	background: url('../images/ovly_bg.png');
+	color: white;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	padding: 0 12px;
+	line-height:18px;
+	vertical-align: top;
+	height: 121px;
+}
+
+.gal_itom table.ovly td.inner h1 {
+	/* font-size: 20px; */
+	font-size: 14px;
+}
+
+.gallery2,
+.gallery2 .gal_itom,
+.gallery2 .gal_itom img.gly_bg {
+	width: 939px;
+	height: 245px;
+}
+
+.gallery2 {
+	position: relative;
+	/* background-color: pink; */
+	margin: 20px auto 0 auto;
+}
+
+/* end test gallery */
+

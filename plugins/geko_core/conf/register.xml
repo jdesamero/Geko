@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<data version-flags="jquery-ui" default-jquery-ui-version="1.9.2">
+	
+	
+	<!-- JavaScript -->
+	<scripts>
+		
+		<!-- non-jquery libraries -->
+		
+		<file id="geko-backbone" src="##geko_core_uri##/external/js/backbone-min.js" dependencies="geko-underscore jquery" />
+		<file id="geko-compatibility" src="##geko_core_uri##/external/js/compatibility.js" />
+		<file id="geko-css_query" src="##geko_core_uri##/external/js/cssQuery-p.js" />
+		<file id="geko-css_sandpaper" src="##geko_core_uri##/external/js/cssSandpaper.js" dependencies="geko-event_helpers geko-css_query geko-sylvester" />
+		<file id="geko-crypto-aes" src="##geko_core_uri##/external/js/crypto/aes.js" />
+		<file id="geko-crypto-hmac-md5" src="##geko_core_uri##/external/js/crypto/hmac-md5.js" />
+		<file id="geko-crypto-hmac-sha1" src="##geko_core_uri##/external/js/crypto/hmac-sha1.js" />
+		<file id="geko-crypto-hmac-sha224" src="##geko_core_uri##/external/js/crypto/hmac-sha224.js" />
+		<file id="geko-crypto-hmac-sha256" src="##geko_core_uri##/external/js/crypto/hmac-sha256.js" />
+		<file id="geko-crypto-hmac-sha384" src="##geko_core_uri##/external/js/crypto/hmac-sha384.js" />
+		<file id="geko-crypto-hmac-sha512" src="##geko_core_uri##/external/js/crypto/hmac-sha512.js" />
+		<file id="geko-crypto-md5" src="##geko_core_uri##/external/js/crypto/md5.js" />
+		<file id="geko-crypto-pbkdf2" src="##geko_core_uri##/external/js/crypto/pbkdf2.js" />
+		<file id="geko-crypto-rabbit" src="##geko_core_uri##/external/js/crypto/rabbit.js" />
+		<file id="geko-crypto-rc4" src="##geko_core_uri##/external/js/crypto/rc4.js" />
+		<file id="geko-crypto-sha1" src="##geko_core_uri##/external/js/crypto/sha1.js" />
+		<file id="geko-crypto-sha224" src="##geko_core_uri##/external/js/crypto/sha224.js" />
+		<file id="geko-crypto-sha256" src="##geko_core_uri##/external/js/crypto/sha256.js" />
+		<file id="geko-crypto-sha384" src="##geko_core_uri##/external/js/crypto/sha384.js" />
+		<file id="geko-crypto-sha512" src="##geko_core_uri##/external/js/crypto/sha512.js" />
+		<file id="geko-crypto-tripledes" src="##geko_core_uri##/external/js/crypto/tripledes.js" />
+		<file id="geko-cufon" src="##geko_core_uri##/external/js/cufon-yui.js" dependencies="jquery" />
+		<file id="geko-date_format" src="##geko_core_uri##/external/js/date_format.js" />
+		<file id="geko-event_helpers" src="##geko_core_uri##/external/js/EventHelpers.js" />
+		<file id="geko-facebook-connect" src="http://connect.facebook.net/en_US/all.js" />
+		<file id="geko-flash-loader" src="##geko_core_uri##/external/js/flash_loader.js" />
+		<file id="geko-get_scroll_xy" src="##geko_core_uri##/external/js/get_scroll_xy.js" />
+		<file id="geko-googlemaps" src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=##GOOGLEMAPS_API_KEY##" />
+		<file id="geko-string_format" src="##geko_core_uri##/external/js/string_format.js" />
+		<file id="geko-swf-object" src="##geko_core_uri##/external/js/swfobject.js" />
+		<file id="geko-sylvester" src="##geko_core_uri##/external/js/sylvester.js" />
+		<file id="geko-underscore" src="##geko_core_uri##/external/js/underscore-min.js" />
+		
+		
+		
+		<!-- for jQuery UI version 1.3.2 -->
+			
+			<!-- effects -->
+			<file id="geko-jquery-fx-core" src="##geko_core_uri##/external/js/ui-1.3.2/effects.core.js" dependencies="jquery" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-fx-blind" src="##geko_core_uri##/external/js/ui-1.3.2/effects.blind.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-fx-bounce" src="##geko_core_uri##/external/js/ui-1.3.2/effects.bounce.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-fx-clip" src="##geko_core_uri##/external/js/ui-1.3.2/effects.clip.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-fx-drop" src="##geko_core_uri##/external/js/ui-1.3.2/effects.drop.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-fx-explode" src="##geko_core_uri##/external/js/ui-1.3.2/effects.explode.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-fx-fold" src="##geko_core_uri##/external/js/ui-1.3.2/effects.fold.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-fx-highlight" src="##geko_core_uri##/external/js/ui-1.3.2/effects.highlight.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-fx-pulsate" src="##geko_core_uri##/external/js/ui-1.3.2/effects.pulsate.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-fx-scale" src="##geko_core_uri##/external/js/ui-1.3.2/effects.scale.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-fx-shake" src="##geko_core_uri##/external/js/ui-1.3.2/effects.shake.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-fx-slide" src="##geko_core_uri##/external/js/ui-1.3.2/effects.slide.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-fx-transfer" src="##geko_core_uri##/external/js/ui-1.3.2/effects.transfer.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.3.2" />
+			
+			<!-- ui -->
+			<file id="geko-jquery-ui-core" src="##geko_core_uri##/external/js/ui-1.3.2/ui.core.js" dependencies="jquery" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-ui-accordion" src="##geko_core_uri##/external/js/ui-1.3.2/ui.accordion.js" dependencies="geko-jquery-ui-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-ui-datepicker" src="##geko_core_uri##/external/js/ui-1.3.2/ui.datepicker.js" dependencies="geko-jquery-ui-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-ui-dialog" src="##geko_core_uri##/external/js/ui-1.3.2/ui.dialog.js" dependencies="geko-jquery-ui-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-ui-draggable" src="##geko_core_uri##/external/js/ui-1.3.2/ui.draggable.js" dependencies="geko-jquery-ui-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-ui-droppable" src="##geko_core_uri##/external/js/ui-1.3.2/ui.droppable.js" dependencies="geko-jquery-ui-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-ui-progressbar" src="##geko_core_uri##/external/js/ui-1.3.2/ui.progressbar.js" dependencies="geko-jquery-ui-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-ui-resizable" src="##geko_core_uri##/external/js/ui-1.3.2/ui.resizable.js" dependencies="geko-jquery-ui-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-ui-selectable" src="##geko_core_uri##/external/js/ui-1.3.2/ui.selectable.js" dependencies="geko-jquery-ui-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-ui-slider" src="##geko_core_uri##/external/js/ui-1.3.2/ui.slider.js" dependencies="geko-jquery-ui-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-ui-sortable" src="##geko_core_uri##/external/js/ui-1.3.2/ui.sortable.js" dependencies="geko-jquery-ui-core" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-ui-tabs" src="##geko_core_uri##/external/js/ui-1.3.2/ui.tabs.js" dependencies="geko-jquery-ui-core" jquery-ui-version="1.3.2" />
+			
+			<!--  Geek Oracle jQuery plugins -->
+			<file id="geko-jquery-geko_event_calendar" src="##geko_core_uri##/external/js/jquery.geko_event_calendar-1.3.2.js" dependencies="geko-date_format geko-jquery-qtip geko-jquery-geko_util geko-jquery-ui-datepicker" jquery-ui-version="1.3.2" />
+			
+			<!-- third-party jquery plugins -->
+			<file id="geko-jquery-qtip" src="##geko_core_uri##/external/js/jquery.qtip-1.0.0-rc3.min.js" dependencies="jquery" jquery-ui-version="1.3.2" />
+			
+			
+		<!-- for jQuery UI version 1.4.2 -->
+			
+			<!-- ui core -->
+			<file id="geko-jquery-ui-core" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.ui.core.js" dependencies="jquery" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-ui-widget" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.ui.widget.js" dependencies="jquery" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-ui-mouse" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.ui.mouse.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-ui-position" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.ui.position.js" dependencies="jquery" jquery-ui-version="1.4.2" />
+			
+			<!-- interactions -->
+			<file id="geko-jquery-ui-draggable" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.ui.draggable.js" dependencies="geko-jquery-ui-mouse" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-ui-droppable" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.ui.droppable.js" dependencies="geko-jquery-ui-mouse geko-jquery-ui-draggable" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-ui-resizable" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.ui.resizable.js" dependencies="geko-jquery-ui-mouse" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-ui-selectable" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.ui.selectable.js" dependencies="geko-jquery-ui-mouse" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-ui-sortable" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.ui.sortable.js" dependencies="geko-jquery-ui-mouse" jquery-ui-version="1.4.2" />
+			
+			<!-- effects -->
+			<file id="geko-jquery-fx-core" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.effects.core.js" dependencies="jquery" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-fx-blind" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.effects.blind.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-fx-bounce" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.effects.bounce.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-fx-clip" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.effects.clip.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-fx-drop" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.effects.drop.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-fx-explode" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.effects.explode.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-fx-fade" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.effects.fade.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-fx-fold" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.effects.fold.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-fx-highlight" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.effects.highlight.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-fx-pulsate" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.effects.pulsate.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-fx-scale" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.effects.scale.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-fx-shake" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.effects.shake.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-fx-slide" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.effects.slide.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-fx-transfer" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.effects.transfer.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.4.2" />
+			
+			<!-- widgets -->
+			<file id="geko-jquery-ui-accordion" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.ui.accordion.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-ui-autocomplete" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.ui.autocomplete.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget geko-jquery-ui-position" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-ui-button" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.ui.button.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-ui-datepicker" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.ui.datepicker.js" dependencies="geko-jquery-ui-core" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-ui-dialog" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.ui.dialog.js" dependencies="geko-jquery-ui-widget geko-jquery-ui-position geko-jquery-ui-draggable geko-jquery-ui-resizable" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-ui-progressbar" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.ui.progressbar.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-ui-slider" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.ui.slider.js" dependencies="geko-jquery-ui-mouse" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-ui-tabs" src="##geko_core_uri##/external/js/ui-1.4.2/jquery.ui.tabs.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget" jquery-ui-version="1.4.2" />
+			
+			<!-- Geek Oracle jQuery plugins -->
+			<file id="geko-jquery-geko_event_calendar" src="##geko_core_uri##/external/js/jquery.geko_event_calendar.js" dependencies="geko-date_format geko-jquery-qtip geko-jquery-geko_util geko-jquery-ui-datepicker" jquery-ui-version="1.4.2" />
+			
+			<!-- third-party jquery plugins -->
+			<file id="geko-jquery-qtip" src="##geko_core_uri##/external/js/jquery.qtip-1.0-rev55.min.js" dependencies="jquery" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-uploadify" src="##geko_core_uri##/external/js/jquery.uploadify.v2.1.4.min.js" dependencies="geko-swf-object jquery" jquery-ui-version="1.4.2" />
+			
+			
+		<!-- for default jQuery UI version 1.9.2 -->
+			
+			<!-- ui core -->
+			<file id="geko-jquery-ui-core" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.core.js" dependencies="jquery" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-widget" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.widget.js" dependencies="jquery" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-mouse" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.mouse.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-position" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.position.js" dependencies="jquery" jquery-ui-version="1.9.2" />
+			
+			<!-- interactions -->
+			<file id="geko-jquery-ui-draggable" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.draggable.js" dependencies="geko-jquery-ui-mouse" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-droppable" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.droppable.js" dependencies="geko-jquery-ui-mouse geko-jquery-ui-draggable" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-resizable" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.resizable.js" dependencies="geko-jquery-ui-mouse" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-selectable" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.selectable.js" dependencies="geko-jquery-ui-mouse" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-sortable" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.sortable.js" dependencies="geko-jquery-ui-mouse" jquery-ui-version="1.9.2" />
+			
+			<!-- effects -->
+			<file id="geko-jquery-fx-core" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.effect.js" dependencies="jquery" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-fx-blind" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.effect-blind.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-fx-bounce" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.effect-bounce.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-fx-clip" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.effect-clip.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-fx-drop" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.effect-drop.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-fx-explode" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.effect-explode.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-fx-fade" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.effect-fade.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-fx-fold" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.effect-fold.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-fx-highlight" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.effect-highlight.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-fx-pulsate" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.effect-pulsate.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-fx-scale" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.effect-scale.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-fx-shake" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.effect-shake.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-fx-slide" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.effect-slide.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-fx-transfer" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.effect-transfer.js" dependencies="geko-jquery-fx-core" jquery-ui-version="1.9.2" />
+			
+			<!-- widgets -->
+			<file id="geko-jquery-ui-accordion" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.accordion.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-autocomplete" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.autocomplete.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget geko-jquery-ui-position" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-button" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.button.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-datepicker" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.datepicker.js" dependencies="geko-jquery-ui-core" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-dialog" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.dialog.js" dependencies="geko-jquery-ui-widget geko-jquery-ui-position geko-jquery-ui-draggable geko-jquery-ui-resizable" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-menu" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.menu.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-progressbar" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.progressbar.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-slider" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.slider.js" dependencies="geko-jquery-ui-mouse" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-spinner" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.spinner.js" dependencies="geko-jquery-ui-core" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-tabs" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.tabs.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-tooltip" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.tooltip.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget geko-jquery-ui-position geko-jquery-fx-core" jquery-ui-version="1.9.2" />
+			
+			<!-- Geek Oracle jQuery plugins -->
+			<file id="geko-jquery-geko_event_calendar" src="##geko_core_uri##/external/js/jquery.geko_event_calendar.js" dependencies="geko-date_format geko-jquery-qtip geko-jquery-geko_util geko-jquery-ui-datepicker" jquery-ui-version="1.9.2" />
+			
+			<!-- third-party jquery plugins -->
+			<file id="geko-jquery-qtip" src="##geko_core_uri##/external/js/jquery.qtip-1.0-rev55.min.js" dependencies="jquery" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-uploadify" src="##geko_core_uri##/external/js/jquery.uploadify.v2.1.4.min.js" dependencies="geko-swf-object jquery" jquery-ui-version="1.9.2" />
+		
+		
+		<!-- third-party jquery plugins -->
+		<file id="geko-jquery-anythingslider" src="##geko_core_uri##/external/js/jquery.anythingslider.js" dependencies="jquery geko-jquery-easing" />
+		<file id="geko-jquery-bgiframe" src="##geko_core_uri##/external/js/jquery.bgiframe.js" dependencies="jquery" />
+		<file id="geko-jquery-cookie" src="##geko_core_uri##/external/js/jquery.cookie.js" dependencies="jquery" />
+		<file id="geko-jquery-easing" src="##geko_core_uri##/external/js/jquery.easing.1.3.js" dependencies="jquery" />
+		<file id="geko-jquery-facebook" src="##geko_core_uri##/external/js/jquery.geko_facebook.js" dependencies="jquery geko-facebook-connect" />
+		<file id="geko-jquery-fixboxmodel" src="##geko_core_uri##/external/js/jquery.fixBoxModel.js" dependencies="jquery" />
+		<file id="geko-jquery-form" src="##geko_core_uri##/external/js/jquery.form.js" dependencies="jquery" />
+		<file id="geko-jquery-jcarousel" src="##geko_core_uri##/external/js/jquery.jcarousel.js" dependencies="jquery" />
+		<file id="geko-jquery-jcarousel-simple" src="##geko_core_uri##/external/js/jquery.jcarousel-simple.js" dependencies="jquery" />
+		<file id="geko-jquery-jcarousellite" src="##geko_core_uri##/external/js/jquery.jcarousellite_1.0.1.min.js" dependencies="geko-jquery-easing" />
+		<file id="geko-jquery-jeditable" src="##geko_core_uri##/external/js/jquery.jeditable.js" dependencies="jquery" />
+		<file id="geko-jquery-jscrollpane" src="##geko_core_uri##/external/js/jquery.jscrollpane.min.js" dependencies="jquery" />
+		<file id="geko-jquery-media" src="##geko_core_uri##/external/js/jquery.media.js" dependencies="jquery geko-jquery-metadata" />
+		<file id="geko-jquery-metadata" src="##geko_core_uri##/external/js/jquery.metadata.js" dependencies="jquery" />
+		<file id="geko-jquery-mobilymap" src="##geko_core_uri##/external/js/jquery.mobilymap.js" dependencies="jquery" />
+		<file id="geko-jquery-pngfix" src="##geko_core_uri##/external/js/jquery.pngFix.js" dependencies="jquery" />
+		<file id="geko-jquery-popupwindow" src="##geko_core_uri##/external/js/jquery.popupWindow.js" dependencies="jquery" />
+		<file id="geko-jquery-prettyphoto" src="##geko_core_uri##/external/js/jquery.prettyPhoto.3.0.3.js" dependencies="jquery" />
+		<file id="geko-jquery-scrollpath" src="##geko_core_uri##/external/js/jquery.scrollpath.js" dependencies="jquery" />
+		<file id="geko-jquery-sfhover" src="##geko_core_uri##/external/js/jquery.sfhover.js" dependencies="jquery" />
+		<file id="geko-jquery-simplemodal" src="##geko_core_uri##/external/js/jquery.simplemodal-1.4.4.min.js" dependencies="jquery" />
+		<file id="geko-jquery-smoothzoom" src="##geko_core_uri##/external/js/jquery.smoothZoom.min.js" dependencies="jquery" />
+		<file id="geko-jquery-swfobject" src="##geko_core_uri##/external/js/jquery.swfobject.1-1-1.min.js" dependencies="jquery" />
+		<file id="geko-jquery-syger" src="##geko_core_uri##/external/js/jquery-syger.js" dependencies="jquery" />
+		<file id="geko-jquery-tabslideout" src="##geko_core_uri##/external/js/jquery.tabSlideOut.v1.3.1.js" dependencies="jquery" />
+		<file id="geko-jquery-tinysort" src="##geko_core_uri##/external/js/jquery.tinysort.min.js" dependencies="geko-jquery-tinysort_charorder" />
+		<file id="geko-jquery-tinysort_charorder" src="##geko_core_uri##/external/js/jquery.tinysort.charorder.min.js" dependencies="jquery" />
+		<file id="geko-jquery-tmpl" src="##geko_core_uri##/external/js/jquery.tmpl.js" dependencies="jquery" />
+		<file id="geko-jquery-touchswipe" src="##geko_core_uri##/external/js/jquery.touchSwipe-1.2.4.js" dependencies="jquery" />
+		<file id="geko-jquery-uri" src="##geko_core_uri##/external/js/jquery.uri.js" dependencies="jquery" />
+		<file id="geko-jquery-url_encode" src="##geko_core_uri##/external/js/jquery.url_encode.js" dependencies="jquery" />
+		<file id="geko-jquery-validate" src="##geko_core_uri##/external/js/jquery.validate.js" dependencies="jquery" />
+		<file id="geko-jquery-waitforimages" src="##geko_core_uri##/external/js/jquery.waitforimages.js" dependencies="jquery" />
+		<file id="geko-jquery-weekcalendar" src="##geko_core_uri##/external/js/jquery.weekcalendar.js" dependencies="jquery geko-jquery-ui-button geko-jquery-ui-draggable geko-jquery-ui-droppable geko-jquery-ui-resizable" />
+		
+		
+		<!-- Geek Oracle jQuery plugins -->
+		<file id="geko-jquery-geko_ajax_form" src="##geko_core_uri##/js/jquery.geko_ajax_form.js" dependencies="geko-jquery-uri" />
+		<file id="geko-jquery-geko_animate_frames" src="##geko_core_uri##/js/jquery.geko_animate_frames.js" dependencies="jquery" />
+		<file id="geko-jquery-geko_center_in_client" src="##geko_core_uri##/js/jquery.geko_center_in_client.js" dependencies="jquery" />
+		<file id="geko-jquery-geko_clock" src="##geko_core_uri##/js/jquery.geko_clock.js" dependencies="jquery" />
+		<file id="geko-jquery-geko_default_value" src="##geko_core_uri##/js/jquery.geko_default_value.js" dependencies="jquery" />
+		<file id="geko-jquery-geko_get_class_from_list" src="##geko_core_uri##/js/jquery.geko_get_class_from_list.js" dependencies="jquery" />
+		<file id="geko-jquery-geko_get_multi" src="##geko_core_uri##/js/jquery.geko_get_multi.js" dependencies="jquery" />
+		<file id="geko-jquery-geko_horizontal_scroll" src="##geko_core_uri##/js/jquery.geko_horizontal_scroll.js" dependencies="jquery geko-jquery-ui-slider" />
+		<file id="geko-jquery-geko_image_picker" src="##geko_core_uri##/js/jquery.geko_image_picker.js" dependencies="geko-jquery-geko_util" />
+		<file id="geko-jquery-geko_portfolio" src="##geko_core_uri##/js/jquery.geko_portfolio.js" dependencies="jquery" />
+		<file id="geko-jquery-geko_read_only_form" src="##geko_core_uri##/js/jquery.geko_read_only_form.js" dependencies="jquery" />
+		<file id="geko-jquery-geko_reinit" src="##geko_core_uri##/js/jquery.geko_reinit.js" dependencies="jquery" />
+		<file id="geko-jquery-geko_scroll_panel" src="##geko_core_uri##/js/jquery.geko_scroll_panel.js" dependencies="geko-css_sandpaper geko-jquery-geko_util geko-jquery-scrollpath geko-jquery-geko_animate_frames" />
+		<file id="geko-jquery-geko_slider" src="##geko_core_uri##/js/jquery.geko_slider.js" dependencies="geko-jquery-easing" />
+		<file id="geko-jquery-geko_slideshow" src="##geko_core_uri##/js/jquery.geko_slideshow.js" dependencies="jquery" />
+		<file id="geko-jquery-geko_update" src="##geko_core_uri##/js/jquery.geko_update.js" dependencies="jquery" />
+		<file id="geko-jquery-geko_util" src="##geko_core_uri##/js/jquery.geko_util.min.js" dependencies="geko-compatibility jquery" />
+		<file id="geko-jquery-geko_vertical_scroller" src="##geko_core_uri##/js/jquery.geko_vertical_scroller.js" dependencies="jquery" />
+		<file id="geko-jquery-googlemaps" src="##geko_core_uri##/js/jquery.googlemaps-1.01.1.js" dependencies="geko-googlemaps jquery" />
+		
+		
+		<!-- Geek Oracle PHP Extensions class-bound jQuery plugins -->
+		<file id="geko_navigation_pagemanager" src="##geko_core_uri##/js/Geko/Navigation/PageManager.js" dependencies="geko-jquery-geko_util" />
+		<file id="geko_navigation_pagemanager_custom" src="##geko_core_uri##/js/Geko/Navigation/PageManager/Custom.js" dependencies="geko_navigation_pagemanager" />
+		<file id="geko_navigation_pagemanager_uri" src="##geko_core_uri##/js/Geko/Navigation/PageManager/Uri.js" dependencies="geko_navigation_pagemanager" />
+		<file id="geko_navigation_pagemanager_implicitlabelabstract" src="##geko_core_uri##/js/Geko/Navigation/PageManager/ImplicitLabelAbstract.js" dependencies="geko_navigation_pagemanager" />
+		<file id="geko_phpquery_formtransform_plugin_rowtemplate" src="##geko_core_uri##/js/Geko/PhpQuery/FormTransform/Plugin/RowTemplate.js" dependencies="jquery" />
+		<file id="geko_phpunit" src="##geko_core_uri##/js/Geko/PhpUnit.js" dependencies="jquery" />
+		<file id="geko_wp_booking_schedule_time_manage" src="##geko_core_uri##/js/Geko/Wp/Booking/Schedule/Time/Manage.js" dependencies="jquery" />
+		<file id="geko_wp_emailmessage_manage" src="##geko_core_uri##/js/Geko/Wp/EmailMessage/Manage.js" dependencies="jquery" />
+		<file id="geko_wp_emailmessage_recipient_manage" src="##geko_core_uri##/js/Geko/Wp/EmailMessage/Recipient/Manage.js" dependencies="geko_phpquery_formtransform_plugin_rowtemplate" />
+		<file id="geko_wp_emailmessage_storage_manage" src="##geko_core_uri##/js/Geko/Wp/EmailMessage/Storage/Manage.js" dependencies="jquery" />
+		<file id="geko_wp_emailmessage_transport_manage" src="##geko_core_uri##/js/Geko/Wp/EmailMessage/Transport/Manage.js" dependencies="jquery" />
+		<file id="geko_wp_form_manage" src="##geko_core_uri##/js/Geko/Wp/Form/Manage.js" dependencies="geko-string_format geko-jquery-geko_util geko-jquery-fx-blind geko-jquery-ui-sortable geko-jquery-ui-button geko-jquery-ui-tabs geko-jquery-ui-dialog" />
+		<file id="geko_wp_form_render" src="##geko_core_uri##/js/Geko/Wp/Form/Render.js" dependencies="geko-jquery-geko_util geko-jquery-ui-tabs geko-jquery-geko_ajax_form geko-jquery-ui-tooltip" />
+		<file id="geko_wp_location" src="##geko_core_uri##/js/Geko/Wp/Location.js" dependencies="geko-jquery-geko_util" />
+		<file id="geko_wp_navigationmanagement_pagemanager_admin" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/Admin.js" dependencies="geko_navigation_pagemanager_uri" />
+		<file id="geko_wp_navigationmanagement_pagemanager_author" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/Author.js" dependencies="geko_navigation_pagemanager_implicitlabelabstract" />
+		<file id="geko_wp_navigationmanagement_pagemanager_category" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/Category.js" dependencies="geko_navigation_pagemanager_implicitlabelabstract" />
+		<file id="geko_wp_navigationmanagement_pagemanager_home" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/Home.js" dependencies="geko_navigation_pagemanager_implicitlabelabstract" />
+		<file id="geko_wp_navigationmanagement_pagemanager_language" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/Language.js" dependencies="geko_navigation_pagemanager_implicitlabelabstract" />
+		<file id="geko_wp_navigationmanagement_pagemanager_page" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/Page.js" dependencies="geko_navigation_pagemanager_implicitlabelabstract" />
+		<file id="geko_wp_navigationmanagement_pagemanager_post" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/Post.js" dependencies="geko_navigation_pagemanager_implicitlabelabstract" />
+		<file id="geko_wp_navigationmanagement_pagemanager_rewrite" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/Rewrite.js" dependencies="geko_navigation_pagemanager_implicitlabelabstract" />
+		<file id="geko_wp_navigationmanagement_pagemanager_role" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/Role.js" dependencies="geko_navigation_pagemanager_implicitlabelabstract" />
+		<file id="geko_wp_navigationmanagement_pagemanager_roleitem" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/RoleItem.js" dependencies="geko_navigation_pagemanager_implicitlabelabstract" />
+		<file id="geko_wp_navigationmanagement_pagemanager_search" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/Search.js" dependencies="geko_navigation_pagemanager_implicitlabelabstract" />
+		<file id="geko_wp_options_manage" src="##geko_core_uri##/js/Geko/Wp/Options/Manage.js" dependencies="geko-jquery-ui-dialog" />
+		
+		
+	</scripts>
+	
+	
+	<!-- CSS -->
+	<styles>
+		
+		<!-- for jQuery version 1.3.2 -->
+		
+			<file id="geko-jquery-ui-themes-base-all" src="##geko_core_uri##/external/styles/themes/base/ui.all.css" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-ui-demos" src="##geko_core_uri##/external/styles/demos/demos.css" dependencies="geko-jquery-ui-themes-base-all" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-ui-wp" src="##geko_core_uri##/external/styles/jquery-ui-wp.css" dependencies="geko-jquery-ui-themes-base-all" jquery-ui-version="1.3.2" />
+		
+		<!-- for jQuery version 1.4.2 -->
+		
+			<file id="geko-jquery-ui-themes-base-all" src="##geko_core_uri##/external/styles/themes/base/ui.all.css" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-ui-demos" src="##geko_core_uri##/external/styles/demos/demos.css" dependencies="geko-jquery-ui-themes-base-all" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-ui-wp" src="##geko_core_uri##/external/styles/jquery-ui-wp.css" dependencies="geko-jquery-ui-themes-base-all" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-uploadify" src="##geko_core_uri##/external/styles/uploadify/style.css" jquery-ui-version="1.4.2" />
+		
+		<!-- for default jQuery version 1.9.2 -->
+			
+			<file id="geko-jquery-ui-themes-base-all" src="##geko_core_uri##/external/styles/themes/base/ui.all.css" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-demos" src="##geko_core_uri##/external/styles/demos/demos.css" dependencies="geko-jquery-ui-themes-base-all" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-wp" src="##geko_core_uri##/external/styles/jquery-ui-wp.css" dependencies="geko-jquery-ui-themes-base-all" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-uploadify" src="##geko_core_uri##/external/styles/uploadify/style.css" jquery-ui-version="1.9.2" />
+		
+		
+		<!-- version independent styles -->
+		
+		<file id="geko-jquery-jcarousel" src="##geko_core_uri##/external/styles/jquery.jcarousel.css" />
+		<file id="geko-jquery-jscrollpane" src="##geko_core_uri##/external/styles/jquery.jscrollpane.css" />
+		<file id="geko-jquery-mobilymap" src="##geko_core_uri##/external/styles/mobilymap/style.css" />
+		<file id="geko-jquery-prettyphoto" src="##geko_core_uri##/external/styles/prettyPhoto/style.css" />
+		<file id="geko-jquery-scrollpath" src="##geko_core_uri##/external/styles/scrollpath/style.css" />
+		<file id="geko-jquery-smoothzoom" src="##geko_core_uri##/external/styles/smoothZoom/style.css" />
+		<file id="geko-jquery-weekcalendar" src="##geko_core_uri##/external/styles/weekcalendar/style.css" />
+		
+		<file id="geko-jquery-wpadmin" src="##geko_core_uri##/styles/wpadmin/style.css" />
+		<file id="geko-basic" src="##geko_core_uri##/styles/basic/style.css" />
+		
+		<!-- Geek Oracle PHP Extensions class-bound styles -->
+		<file id="geko_phpunit" src="##geko_core_uri##/styles/Geko/PhpUnit.css" dependencies="geko-basic" />
+		
+	</styles>
+	
+	
+</data>

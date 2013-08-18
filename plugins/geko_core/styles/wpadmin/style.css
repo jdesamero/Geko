@@ -1,0 +1,461 @@
+/* general */
+
+.fix {
+	clear: both;
+	height: 1px;
+	margin: 0 0 -1px 0;
+	overflow: hidden;
+}
+
+span.loading {
+	width: 16px;
+	height: 16px;
+	background: url('images/loader.gif') no-repeat;
+	display: inline-block;
+}
+
+
+/* tabs */
+
+.geko-wpadmin-tabs .ui-tabs-nav {
+	margin: 0 20px;
+	padding: 0;
+}
+
+.geko-wpadmin-tabs .ui-tabs-nav li {
+	margin: 0 2px -1px 2px;
+	border: solid 1px #dfdfdf;
+	background: none repeat scroll 0 0 #fbfbfb;
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
+	display: inline-block;
+	line-height: 16px;
+	padding: 4px 14px 6px;
+	text-shadow: 0 1px 0 #fff;
+}
+
+.geko-wpadmin-tabs .ui-tabs-nav li a {
+	font-family: 'Georgia', 'Times New Roman', 'Bitstream Charter', 'Times', 'serif';
+	font-size: 14px;
+	color: #aaa;
+	text-decoration: none;
+}
+
+.geko-wpadmin-tabs .ui-tabs-nav li.ui-state-active {
+	background: none repeat scroll 0 0 #f9f9f9;
+	border-bottom-color: #f9f9f9;
+	box-shadow: 0 1px 0 #fff inset;
+}
+
+.geko-wpadmin-tabs .ui-tabs-nav li.ui-state-active a {
+	color: #464646;
+}
+
+.geko-wpadmin-tabs .ui-tabs-nav li.add_menu {
+	float: right;
+}
+
+.geko-wpadmin-tabs .ui-tabs-nav li.add_menu a {
+	font-weight: bold;
+	cursor: pointer;
+	border-bottom: dotted 1px;
+}
+
+.geko-wpadmin-tabs .ui-tabs-panel {
+	margin: 0;
+	border: solid 1px #dfdfdf;
+	border-radius: 3px 3px 3px 3px;
+}
+
+.geko-wpadmin-tabs .ui-tabs-panel-header,
+.geko-wpadmin-tabs .ui-tabs-panel-footer,
+.geko-wpadmin-tabs .ui-tabs-panel-single {
+	padding: 4px 10px;
+	background-color: #f1f1f1;
+	background-image: -moz-linear-gradient( center top, #f9f9f9, #ececec );
+}
+
+.geko-wpadmin-tabs .ui-tabs-panel-header,
+.geko-wpadmin-tabs .ui-tabs-panel-single {
+	border-bottom: solid 1px #dfdfdf;
+}
+
+.geko-wpadmin-tabs .ui-tabs-panel-footer {
+	border-top: solid 1px #dfdfdf;
+}
+
+.geko-wpadmin-tabs .ui-tabs-panel-body {
+	padding: 4px 10px;
+}
+
+
+
+/* form builder */
+
+#form_editor div.icons span.spacer {
+	display: inline-block;
+	float: left;
+	width: 52px;
+	height: 26px;	
+}
+
+.geko-form-item {
+	background-color: #f1f1f1;
+	background-image: -moz-linear-gradient( center top, #f9f9f9, #ececec );
+	/* height: 32px; */
+	cursor: move;
+	border: solid 1px #dfdfdf;
+	box-shadow: 0 1px 0 #fff inset;
+	border-radius: 3px;
+	position: relative;
+}
+
+.geko-form-value {
+	background-color: #fff;
+	/* background-image: -moz-linear-gradient( center top, #fff, #f9f9f9 ); */
+	/* height: 32px; */
+	cursor: move;
+	border: solid 1px #dfdfdf;
+	box-shadow: 0 1px 0 #fff inset;
+	border-radius: 3px;
+	margin-left: 31px;
+	margin-right: 9px;
+	position: relative;
+}
+
+.geko-form-item .label,
+.geko-form-value .label {
+	display: inline-block;
+	margin: 6px 3px;
+	float: left;
+	overflow: hidden;
+	height: 20px;
+}
+
+.geko-form-expand-choices span,
+.geko-form-expand-widgets span,
+.geko-form-expand-items span {
+	display: block;
+	position: absolute;
+	top: 0;
+}
+
+.geko-form-expand-choices span,
+.geko-form-expand-items span {
+	right: 0;
+}
+
+.geko-form-expand-widgets span {
+	right: 30px;
+}
+
+.geko-form-value > .icons_container {
+	background-color: #fff;
+	position: absolute;
+	overflow: hidden;
+	right: 60px;
+}
+
+.geko-form-value > .icons_container > .icons {
+	position: relative;
+	overflow: hidden;
+}
+
+#form_editor .geko-form-value > .icons_container > .icons > .spacer {
+	width: 8px;
+}
+
+.geko-form-sub-items {
+	padding: 0 10px;
+}
+
+/* .geko-form-values-main {
+	margin-top: 3px;
+} */
+
+body.toplevel_page_Geko_Wp_Form_Manage #form_editor,
+body.toplevel_page_Geko_Wp_Form_Manage #meta_data_editor,
+body.toplevel_page_Geko_Wp_Form_Manage .dialog {
+	display: none;
+}
+
+
+
+
+.geko-form-icon {
+	display: inline-block;
+	margin: 3px;
+	float: left;
+	width: 26px;
+	height: 26px;
+	background-image: url( 'images/form_item_icons.png' );
+}
+
+.geko-form-icon-text {
+
+}
+
+.geko-form-icon-textarea {
+	background-position: 0 -26px;
+}
+
+.geko-form-icon-radio {
+	background-position: 0 -52px;
+}
+
+.geko-form-icon-checkbox,
+.geko-form-icon-checkbox_multi {
+	background-position: 0 -78px;
+}
+
+.geko-form-icon-select {
+	background-position: 0 -104px;
+}
+
+.geko-form-icon-select_multi {
+	background-position: 0 -130px;
+}
+
+.geko-form-icon-file {
+	background-position: -26px 0;
+}
+
+.geko-form-icon-password {
+	background-position: -26px -26px;
+}
+
+.geko-form-icon-plain_text {
+	background-position: -26px -52px;
+}
+
+.geko-form-icon-date {
+	background-position: -26px -78px;
+}
+
+.geko-form-icon-email {
+	background-position: -26px -104px;
+}
+
+.geko-form-icon-email {
+	background-position: -26px -130px;
+}
+
+.geko-form-icon-image {
+	background-position: -52px 0;
+}
+
+.geko-form-icon-telephone {
+	background-position: -52px -26px;
+}
+
+.geko-form-icon-logo {
+	background-position: -52px -52px;
+}
+
+.geko-form-icon-submit {
+	background-position: -52px -78px;
+}
+
+.geko-form-icon-captcha {
+	background-position: -52px -104px;
+}
+
+.geko-form-icon-footer {
+	background-position: -52px -130px;
+}
+
+.geko-form-icon-header {
+	background-position: -78px 0;
+}
+
+.geko-form-icon-spacer {
+	background-position: -78px -26px;
+}
+
+.geko-form-icon-break {
+	background-position: -78px -52px;
+}
+
+.geko-form-icon-number {
+	background-position: -78px -78px;
+}
+
+.geko-form-icon-heading {
+	background-position: -78px -104px;
+}
+
+.geko-form-icon-regex {
+	background-position: -78px -130px;
+}
+
+.geko-form-icon-edit {
+	background-position: -104px 0;
+}
+
+.geko-form-icon-remove {
+	background-position: -104px -26px;
+}
+
+.geko-form-icon-show-items {
+	background-position: -104px -52px;
+}
+
+.geko-form-icon-hide-items {
+	background-position: -104px -78px;
+}
+
+.geko-form-icon-show-widgets {
+	background-position: -104px -104px;
+}
+
+.geko-form-icon-hide-widgets {
+	background-position: -104px -130px;
+}
+
+
+#dialog_field_templates {
+	display: none;
+}
+
+
+
+/* dialog */
+
+.ui-widget-overlay {
+	position: fixed;
+	left: 0;
+	top: 0;
+	background: url( 'images/macFFBgHack.png' );
+	height: 100%;
+	width: 100%;
+}
+
+.ui-dialog {
+	border-radius: 3px;
+	padding: 0;
+	margin: 0;
+    background: none repeat scroll 0 0 #fff;
+    border: 1px solid #555;
+    box-shadow: 0 4px 30px #000;
+    color: #000;
+    left: 50%;
+    position: fixed;
+    text-align: left;
+    top: 50%;
+    z-index: 102;
+}
+
+.ui-dialog fieldset {
+	border: 0;
+	margin: 20px 0;
+	padding: 12px;
+}
+
+.ui-dialog label,
+.ui-dialog input,
+.ui-dialog textarea {
+	display: block;
+	width: 95%;
+}
+
+.ui-dialog .ui-dialog-titlebar {
+	background-color: #222;
+	color: #cfcfcf;
+	height: 27px;
+	font-size: 12px;
+	font-family: 'Lucida Grande', 'Verdana', 'Arial', 'sans-serif';
+}
+
+.ui-dialog .ui-dialog-title {
+	float: left;
+    padding: 6px 10px 0;
+}
+
+.ui-dialog .ui-dialog-titlebar-close span {
+	display: block;
+	float: right;
+	width: 15px;
+	height: 15px;
+	background: url( 'images/tb-close.png' ) no-repeat;
+	overflow: hidden;
+	text-indent: -99999px;
+	margin: 6px 10px 0;
+}
+
+.ui-widget-content .ui-icon {
+    background-image: url( '../themes/base/images/ui-icons_222222_256x240.png' );
+    background-position: -80px -224px;
+}
+.ui-dialog .ui-resizable-se {
+    bottom: 3px;
+    height: 14px;
+    right: 3px;
+    width: 14px;
+}
+
+.ui-resizable-handle {
+    display: block;
+    font-size: 0.1px;
+    position: absolute;
+}
+
+.ui-dialog .multiple input,
+.ui-dialog .multiple label {
+	width: auto;
+	display: inline-block;
+}
+
+.ui-dialog fieldset > div {
+	margin-top: 9px;
+	margin-bottom: 9px;
+}
+
+.ui-dialog fieldset > div > div.multiple {
+	padding-left: 12px;
+}
+
+.ui-dialog fieldset div input[type='checkbox'],
+.ui-dialog fieldset div input[type='radio'],
+.ui-dialog fieldset div label.radio {
+	width: auto;
+	display: inline-block;
+	margin-left: 12px;
+}
+
+
+/* sortable */
+
+.ui-sortable tr {
+	cursor: pointer;
+}
+
+
+
+
+.btn_spacer {
+	height: 10px;
+	width: 30px;
+	display: inline-block;
+}
+
+
+/* #cc0000 #ffebe8 */
+
+.ui-dialog textarea.error,
+.ui-dialog input[type="text"].error,
+.ui-dialog input[type="password"].error,
+.ui-dialog input[type="file"].error,
+.ui-dialog input[type="email"].error,
+.ui-dialog input[type="number"].error,
+.ui-dialog input[type="search"].error,
+.ui-dialog input[type="tel"].error,
+.ui-dialog input[type="url"].error,
+select.error {
+    border-color: #cc0000;
+}
+
+.ui-dialog label.error {
+    color: #cc0000;
+}
+
+

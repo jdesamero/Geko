@@ -1,0 +1,392 @@
+/*
+Theme Name: Base Theme with Login
+Theme URI: http://www.geekoracle.com
+Description: Base Wordpress Theme with Login/Registration/Password Reset for Geek Oracle Projects
+Version: TRUNK
+Author: Geek Oracle
+Author URI: http://www.geekoracle.com
+*/
+
+html * {
+	margin: 0 auto;
+	padding: 0;
+	font-family: arial, helvetica, sans-serif;
+}
+
+html {
+	height: 100%;
+}
+
+body {
+	background-color: #fff;
+	height: 100%;
+}
+
+div.clear {
+	clear: both;
+}
+
+a {
+	color: blue;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a.current_item {
+	font-weight: bold;
+	color: darkblue;
+}
+
+img {
+	border: 0;
+}
+
+p {
+	margin: 1em auto;
+}
+
+ul {
+	padding-left: 40px;
+}
+
+.fix {
+	clear: both;
+	height: 1px;
+	margin: 0 0 -1px 0;
+	overflow: hidden;
+}
+
+a, object {				/* remove outlines in firefox */
+	outline: none;
+}
+
+/* hide these */
+
+div.mapp-poweredby,
+p#ll.linklove {
+	display: none;
+}
+
+#outer {
+	width: 999px;
+	height: 100%;
+	border: 0;
+	border-collapse: collapse;
+}
+
+#outer td.top {
+	vertical-align: top;
+}
+
+#outer td.bottom {
+	vertical-align: bottom;
+}
+
+
+
+#wrapper {
+	margin-top: 25px;
+	margin-bottom: 25px;
+}
+
+#topnav {
+
+}
+
+
+#header {
+	margin: 0 0 12px 0;
+	position: relative;
+	height: 100px;
+}
+
+#header .logo {
+	position: absolute;
+	left: 0;
+}
+
+#login {
+	position: absolute;
+	right: 300px;
+}
+
+.loginform th {
+	text-align: left;
+	padding-right: 9px;
+	font-size: 14px;
+}
+
+.loginform td.center {
+	text-align: center;
+}
+
+#search {
+	position: absolute;
+	right: 0;
+	top: 26px;
+}
+
+
+
+#mainnav {
+	margin-top: 25px;
+}
+#container {
+	clear: both;
+}
+#content {
+	width: 666px;
+	float: right;
+}
+#post {
+	border-left-width: 1px;
+	border-left-style: solid;
+	border-left-color: #000;
+	padding-left: 25px;
+}
+#homeboxes {
+	margin-top: 25px;
+}
+.homesepline {
+	border-left-width: 1px;
+	border-left-style: solid;
+	border-left-color: #000;
+}
+.boxcontent {
+	font-size: 12px;
+	padding-right: 20px;
+	padding-left: 20px;
+}
+.boxcontent h1 {
+	font-weight: normal;
+}
+.boxlinkout {
+	float: right;
+}
+/* Navigations */
+
+/* Top Nav */
+
+#topnav {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	text-align: right;
+}
+#topnav li {
+	display: inline;
+	padding: 0;
+	margin: 0;
+}
+#topnav li:before {
+	content: "| ";
+}
+#topnav li:first-child:before {
+	content: "";
+}
+/*IE workaround*/
+/*All IE browsers*/
+* html #topnav li {
+	border-left: 1px solid black;
+	padding: 0 0.4em 0 0.4em;
+	margin: 0 0.4em 0 -0.4em;
+}
+/*Win IE browsers - hide from Mac IE\*/
+* html #topnav {
+	height: 1%;
+}
+* html #topnav li {
+	display: block;
+	float: left;
+}
+/*End hide*/
+/*Mac IE 5*/
+* html #topnav li:first-child {
+	border-left: 0;
+}
+/* Main Nav */
+
+#mainnav {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	text-align: right;
+}
+#mainnav li {
+	display: inline;
+	padding: 0;
+	margin: 0;
+}
+#mainnav li:before {
+	content: "| ";
+}
+#mainnav li:first-child:before {
+	content: "";
+}
+/*IE workaround*/
+/*All IE browsers*/
+* html #mainnav li {
+	border-left: 1px solid black;
+	padding: 0 0.4em 0 0.4em;
+	margin: 0 0.4em 0 -0.4em;
+}
+/*Win IE browsers - hide from Mac IE\*/
+* html #mainnav {
+	height: 1%;
+}
+* html #mainnav li {
+	display: block;
+	float: left;
+}
+/*End hide*/
+/*Mac IE 5*/
+* html #mainnav li:first-child {
+	border-left: 0;
+}
+/* Bottom Nav */
+
+
+#bottomnav {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	text-align: left;
+	float: left;
+}
+#bottomnav li {
+	display: inline;
+	padding: 0;
+	margin: 0;
+}
+#bottomnav li:before {
+	content: "| ";
+}
+#bottomnav li:first-child:before {
+	content: "";
+}
+
+
+#topnav ul,
+#mainnav ul,
+#bottomnav ul {
+	padding-left: 0;
+}
+
+
+/*IE workaround*/
+/*All IE browsers*/
+* html #bottomnav li {
+	border-left: 1px solid black;
+	padding: 0 0.4em 0 0.4em;
+	margin: 0 0.4em 0 -0.4em;
+}
+/*Win IE browsers - hide from Mac IE\*/
+* html #bottomnav {
+	height: 1%;
+}
+* html #bottomnav li {
+	display: block;
+	float: left;
+}
+/*End hide*/
+/*Mac IE 5*/
+* html #bottomnav li:first-child {
+	border-left: 0;
+}
+/* Navigations */
+
+
+
+
+
+
+
+#footer {
+	clear: both;
+	border-top: solid 1px #000;
+	margin: 25px 0 0 0;
+	padding: 15px 0;
+}
+.bottomcopy {
+	float: right;
+}
+.copyright {
+	float: left;
+	padding-right: 10px;
+}
+.blogo {
+	float: right;
+}
+#comments {
+	clear: both;
+}
+form#commentform .form-label {
+	margin: 1em 0 0;
+}
+form#commentform span.req-field {
+	color: red;
+}
+form#commentform, form#commentform p {
+	padding: 0;
+}
+.comments ol li {
+	list-style-position: inside;
+}
+textarea#comment {
+	overflow: auto;
+}
+li.comment {
+	padding: 20px 0 0;
+}
+li.comment.bypostauthor {
+	background: #cbc4ab;
+}
+#respond {
+}
+#comments ol {
+	margin: 0;
+}
+.comment-author {
+}
+
+
+
+
+/* ajax form styles */
+
+.error_field {
+	border: solid 1px red;
+}
+
+.error {
+	color: red;
+}
+
+.success {
+	color: blue;
+}
+
+.loading {
+	display: none;
+}
+
+#successdiv {
+	display: none;
+}
+
+
+
+/* testing styles */
+
+.entry-content img.test {
+	width: 200px;
+	height: 125px;
+	border: 0;
+	float: left;
+	padding: 0 18px 6px 0;
+}
+
+

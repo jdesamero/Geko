@@ -1,0 +1,31 @@
+div.geko_phpunit h2 {
+	float: left;		
+	display: inline-block;
+}
+
+div.geko_phpunit a.details {
+	float: left;
+	display: inline-block;
+	padding: 26px 0 0 23px;
+}
+
+ul.geko_phpunit.jumplinks .not_implemented,
+ul.geko_phpunit.jumplinks .skipped,
+ul.geko_phpunit.jumplinks .failure,
+ul.geko_phpunit.jumplinks .error {
+	font-style: italic;
+	color: red;
+}
+
+/* regular mode styles */
+
+body.regular table.geko_phpunit.messages {
+	display: none;
+}
+
+/* compact mode styles */
+
+body.compact table.geko_phpunit.results tr.messages {
+	display: none;
+}
+
