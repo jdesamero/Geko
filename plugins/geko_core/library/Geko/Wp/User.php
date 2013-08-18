@@ -102,7 +102,7 @@ class Geko_Wp_User extends Geko_Wp_Entity
 	
 	//
 	public function getEditUrl() {
-		return get_bloginfo( 'url' ) . '/wp-admin/user-edit.php?user_id=' . $this->getId();
+		return sprintf( '%s?user_id=%d', Geko_Uri::getUrl( 'wp_user_edit' ), $this->getId() );
 	}
 	
 	// !!! show_latest_post_date = TRUE must be defined for query
