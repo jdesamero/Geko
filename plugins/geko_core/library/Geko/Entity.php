@@ -618,7 +618,12 @@ abstract class Geko_Entity
 		
 		$sValue = $this->getMeta( $sMetaKey );
 		
-		if ( $sValue ) return Zend_Json::decode( $sValue );
+		try {
+			if ( $sValue ) return Zend_Json::decode( $sValue );
+		} catch ( Exception $e ) {
+			return NULL;		
+		}
+		
 		return NULL;
 	}
 	
