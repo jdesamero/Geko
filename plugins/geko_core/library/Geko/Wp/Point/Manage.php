@@ -559,6 +559,35 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 	}
 	
 	
+	//
+	public function getPoints( $mUserIdOrEmail ) {
+		
+		global $wpdb;
+		
+		if ( preg_match( '/^[0-9]+$/', $mUserIdOrEmail ) ) {
+			$iUserId = $mUserIdOrEmail;
+			if ( !get_userdata( $iUserId ) ) {
+				return FALSE;
+			}
+		} else {
+			$sEmail = $mUserIdOrEmail;
+			if ( !$iUserId = email_exists( $sEmail ) ) {
+				return FALSE;
+			}
+		}
+		
+		$oPointsQuery = new Geko_Sql_Select();
+		$oPointsQuery
+			->field( 'SUM( CAST( p.value AS SIGNED ) )' )
+			->from( $wpdb->geko_point, 'p' )
+			->where( 'p.user_id = ?', $iUserId )
+			->where( 'p.approve_status_id = 1' )		// hard-code for now
+		;
+		
+		return intval( $wpdb->get_var( strval( $oPointsQuery ) ) );
+	}
+	
+	
 	// delete user
 	public function deleteUser( $iUserId ) {
 		
