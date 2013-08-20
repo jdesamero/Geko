@@ -1,21 +1,10 @@
 <?php
 
 //
-class Geko_Wp_Layout extends Geko_Layout
+class Geko_Layout extends Geko_Singleton_Abstract
 {
-	
-	const URL = 1;
-	const REPLACE = 2;							// replacement pattern is stripped if in the default language
-	const FORCE_REPLACE = 3;					// replacement pattern is set always
-	
-	
-	
-	protected $_aUnprefixedActions = array(
-		'get_header', 'wp_head', 'get_sidebar', 'wp_footer', 'get_footer'
-	);
-	protected $_aUnprefixedFilters = array( 'body_class', 'post_class' );
-	
-	protected $_sRenderer = 'Geko_Wp_Layout_Renderer';
+	protected $_sRenderer = 'Geko_Layout_Renderer';
+	protected $_aParams = array();
 	
 	protected $_aMapMethods = array(
 		
@@ -27,319 +16,251 @@ class Geko_Wp_Layout extends Geko_Layout
 		'pn' => array( 'Geko_String', 'printNumberFormat' ),
 		'tm' => array( 'Geko_String', 'mbTrim' ),
 		
-		'pf' => array( 'Geko_Html', 'populateForm' ),
-		
-		'is' => array( 'Geko_Wp', 'is' ),
-		
-		'listCats' => 'wp_list_cats',
-		'listArchives' => 'wp_get_archives',
-		'listAuthors' => 'wp_list_authors',
-		'listBookmarks' => 'wp_list_bookmarks',
-		'tagCloud' => 'wp_tag_cloud'
+		'pf' => array( 'Geko_Html', 'populateForm' )
 		
 	);
 	
-	protected $_aTranslatedValues = array();
+	protected $_bIntrospect = FALSE;
+	protected $_aExcludeFromIntrospection = array();
 	
-	protected $_aTemplates = array();
+	//
+	public function init( $bUnshift = FALSE ) {
+		
+		$oRenderer = Geko_Singleton_Abstract::getInstance( $this->_sRenderer );
+		
+		if ( $bUnshift ) {
+			$oRenderer->addLayoutUnshift( $this );
+		} else {
+			$oRenderer->addLayout( $this );
+		}
+		
+		return $this;
+	}
 	
-	protected $_aLinks = array();
 	
+	
+	// labels
+	
+	//
+	public function _getLabel( $iIdx ) {
+		return $this->_aLabels[ $iIdx ];
+	}
+	
+	//
+	public function _getLabels() {
+		return $this->_aLabels;
+	}
+	
+	
+	
+	// used to trigger methods implemented by concrete classes to determine
+	// "constant" values triggered by certain functions so certain admin
+	// functionality can be automated
+	// DEPRACATED: Can break things easily when called
+	public function introspect() {
+		
+		// set introspect mode
+		$this->_bIntrospect = TRUE;
+		
+		$sClass = get_class( $this );
+		
+		$oReflect = new ReflectionClass( $sClass );
+		
+		$aMethods = $oReflect->getMethods();
+		
+		foreach ( $aMethods as $oMethod ) {
+			if (
+				( $oMethod->isPublic() ) && 
+				( 0 == $oMethod->getNumberOfRequiredParameters() ) && 
+				( $sMethod = $oMethod->getName() ) && 
+				( $sClass == $oMethod->getDeclaringClass()->getName() ) && 
+				( !in_array( $sMethod, $this->_aExcludeFromIntrospection ) )
+			) {
+				// invoke method to trigger introspection
+				ob_start();
+				$oMethod->invoke( $this );
+				ob_end_clean();
+			}
+		}
+		
+		// unset introspect mode
+		$this->_bIntrospect = FALSE;
+		
+	}
 	
 	
 	//// helpers
 	
 	//
 	public function resolveClass( $sClass ) {
-		return Geko_Class::existsCoalesce( $sClass, 'Gloc_' . $sClass, 'Geko_Wp_' . $sClass );
+		return Geko_Class::existsCoalesce( $sClass, 'Geko_' . $sClass );
 	}
 	
 	//
 	public function escapeHtml( $sValue ) {
-		return wp_specialchars( $sValue, 1 );
-	}
-	
-	
-	//// language translation handling
-	
-	//
-	public function _t( $sValue = '', $iFlag = NULL ) {
-		
-		if ( $this->_bIntrospect && $sValue && ( NULL === $iFlag ) ) {
-			
-			// introspection mode, so track what was called
-			$this->_aTranslatedValues[ $sValue ] = TRUE;
-			return NULL;
-			
-		}
-		
-		$oResolver = Geko_Wp_Language_Resolver::getInstance();
-		$oLangMgmt = Geko_Wp_Language_Manage::getInstance();
-		
-		if ( !$sValue ) return $oResolver->getCurLang( FALSE );
-		
-		$sCurLang = $oResolver->getCurLang();
-		
-		if ( ( self::REPLACE == $iFlag ) || ( self::FORCE_REPLACE == $iFlag ) ) {
-			
-			// look for replacement pattern
-			$aRegs = array();
-			if ( preg_match( '/##(.+)##/', $sValue, $aRegs ) ) {
-				
-				if ( self::FORCE_REPLACE == $iFlag ) {
-					// force lang code value if current language is empty
-					if ( !$sCurLang ) $sCurLang = $oLangMgmt->getDefLangCode();
-				} else {
-					// if lang code is default then make it empty
-					if ( $sCurLang && ( $sCurLang == $oLangMgmt->getDefLangCode() ) ) $sCurLang = '';				
-				}
-				
-				$sToReplace = $aRegs[ 0 ];
-				$sReplaceWith = ( $sCurLang ) ? str_replace( '[lang]', $sCurLang, $aRegs[ 1 ] ) : '';
-				return str_replace( $sToReplace, $sReplaceWith, $sValue );
-			}
-			
-		}
-		
-		if ( $sCurLang ) {
-			
-			if ( self::URL == $iFlag ) {
-				
-				$oUrl = new Geko_Uri( $sValue );
-				$oUrl->setVar( 'lang', $sCurLang );
-				return strval( $oUrl );
-				
-			} else {
-			
-				if ( !$this->_aTranslatedValues ) {
-					
-					$this->_aTranslatedValues = array();
-					
-					$iLangId = $oLangMgmt->getLanguage( $sCurLang )->getId();
-					$aStrings = new Geko_Wp_Language_String_Query( array( 'lang_id' => $iLangId ) );
-					
-					foreach ( $aStrings as $oString ) {
-						$this->_aTranslatedValues[ $oString->getKeyId() ] = $oString->getContent();
-					}
-					
-				}
-				
-				$iKeyId = Geko_Wp_Options_MetaKey::getId( $sValue );
-				
-				if ( $this->_aTranslatedValues[ $iKeyId ] ) {
-					return $this->_aTranslatedValues[ $iKeyId ];
-				}
-			
-			}
-			
-		}
-		
-		return $sValue;
-	}
-	
-	//
-	public function _e( $sValue = '', $iFlag = NULL ) {
-		echo $this->_t( $sValue, $iFlag );
-	}
-	
-	//
-	public function getTranslatedValues() {
-		return $this->_aTranslatedValues;
-	}
-	
-	// translate labels
-	public function _getLabel( $iIdx ) {
-		return $this->_t( parent::_getLabel( $iIdx ) );
-	}
-	
-	//
-	public function _getLabels() {
-		$aLabels = parent::_getLabels();
-		$aRet = array();
-		foreach ( $aLabels as $iIdx => $sValue ) {
-			$aRet[ $iIdx ] = $this->_t( $sValue );
-		}
-		return $aRet;
-	}
-	
-	//
-	public function getScriptUrls( $aOther = NULL ) {
-		return Geko_Wp::getScriptUrls( $aOther );
+		return htmlspecialchars( $sValue );
 	}
 	
 	
 	
 	
-	//// template routing methods
-	
-	// usage: addTemplate( <some template>, <grouping 1>, <grouping 2>, ... <n> )
-	public function addTemplate() {
-		
-		$aArgs = func_get_args();
-		
-		$sTemplate = array_shift( $aArgs );
-		
-		$this->_aTemplates[ $sTemplate ] = $aArgs;
-		
-		return $this;
-	}
-	
-	// usage: getTemplates( <grouping 1>, <grouping 2>, ... <n> )
-	public function getTemplates() {
-
-		$aArgs = func_get_args();
-		$aRet = array();
-		
-		foreach ( $this->_aTemplates  as $sTemplate => $aGroup ) {
-			$bMatch = TRUE;
-			foreach ( $aArgs as $sMatchGroup ) {
-				if ( !in_array( $sMatchGroup, $aGroup ) ) {
-					$bMatch = FALSE;
-					break;
-				}
-			}
-			if ( $bMatch ) $aRet[] = $sTemplate;
-		}
-		
-		return $aRet;
-	}
-	
-	// same as getTemplates(), return imploded string
-	public function getTemplateList() {
-		$aArgs = func_get_args();
-		$aRet = call_user_func_array( array( $this, 'getTemplates' ), $aArgs );
-		return implode( '|', $aRet );
-	}
-	
-	// convenience method
-	public function isTemplateList() {
-		$aArgs = func_get_args();
-		return $this->is(
-			call_user_func_array( array( $this, 'getTemplateList' ), $aArgs )
-		);
-	}
-	
-	//
-	public function getTemplateGrouping() {
-		foreach ( $this->_aTemplates as $sTemplate => $aGroup ) {
-			if ( $this->is( $sTemplate ) ) {
-				return $aGroup;
-			}
-		}
-		return array();
-	}
-	
-	
-	
-	
-	
-	//// link methods
-	
-	//
-	public function addLink( $sKey, $aLink ) {
-		$this->_aLinks[ $sKey ] = $aLink;
-		return $this;
-	}
-	
-	//
-	public function echoLinks() {
-		
-		$aArgs = func_get_args();
-		
-		if ( count( $aArgs ) == 0 ) {
-			$aLinkKeys = array_keys( $this->_aLinks );		
-		} elseif ( is_array( $aArgs[ 0 ] ) ) {
-			$aLinkKeys = $aArgs[ 0 ];
-		} else {
-			$aLinkKeys = $aArgs;
-		}
-		
-		$oA = new Geko_Html_Element_A();
-		
-		if ( count( $aLinkKeys ) > 0 ): ?>
-			<p><?php foreach ( $aLinkKeys as $i => $sKey ) {
-				$aLink = $this->_aLinks[ $sKey ];
-				if ( 0 != $i ) echo ' | ';
-				$oA
-					->reset()
-					->_setAtts( $aLink )
-					->append( $aLink[ 'title' ] )
-				;
-				echo strval( $oA );
-			} ?></p>
-		<?php endif;
-		
-	}
-	
-	
-	
-	
-	
-	//// ajax content methods
-	
-	//
-	public function echoAjaxContent() {
-		
-		$sSection = trim( $_GET[ 'section' ] );
-		$sMethod = '';
-		
-		if ( $sSection ) {
-			$sMethod = sprintf( 'get%sAjax', Geko_Inflector::camelize( $sSection ) );
-			if ( !method_exists( $this, $sMethod ) ) $sMethod = '';
-		}
-		
-		if ( $sMethod ) {
-			$aAjaxResponse = $this->$sMethod();
-			echo Zend_Json::encode( $aAjaxResponse );
-		}
-	}
-	
-	
-	
-	
-	
-	//// magic methods
 	
 	//
 	public function __call( $sMethod, $aArgs ) {
 		
-		if ( 0 === strpos( strtolower( $sMethod ), 'do' ) ) {
+		if ( array_key_exists( $sMethod, $this->_aMapMethods ) ) {
 			
-			$sAction = Geko_Inflector::underscore(
-				substr_replace( $sMethod, '', 0, 2 )
+			return call_user_func_array(
+				$this->_aMapMethods[ $sMethod ],
+				$aArgs
 			);
 			
-			if ( !in_array( $sAction, $this->_aUnprefixedActions ) ) {
-				$sAction = 'theme_' . $sAction;
+		} elseif ( 0 === strpos( strtolower( $sMethod ), 'do' ) ) {
+			
+			call_user_func_array(
+				array(
+					Geko_Singleton_Abstract::getInstance( $this->_sRenderer ),
+					$sMethod
+				),
+				$aArgs
+			);
+			
+			return TRUE;
+
+		} elseif ( 0 === strpos( strtolower( $sMethod ), 'ob' ) ) {
+			
+			// send as do*() to renderer
+			$sCall = substr_replace( $sMethod, 'do', 0, 2 );
+			
+			ob_start();
+			call_user_func_array(
+				array(
+					Geko_Singleton_Abstract::getInstance( $this->_sRenderer ),
+					$sCall
+				),
+				$aArgs
+			);
+			$sRes = ob_get_contents();
+			ob_end_clean();
+			
+			return $sRes;
+			
+		} elseif ( 0 === strpos( strtolower( $sMethod ), 'apply' ) ) {
+			
+			return call_user_func_array(
+				array(
+					Geko_Singleton_Abstract::getInstance( $this->_sRenderer ),
+					$sMethod
+				),
+				$aArgs
+			);
+			
+		} elseif ( 0 === strpos( $sMethod, 'get' ) ) {
+			
+			// attempt to call echo*() method if it exists
+			$sCall = substr_replace( $sMethod, 'echo', 0, 3 );
+			
+			if ( method_exists( $this, $sCall ) ) {
+				
+				ob_start();
+				call_user_func_array( array( $this, $sCall ), $aArgs );				
+				$sRes = ob_get_contents();
+				ob_end_clean();
+				
+				return $sRes;
+				
+			} else {
+
+				$sParamKey = Geko_Inflector::underscore(
+					substr_replace( $sMethod, '', 0, 3 )
+				);
+				
+				if ( isset( $this->_aParams[ $sParamKey ] ) ) {
+					return $this->_aParams[ $sParamKey ];
+				} else {
+					return NULL;
+				}
+				
 			}
 			
-			parent::__call( $sMethod, $aArgs );
+		} elseif ( 0 === strpos( strtolower( $sMethod ), 'echo' ) ) {
 			
-			do_action_ref_array( $sAction, $aArgs );
+			// echo results from get*() method if it exists
+			$sCall = substr_replace( $sMethod, 'get', 0, 4 );
+			
+			if ( method_exists( $this, $sCall ) ) {
+				
+				$mRes = call_user_func_array( array( $this, $sCall ), $aArgs );
+				echo strval( $mRes );
+				return TRUE;
+			
+			} else {
+				
+				$sParamKey = Geko_Inflector::underscore(
+					substr_replace( $sMethod, '', 0, 3 )
+				);
+				
+				if ( isset( $this->_aParams[ $sParamKey ] ) ) {
+					echo strval( $this->_aParams[ $sParamKey ] );
+					return TRUE;
+				} else {
+					return FALSE;
+				}
+				
+			}
+			
+		} elseif ( 0 === strpos( strtolower( $sMethod ), 'set' ) ) {
+			
+			$sParamKey = Geko_Inflector::underscore(
+				substr_replace( $sMethod, '', 0, 3 )
+			);
+			
+			$this->_aParams[ $sParamKey ] = $aArgs[ 0 ];
+			return $this;
+			
+		} elseif ( 0 === strpos( strtolower( $sMethod ), 'new' ) ) {
+			
+			$sClass = substr_replace( $sMethod, '', 0, 3 );
+			
+			if ( $sClass = $this->resolveClass( $sClass ) ) {
+				$oReflect = new ReflectionClass( $sClass );
+				return $oReflect->newInstanceArgs( $aArgs );
+			}
 			
 			return NULL;
 			
-		} elseif ( 0 === strpos( strtolower( $sMethod ), 'apply' ) ) {
-
-			$sFilter = Geko_Inflector::underscore(
-				substr_replace( $sMethod, '', 0, 5 )
-			);
+		} elseif ( 0 === strpos( strtolower( $sMethod ), 'one' ) ) {
 			
-			if ( !in_array( $sFilter, $this->_aUnprefixedFilters ) ) {
-				$sFilter = 'theme_' . $sFilter;
+			$sClass = substr_replace( $sMethod, '', 0, 3 );
+			
+			if ( $sClass = $this->resolveClass( $sClass ) ) {
+				$oReflect = new ReflectionClass( $sClass );
+				$oQuery = $oReflect->newInstanceArgs( $aArgs );
+				if ( $oQuery instanceof Geko_Entity_Query ) {
+					return $oQuery->getOne();
+				}
 			}
 			
-			$mRes = parent::__call( $sMethod, $aArgs );
-			$aArgs[ 0 ] = $mRes;
+			return NULL;
 			
-			return apply_filters_ref_array( $sFilter, $aArgs );
+		} elseif ( 0 === strpos( $sMethod, 'l_' ) ) {
+			
+			$iIdx = str_replace( 'l_', '', $sMethod );
+			return $this->_getLabel( $iIdx );
+			
+		} elseif ( 0 === strpos( $sMethod, 'e_' ) ) {
+			
+			$iIdx = str_replace( 'e_', '', $sMethod );
+			echo $this->_getLabel( $iIdx );
+			return NULL;
 			
 		}
+
+		// TO DO: add mechanism for "layout helpers"
 		
-		return parent::__call( $sMethod, $aArgs );
+		throw new Exception( 'Invalid method ' . __CLASS__ . '::' . $sMethod . '() called.' );
 	}
 	
-	
-	
 }
+
 

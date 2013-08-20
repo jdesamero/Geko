@@ -162,6 +162,10 @@ class Geko_Wp_Layout extends Geko_Layout
 		return $aRet;
 	}
 	
+	//
+	public function getScriptUrls( $aOther = NULL ) {
+		return Geko_Wp::getScriptUrls( $aOther );
+	}
 	
 	
 	
