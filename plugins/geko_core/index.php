@@ -79,7 +79,9 @@ Geko_Uri::setUrl( array(
 	'geko_process' => GEKO_CORE_URI . '/srv/process.php',
 	'geko_thumb' => GEKO_CORE_URI . '/srv/thumb.php',
 	'geko_upload' => GEKO_CORE_URI . '/srv/upload.php',
-	'geko_styles' => GEKO_CORE_URI . '/styles'
+	'geko_styles' => GEKO_CORE_URI . '/styles',
+	'geko_ext_styles' => GEKO_CORE_URI . '/external/styles',
+	'geko_ext_swf' => GEKO_CORE_URI . '/swf'
 ) );
 
 

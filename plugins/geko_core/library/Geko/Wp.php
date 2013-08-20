@@ -416,6 +416,36 @@ class Geko_Wp
 		return self::$aStandardPlaceholders;
 	}
 	
+	//
+	public static function getScriptUrls( $aOther = NULL ) {
+		
+		$oUrl = Geko_Uri::getGlobal();
+		
+		$aRet = array(
+
+			'export' => Geko_Uri::getUrl( 'geko_export' ),
+			'pdf' => Geko_Uri::getUrl( 'geko_pdf' ),
+			'process' => Geko_Uri::getUrl( 'geko_process' ),
+			'thumb' => Geko_Uri::getUrl( 'geko_thumb' ),
+			'upload' => Geko_Uri::getUrl( 'geko_upload' ),
+			
+			'styles' => Geko_Uri::getUrl( 'geko_styles' ),
+			'ext_styles' => Geko_Uri::getUrl( 'geko_ext_styles' ),
+			'ext_swf' => Geko_Uri::getUrl( 'geko_ext_swf' ),
+			
+			'curpage' => strval( $oUrl ),
+			'template_dir' => get_bloginfo( 'template_directory' ),
+			'url' => get_bloginfo( 'url' )
+
+		);
+		
+		if ( is_array( $aOther ) ) {
+			$aRet = array_merge( $aRet, $aOther );
+		}
+		
+		return $aRet;	
+	}
+	
 	
 }
 
