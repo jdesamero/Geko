@@ -193,10 +193,12 @@
 		<file id="geko-jquery-jcarousel-simple" src="##geko_core_uri##/external/js/jquery.jcarousel-simple.js" dependencies="jquery" />
 		<file id="geko-jquery-jcarousellite" src="##geko_core_uri##/external/js/jquery.jcarousellite_1.0.1.min.js" dependencies="geko-jquery-easing" />
 		<file id="geko-jquery-jeditable" src="##geko_core_uri##/external/js/jquery.jeditable.js" dependencies="jquery" />
+		<file id="geko-jquery-jscrollbar" src="##geko_core_uri##/external/js/jquery.jScrollbar.min.js" dependencies="geko-jquery-ui-draggable geko-jquery-mousewheel" />
 		<file id="geko-jquery-jscrollpane" src="##geko_core_uri##/external/js/jquery.jscrollpane.min.js" dependencies="jquery" />
 		<file id="geko-jquery-media" src="##geko_core_uri##/external/js/jquery.media.js" dependencies="jquery geko-jquery-metadata" />
 		<file id="geko-jquery-metadata" src="##geko_core_uri##/external/js/jquery.metadata.js" dependencies="jquery" />
 		<file id="geko-jquery-mobilymap" src="##geko_core_uri##/external/js/jquery.mobilymap.js" dependencies="jquery" />
+		<file id="geko-jquery-mousewheel" src="##geko_core_uri##/external/js/jquery-mousewheel.js" dependencies="jquery" />
 		<file id="geko-jquery-pngfix" src="##geko_core_uri##/external/js/jquery.pngFix.js" dependencies="jquery" />
 		<file id="geko-jquery-popupwindow" src="##geko_core_uri##/external/js/jquery.popupWindow.js" dependencies="jquery" />
 		<file id="geko-jquery-prettyphoto" src="##geko_core_uri##/external/js/jquery.prettyPhoto.3.0.3.js" dependencies="jquery" />
@@ -299,6 +301,7 @@
 		<!-- version independent styles -->
 		
 		<file id="geko-jquery-jcarousel" src="##geko_core_uri##/external/styles/jquery.jcarousel.css" />
+		<file id="geko-jquery-jscrollbar" src="##geko_core_uri##/external/styles/jScrollbar/style.css" />
 		<file id="geko-jquery-jscrollpane" src="##geko_core_uri##/external/styles/jquery.jscrollpane.css" />
 		<file id="geko-jquery-mobilymap" src="##geko_core_uri##/external/styles/mobilymap/style.css" />
 		<file id="geko-jquery-prettyphoto" src="##geko_core_uri##/external/styles/prettyPhoto/style.css" />

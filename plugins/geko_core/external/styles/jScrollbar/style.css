@@ -1,0 +1,118 @@
+.clear {
+	clear:both;
+	height:0
+}
+
+/* Main Scroller */
+
+
+.jScrollbar { /* main container */
+	width: 645px;
+	border-right: 1px solid #929497;
+	border-bottom: 12px solid #5d798d;
+	height: 423px;
+	overflow: hidden;
+	position: relative;
+	padding-bottom: 40px;
+}
+
+.jScrollbar .jScrollbar_mask { /* text container */
+	width: 562px;
+	position: relative;
+	top: 0;
+	margin-left: 30px;
+}
+
+.jScrollbar .jScrollbar_draggable { /* slider container */
+	float: right;
+	width: 10px;
+	height: 423px;
+	overflow: hidden;
+	background: transparent;
+	position: relative;
+	top: 20px;
+}
+
+.jScrollbar .jScrollbar_draggable a.draggable { /** draggable **/
+	position: relative;
+	background-color: #5d798d;
+	display: block;
+	height: 10px;
+	width: 10px;
+	cursor: s-resize;
+}
+
+/* Learn Scrollers */
+
+
+/* Blog */
+
+.jScrollbarBlogNav,
+.jScrollbarBlog {
+	width: 732px;
+	height: 700px;
+	border-bottom: none;
+}   
+
+.jScrollbarBlogNav {
+	width: 220px;
+}
+
+.jScrollbarBlog .jScrollbar_mask {
+	width: 702px;
+	margin-left: 0;
+}
+
+.jScrollbarBlogNav .jScrollbar_mask {
+	width: 209px;
+}
+
+.jScrollbarBlogNav .jScrollbar_draggable,
+.jScrollbarBlog .jScrollbar_draggable {
+	height: 700px;
+}
+
+/* Learn */
+
+.jScrollbarQA {
+	width: 243px;
+}
+
+.jScrollbarQA  .jScrollbar_mask {
+	width: 220px;
+	margin-left: 0;
+}
+
+.jScrollbarVideos {
+	width: 393px;
+}
+
+.jScrollbarVideos  .jScrollbar_mask {
+	width: 380px;
+	margin-left: 0;
+}
+
+.jScrollbarResources {
+	width: 196px;
+}
+
+
+.jScrollbarResources .jScrollbar_mask {
+	width: 176px;
+	margin-left: 0;
+}
+
+/* Teams */
+.jScrollbarTeams {
+	width: 643px;
+	height: 627px;
+}
+
+.jScrollbarTeams .jScrollbar_mask {
+	width: 613px;
+	margin-left: 0;
+}
+
+.jScrollbarTeams .jScrollbar_draggable {
+	height: 627px;
+}
