@@ -1,21 +1,12 @@
 <?php
-/*
-Plugin Name: Geek Oracle Core
-Plugin URI: http://geekoracle.com
-Description: Core plugin which contains shared libraries/code for other Geek Oracle themes and plugins.
-Version: TRUNK
-Author: Joel Desamero
-Author URI: http://geekoracle.com
-*/
 
 //// bootstrap
 
 // path constants
 
-define( 'GEKO_CORE_ROOT', realpath( dirname( __FILE__ ) ) );
-define( 'GEKO_CORE_URI', plugins_url( '', __FILE__ ) );
 define( 'GEKO_CORE_EXTERNAL_LIB_ROOT', realpath( GEKO_CORE_ROOT . '/external/libs' ) );
-define( 'GEKO_LOG', realpath( ABSPATH . '/wp-content/logs/logs.txt' ) );
+define( 'GEKO_LOG', realpath( GEKO_STANDALONE_PATH . '/logs/logs.txt' ) );
+define( 'GEKO_REGISTER_EXTRA_XML', realpath( GEKO_CORE_ROOT . '/conf/register_extra.xml' ) );
 define( 'GEKO_REGISTER_XML', realpath( GEKO_CORE_ROOT . '/conf/register.xml' ) );
 define( 'GEKO_VIEW_HELPER_PATH', realpath( GEKO_CORE_ROOT . '/library' ) );
 
@@ -62,18 +53,23 @@ Geko_Loader::registerNamespaces(
 	'PEAR_', 'Console_', 'OLE_', 'Spreadsheet_', 'WideImage_'
 );
 
-// register JavaScript/CSS files
-Geko_Wp::setStandardPlaceholders( array(
-	'geko_core_root' => GEKO_CORE_ROOT,
-	'geko_core_uri' => GEKO_CORE_URI
-) );
-Geko_Wp::registerExternalFiles( GEKO_REGISTER_XML );
+
+
+$oLoader = Geko_Loader_ExternalFiles::getInstance();
+$oLoader
+	->setMergeParams( array(
+		'geko_core_root' => GEKO_CORE_ROOT,
+		'geko_core_uri' => GEKO_CORE_URI
+	) )
+	->registerFromXmlConfigFile( GEKO_REGISTER_EXTRA_XML )
+	->registerFromXmlConfigFile( GEKO_REGISTER_XML )
+;
 
 
 // register global urls to services
 Geko_Uri::setUrl( array(
-	'wp_admin' => get_bloginfo( 'url' ) . '/wp-admin/admin.php',
-	'wp_user_edit' => get_bloginfo( 'url' ) . '/wp-admin/user-edit.php',
+	'wp_admin' => GEKO_STANDALONE_URL . '/wp-admin/admin.php',
+	'wp_user_edit' => GEKO_STANDALONE_URL . '/wp-admin/user-edit.php',
 	'geko_export' => GEKO_CORE_URI . '/srv/export.php',
 	'geko_pdf' => GEKO_CORE_URI . '/srv/pdf.php',
 	'geko_process' => GEKO_CORE_URI . '/srv/process.php',
@@ -93,5 +89,9 @@ if ( is_file( GEKO_LOG ) ) {
 	$oLogger = new Zend_Log( $oWriter );
 	Zend_Registry::set( 'logger', $oLogger );
 }
+
+
+
+
 
 
