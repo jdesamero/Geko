@@ -107,14 +107,26 @@ class Geko_Layout extends Geko_Singleton_Abstract
 	//// render tags
 	
 	//
-	public function enqueueScript( $sId ) {
-		Geko_Loader_ExternalFiles::getInstance()->enqueueScript( $sId );
+	public function enqueueScript() {
+		
+		$aArgs = func_get_args();
+		
+		foreach ( $aArgs as $sId ) {
+			Geko_Loader_ExternalFiles::getInstance()->enqueueScript( $sId );
+		}
+		
 		return $this;
 	}
 	
 	//
-	public function enqueueStyle( $sId ) {
-		Geko_Loader_ExternalFiles::getInstance()->enqueueStyle( $sId );		
+	public function enqueueStyle() {
+
+		$aArgs = func_get_args();
+
+		foreach ( $aArgs as $sId ) {
+			Geko_Loader_ExternalFiles::getInstance()->enqueueStyle( $sId );		
+		}
+		
 		return $this;
 	}
 	
