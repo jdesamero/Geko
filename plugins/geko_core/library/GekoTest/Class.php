@@ -30,7 +30,11 @@ class GekoTest_Class extends Geko_PhpUnit_TestCase
 	public function providerResolveRelatedClass() {
 		return array(
 			array( 'GekoX_Test_Simple', '', '_Query', '', 'GekoX_Test_Simple_Query' ),
-			array( 'GekoX_Test_Simple_Query', '_Query', '', '', 'GekoX_Test_Simple' )
+			array( 'GekoX_Test_Simple_Query', '_Query', '', '', 'GekoX_Test_Simple' ),
+			array( 'GekoX_Test_Simple_QueryFoo', '_Query*', '', '', 'GekoX_Test_Simple' ),
+			array( 'GekoX_Test_Simple_QueryBar', '_Query*', '', '', 'GekoX_Test_Simple' ),
+			array( 'GekoX_Test_Simple_Query', '_Query', '_Manage', '', 'GekoX_Test_Simple_Manage' ),
+			array( '', '', '', 'GekoX_Test_Simple', 'GekoX_Test_Simple' )
 		);
 	}
 	
