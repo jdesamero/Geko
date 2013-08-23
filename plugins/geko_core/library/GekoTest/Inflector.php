@@ -3,64 +3,45 @@
 //
 class GekoTest_Inflector extends Geko_PhpUnit_TestCase
 {
+	
 	//
-    public function testPluralize() {
-    	
-		//
-        $this->assertEquals(
-        	'categories',
-        	Geko_Inflector::pluralize( 'category' )
-        );
-		
-		//
-        $this->assertEquals(
-        	'categories',
-        	Geko_Inflector::pluralize( 'categories' )
-        );
-		
-		//
-        $this->assertEquals(
-        	'products',
-        	Geko_Inflector::pluralize( 'product' )
-        );
-		
-		//
-        $this->assertEquals(
-        	'mice',
-        	Geko_Inflector::pluralize( 'mouse' )
-        );
-        
-	}
-
-	//
-    public function testSingularize() {
-    	
-		//
-        $this->assertEquals(
-        	'category',
-        	Geko_Inflector::singularize( 'categories' )
-        );
-		
-		//
-        $this->assertEquals(
-        	'category',
-        	Geko_Inflector::singularize( 'category' )
-        );
-		
-		//
-        $this->assertEquals(
-        	'product',
-        	Geko_Inflector::singularize( 'products' )
-        );
-        
-		//
-        $this->assertEquals(
-        	'mouse',
-        	Geko_Inflector::singularize( 'mice' )
-        );
-        
+	public function providerPluralize() {
+		return array(
+			array( 'categories', 'category' ),
+			array( 'categories', 'categories' ),
+			array( 'products', 'product' ),
+			array( 'mice', 'mouse' ),
+			array( 'oxen', 'ox' ),
+			array( 'viruses', 'virus' )
+		);
 	}
 	
+	/**
+	 * @dataProvider providerPluralize
+	 */
+    public function testPluralize( $sResult, $sSubject ) {
+        $this->assertEquals( $sResult, Geko_Inflector::pluralize( $sSubject ) );
+	}
+	
+
+	//
+	public function providerSingularize() {
+		return array(
+			array( 'category', 'categories' ),
+			array( 'category', 'category' ),
+			array( 'product', 'products' ),
+			array( 'mouse', 'mice' )
+		);
+	}
+	
+	/**
+	 * @dataProvider providerSingularize
+	 */
+    public function testSingularize( $sResult, $sSubject ) {
+        $this->assertEquals( $sResult, Geko_Inflector::singularize( $sSubject ) );
+	}
+	
+    
     
 }
 
