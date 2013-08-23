@@ -41,8 +41,7 @@ class Geko_Class
 		$aArgs = func_get_args();		
 		foreach ( $aArgs as $mValue ) {
 			if ( TRUE == is_array( $mValue ) ) {
-				$mValRec = self::existsCoalesce( $mValue );		// recursive
-				if ( @class_exists( $mValRec ) ) return $mValRec;
+				return call_user_func_array( array( self, 'existsCoalesce' ), $mValue );
 			} else {
 				if ( @class_exists( $mValue ) ) return $mValue;
 			}
