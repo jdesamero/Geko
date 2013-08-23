@@ -15,7 +15,7 @@ class GekoTest_Uri extends Geko_PhpUnit_TestCase
 	
 	//
 	public static function tearDownAfterClass() {
-
+		self::$oUrl = NULL;
 	}
 	
 	

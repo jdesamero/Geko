@@ -4,10 +4,10 @@
 class GekoTest_Entity_Query extends Geko_PhpUnit_TestCase
 {
 	
-	protected $aSimple;
+	protected static $aSimple;
 	
 	//
-	public function setUp() {
+	public static function setUpBeforeClass() {
 		
 		$aColors = array(
 			'red' => 1,
@@ -27,19 +27,19 @@ class GekoTest_Entity_Query extends Geko_PhpUnit_TestCase
 			array( 'id' => 11, 'title' => 'Carrot', 'type' => 'vegetable', 'color_id' => $aColors[ 'orange' ] )
 		) );
 		
-		$this->aSimple = $aSimple;
+		self::$aSimple = $aSimple;
 	}
 	
 	//
-	public function tearDown() {
-		unset( $this->aSimple );
+	public static function tearDownAfterClass() {
+		self::$aSimple = NULL;
 	}
 
 
 	//
 	public function testBasic() {	
 		
-		$aSimple = $this->aSimple;
+		$aSimple = self::$aSimple;
 		
 		$this->assertEquals( $aSimple->count(), 7 );
 	}
@@ -47,7 +47,7 @@ class GekoTest_Entity_Query extends Geko_PhpUnit_TestCase
 	//
 	public function testGather() {
 
-		$aSimple = $this->aSimple;
+		$aSimple = self::$aSimple;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 		
@@ -83,7 +83,7 @@ class GekoTest_Entity_Query extends Geko_PhpUnit_TestCase
 	//
 	public function testSubset() {
 		
-		$aSimple = $this->aSimple;
+		$aSimple = self::$aSimple;
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 		
@@ -115,7 +115,7 @@ class GekoTest_Entity_Query extends Geko_PhpUnit_TestCase
 	//
 	public function testImplode() {
 
-		$aSimple = $this->aSimple;
+		$aSimple = self::$aSimple;
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 		

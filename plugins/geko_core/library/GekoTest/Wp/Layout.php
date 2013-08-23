@@ -4,10 +4,10 @@
 class GekoTest_Wp_Layout extends Geko_PhpUnit_TestCase
 {
 	
-	protected $oLayout;
+	protected static $oLayout;
 	
 	//
-	public function setUp() {
+	public static function setUpBeforeClass() {
 	
 		$oLayout = GekoX_Test_Wp_Layout::getInstance()->init();
 		$oLayout
@@ -20,12 +20,12 @@ class GekoTest_Wp_Layout extends Geko_PhpUnit_TestCase
 			->addTemplate( 'member_events.php', 'listing', 'protected' )
 		;
 	
-		$this->oLayout = $oLayout;
+		self::$oLayout = $oLayout;
 	}
 	
 	//
-	public function tearDown() {
-		unset( $this->oLayout );
+	public static function tearDownAfterClass() {
+		self::$oLayout = NULL;
 	}
 	
 	
@@ -47,7 +47,7 @@ class GekoTest_Wp_Layout extends Geko_PhpUnit_TestCase
 	 * @dataProvider providerTemplates
 	 */
     public function testTemplates( $sResult, $aParams ) {
-    	$oLayout = $this->oLayout;
+    	$oLayout = self::$oLayout;
 		$this->assertEquals( $sResult,
 			call_user_func_array( array( $oLayout, 'getTemplateList' ), $aParams )
 		);

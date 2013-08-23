@@ -4,12 +4,14 @@
 class GekoTest_Entity extends Geko_PhpUnit_TestCase
 {
 	
-	protected $oSimple;
-	protected $oMultiKey;
+	protected static $oSimple;
+	protected static $oMultiKey;
+	protected static $oPlaceholder;
+	protected static $oLanguage;
 	
 	
 	//
-	public function setUp() {
+	public static function setUpBeforeClass() {
 		
 		$aValues = array(
 			'id' => 567,
@@ -21,7 +23,7 @@ class GekoTest_Entity extends Geko_PhpUnit_TestCase
 		
 		$oSimple = new GekoX_Test_Simple( $aValues );
 		
-		$this->oSimple = $oSimple;
+		self::$oSimple = $oSimple;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 		
@@ -38,7 +40,7 @@ class GekoTest_Entity extends Geko_PhpUnit_TestCase
 		
 		$oMultiKey = new GekoX_Test_MultiKey( $aValues );
 		
-		$this->oMultiKey = $oMultiKey;
+		self::$oMultiKey = $oMultiKey;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 		
@@ -59,7 +61,7 @@ class GekoTest_Entity extends Geko_PhpUnit_TestCase
 		
 		$oPlaceholder = new GekoX_Test_Simple( $aValues, NULL, $aData );
 		
-		$this->oPlaceholder = $oPlaceholder;
+		self::$oPlaceholder = $oPlaceholder;
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 		
@@ -83,23 +85,23 @@ class GekoTest_Entity extends Geko_PhpUnit_TestCase
 		
 		$oLanguage = new GekoX_Test_Simple( $aValues, NULL, $aData );
 		
-		$this->oLanguage = $oLanguage;
+		self::$oLanguage = $oLanguage;
 		
 	}
 	
 	//
-	public function tearDown() {
-		unset( $this->oSimple );
-		unset( $this->oMultiKey );
-		unset( $this->oPlaceholder );
-		unset( $this->oLanguage );
+	public static function tearDownAfterClass() {
+		self::$oSimple = NULL;
+		self::$oMultiKey = NULL;
+		self::$oPlaceholder = NULL;
+		self::$oLanguage = NULL;
 	}
 	
 	
 	//
 	public function testGet() {
 		
-		$oSimple = $this->oSimple;
+		$oSimple = self::$oSimple;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 		
@@ -117,7 +119,7 @@ class GekoTest_Entity extends Geko_PhpUnit_TestCase
 	//
     public function testEcho() {
 		
-		$oSimple = $this->oSimple;
+		$oSimple = self::$oSimple;
 		
 		$this->assertEquals( Geko_String::fromOb( array( $oSimple, 'echoId' ) ), 567 );
 		$this->assertEquals( 'http://apple.com', Geko_String::fromOb( array( $oSimple, 'echoUrl' ) ) );
@@ -131,7 +133,7 @@ class GekoTest_Entity extends Geko_PhpUnit_TestCase
 	//
 	public function testMultiKey() {
 
-		$oMultiKey = $this->oMultiKey;
+		$oMultiKey = self::$oMultiKey;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 		
@@ -148,7 +150,7 @@ class GekoTest_Entity extends Geko_PhpUnit_TestCase
 	//
 	public function testPlaceholder() {
 
-		$oPlaceholder = $this->oPlaceholder;
+		$oPlaceholder = self::$oPlaceholder;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 		
@@ -178,7 +180,7 @@ class GekoTest_Entity extends Geko_PhpUnit_TestCase
 	//
 	public function testLanguage() {
 		
-		$oLanguage = $this->oLanguage;
+		$oLanguage = self::$oLanguage;
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 		
@@ -198,7 +200,7 @@ class GekoTest_Entity extends Geko_PhpUnit_TestCase
 	//
 	public function testMethods() {
 
-		$oSimple = $this->oSimple;
+		$oSimple = self::$oSimple;
 
 		$this->assertEqualsHtml(
 			$oSimple->getLink(),

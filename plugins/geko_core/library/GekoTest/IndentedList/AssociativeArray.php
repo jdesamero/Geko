@@ -5,7 +5,7 @@ class GekoTest_IndentedList_AssociativeArray extends Geko_PhpUnit_TestCase
 {
 
 	
-	protected $aFlat = array(
+	protected static $aFlat = array(
 		array( 'level' => 1, 'item' => 'plant' ),
 			array( 'level' => 2, 'item' => 'vine' ),
 				array( 'level' => 3, 'item' => 'grape' ),
@@ -41,20 +41,20 @@ class GekoTest_IndentedList_AssociativeArray extends Geko_PhpUnit_TestCase
 			array( 'level' => 2, 'item' => 'germany' )
 	);
 	
-	protected $aTree;
+	protected static $aTree;
 	
 	
 	//
-	public function setUp() {
+	public static function setUpBeforeClass() {
 		$oTree = new Geko_IndentedList_AssociativeArray(
-			$this->aFlat, 'children', 'level'
+			self::$aFlat, 'children', 'level'
 		);
-		$this->aTree = $oTree->getTree();	
+		self::$aTree = $oTree->getTree();	
 	}
 	
 	//
-	public function tearDown() {
-		unset( $this->aTree );
+	public static function tearDownAfterClass() {
+		self::$aTree = NULL;
 	}
 	
 	
@@ -78,7 +78,7 @@ class GekoTest_IndentedList_AssociativeArray extends Geko_PhpUnit_TestCase
 	 * @dataProvider provider
 	 */
 	public function testBasic( $sKey, $aResult ) {
-		$aItems = $this->getItems( Geko_Array::getElement( $this->aTree, $sKey ) );
+		$aItems = $this->getItems( Geko_Array::getElement( self::$aTree, $sKey ) );
 		$this->assertEquals( $aItems, $aResult );
 	}
 	
