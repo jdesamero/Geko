@@ -1,7 +1,7 @@
 <?php
 
 //
-class GekoTest_String_Highlight extends PHPUnit_Framework_TestCase
+class GekoTest_String_Highlight extends Geko_PhpUnit_TestCase
 {
 	//
     public function testHighlight() {

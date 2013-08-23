@@ -1,7 +1,7 @@
 <?php
 
 //
-class GekoTest_Entity_Query extends PHPUnit_Framework_TestCase
+class GekoTest_Entity_Query extends Geko_PhpUnit_TestCase
 {
 	
 	protected $aSimple;

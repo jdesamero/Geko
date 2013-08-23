@@ -1,7 +1,7 @@
 <?php
 
 //
-class GekoTest_Inflector extends PHPUnit_Framework_TestCase
+class GekoTest_Inflector extends Geko_PhpUnit_TestCase
 {
 	//
     public function testPluralize() {

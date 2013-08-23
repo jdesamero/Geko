@@ -1,7 +1,7 @@
 <?php
 
 //
-class GekoTest_Wp_Layout extends PHPUnit_Framework_TestCase
+class GekoTest_Wp_Layout extends Geko_PhpUnit_TestCase
 {
 	
 	protected $oLayout;

@@ -1,7 +1,7 @@
 <?php
 
 //
-class GekoTest_Sql_Table extends PHPUnit_Framework_TestCase
+class GekoTest_Sql_Table extends Geko_PhpUnit_TestCase
 {
 	//
     public function testBasicCreate() {

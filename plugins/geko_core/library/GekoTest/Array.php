@@ -1,7 +1,7 @@
 <?php
 
 //
-class GekoTest_Array extends PHPUnit_Framework_TestCase
+class GekoTest_Array extends Geko_PhpUnit_TestCase
 {
 	
 	protected $sTest = "Furdi, ,, , 0, Pudgy, Ratzo, 'Babew', Frank, \t\r\"Woodchuck\"";
