@@ -17,8 +17,6 @@ class Gloc_Post_Meta extends Geko_Wp_Post_Meta
 	//
 	protected function preFormFields() {
 		
-		$oPost = $this->getCurPost();
-		
 		$aJsonParams = array(
 			'url' => get_bloginfo( 'url' ),
 			'prefix' => $this->getPrefixWithSep()
@@ -34,26 +32,26 @@ class Gloc_Post_Meta extends Geko_Wp_Post_Meta
 				overflow: hidden;
 			}
 			
-			#wp_post_meta table.fields {
+			#gloc_post_meta table.fields {
 				width: 100%;
 			}
 			
-			#wp_post_meta table.fields input[type=text] {
+			#gloc_post_meta table.fields input[type=text] {
 				width: 95%;
 			}
 
-			#wp_post_meta table.fields input[type=text].short {
+			#gloc_post_meta table.fields input[type=text].short {
 				width: 30%;
 			}
 			
-			#wp_post_meta table.fields textarea {
+			#gloc_post_meta table.fields textarea {
 				width: 95%;
 				height: 150px;
 			}
 			
 			/* ---------------------------------------------------------------------------------- */
 			
-			#wp_post_meta .image_picker {
+			#gloc_post_meta .image_picker {
 				border: solid 1px #dfdfdf;		
 				padding: 5px;
 				width: 346px;
@@ -63,19 +61,19 @@ class Gloc_Post_Meta extends Geko_Wp_Post_Meta
 				border-radius: 5px;
 			}
 			
-			#wp_post_meta .image_picker img {
+			#gloc_post_meta .image_picker img {
 				border: solid 2px #dfdfdf;
 			}
 			
-			#wp_post_meta .image_picker img.ip_not_selected {
+			#gloc_post_meta .image_picker img.ip_not_selected {
 				border: solid 2px #fff;
 			}
 			
-			#wp_post_meta .image_picker img.ip_selected {
+			#gloc_post_meta .image_picker img.ip_selected {
 				border: solid 2px red;
 			}
 			
-			#wp_post_meta .selmulti {
+			#gloc_post_meta .selmulti {
 				height: 100px;
 			}
 
@@ -101,19 +99,18 @@ class Gloc_Post_Meta extends Geko_Wp_Post_Meta
 	//
 	protected function formFields() {
 		
-		$oPost = $this->getCurPost();
-		if ( $oPost ) {
+		if ( $oPost = $this->getCurPost() ) {
 			$aImages = $oPost->getAttachments( array( 'images_only' => 1, 'orderby' => 'file_menu_order' ) );
 		}
 		
 		?>
 		<table class="fields">
-			<?php if ( FALSE ): ?>
+			<?php if ( $oPost && $oPost->inCategory( 'news' ) ): ?>
 				<tr>
-					<th><label for="slideshow_images">Slideshow Images</label></th>
-					<td><div class="image_picker multi">
+					<th><label for="main_image">Main Image</label></th>
+					<td><div class="image_picker">
 						<?php $this->echoImagePickerItems( $aImages ); ?>
-						<input type="hidden" id="slideshow_images" name="slideshow_images" class="imgpck_field" _member_ids="yes" />
+						<input type="hidden" id="main_image" name="main_image" class="imgpck_field" />
 					</div></td>
 				</tr>
 			<?php endif; ?>
