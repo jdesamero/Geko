@@ -270,30 +270,7 @@ class Geko_Wp_Layout extends Geko_Layout
 		<?php endif;
 		
 	}
-	
-	
-	
-	
-	
-	//// ajax content methods
-	
-	//
-	public function echoAjaxContent() {
 		
-		$sSection = trim( $_GET[ 'section' ] );
-		$sMethod = '';
-		
-		if ( $sSection ) {
-			$sMethod = sprintf( 'get%sAjax', Geko_Inflector::camelize( $sSection ) );
-			if ( !method_exists( $this, $sMethod ) ) $sMethod = '';
-		}
-		
-		if ( $sMethod ) {
-			$aAjaxResponse = $this->$sMethod();
-			echo Zend_Json::encode( $aAjaxResponse );
-		}
-	}
-	
 	
 	
 	

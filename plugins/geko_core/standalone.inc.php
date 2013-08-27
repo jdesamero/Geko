@@ -68,13 +68,11 @@ $oLoader
 
 // register global urls to services
 Geko_Uri::setUrl( array(
-	'wp_admin' => GEKO_STANDALONE_URL . '/wp-admin/admin.php',
-	'wp_user_edit' => GEKO_STANDALONE_URL . '/wp-admin/user-edit.php',
-	'geko_export' => GEKO_CORE_URI . '/srv/export.php',
-	'geko_pdf' => GEKO_CORE_URI . '/srv/pdf.php',
-	'geko_process' => GEKO_CORE_URI . '/srv/process.php',
-	'geko_thumb' => GEKO_CORE_URI . '/srv/thumb.php',
-	'geko_upload' => GEKO_CORE_URI . '/srv/upload.php',
+	'geko_export' => GEKO_CORE_URI . '/to-do/export.php',
+	'geko_pdf' => GEKO_CORE_URI . '/to-do/pdf.php',
+	'geko_process' => GEKO_CORE_URI . '/to-do/process.php',
+	'geko_thumb' => GEKO_CORE_URI . '/to-do/thumb.php',
+	'geko_upload' => GEKO_CORE_URI . '/to-do/upload.php',
 	'geko_styles' => GEKO_CORE_URI . '/styles',
 	'geko_ext_styles' => GEKO_CORE_URI . '/external/styles',
 	'geko_ext_swf' => GEKO_CORE_URI . '/external/swf'

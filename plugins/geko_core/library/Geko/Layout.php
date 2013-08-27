@@ -53,6 +53,35 @@ class Geko_Layout extends Geko_Singleton_Abstract
 	
 	
 	
+	// HACK!!!
+	public function getScriptUrls( $aOther = NULL ) {
+		
+		$oUrl = new Geko_Uri();
+		
+		$sCurPage = strval( $oUrl );
+		
+		$oUrl->unsetVars();
+		$sCurPath = strval( $oUrl ); 
+
+		$oUrl->setVar( 'ajax_content', 1 );
+		$sAjaxContent = strval( $oUrl ); 
+		
+		$aRet = array(
+			'url' => GEKO_STANDALONE_URL,
+			'curpage' => $sCurPage,
+			'curpath' => $sCurPath,
+			'ajax_content' => $sAjaxContent
+		);
+		
+		if ( is_array( $aOther ) ) {
+			$aRet = array_merge( $aRet, $aOther );
+		}
+		
+		return $aRet;
+	}
+	
+	
+	
 	// used to trigger methods implemented by concrete classes to determine
 	// "constant" values triggered by certain functions so certain admin
 	// functionality can be automated
@@ -141,6 +170,30 @@ class Geko_Layout extends Geko_Singleton_Abstract
 		Geko_Loader_ExternalFiles::getInstance()->renderScriptTags();
 		return $this;		
 	}
+	
+	
+	
+	
+	//// ajax content methods
+	
+	//
+	public function echoAjaxContent() {
+		
+		$sSection = trim( $_GET[ 'section' ] );
+		$sMethod = '';
+		
+		if ( $sSection ) {
+			$sMethod = sprintf( 'get%sAjax', Geko_Inflector::camelize( $sSection ) );
+			if ( !method_exists( $this, $sMethod ) ) $sMethod = '';
+		}
+		
+		if ( $sMethod ) {
+			$aAjaxResponse = $this->$sMethod();
+			echo Zend_Json::encode( $aAjaxResponse );
+		}
+	}
+	
+	
 	
 	
 	
