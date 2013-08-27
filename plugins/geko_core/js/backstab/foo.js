@@ -31,6 +31,11 @@
 			
 			this.trigger( 'foo', this, msg );
 			return this;
+		},
+		
+		baz: function( msg ) {
+			this.trigger( 'baz', this, msg );
+			return 'Calling baz: ' + this.options.baz + ' ' + msg;
 		}
 		
 	} );
