@@ -65,6 +65,24 @@ $oLoader
 	->registerFromXmlConfigFile( GEKO_REGISTER_XML )
 ;
 
+if ( defined( 'GEKO_TEMPLATE_URL' ) ) {
+	$oLoader->setMergeParams( array(
+		'geko_template_url' => GEKO_TEMPLATE_URL
+	) );
+}
+
+if ( defined( 'GEKO_TEMPLATE_PATH' ) ) {
+	
+	$oLoader->setMergeParams( array(
+		'geko_template_path' => GEKO_TEMPLATE_PATH
+	) );
+	
+	$sRegFile = GEKO_TEMPLATE_PATH . '/etc/register.xml';
+	if ( is_file( $sRegFile ) ) {
+		$oLoader->registerFromXmlConfigFile( $sRegFile );
+	}
+}
+
 
 // register global urls to services
 Geko_Uri::setUrl( array(
