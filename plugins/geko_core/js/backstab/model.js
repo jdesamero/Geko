@@ -12,7 +12,7 @@
 	
 	var getTarget = function( elem, params, prop ) {
 		
-		var sel = null, fcont = null, target = null, _target = null;
+		var sel = null, fcont = null, target = null, _target = null, defer = null;
 		
 		if ( params && params[ prop ] ) {
 			
@@ -24,6 +24,10 @@
 			
 			if ( propParams.contents ) {
 				fcont = propParams.contents;
+			}
+
+			if ( propParams.defer ) {
+				defer = propParams.defer;
 			}
 		}
 		
@@ -49,7 +53,7 @@
 			
 		}
 		
-		return [ _target, fcont ];
+		return [ _target, fcont, defer ];
 	};
 	
 	var Backbone = this.Backbone;
@@ -98,16 +102,19 @@
 		populateElem: function( elem, params ) {
 			
 			var model = this;
-
-			var setTargetValue = function( target, val ) {
-				
-				var tag = target.prop( 'tagName' ).toLowerCase();
-				
-				// TO DO!!!!!!
-				if ( 'input' == tag ) {
-					target.val( val );
-				} else {
-					target.html( val );						
+			
+			var setTargetValue = function( target, val, cb ) {
+				if ( target ) {
+					if ( cb ) {
+						cb( target, val );
+					} else {
+						var tag = target.prop( 'tagName' ).toLowerCase();
+						if ( 'input' == tag ) {
+							target.val( val );
+						} else {
+							target.html( val );						
+						}
+					}
 				}
 			};
 			
@@ -120,11 +127,29 @@
 					var res = getTarget( elem, params, prop );
 					var _target = res[ 0 ];
 					var fcont = res[ 1 ];
+					var defer = res[ 2 ];
 					
-					// populate
-					if ( _target ) {
-						if ( fcont ) fcont( _target, val );
-						else setTargetValue( _target, val );
+					if ( defer ) {
+						
+						if ( defer.contents ) {
+							defer.contents( _target, val );
+						}
+						
+						var funtil = defer.until;
+						
+						if ( funtil ) {
+							var itvl, deferTil = function() {
+								if ( funtil() ) {
+									setTargetValue( _target, val, fcont );
+									clearInterval( itvl );
+								}
+							};
+							
+							itvl = setInterval( deferTil, 100 );
+						}
+						
+					} else {
+						setTargetValue( _target, val, fcont );
 					}
 					
 				} );
