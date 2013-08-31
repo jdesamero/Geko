@@ -37,6 +37,11 @@ class Geko_Layout extends Geko_Singleton_Abstract
 		return $this;
 	}
 	
+	// call after rendering the layout stack
+	public function end() {
+		return $this;	
+	}
+	
 	
 	
 	// labels

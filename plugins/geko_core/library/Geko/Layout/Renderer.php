@@ -19,7 +19,13 @@ class Geko_Layout_Renderer extends Geko_Singleton_Abstract
 	
 	//
 	public function render() {
+		
 		$this->doMain();
+		
+		foreach ( $this->aLayouts as $oLayout ) {
+			$oLayout->end();
+		}
+		
 		return $this;
 	}
 	
