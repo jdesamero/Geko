@@ -16,7 +16,8 @@ class Geko_Layout extends Geko_Singleton_Abstract
 		'pn' => array( 'Geko_String', 'printNumberFormat' ),
 		'tm' => array( 'Geko_String', 'mbTrim' ),
 		
-		'pf' => array( 'Geko_Html', 'populateForm' )
+		'pf' => array( 'Geko_Html', 'populateForm' ),
+		'is' => array( 'Geko_Match', 'is' )
 		
 	);
 	

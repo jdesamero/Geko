@@ -117,11 +117,11 @@ class Geko_Wp
 	public static function is( $mParams ) {
 		
 		if ( is_string( $mParams ) ) {
-			$aParams = Geko_Array::explodeTrim( '|', $mParams, array( 'remove_empty' => TRUE ) );
+			$aParams = Geko_Array::explodeTrimEmpty( '|', $mParams );
 			foreach ( $aParams as $i => $sSubParam ) {
-				$aSubParam = Geko_Array::explodeTrim( ':', $sSubParam, array( 'remove_empty' => TRUE ) );
+				$aSubParam = Geko_Array::explodeTrimEmpty( ':', $sSubParam );
 				if ( $aSubParam[ 1 ] ) {
-					$aSubParam[ 1 ] = Geko_Array::explodeTrim( ',', $aSubParam[ 1 ], array( 'remove_empty' => TRUE ) );
+					$aSubParam[ 1 ] = Geko_Array::explodeTrimEmpty( ',', $aSubParam[ 1 ] );
 					if (
 						( !in_array( $aSubParam[ 0 ], array( 'page_template', 'category_template', 'category_post_template' ) ) ) && 
 						( 1 == count( $aSubParam[ 1 ] ) )

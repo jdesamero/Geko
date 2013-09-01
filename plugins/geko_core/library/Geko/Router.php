@@ -32,7 +32,7 @@ class Geko_Router
 			}
 		}
 		
-		$this->_aPathItems = array_filter( explode( '/', $sPath ) );
+		$this->_aPathItems = Geko_Array::explodeTrimEmpty( '/', $sPath );
 		
 		// print_r( $this->_aPathItems );
 		
