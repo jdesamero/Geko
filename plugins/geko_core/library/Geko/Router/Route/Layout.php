@@ -5,6 +5,7 @@ class Geko_Router_Route_Layout extends Geko_Router_Route
 {
 	
 	protected $_aPrefixes = array( 'Tmpl_', 'Gloc_', 'Geko_' );
+	protected $_aSkip = array( 'Aux' );
 	
 	protected $_sBestMatch = '';
 	protected $_aLeftovers = array();
@@ -99,6 +100,9 @@ class Geko_Router_Route_Layout extends Geko_Router_Route
 			$sClass .= $sItem;
 			
 			if ( $sCheck = $this->getBestMatch( $sClass ) ) {
+				
+				if ( $this->skipClass( $sCheck ) ) break;
+				
 				$sBestMatch = $sCheck;
 				$aBestMatch = $aPathLeft;
 			}
@@ -118,6 +122,20 @@ class Geko_Router_Route_Layout extends Geko_Router_Route
 		
 		return ( $this->_sBestMatch ) ? TRUE : FALSE ;		
 	}
+	
+	//
+	public function skipClass( $sCheck ) {
+		foreach ( $this->_aPrefixes as $sPrefix ) {
+			foreach ( $this->_aSkip as $sSuffix ) {
+				if ( 0 === strpos( $sCheck, $sPrefix . $sSuffix ) ) {
+					// begins with class path to skip
+					return TRUE;
+				}
+			}
+		}
+		return FALSE;
+	}
+	
 	
 	//
 	public function run() {
