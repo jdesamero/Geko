@@ -24,7 +24,7 @@ class Geko_Router_Route_Layout extends Geko_Router_Route
 			$this->_sDefaultLayout = $sClass;
 		}
 		
-		if ( $sClass = $this->getBestMatch( 'NotFound' ) ) {
+		if ( $sClass = $this->getBestMatch( 'Aux_NotFound', 'NotFound' ) ) {
 			$this->_sNotFoundLayout = $sClass;
 		}
 		
@@ -55,12 +55,16 @@ class Geko_Router_Route_Layout extends Geko_Router_Route
 	//// helpers
 	
 	//
-	public function getBestMatch( $sSuffix ) {
+	public function getBestMatch() {
+		
+		$aSuffixes = func_get_args();
 		
 		$aClasses = array();
 		
-		foreach ( $this->_aPrefixes as $sPrefix ) {
-			$aClasses[] = $sPrefix . $sSuffix;
+		foreach ( $aSuffixes as $sSuffix ) {
+			foreach ( $this->_aPrefixes as $sPrefix ) {
+				$aClasses[] = $sPrefix . $sSuffix;
+			}
 		}
 		
 		return Geko_Class::existsCoalesce( $aClasses );
