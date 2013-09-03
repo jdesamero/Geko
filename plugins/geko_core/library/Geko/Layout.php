@@ -185,21 +185,79 @@ class Geko_Layout extends Geko_Singleton_Abstract
 	//
 	public function echoAjaxContent() {
 		
+		$aAjaxResponse = NULL;
+		
 		$sSection = trim( $_GET[ 'section' ] );
 		$sMethod = '';
 		
-		if ( $sSection ) {
-			$sMethod = sprintf( 'get%sAjax', Geko_Inflector::camelize( $sSection ) );
-			if ( !method_exists( $this, $sMethod ) ) $sMethod = '';
+		// check for matching method
+		if (
+			( $sSection ) && 
+			( $sMethod = sprintf( 'get%sAjax', Geko_Inflector::camelize( $sSection ) ) ) && 
+			( method_exists( $this, $sMethod ) )
+		) {
+			$aAjaxResponse = $this->$sMethod();		
 		}
 		
-		if ( $sMethod ) {
-			$aAjaxResponse = $this->$sMethod();
-			echo Zend_Json::encode( $aAjaxResponse );
+		// check for callable handlers
+		if ( $sSection && !$aAjaxResponse ) {
+			$aAjaxResponse = $this->getCallableResult( 'ajax_content', $sSection );
+		}
+		
+		if ( $aAjaxResponse ) {
+			echo Zend_Json::encode( $aAjaxResponse );		
 		}
 	}
 	
 	
+	
+	
+	//// callable result
+	
+	//
+	public function getCallableResult( $sCaller, $sSection ) {
+		
+		$aRes = NULL;
+		
+		if ( $aHandlers = $this->_aCallableHandlers[ $sCaller ] ) {			
+			foreach ( $aHandlers as $sHandler => $mParams ) {
+				
+				if ( is_array( $mParams ) ) {
+					$sHandlerMethod = $mParams[ 'handler' ];
+				}
+				
+				if ( !$sHandlerMethod ) {
+					$sHandlerMethod = sprintf( 'call%s', Geko_Inflector::camelize( $sHandler ) );
+				}
+				
+				$aParams = $this->_aCallables[ $sHandler ][ $sSection ];
+				
+				if (
+					( $aParams ) && 
+					( method_exists( $this, $sHandlerMethod ) )
+				) {
+					
+					$aParams = array_merge( $aParams, array(
+						'__caller' => $sCaller,
+						'__section' => $sSection
+					) );
+					
+					$aThisRes = $this->$sHandlerMethod( $aParams );
+					
+					if ( is_array( $aThisRes ) ) {
+						if ( is_array( $aRes ) ) {
+							$aRes = array_merge( $aRes, $aThisRes );
+						} else {
+							$aRes = $aThisRes;
+						}
+					}
+					
+				}
+			}
+		}
+		
+		return $aRes;
+	}
 	
 	
 	
