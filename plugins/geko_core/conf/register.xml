@@ -46,11 +46,12 @@
 		<file id="geko-backstab-underscore" src="##geko_core_uri##/js/backstab/underscore.js" dependencies="geko-underscore" />
 		<file id="geko-backstab-core" src="##geko_core_uri##/js/backstab/core.js" dependencies="geko-backstab-underscore geko-backbone" />
 		<file id="geko-backstab-model" src="##geko_core_uri##/js/backstab/model.js" dependencies="geko-backstab-core" />
-		<file id="geko-backstab-view" src="##geko_core_uri##/js/backstab/view.js" dependencies="geko-backstab-core" />
 		<file id="geko-backstab-collection" src="##geko_core_uri##/js/backstab/collection.js" dependencies="geko-backstab-core" />
+		<file id="geko-backstab-view" src="##geko_core_uri##/js/backstab/view.js" dependencies="geko-backstab-core" />
 		<file id="geko-backstab-dispatcher" src="##geko_core_uri##/js/backstab/dispatcher.js" dependencies="geko-backstab-core" />
 		<file id="geko-backstab-statemachine" src="##geko_core_uri##/js/backstab/statemachine.js" dependencies="geko-backstab-core" />
 		<file id="geko-backstab-foo" src="##geko_core_uri##/js/backstab/foo.js" dependencies="geko-backstab-core" />
+		<file id="geko-backstab-factory" src="##geko_core_uri##/js/backstab/factory.js" dependencies="geko-jquery-tmpl geko-backstab-model geko-backstab-collection geko-backstab-view" />
 		
 		
 		
