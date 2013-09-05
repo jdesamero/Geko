@@ -88,14 +88,11 @@
 					var orig = evtsel;
 					evtsel = _.expandCurlyShortform( evtsel );
 					
-					// _.showMe( evtsel );
-					
 					if ( evtsel != orig ) {
 						obj.events[ evtsel ] = copyMethod( method );
 						delete obj.events[ orig ];
 					}
 					
-					// if ( evtsel != orig ) _.showMe( evtsel, orig );					
 				} );
 				
 				// pass 2, find semi-colon separated event/selectors and split
@@ -131,7 +128,6 @@
 					evt[ evtsel ] = method;
 				} );
 				
-				// _.showMe( evt );
 				obj.events = evt;
 			}
 			
@@ -162,14 +158,16 @@
 			var props = this._props;
 			
 			if ( 'array' !== $.type( props ) ) {
+				// find view descendants with an "on()" method so we can trigger them from the "events" hash
 				props = _.descendantsWithMethod( view, 'on', this._maxLevels );
 			}
 			
+			// find view descendants with an "each()" method so we can iterate through members when initializing
 			var hasEach = _.descendantsWithMethod( view, 'each', this._maxLevels );
 			
 			var delegate = {};
 			
-			// helpers
+			//// helpers
 			
 			//
 			var resolveTarget = function( elem, sel ) {
@@ -191,7 +189,7 @@
 				return null;
 			};
 			
-			//
+			// go through the "events" hash and bind the view event to the matching descendants
 			if (  view.events ) {
 				$.each( view.events, function( evtsel, method ) {
 					
@@ -229,7 +227,9 @@
 						var target = resolveTarget( view.$el, sel );
 											
 						if ( evt ) {
+							
 							func = _.bind( func, view );
+							
 							var hasEachProp = _.beginsWith( evt, hasEach );
 							if ( hasEachProp && ( ( hasEachProp + ':initialize' ) == evt ) ) {
 								target.on( evt, func );
@@ -239,26 +239,25 @@
 				} );
 			}
 			
-			// _.showMe( delegate, props );
-			
+			// set listener
 			$.each( props, function( i, prop ) {
 				
 				var propObj = _.descendant( view, prop );
 				
 				if ( propObj && propObj.on ) {
 					
-					// alert( prop );
+					// delegate to the corresponding element
+					// IMPORTANT!!! use 'click :first', instead of just 'click'
+					// http://japhr.blogspot.ca/2011/09/event-propagation-in-backbonejs.html
 					
-					// delegate to master element (default), or sub-elements
 					propObj.on( 'all', function() {
-						
+												
 						var args = $.makeArray( arguments );
 						var evt = args.shift();
 						var event = prop + ':' + evt;
 						var sel = getDelegateSelector( prop, evt );
 						
 						if ( null !== sel ) {
-							sel = delegate[ prop ][ evt ];
 							var target = resolveTarget( view.$el, sel );
 							target.trigger( event, args );
 						}
@@ -268,14 +267,16 @@
 					// trigger now
 					if ( _.contains( hasEach, prop ) ) {
 						propObj.each( function() {
+							
 							var args2 = $.makeArray( arguments );
 							var evt = 'initialize';
 							var sel = getDelegateSelector( prop, evt );
+							
 							if ( null !== sel ) {
 								var target = resolveTarget( view.$el, sel );
 								target.trigger( prop + ':' + evt, args2 );
 							}
-							// _.showMe( args2 );
+							
 						} );
 					}
 				}
