@@ -272,7 +272,7 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 						$sReplace = FALSE;
 						
 						if ( defined( $sKey ) ) {
-							$sReplace = constant( $sConst );
+							$sReplace = constant( $sKey );
 						} elseif ( array_key_exists( $sKey, $this->_aMergeParams ) ) {
 							$sReplace = $this->_aMergeParams[ $sKey ];
 						}
