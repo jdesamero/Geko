@@ -1,8 +1,7 @@
 <?php 
 
-require_once realpath( '../../../../wp-load.php' );
-require_once realpath( '../../../../wp-admin/includes/admin.php' );
-require_once realpath( 'external/libs/mpdf/mpdf.php' );
+require_once( 'shared.inc.php' );
+require_once( realpath( 'external/libs/mpdf/mpdf.php' ) );
 
 // ---------------------------------------------------------------------------------------------- //
 

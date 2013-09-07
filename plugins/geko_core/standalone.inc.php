@@ -86,11 +86,11 @@ if ( defined( 'GEKO_TEMPLATE_PATH' ) ) {
 
 // register global urls to services
 Geko_Uri::setUrl( array(
-	'geko_export' => GEKO_CORE_URI . '/to-do/export.php',
-	'geko_pdf' => GEKO_CORE_URI . '/to-do/pdf.php',
-	'geko_process' => GEKO_CORE_URI . '/to-do/process.php',
-	'geko_thumb' => GEKO_CORE_URI . '/to-do/thumb.php',
-	'geko_upload' => GEKO_CORE_URI . '/to-do/upload.php',
+	'geko_export' => GEKO_CORE_URI . '/srv/export.php',
+	'geko_pdf' => GEKO_CORE_URI . '/srv/pdf.php',
+	'geko_process' => GEKO_CORE_URI . '/srv/process.php',
+	'geko_thumb' => GEKO_CORE_URI . '/srv/thumb.php',
+	'geko_upload' => GEKO_CORE_URI . '/srv/upload.php',
 	'geko_styles' => GEKO_CORE_URI . '/styles',
 	'geko_ext_styles' => GEKO_CORE_URI . '/external/styles',
 	'geko_ext_swf' => GEKO_CORE_URI . '/external/swf'
@@ -105,9 +105,6 @@ if ( is_file( GEKO_LOG ) ) {
 	$oLogger = new Zend_Log( $oWriter );
 	Zend_Registry::set( 'logger', $oLogger );
 }
-
-
-
 
 
 

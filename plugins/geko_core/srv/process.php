@@ -2,15 +2,7 @@
 
 ob_start();
 
-require_once realpath( '../../../../wp-load.php' );
-require_once realpath( '../../../../wp-admin/includes/admin.php' );
-
-/* /
-ini_set( 'display_errors', 1 );
-ini_set( 'scream.enabled', 1 );		// >= v.5.2.0
-error_reporting( E_ALL ^ E_NOTICE );
-error_reporting( E_ALL );
-/* */
+require_once( 'shared.inc.php' );
 
 // ---------------------------------------------------------------------------------------------- //
 
