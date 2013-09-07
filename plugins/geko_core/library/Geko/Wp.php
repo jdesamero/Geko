@@ -435,8 +435,9 @@ class Geko_Wp
 			
 			'curpage' => strval( $oUrl ),
 			'template_dir' => get_bloginfo( 'template_directory' ),
-			'url' => get_bloginfo( 'url' )
-
+			'url' => get_bloginfo( 'url' ),
+			'wp_login' => Geko_Uri::getUrl( 'wp_login' )
+			
 		);
 		
 		if ( is_array( $aOther ) ) {

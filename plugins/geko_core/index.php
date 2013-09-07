@@ -73,6 +73,7 @@ Geko_Wp::registerExternalFiles( GEKO_REGISTER_XML );
 // register global urls to services
 Geko_Uri::setUrl( array(
 	'wp_admin' => get_bloginfo( 'url' ) . '/wp-admin/admin.php',
+	'wp_login' => get_bloginfo( 'url' ) . '/wp-login.php',
 	'wp_user_edit' => get_bloginfo( 'url' ) . '/wp-admin/user-edit.php',
 	'geko_export' => GEKO_CORE_URI . '/srv/export.php',
 	'geko_pdf' => GEKO_CORE_URI . '/srv/pdf.php',
