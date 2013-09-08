@@ -3,7 +3,7 @@
 $sPluginFunc = '
 	if ( class_exists( "Geko_Loader" ) ) {
 		Geko_Loader::addIncludePaths( dirname( __FILE__ ) . "/includes/library" );
-		$oPlugin = ' . $sPluginClass . '::getInstance();
+		$oPlugin = Geko_Singleton_Abstract::getInstance( "' . $sPluginClass . '" );
 		add_action( "init", array( $oPlugin, "init" ) );
 	} else {
 		add_action( "admin_notices", create_function( "", \'
