@@ -364,7 +364,7 @@
 											}
 											
 											if ( v.fade ) {
-												if ( v.fade.in ) {
+												if ( v.fade[ 'in' ] ) {
 													if ( pct < -1 ) sprite.css( 'opacity', 0 );
 													else if ( pct >= -1 && pct < 0 ) sprite.css( 'opacity', 1 + pct );
 													else sprite.css( 'opacity', 1 );
@@ -377,14 +377,14 @@
 											
 											// TO DO: implement wipe effect
 											if ( v.wipe ) {
-												if ( v.wipe.in ) {
-													if ( 'top' == v.wipe.in ) {
+												if ( v.wipe[ 'in' ] ) {
+													if ( 'top' == v.wipe[ 'in' ] ) {
 													
-													} else if ( 'right' == v.wipe.in ) {
+													} else if ( 'right' == v.wipe[ 'in' ] ) {
 													
-													} else if ( 'bottom' == v.wipe.in ) {
+													} else if ( 'bottom' == v.wipe[ 'in' ] ) {
 													
-													} else if ( 'left' == v.wipe.in ) {
+													} else if ( 'left' == v.wipe[ 'in' ] ) {
 													
 													}
 												}
