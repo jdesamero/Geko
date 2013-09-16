@@ -62,6 +62,16 @@ class Geko_Array
 	}
 	
 	
+	// return the chopped elements off subject
+	public static function chop( &$aSubject, $iNum ) {
+		
+		$aRet = array_slice( $aSubject, 0, $iNum );
+		$aSubject = array_slice( $aSubject, $iNum );
+		
+		return $aRet;
+	}
+	
+	
 	
 	// Get the corresponding element in an array, based on the given string index
 	//    ie: $sKeys: '[1]' or '[foo]' or '[att][val][30]

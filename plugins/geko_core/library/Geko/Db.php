@@ -1,62 +1,77 @@
 <?php
 
-//
+// wrapper for Zend_Db::factory
 class Geko_Db
 {
-	const GROC_NAMED_QUERY = 'groc.named.query';
+	
+	protected $_oDb;
+	
 	
 	//
-	public static function getRecord($sTableName)
-	{
-		$sDbClass = $sTableName;
-		return new $sDbClass;
+	public static function factory() {
+		
+		$aArgs = func_get_args();
+		
+		// create native instance of Zend_Db_Adapter
+		$oDb = call_user_func_array( array( 'Zend_Db', 'factory' ), $aArgs );
+		
+		// wrap it
+		return new Geko_Db( $oDb );
 	}
 	
-	//
-	public static function getTable($sTableName)
-	{
-		return Doctrine::getTable($sTableName);		
-	}
 	
 	//
-	public static function getRecordOrCreate(
-		$sTableName, $aParams, $sNamedQuery = self::GROC_NAMED_QUERY
-	) {
+	public function __construct( $oDb ) {
+		
+		$this->_oDb = $oDb;
+		
+	}
+	
+	
+	//
+	public function tableCreateIfNotExists() {
+		
+		$aArgs = func_get_args();
+		
+		if ( $aArgs[ 0 ] instanceof Geko_Sql_Table ) {
+			
+			$oTable = $aArgs[ 0 ];
+			
+			$sTableName = $oTable->getTableName();
+			$sQuery = strval( $oTable );
+			
+		} elseif ( is_string( $aArgs[ 0 ] ) && is_string( $aArgs[ 1 ] ) ) {
 
-		try {
+			$sTableName = $aArgs[ 0 ];
+			$sQuery = $aArgs[ 1 ];
+		}
+		
+		//
+		if ( $sTableName && $sQuery ) {
 			
-			// Check if record already exists
-			$oRec = Gapp_Db::getTable($sTableName)
-				->createNamedQuery($sNamedQuery)
-				->fetchOne($aParams)
-			;
+			$oDb = $this->_oDb;
 			
-			if (FALSE == is_object($oRec))
-			{	
-				// Insert new node
-				$oRec = Gapp_Db::getRecord($sTableName);
-				$oRec->merge($aParams);
-				$oRec->save();
+			try {
+				$oDb->describeTable( $sTableName );
+			} catch ( Exception $s ) {
+				$oDb->getConnection()->exec( $sQuery );
 			}
-			
-			return $oRec;
-			
-    	} catch (Exception $e) {
-    		
-    		// TO DO: log exception
-    		// echo $e;
-    		return NULL;
-    		
-    	}
-    	
+		}
+		
 	}
 	
 	
 	//
-	public static function insert($oCollection)
-	{
-		return $oCollection[$oCollection->count()];
+	public function __call( $sMethod, $aArgs ) {
+		
+		if ( $oDb = $this->_oDb ) {
+			// delegate
+			return call_user_func_array( array( $oDb, $sMethod ), $aArgs );
+		}
+		
+		throw new Exception( 'Invalid method ' . get_class( $this ) . '::' . $sMethod . '() called.' );
 	}
+	
 	
 }
 
