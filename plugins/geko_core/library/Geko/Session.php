@@ -122,11 +122,13 @@ class Geko_Session extends Geko_Singleton_Abstract
 	
 	//
 	public function getSessionKey() {
+		$this->initDb();
 		return $this->_sSessionKey;
 	}
 	
 	//
 	public function getSessionId() {
+		$this->initDb();
 		return $this->_iSessionId;
 	}
 	
