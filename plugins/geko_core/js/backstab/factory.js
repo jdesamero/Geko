@@ -84,6 +84,22 @@
 				if ( params.autourl ) {
 					ext.url = opts.script.ajax_content + '&section=' + opts.name_plural;
 				}
+
+				if ( params.parseinfo ) {
+					
+					ext.parse = function( response, options ) {
+						
+						this.info = null;	// reset
+						
+						if ( response[ '__info' ] && response[ '__body' ] ) {
+							this.info = response[ '__info' ];
+							return response[ '__body' ];
+						}
+						
+						return response;
+					}
+					
+				}
 				
 				return ext;
 				
