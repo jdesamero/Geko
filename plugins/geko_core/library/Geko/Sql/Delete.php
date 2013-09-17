@@ -11,10 +11,14 @@ class Geko_Sql_Delete
 	protected $_aFrom = array();
 	protected $_aWhere = array();
 	
+	protected $_oDb = NULL;
+	
 	
 	
 	//// constructor
-	public function __construct() { }
+	public function __construct( $oDb = NULL ) {
+		$this->_oDb = $oDb;
+	}
 	
 	//
 	public function from( $mValue, $sKey = NULL, $iFlag = NULL ) {
@@ -230,6 +234,11 @@ class Geko_Sql_Delete
 		// where clauses
 		if ( count( $this->_aWhere ) > 0 ) {
 			$sOutput .= 'WHERE ' . $this->createExpressionList( $this->_aWhere );
+		}
+		
+		// auto-prefix replacement
+		if ( $oDb = $this->_oDb ) {
+			$sOutput = $oDb->replacePrefixPlaceholder( $sOutput );
 		}
 		
 		return trim( $sOutput );

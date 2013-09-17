@@ -43,10 +43,14 @@ class Geko_Sql_Select
 												// to a query, useful if it is being passed
 												// along and modified
 	
+	protected $_oDb = NULL;
+	
 	
 	
 	//// constructor
-	public function __construct() { }
+	public function __construct( $oDb = NULL ) {
+		$this->_oDb = $oDb;
+	}
 	
 	
 	
@@ -879,6 +883,11 @@ class Geko_Sql_Select
 		// offset
 		if ( FALSE !== $this->_iOffset ) {
 			$sOutput .= sprintf( 'OFFSET %s ', $this->_iOffset );
+		}
+		
+		// auto-prefix replacement
+		if ( $oDb = $this->_oDb ) {
+			$sOutput = $oDb->replacePrefixPlaceholder( $sOutput );
 		}
 		
 		return trim( $sOutput );

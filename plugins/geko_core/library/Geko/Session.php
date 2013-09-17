@@ -51,9 +51,9 @@ class Geko_Session extends Geko_Singleton_Abstract
 			
 			//// session table
 			
-			$oSessTable = new Geko_Sql_Table();
+			$oSessTable = new Geko_Sql_Table( $oDb );
 			$oSessTable
-				->create( 'session', 's' )
+				->create( '##pfx##session', 's' )
 				->fieldBigInt( 'sess_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 				->fieldChar( 'sess_key', array( 'size' => 32, 'unq' ) )
 				->fieldLongText( 'user_agent' )
@@ -67,9 +67,9 @@ class Geko_Session extends Geko_Singleton_Abstract
 			
 			//// session data table
 			
-			$oSessDataTable = new Geko_Sql_Table();
+			$oSessDataTable = new Geko_Sql_Table( $oDb );
 			$oSessDataTable
-				->create( 'session_data', 'd' )
+				->create( '##pfx##session_data', 'd' )
 				->fieldBigInt( 'sess_id', array( 'unsgnd', 'notnull', 'key' ) )
 				->fieldVarChar( 'namespace', array( 'size' => 255 ) )
 				->fieldVarChar( 'var_name', array( 'size' => 255 ) )
@@ -86,13 +86,13 @@ class Geko_Session extends Geko_Singleton_Abstract
 			
 			
 			// check if session id is in database
-			$sSql = 'SELECT s.sess_id FROM session s WHERE sess_key = ?';
+			$sSql = 'SELECT s.sess_id FROM ##pfx##session s WHERE sess_key = ?';
 			
 			$iSessId = $oDb->fetchOne( $sSql, $this->_sSessionKey );
 			
 			if ( !$iSessId ) {
 				
-				$sDateTime = Geko_Db_Mysql::getTimestamp();
+				$sDateTime = $oDb->getTimestamp();
 				$aData = array(
 					'sess_key' => $this->_sSessionKey,
 					'user_agent' => $_SERVER[ 'HTTP_USER_AGENT' ],
@@ -100,7 +100,7 @@ class Geko_Session extends Geko_Singleton_Abstract
 					'date_modified' => $sDateTime
 				);
 				
-				$oDb->insert( 'session', $aData );
+				$oDb->insert( '##pfx##session', $aData );
 				
 				$iSessId = $oDb->lastInsertId();
 			}
@@ -176,7 +176,7 @@ class Geko_Session extends Geko_Singleton_Abstract
 		
 		//// insert
 		
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$sDateTime = $oDb->getTimestamp();
 		$aData = array(
 			'sess_id' => $this->_iSessionId,
 			'var_name' => $sKey,
@@ -193,7 +193,7 @@ class Geko_Session extends Geko_Singleton_Abstract
 			$aData[ 'namespace' ] = $sNamespace;
 		}
 		
-		$oDb->insert( 'session_data', $aData );
+		$oDb->insert( '##pfx##session_data', $aData );
 		
 		$this->_bCalledSet = TRUE;
 		
@@ -208,10 +208,10 @@ class Geko_Session extends Geko_Singleton_Abstract
 		$this->_iLastGetIdx = NULL;
 		$mValue = NULL;
 		
-		$oSql = new Geko_Sql_Select();
+		$oSql = new Geko_Sql_Select( $oDb );
 		$oSql
 			->field( '*' )
-			->from( 'session_data', 'd' )
+			->from( '##pfx##session_data', 'd' )
 			->where( 'd.sess_id = ?', $this->_iSessionId )
 			->where( 'd.var_name = ?', $sKey )
 			->order( 'd.idx', 'ASC' )
@@ -262,7 +262,7 @@ class Geko_Session extends Geko_Singleton_Abstract
 			$aDelParams[ 'namespace = ?' ] = $sNamespace;		
 		}
 		
-		$oDb->delete( 'session_data', $aDelParams );
+		$oDb->delete( '##pfx##session_data', $aDelParams );
 		
 		return $this;
 	}
@@ -348,8 +348,8 @@ class Geko_Session extends Geko_Singleton_Abstract
 			// update session time
 			$oDb = $this->_oDb;
 			
-			$oDb->update( 'session', array(
-				'date_modified' => Geko_Db_Mysql::getTimestamp()
+			$oDb->update( '##pfx##session', array(
+				'date_modified' => $oDb->getTimestamp()
 			), array(
 				'sess_id = ?' => $this->_iSessionId
 			) );

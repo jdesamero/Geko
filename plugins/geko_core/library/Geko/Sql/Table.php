@@ -61,10 +61,14 @@ class Geko_Sql_Table
 		'character set', 'collate'
 	);
 	
+	protected $_oDb = NULL;
+	
 	
 	
 	//// constructor
-	public function __construct() { }
+	public function __construct( $oDb = NULL ) {
+		$this->_oDb = $oDb;
+	}
 	
 	//
 	public function create( $sKey, $sPrefix = '' ) {
@@ -339,6 +343,11 @@ class Geko_Sql_Table
 					$sOutput .= ' ENGINE=' . $sEngine . ' ';
 				}
 			}
+		}
+		
+		// auto-prefix replacement
+		if ( $oDb = $this->_oDb ) {
+			$sOutput = $oDb->replacePrefixPlaceholder( $sOutput );
 		}
 		
 		return trim( $sOutput );
