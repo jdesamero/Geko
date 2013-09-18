@@ -41,8 +41,6 @@ class Geko_Wp_Layout extends Geko_Layout
 	
 	protected $_aTranslatedValues = array();
 	
-	protected $_aTemplates = array();
-	
 	protected $_aLinks = array();
 	
 	
@@ -166,69 +164,6 @@ class Geko_Wp_Layout extends Geko_Layout
 	public function getScriptUrls( $aOther = NULL ) {
 		return Geko_Wp::getScriptUrls( $aOther );
 	}
-	
-	
-	
-	
-	//// template routing methods
-	
-	// usage: addTemplate( <some template>, <grouping 1>, <grouping 2>, ... <n> )
-	public function addTemplate() {
-		
-		$aArgs = func_get_args();
-		
-		$sTemplate = array_shift( $aArgs );
-		
-		$this->_aTemplates[ $sTemplate ] = $aArgs;
-		
-		return $this;
-	}
-	
-	// usage: getTemplates( <grouping 1>, <grouping 2>, ... <n> )
-	public function getTemplates() {
-
-		$aArgs = func_get_args();
-		$aRet = array();
-		
-		foreach ( $this->_aTemplates  as $sTemplate => $aGroup ) {
-			$bMatch = TRUE;
-			foreach ( $aArgs as $sMatchGroup ) {
-				if ( !in_array( $sMatchGroup, $aGroup ) ) {
-					$bMatch = FALSE;
-					break;
-				}
-			}
-			if ( $bMatch ) $aRet[] = $sTemplate;
-		}
-		
-		return $aRet;
-	}
-	
-	// same as getTemplates(), return imploded string
-	public function getTemplateList() {
-		$aArgs = func_get_args();
-		$aRet = call_user_func_array( array( $this, 'getTemplates' ), $aArgs );
-		return implode( '|', $aRet );
-	}
-	
-	// convenience method
-	public function isTemplateList() {
-		$aArgs = func_get_args();
-		return $this->is(
-			call_user_func_array( array( $this, 'getTemplateList' ), $aArgs )
-		);
-	}
-	
-	//
-	public function getTemplateGrouping() {
-		foreach ( $this->_aTemplates as $sTemplate => $aGroup ) {
-			if ( $this->is( $sTemplate ) ) {
-				return $aGroup;
-			}
-		}
-		return array();
-	}
-	
 	
 	
 	
