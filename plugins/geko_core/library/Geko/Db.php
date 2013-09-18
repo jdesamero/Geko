@@ -108,7 +108,7 @@ class Geko_Db
 				$sTableName = $this->replacePrefixPlaceholder( $sTableName );
 				$oDb->describeTable( $sTableName );
 			} catch ( Exception $s ) {
-				$oDb->getConnection()->exec( $sQuery );
+				$oDb->exec( $sQuery );
 			}
 		}
 		
