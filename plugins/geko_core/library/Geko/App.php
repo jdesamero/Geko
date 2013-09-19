@@ -8,7 +8,18 @@ class Geko_App extends Geko_Singleton_Abstract
 	
 	protected $_bCalledInit = FALSE;
 	
-	protected $_aConfig = array();			// config flags for desired modules
+	protected $_aDeps = array(						// dependency tree for the various app components
+		'db' => NULL,
+		'match' => NULL,
+		'router' => NULL,
+		'sess' => array( 'db' ),
+		'auth' => array( 'sess' )
+	);
+	
+	protected $_aConfig = array(					// config flags for desired modules
+		'match' => TRUE,
+		'router' => TRUE
+	);
 	
 	
 	
@@ -34,73 +45,56 @@ class Geko_App extends Geko_Singleton_Abstract
 		return $this;
 	}
 	
+	// resolve any dependencies
+	public function resolveConfig( $aConfig = NULL ) {
+		
+		if ( NULL === $aConfig ) {
+			$aConfig = $this->_aConfig;
+		}
+		
+		foreach ( $aConfig as $sKey => $bUse ) {
+			if ( $bUse ) {
+				$aConfig[ $sKey ] = TRUE;
+				$aConfig = $this->getDeps( $aConfig, $sKey );
+			}
+		}
+		
+		return $aConfig;
+	}
+	
+	//
+	public function getDeps( $aConfig, $sKey ) {
+		
+		if ( $aDeps = $this->_aDeps[ $sKey ] ) {
+			foreach ( $aDeps as $sDep ) {
+				$aConfig = array_merge( array( $sDep => TRUE ), $aConfig );
+				$aConfig = $this->getDeps( $aConfig, $sDep );
+			}
+		}
+		
+		return $aConfig;
+	}
+	
+	
 	//
 	public function init() {
 		
 		if ( !$this->_bCalledInit ) {
 			
-			//
 			$this->doInitPre();
 			
-			//// database connection
+			//// run the requested components
 			
-			$oDb = Geko_Db::factory( 'Pdo_Mysql', array(
-				'host' => GEKO_DB_HOST,
-				'username' => GEKO_DB_USER,
-				'password' => GEKO_DB_PWD,
-				'dbname' => GEKO_DB_NAME,
-				'table_prefix' => GEKO_DB_TABLE_PREFIX
-			) );
+			$aConfig = $this->resolveConfig();
 			
-			self::set( 'db', $oDb );
-			
-			
-			//// session handler
-			$oSess = Geko_App_Session::getInstance()->init()->setDb( $oDb );
-			
-			self::set( 'sess', $oSess );
-			
-						
-			
-			//// router
-			
-			$oLayoutRoute = new Gloc_Router_Route_Layout();
-			
-			$oRouter = new Gloc_Router( GEKO_STANDALONE_URL );
-			$oRouter->addRoute( $oLayoutRoute );
-			
-			self::set( 'router', $oRouter );
-			
-			//// matcher
-			
-			$oMatch = new Gloc_Match();
-			$oMatch->addRule( new Gloc_Match_Rule_Route( $oRouter ) );
-			
-			Geko_Match::set( $oMatch );
-			self::set( 'match', $oMatch );
-			
-			
-			
-			//// optionals
-			$aConfig = $this->_aConfig;
-			
-			if ( $aConfig[ 'auth' ] ) {
-			
-				$oAuth = Zend_Auth::getInstance();
-				
-				$oAuthAdapter = new Geko_App_Auth_Adapter( $oDb );
-				$oAuthStorage = new Geko_App_Auth_Storage( $oSess );
-				
-				$oAuth->setStorage( $oAuthStorage );
-				
-				self::set( 'auth', $oAuth );
-				self::set( 'auth_adapter', $oAuthAdapter );
-				
-				$oRouter->prependRoute( new Geko_App_Auth_Route( $oAuth ) );
+			// $mArgs, use if needed later
+			foreach ( $aConfig as $sComp => $mArgs ) {
+				$sMethod = 'comp' . Geko_Inflector::camelize( $sComp );
+				if ( method_exists( $this, $sMethod ) ) {
+					$this->$sMethod();
+				}
 			}
 			
-			
-			//
 			$this->doInitPost();
 			
 			$this->_bCalledInit = TRUE;
@@ -116,16 +110,123 @@ class Geko_App extends Geko_Singleton_Abstract
 	
 	
 	
+	
+	//// default components
+	
+	
+	// database connection
+	// independent
+	public function compDb() {
+
+		$oDb = Geko_Db::factory( 'Pdo_Mysql', array(
+			'host' => GEKO_DB_HOST,
+			'username' => GEKO_DB_USER,
+			'password' => GEKO_DB_PWD,
+			'dbname' => GEKO_DB_NAME,
+			'table_prefix' => GEKO_DB_TABLE_PREFIX
+		) );
+		
+		self::set( 'db', $oDb );
+	}
+	
+	
+	// session handler
+	// depends on: "db"
+	public function compSess() {
+		
+		$oDb = self::get( 'db' );
+		
+		$oSess = Geko_App_Session::getInstance()->setDb( $oDb )->init();
+		
+		if ( $this->doRegenerateSessionKey() ) {
+			$oSess->regenerateSessionKey();
+		}
+		
+		self::set( 'sess', $oSess );	
+	}
+	
+	//
+	public function doRegenerateSessionKey() {
+		return ( $_REQUEST[ 'ajax_content' ] ) ? FALSE : TRUE ;
+	}
+	
+	
+	
+	// matcher
+	// independent
+	public function compMatch() {
+	
+		$oMatch = new Gloc_Match();
+		
+		Geko_Match::set( $oMatch );
+		
+		self::set( 'match', $oMatch );	
+	}
+	
+	
+	// router
+	// independent; optional: "match"
+	public function compRouter() {
+		
+		$oLayoutRoute = new Gloc_Router_Route_Layout();
+		
+		$oRouter = new Gloc_Router( GEKO_STANDALONE_URL );
+		$oRouter->addRoute( $oLayoutRoute );
+
+		if ( $oMatch = self::get( 'match' ) ) {
+			$oMatch->addRule( new Gloc_Match_Rule_Route( $oRouter ) );		
+		}
+		
+		self::set( 'router', $oRouter );	
+	}
+	
+	
+	// auth
+	// depends on: "db", "sess"; optional: "router"
+	public function compAuth() {
+		
+		$oDb = self::get( 'db' );
+		$oSess = self::get( 'sess' );
+		
+		$oAuth = Zend_Auth::getInstance();
+		
+		$oAuthAdapter = new Geko_App_Auth_Adapter( $oDb );
+		$oAuthStorage = new Geko_App_Auth_Storage( $oSess );
+		
+		$oAuth->setStorage( $oAuthStorage );
+		
+		if ( $oRouter = self::get( 'router' ) ) {
+			$oRouter->prependRoute( new Geko_App_Auth_Route( $oAuth ) );
+		}
+		
+		// logout
+		if ( $this->doLogout() ) {
+			
+			$oSess->destroySession();
+			$oAuth->clearIdentity();
+			
+			header( 'Location: ' . GEKO_STANDALONE_URL );
+			die();
+		}
+		
+		self::set( 'auth', $oAuth );
+		self::set( 'auth_adapter', $oAuthAdapter );	
+	}
+	
+	//
+	public function doLogout() {
+		return ( $_REQUEST[ 'logout' ] ) ? TRUE : FALSE ;
+	}
+	
+	
+	
+	//// run the app
+	
 	//
 	public function run() {
 		
-		//
 		$this->doRunPre();
-		
-		// run the router
-		self::get( 'router' )->run();
-		
-		//
+		$this->doRun();
 		$this->doRunPost();
 		
 		return $this;
@@ -135,6 +236,10 @@ class Geko_App extends Geko_Singleton_Abstract
 	public function doRunPre() { }
 	public function doRunPost() { }
 	
+	//
+	public function doRun() {
+		self::get( 'router' )->run();
+	}
 	
 	
 	

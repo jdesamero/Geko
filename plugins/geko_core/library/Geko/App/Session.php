@@ -11,6 +11,7 @@ class Geko_App_Session extends Geko_Singleton_Abstract
 	
 	protected $_iSessionId;
 	protected $_sSessionKey;
+	protected $_bNewSession = FALSE;
 	
 	protected $_aDbParams = array();
 	protected $_oDb;
@@ -30,11 +31,10 @@ class Geko_App_Session extends Geko_Singleton_Abstract
 		if ( !$this->_bCalledInit ) {
 						
 			Zend_Session::start();
-			
-			// TO DO: for security
-			// Zend_Session::regenerateId()
-			
+						
 			$this->_sSessionKey = Zend_Session::getId();
+			
+			$this->initDb();
 			
 			$this->_bCalledInit = TRUE;
 		}
@@ -52,7 +52,10 @@ class Geko_App_Session extends Geko_Singleton_Abstract
 				$oDb = call_user_func_array( array( 'Geko_Db', 'factory' ), $this->_aDbParams );
 			}
 			
-			//// session table
+			
+			//// initialize session tables, if needed
+			
+			// session table
 			
 			$oSessTable = new Geko_Sql_Table( $oDb );
 			$oSessTable
@@ -67,8 +70,7 @@ class Geko_App_Session extends Geko_Singleton_Abstract
 			$oDb->tableCreateIfNotExists( $oSessTable );
 				
 			
-			
-			//// session data table
+			// session data table
 			
 			$oSessDataTable = new Geko_Sql_Table( $oDb );
 			$oSessDataTable
@@ -88,12 +90,15 @@ class Geko_App_Session extends Geko_Singleton_Abstract
 			
 			
 			
-			// check if session id is in database
+			//// check if session id is in database
+			
 			$sSql = 'SELECT s.sess_id FROM ##pfx##session s WHERE sess_key = ?';
 			
 			$iSessId = $oDb->fetchOne( $sSql, $this->_sSessionKey );
 			
 			if ( !$iSessId ) {
+				
+				// create new entry
 				
 				$sDateTime = $oDb->getTimestamp();
 				$aData = array(
@@ -106,17 +111,49 @@ class Geko_App_Session extends Geko_Singleton_Abstract
 				$oDb->insert( '##pfx##session', $aData );
 				
 				$iSessId = $oDb->lastInsertId();
+				
+				$this->_bNewSession = TRUE;
 			}
+			
+			
+			
+			//// assign stuff
 			
 			$this->_iSessionId = $iSessId;
 			$this->_oDb = $oDb;
 			
 			$this->_bInitDb = TRUE;
+			
 		}
 		
 		return $this->_oDb;
 	}
 	
+	
+	//
+	public function regenerateSessionKey() {
+		
+		$oDb = $this->initDb();
+		
+		// if already an existing session, then regenerate session key and update
+		if ( !$this->_bNewSession ) {
+			
+			Zend_Session::regenerateId();	// regenerate
+			
+			$sRegenSessKey = Zend_Session::getId();
+			
+			$oDb->update( '##pfx##session', array(
+				'sess_key' => $sRegenSessKey,
+				'date_modified' => $oDb->getTimestamp()
+			), array(
+				'sess_id = ?' => $this->_iSessionId
+			) );
+			
+			$this->_sSessionKey = $sRegenSessKey;
+		}
+		
+		return $this;
+	}
 	
 	
 	
@@ -344,6 +381,17 @@ class Geko_App_Session extends Geko_Singleton_Abstract
 		return $mValue;
 	}
 	
+	//
+	public function destroySession() {
+
+		// update session time
+		$oDb = $this->_oDb;
+		
+		$oDb->delete( '##pfx##session_data', array( 'sess_id = ?' => $this->_iSessionId ) );
+		$oDb->delete( '##pfx##session', array( 'sess_id = ?' => $this->_iSessionId ) );
+		
+		return $this;
+	}
 	
 	//
 	public function __destruct() {

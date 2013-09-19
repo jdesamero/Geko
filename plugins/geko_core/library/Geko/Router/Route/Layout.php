@@ -4,7 +4,6 @@
 class Geko_Router_Route_Layout extends Geko_Router_Route
 {
 	
-	protected $_aPrefixes = array( 'Tmpl_', 'Gloc_', 'Geko_' );
 	protected $_aSkip = array( 'Aux' );
 	
 	protected $_sBestMatch = '';
@@ -52,24 +51,7 @@ class Geko_Router_Route_Layout extends Geko_Router_Route
 		return $this;
 	}
 	
-	
-	//// helpers
-	
-	//
-	public function getBestMatch() {
 		
-		$aSuffixes = func_get_args();
-		
-		$aClasses = array();
-		
-		foreach ( $aSuffixes as $sSuffix ) {
-			foreach ( $this->_aPrefixes as $sPrefix ) {
-				$aClasses[] = $sPrefix . $sSuffix;
-			}
-		}
-		
-		return Geko_Class::existsCoalesce( $aClasses );
-	}
 	
 	
 	//// functionality
@@ -139,13 +121,18 @@ class Geko_Router_Route_Layout extends Geko_Router_Route
 	
 	//
 	public function run() {
+		
 		if ( $sBestMatch = $this->_sBestMatch ) {
 			Geko_Singleton_Abstract::getInstance( $sBestMatch )
 				->init()
 				->setLeftovers( $this->_aLeftovers )
 			;
+		} else {
+			throw new Exception( 'A valid template class was not found!' );
 		}
+		
 	}
+	
 	
 }
 
