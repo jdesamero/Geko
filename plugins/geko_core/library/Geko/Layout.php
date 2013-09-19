@@ -41,6 +41,13 @@ class Geko_Layout extends Geko_Singleton_Abstract
 			$oRenderer->addLayout( $this );
 		}
 		
+		$this->start();
+		
+		return $this;
+	}
+	
+	// call right after init()
+	public function start() {
 		return $this;
 	}
 	
@@ -253,6 +260,12 @@ class Geko_Layout extends Geko_Singleton_Abstract
 	
 	//
 	public function echoAjaxContent() {
+		
+		if ( $sData = $GLOBALS[ 'HTTP_RAW_POST_DATA' ] ) {
+			try {
+				$_POST = $_REQUEST = Zend_Json::decode( $sData );
+			} catch ( Exception $e ) { }
+		}
 		
 		$aAjaxResponse = NULL;
 		

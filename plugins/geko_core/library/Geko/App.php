@@ -4,29 +4,45 @@
 class Geko_App extends Geko_Singleton_Abstract
 {
 	
-	protected static $aRegistry = array();
+	protected static $_aRegistry = array();
 	
-	protected $bCalledInit = FALSE;
+	protected $_bCalledInit = FALSE;
+	
+	protected $_aConfig = array();			// config flags for desired modules
 	
 	
+	
+	//// static methods
 	
 	//
 	public static function set( $sKey, $mValue ) {
-		self::$aRegistry[ $sKey ] = $mValue;
+		self::$_aRegistry[ $sKey ] = $mValue;
 	}
 	
 	//
 	public static function get( $sKey ) {
-		return self::$aRegistry[ $sKey ];
+		return self::$_aRegistry[ $sKey ];
 	}
 	
+	
+	
+	//// functionality
+	
+	//
+	public function config( $aParams ) {
+		$this->_aConfig = array_merge( $this->_aConfig, $aParams );
+		return $this;
+	}
 	
 	//
 	public function init() {
 		
-		if ( !$this->bCalledInit ) {
+		if ( !$this->_bCalledInit ) {
 			
-			// database connection
+			//
+			$this->doInitPre();
+			
+			//// database connection
 			
 			$oDb = Geko_Db::factory( 'Pdo_Mysql', array(
 				'host' => GEKO_DB_HOST,
@@ -39,13 +55,14 @@ class Geko_App extends Geko_Singleton_Abstract
 			self::set( 'db', $oDb );
 			
 			
-			// session handler
-			$oSess = Geko_Session::getInstance()->init()->setDb( $oDb );
+			//// session handler
+			$oSess = Geko_App_Session::getInstance()->init()->setDb( $oDb );
 			
 			self::set( 'sess', $oSess );
 			
+						
 			
-			// router
+			//// router
 			
 			$oLayoutRoute = new Gloc_Router_Route_Layout();
 			
@@ -54,7 +71,7 @@ class Geko_App extends Geko_Singleton_Abstract
 			
 			self::set( 'router', $oRouter );
 			
-			// matcher
+			//// matcher
 			
 			$oMatch = new Gloc_Match();
 			$oMatch->addRule( new Gloc_Match_Rule_Route( $oRouter ) );
@@ -63,21 +80,62 @@ class Geko_App extends Geko_Singleton_Abstract
 			self::set( 'match', $oMatch );
 			
 			
-			$this->bCalledInit = TRUE;
+			
+			//// optionals
+			$aConfig = $this->_aConfig;
+			
+			if ( $aConfig[ 'auth' ] ) {
+			
+				$oAuth = Zend_Auth::getInstance();
+				
+				$oAuthAdapter = new Geko_App_Auth_Adapter( $oDb );
+				$oAuthStorage = new Geko_App_Auth_Storage( $oSess );
+				
+				$oAuth->setStorage( $oAuthStorage );
+				
+				self::set( 'auth', $oAuth );
+				self::set( 'auth_adapter', $oAuthAdapter );
+				
+				$oRouter->prependRoute( new Geko_App_Auth_Route( $oAuth ) );
+			}
+			
+			
+			//
+			$this->doInitPost();
+			
+			$this->_bCalledInit = TRUE;
 		}
 		
 		return $this;
 	}
 	
+	// hook methods
+	public function doInitPre() { }
+	public function doInitPost() { }
+	
+	
+	
+	
 	//
 	public function run() {
-
+		
+		//
+		$this->doRunPre();
+		
 		// run the router
 		self::get( 'router' )->run();
 		
+		//
+		$this->doRunPost();
+		
 		return $this;
 	}
-		
+	
+	// hook methods
+	public function doRunPre() { }
+	public function doRunPost() { }
+	
+	
 	
 	
 }

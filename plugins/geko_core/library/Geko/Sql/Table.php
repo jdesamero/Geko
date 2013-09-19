@@ -120,8 +120,21 @@ class Geko_Sql_Table
 	//// accessors
 	
 	//
-	public function getTableName() {
+	public function getRawTableName() {
 		return $this->_aTable[ 0 ];
+	}
+	
+	//
+	public function getTableName() {
+		
+		$sTable = $this->_aTable[ 0 ];
+		
+		// auto-prefix replacement
+		if ( $oDb = $this->_oDb ) {
+			$sTable = $oDb->replacePrefixPlaceholder( $sTable );
+		}
+		
+		return $sTable;
 	}
 	
 	//

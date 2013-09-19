@@ -71,6 +71,10 @@ class Geko_Db
 		return $sOutput;
 	}
 	
+	//
+	public function getDb() {
+		return $this->_oDb;
+	}
 	
 	
 	

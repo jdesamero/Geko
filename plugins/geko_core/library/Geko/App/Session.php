@@ -1,7 +1,7 @@
 <?php
 
 //
-class Geko_Session extends Geko_Singleton_Abstract
+class Geko_App_Session extends Geko_Singleton_Abstract
 {
 	
 	const ENCODE_NONE = 0;
@@ -29,9 +29,12 @@ class Geko_Session extends Geko_Singleton_Abstract
 		
 		if ( !$this->_bCalledInit ) {
 						
-			session_start();
+			Zend_Session::start();
 			
-			$this->_sSessionKey = session_id();
+			// TO DO: for security
+			// Zend_Session::regenerateId()
+			
+			$this->_sSessionKey = Zend_Session::getId();
 			
 			$this->_bCalledInit = TRUE;
 		}
