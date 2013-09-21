@@ -4,7 +4,7 @@
 class Geko_Router_Route
 {
 	
-	protected $_aPrefixes = array( 'Tmpl_', 'Gloc_', 'Geko_' );
+	protected $_aPrefixes = array( 'Geko_' );
 	
 	protected $_oRouter;
 	
@@ -26,23 +26,14 @@ class Geko_Router_Route
 	
 	
 	//// helpers
-
+	
 	//
 	public function getBestMatch() {
-		
 		$aSuffixes = func_get_args();
-		
-		$aClasses = array();
-		
-		foreach ( $aSuffixes as $sSuffix ) {
-			foreach ( $this->_aPrefixes as $sPrefix ) {
-				$aClasses[] = $sPrefix . $sSuffix;
-			}
-		}
-		
-		return Geko_Class::existsCoalesce( $aClasses );
+		return Geko_Class::getBestMatch( $this->_aPrefixes, $aSuffixes );
 	}
-
+	
+	
 	
 }
 

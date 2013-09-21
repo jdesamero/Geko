@@ -91,7 +91,23 @@ class Geko_Class
 
 		return self::$_aResolveCache[ $sResolveKey ];
 	}
+	
+	//
+	public static function getBestMatch( $aPrefixes, $aSuffixes ) {
 		
+		$aClasses = array();
+		
+		foreach ( $aSuffixes as $sSuffix ) {
+			foreach ( $aPrefixes as $sPrefix ) {
+				$aClasses[] = $sPrefix . $sSuffix;
+			}
+		}
+		
+		return Geko_Class::existsCoalesce( $aClasses );	
+	}
+	
+	
+	
 }
 
 

@@ -6,6 +6,7 @@ class Geko_App extends Geko_Singleton_Abstract
 	
 	protected static $_aRegistry = array();
 	
+	
 	protected $_bCalledInit = FALSE;
 	
 	protected $_aDeps = array(						// dependency tree for the various app components
@@ -20,6 +21,9 @@ class Geko_App extends Geko_Singleton_Abstract
 		'match' => TRUE,
 		'router' => TRUE
 	);
+	
+	protected $_aPrefixes = array( 'Gloc_', 'Geko_App_', 'Geko_' );
+	
 	
 	
 	
@@ -52,9 +56,9 @@ class Geko_App extends Geko_Singleton_Abstract
 			$aConfig = $this->_aConfig;
 		}
 		
-		foreach ( $aConfig as $sKey => $bUse ) {
-			if ( $bUse ) {
-				$aConfig[ $sKey ] = TRUE;
+		foreach ( $aConfig as $sKey => $mArgs ) {
+			if ( $mArgs ) {
+				$aConfig[ $sKey ] = $mArgs;
 				$aConfig = $this->getDeps( $aConfig, $sKey );
 			}
 		}
@@ -155,30 +159,58 @@ class Geko_App extends Geko_Singleton_Abstract
 	// matcher
 	// independent
 	public function compMatch() {
-	
-		$oMatch = new Gloc_Match();
 		
-		Geko_Match::set( $oMatch );
+		$sClass = $this->getBestMatch( 'Match' );
+		
+		$oMatch = new $sClass();
+		
+		call_user_func( array( $sClass, 'set' ), $oMatch );
 		
 		self::set( 'match', $oMatch );	
 	}
+	
 	
 	
 	// router
 	// independent; optional: "match"
 	public function compRouter() {
 		
-		$oLayoutRoute = new Gloc_Router_Route_Layout();
+		$sRouterClass = $this->getBestMatch( 'Router' );
 		
-		$oRouter = new Gloc_Router( GEKO_STANDALONE_URL );
-		$oRouter->addRoute( $oLayoutRoute );
-
+		$oRouter = new $sRouterClass( GEKO_STANDALONE_URL );
+		
+		
+		
+		
+		//// service stuff
+		
+		$sRouteServiceClass = $this->getBestMatch( 'Router_Route_Service' );
+		
+		$oServiceRoute = new $sRouteServiceClass();
+		$oRouter->addRoute( $oServiceRoute, 6000, 'service' );
+		
+		
+		
+		//// layout stuff
+		
+		$sRouteLayoutClass = $this->getBestMatch( 'Router_Route_Layout' );
+		
+		$oLayoutRoute = new $sRouteLayoutClass();
+		$oRouter->addRoute( $oLayoutRoute, 9000, 'layout' );
+		
 		if ( $oMatch = self::get( 'match' ) ) {
-			$oMatch->addRule( new Gloc_Match_Rule_Route( $oRouter ) );		
+			
+			$sMatchClass = $this->getBestMatch( 'Match_Rule_Route' );
+			
+			$oMatch->addRule( new $sMatchClass( $oRouter ) );		
 		}
+		
+		
+		
 		
 		self::set( 'router', $oRouter );	
 	}
+	
 	
 	
 	// auth
@@ -196,7 +228,7 @@ class Geko_App extends Geko_Singleton_Abstract
 		$oAuth->setStorage( $oAuthStorage );
 		
 		if ( $oRouter = self::get( 'router' ) ) {
-			$oRouter->prependRoute( new Geko_App_Auth_Route( $oAuth ) );
+			$oRouter->addRoute( new Geko_App_Auth_Route( $oAuth ), 1000 );
 		}
 		
 		// logout
@@ -239,6 +271,16 @@ class Geko_App extends Geko_Singleton_Abstract
 	//
 	public function doRun() {
 		self::get( 'router' )->run();
+	}
+	
+	
+	
+	//// helpers
+	
+	//
+	public function getBestMatch() {
+		$aSuffixes = func_get_args();
+		return Geko_Class::getBestMatch( $this->_aPrefixes, $aSuffixes );
 	}
 	
 	
