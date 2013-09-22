@@ -4,9 +4,50 @@
 class Geko_Service extends Geko_Singleton_Abstract
 {
 	
-	protected $aAjaxResponse = array();
+	protected $aLeftovers = array();
+	protected $aAjaxResponse = array(
+		'context' => 'service'
+	);
 	protected $sEncryptKey = '';
 	
+	
+	
+	
+	//// other stuff
+	
+	//
+	public function init() {
+		
+		if ( $sData = $GLOBALS[ 'HTTP_RAW_POST_DATA' ] ) {
+			try {
+				$_POST = $_REQUEST = Zend_Json::decode( $sData );
+			} catch ( Exception $e ) { }
+		}
+		
+		return $this;
+	}
+	
+	//
+	public function process() {
+		return $this;
+	}
+	
+	//
+	public function output() {
+		echo Zend_Json::encode( $this->aAjaxResponse );
+		return $this;
+	}
+	
+	// hook
+	public function modifyParams( $aParams ) {
+		return $aParams;
+	}
+	
+	//
+	public function setLeftovers( $aLeftovers ) {
+		 $this->aLeftovers = $aLeftovers;
+		 return $this;
+	}
 	
 	
 	
@@ -38,39 +79,17 @@ class Geko_Service extends Geko_Singleton_Abstract
 		return $this;
 	}
 	
-	
-	
-	//// captcha stuff
-	
 	//
-	public function captchaIsValid() {
+	public function setResponseValues( $aValues ) {
 		
-		$oCaptcha = recaptcha_check_answer(
-			RECAPTCHA_PRIVATE_KEY,
-			$_SERVER[ 'REMOTE_ADDR' ],
-			$_REQUEST[ 'recaptcha_challenge_field' ],
-			$_REQUEST[ 'recaptcha_response_field' ]
-		);
+		$this->aAjaxResponse = array_merge( $this->aAjaxResponse, $aValues );
 		
-		return $oCaptcha->is_valid;
-	}
-	
-	
-	
-	
-	//// other stuff
-	
-	
-	//
-	public function process() {
 		return $this;
 	}
 	
-	//
-	public function output() {
-		echo Zend_Json::encode( $this->aAjaxResponse );
-		return $this;
-	}
+	
+	
+	//// encrypt/decrypt helpers
 	
 	//
 	public function encrypt( $sData, $sKey = '' ) {
@@ -101,12 +120,27 @@ class Geko_Service extends Geko_Singleton_Abstract
 			md5( md5( $sKey ) )
 		), "\0" );
 	}
+
 	
-	// hook
-	public function modifyParams( $aParams ) {
-		return $aParams;
+	
+	
+	
+	//// captcha stuff
+	
+	//
+	public function captchaIsValid() {
+		
+		$oCaptcha = recaptcha_check_answer(
+			RECAPTCHA_PRIVATE_KEY,
+			$_SERVER[ 'REMOTE_ADDR' ],
+			$_REQUEST[ 'recaptcha_challenge_field' ],
+			$_REQUEST[ 'recaptcha_response_field' ]
+		);
+		
+		return $oCaptcha->is_valid;
 	}
 	
+		
 	
 	
 	

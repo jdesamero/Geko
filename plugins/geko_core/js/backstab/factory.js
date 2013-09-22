@@ -57,7 +57,9 @@
 			
 			modelExt = factorySetup( modelExt, opts.model, function( ext, params ) {
 				
-				if ( params.autourl ) {
+				if ( 'srv' == params.autourl ) {
+					ext.url = opts.script.srv + '/' + opts.name;
+				} else if ( 'ajax_content' == params.autourl ) {
 					ext.url = opts.script.ajax_content + '&section=' + opts.name;
 				}
 				
@@ -81,10 +83,12 @@
 			
 			collectionExt = factorySetup( collectionExt, opts.collection, function( ext, params ) {
 				
-				if ( params.autourl ) {
+				if ( 'srv' == params.autourl ) {
+					ext.url = opts.script.srv + '/' + opts.name;
+				} else if ( 'ajax_content' == params.autourl ) {
 					ext.url = opts.script.ajax_content + '&section=' + opts.name_plural;
 				}
-
+				
 				if ( params.parseinfo ) {
 					
 					ext.parse = function( response, options ) {

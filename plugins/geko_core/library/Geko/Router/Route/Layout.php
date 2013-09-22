@@ -93,7 +93,7 @@ class Geko_Router_Route_Layout extends Geko_Router_Route
 		$sBestMatch = '';
 		$aBestMatch = array();
 		
-		foreach ( $aPathItems as $i => $sItem ) {
+		foreach ( $aPathItems as $sItem ) {
 			
 			array_shift( $aPathLeft );
 			

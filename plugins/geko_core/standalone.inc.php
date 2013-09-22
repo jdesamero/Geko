@@ -93,7 +93,8 @@ Geko_Uri::setUrl( array(
 	'geko_upload' => GEKO_CORE_URI . '/srv/upload.php',
 	'geko_styles' => GEKO_CORE_URI . '/styles',
 	'geko_ext_styles' => GEKO_CORE_URI . '/external/styles',
-	'geko_ext_swf' => GEKO_CORE_URI . '/external/swf'
+	'geko_ext_swf' => GEKO_CORE_URI . '/external/swf',
+	'geko_app_srv' => GEKO_STANDALONE_URL . '/srv'
 ) );
 
 

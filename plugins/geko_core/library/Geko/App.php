@@ -171,7 +171,7 @@ class Geko_App extends Geko_Singleton_Abstract
 	
 	// database connection
 	// independent
-	public function compDb() {
+	public function compDb( $mArgs ) {
 
 		$oDb = Geko_Db::factory( 'Pdo_Mysql', array(
 			'host' => GEKO_DB_HOST,
@@ -187,7 +187,7 @@ class Geko_App extends Geko_Singleton_Abstract
 	
 	// session handler
 	// depends on: "db"
-	public function compSess() {
+	public function compSess( $mArgs ) {
 		
 		$oDb = self::get( 'db' );
 		
@@ -209,7 +209,7 @@ class Geko_App extends Geko_Singleton_Abstract
 	
 	// matcher
 	// independent
-	public function compMatch() {
+	public function compMatch( $mArgs ) {
 		
 		$sClass = $this->getBestMatch( 'Match' );
 		
@@ -224,7 +224,7 @@ class Geko_App extends Geko_Singleton_Abstract
 	
 	// router
 	// independent; optional: "match"
-	public function compRouter() {
+	public function compRouter( $mArgs ) {
 		
 		$sRouterClass = $this->getBestMatch( 'Router' );
 		
@@ -236,7 +236,7 @@ class Geko_App extends Geko_Singleton_Abstract
 	
 	// router.service
 	// depends on: "router"
-	public function compRouter_Service() {
+	public function compRouter_Service( $mArgs ) {
 		
 		$oRouter = self::get( 'router' );
 		
@@ -252,7 +252,7 @@ class Geko_App extends Geko_Singleton_Abstract
 	
 	// router.layout
 	// depends on: "router"
-	public function compRouter_Layout() {
+	public function compRouter_Layout( $mArgs ) {
 		
 		$oRouter = self::get( 'router' );
 		
@@ -276,7 +276,7 @@ class Geko_App extends Geko_Singleton_Abstract
 	
 	// auth
 	// depends on: "db", "sess"; optional: "router"
-	public function compAuth() {
+	public function compAuth( $mArgs ) {
 		
 		$oDb = self::get( 'db' );
 		$oSess = self::get( 'sess' );
@@ -310,7 +310,7 @@ class Geko_App extends Geko_Singleton_Abstract
 	
 	// router.auth
 	// depends on: "router", "auth"
-	public function compRouter_Auth() {
+	public function compRouter_Auth( $mArgs ) {
 		
 		$oRouter = self::get( 'router' );
 		$oAuth = self::get( 'auth' );

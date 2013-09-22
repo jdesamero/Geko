@@ -89,7 +89,8 @@ class Geko_Layout extends Geko_Singleton_Abstract
 			'url' => GEKO_STANDALONE_URL,
 			'curpage' => $sCurPage,
 			'curpath' => $sCurPath,
-			'ajax_content' => $sAjaxContent
+			'ajax_content' => $sAjaxContent,
+			'srv' => Geko_Uri::getUrl( 'geko_app_srv' )
 		);
 		
 		if ( is_array( $aOther ) ) {
