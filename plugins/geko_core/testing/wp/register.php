@@ -5,8 +5,8 @@ ini_set( 'display_errors', 1 );
 error_reporting( E_ALL ^ E_NOTICE );
 // error_reporting( E_ALL );
 
-require_once realpath( '../wp-load.php' );
-require_once realpath( '../wp-admin/includes/admin.php' );
+require_once realpath( '../../../../../wp-load.php' );
+require_once realpath( '../../../../../wp-admin/includes/admin.php' );
 
 // ---------------------------------------------------------------------------------------------- //
 
@@ -35,43 +35,8 @@ error_reporting( E_ALL );
 
 <?php
 
-$aFmMetaDataFmt = array();
-$aFmMetaData = new Geko_Wp_Form_MetaData_Query( array(
-	'form_id' => 1,
-	'showposts' => -1,
-	'posts_per_page' => -1
-), FALSE );
-
-foreach ( $aFmMetaData as $oFmMetaData ) {
-	$aFmMetaDataFmt[] = array(
-		'id' => $oFmMetaData->getId(),
-		'fmitmtyp_id' => $oFmMetaData->getFmitmtypId(),
-		'name' => $oFmMetaData->getName(),
-		'slug' => $oFmMetaData->getSlug(),
-		'rank' => $oFmMetaData->getRank(),
-		'lang_id' => $oFmMetaData->getLangId(),
-		'context_id' => $oFmMetaData->getContextId()
-	);		
-}
-
-print_r( $aFmMetaDataFmt );
 
 
-/*
-
-wp_geko_form_item
-	parent_itmvalidx_id
-	parent_itm_id
-	hide_subs
-	
-wp_geko_form_item_type
-	has_choice_subs
-
-wp_geko_form_item_value
-	hide_items
-	show_widgets
-
-*/
 
 ?>
 

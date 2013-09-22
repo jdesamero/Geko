@@ -1,7 +1,7 @@
 <?php
 
-require_once realpath( '../wp-load.php' );
-require_once realpath( '../wp-admin/includes/admin.php' );
+require_once realpath( '../../../../../wp-load.php' );
+require_once realpath( '../../../../../wp-admin/includes/admin.php' );
 
 // ---------------------------------------------------------------------------------------------- //
 

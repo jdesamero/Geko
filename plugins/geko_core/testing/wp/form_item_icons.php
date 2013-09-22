@@ -5,8 +5,8 @@ ini_set( 'display_errors', 1 );
 error_reporting( E_ALL ^ E_NOTICE );
 // error_reporting( E_ALL );
 
-require_once realpath( '../wp-load.php' );
-require_once realpath( '../wp-admin/includes/admin.php' );
+require_once realpath( '../../../../../wp-load.php' );
+require_once realpath( '../../../../../wp-admin/includes/admin.php' );
 
 // ---------------------------------------------------------------------------------------------- //
 

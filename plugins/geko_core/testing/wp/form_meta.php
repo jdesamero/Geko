@@ -5,8 +5,8 @@ ini_set( 'display_errors', 1 );
 error_reporting( E_ALL ^ E_NOTICE );
 // error_reporting( E_ALL );
 
-require_once realpath( '../wp-load.php' );
-require_once realpath( '../wp-admin/includes/admin.php' );
+require_once realpath( '../../../../../wp-load.php' );
+require_once realpath( '../../../../../wp-admin/includes/admin.php' );
 
 // ---------------------------------------------------------------------------------------------- //
 
@@ -23,19 +23,12 @@ error_reporting( E_ALL );
 /* */
 
 $sForm = $_GET[ 'form' ];
-if ( !$sForm ) $sForm = 'test';
-// $sForm = 'job-app';
+if ( !$sForm ) {
+	// $sForm = 'test';
+	$sForm = 'testing-reference-form';
+}
 
 $oForm = new Geko_Wp_Form( $sForm );
-$oFormRender = $oForm->getRenderer();
-// $aItemTypes = Geko_Wp_Form::getItemTypes();
-
-/* /
-foreach ( $aItemTypes as $oType ):
-	$oType->echoTitle();
-	$oType->echoSlug();
-endforeach;
-/* */
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -49,8 +42,27 @@ endforeach;
 
 <body>
 
-<?php $oFormRender->render(); ?>
-<?php // $oFormRender->render( FALSE ); ?>
+<h1>Form Meta</h1>
+
+<?php
+
+$aLangContext = array(
+	array( 'section', 'en' ),
+	array( 'question', 'en' ),
+	array( 'choice', 'en' ),
+	array( 'section', 'fr' ),
+	array( 'question', 'fr' ),
+	array( 'choice', 'fr' )
+);
+
+?>
+
+<?php foreach ( $aLangContext as $a ): ?>
+	<h2><?php printf( '%s - %s', $a[ 0 ], $a[ 1 ] ); ?></h2>
+	<pre>
+		<?php print_r( $oForm->getFormMeta( $a[ 0 ], $a[ 1 ] ) ); ?>
+	</pre>
+<?php endforeach; ?>
 
 </body>
 
