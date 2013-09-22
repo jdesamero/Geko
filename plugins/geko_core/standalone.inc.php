@@ -49,7 +49,7 @@ require_once 'mpgClasses.php';
 
 // register class namespaces
 Geko_Loader::registerNamespaces(
-	'Geko_', 'GekoTest_', 'GekoX_', 'Gloc_', 'Tmpl_', 'phpQuery_',
+	'Geko_', 'GekoTest_', 'GekoX_', 'Gloc_', 'Tmpl_', 'Srv_', 'phpQuery_',
 	'Mime_Types_', 'PEAR_', 'Console_', 'OLE_', 'Spreadsheet_', 'WideImage_'
 );
 

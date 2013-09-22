@@ -21,6 +21,19 @@ class Geko_Router_Route
 	}
 	
 	//
+	public function skipClass( $sCheck ) {
+		foreach ( $this->_aPrefixes as $sPrefix ) {
+			foreach ( $this->_aSkip as $sSuffix ) {
+				if ( 0 === strpos( $sCheck, $sPrefix . $sSuffix ) ) {
+					// begins with class path to skip
+					return TRUE;
+				}
+			}
+		}
+		return FALSE;
+	}
+	
+	//
 	public function run() { }
 	
 	

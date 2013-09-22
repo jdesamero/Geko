@@ -8,6 +8,10 @@ class Geko_Router
 	protected $_aPathItems = array();
 	
 	protected $_aRoutes = array();
+	protected $_aTokens = array();
+	
+	protected $_bStopRunning = FALSE;
+	
 	
 	
 	//
@@ -65,18 +69,37 @@ class Geko_Router
 		return $this;
 	}
 	
-	// ???
-	public function prependRoute( $oRoute, $iPriority = 1000, $sKey = NULL ) {
-		
-		$this->addRoute( $oRoute, $iPriority, $sKey );
-		
-		return $this;
-	}
-	
 	//
 	public function removeRoute( $sKey ) {
 		unset( $this->_aRoutes[ $sKey ] );
 		return $this;
+	}
+	
+	//
+	public function setStopRunning( $bStopRunning ) {
+		$this->_bStopRunning = $bStopRunning;
+		return $this;
+	}
+	
+	//
+	public function stopRunning() {
+		return $this->_bStopRunning;
+	}
+	
+	// messaging tokens
+	public function setToken( $sKey, $mValue ) {
+		$this->_aTokens[ $sKey ] = $mValue;
+		return $this;
+	}
+	
+	//
+	public function getToken( $sKey ) {
+		return $this->_aTokens[ $sKey ];
+	}
+	
+	//
+	public function hasToken( $sKey ) {
+		return array_key_exists( $sKey, $this->_aTokens ) ? TRUE : FALSE ;
 	}
 	
 	
@@ -96,8 +119,10 @@ class Geko_Router
 			// echo 'Running... ' . get_class( $oRoute ) . '<br />';
 			
 			if ( $oRoute->isMatch() ) {
+				
 				$oRoute->run();
-				break;
+				
+				if ( $this->stopRunning() ) break;
 			}
 			
 		}
