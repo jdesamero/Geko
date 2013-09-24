@@ -391,7 +391,10 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 				$this->_iCurrentParentEntityId = $this->getCurrentParentEntityId();	
 			}
 			
-		} elseif ( class_exists( $this->_sCurrentPage ) ) {
+		} elseif (
+			class_exists( $this->_sCurrentPage ) && 
+			( $this->_sCurrentPage instanceof Geko_Singleton_Abstract )
+		) {
 			
 			$sClass = __CLASS__;
 			$oCurPage = Geko_Singleton_Abstract::getInstance( $this->_sCurrentPage );
