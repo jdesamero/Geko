@@ -104,6 +104,19 @@ class Geko_Wp_EmailMessage_Delivery
 		return $this;
 	}
 	
+	//
+	public function addCcs( $aCcs ) {
+		
+		if ( is_array( $aCcs ) ) {
+			$this->aCc = array_merge( $this->aCc, $aCcs );
+		}
+		
+		return $this;
+	}
+	
+	
+	
+	
 	
 	//// sender
 	

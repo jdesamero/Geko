@@ -16,7 +16,18 @@ class Geko_Wp_Service extends Geko_Service
 			$oDeliverMail->addRecipients( $aRecipients );
 		}
 		
+		if ( is_array( $aCcs = $aParams[ 'ccs' ] ) ) {
+			$oDeliverMail->addCcs( $aCcs );
+		}
+		
 		if ( is_array( $aMergeParams = $aParams[ 'merge_params' ] ) ) {
+			
+			foreach ( $aMergeParams as $sKey => $mParam ) {
+				if ( is_array( $mParam ) ) {
+					$aMergeParams[ $sKey ] = implode( ', ', $mParam );
+				}
+			}
+			
 			$oDeliverMail->setMergeParams( $aMergeParams );
 		}
 		
