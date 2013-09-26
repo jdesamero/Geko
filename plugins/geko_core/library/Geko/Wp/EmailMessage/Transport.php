@@ -72,6 +72,10 @@ class Geko_Wp_EmailMessage_Transport extends Geko_Wp_Entity
 					}
 					
 					if ( $oTransport ) {
+						
+						// HACKISH!!!
+						$oTransport->geko_trpt = $oTrpt;
+						
 						self::$_aTransports[ $oTrpt->getId() ] = $oTransport;
 						self::$_aTransports[ $oTrpt->getSlug() ] = $oTransport;
 					}

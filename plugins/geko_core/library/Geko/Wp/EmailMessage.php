@@ -38,11 +38,21 @@ class Geko_Wp_EmailMessage extends Geko_Wp_Entity
 	
 	//
 	public function getTheFromEmail() {
-		if ( $sFromEmail = $this->getFromEmail() ) {
-			return $sFromEmail;
-		} else {
-			return get_bloginfo( 'admin_email' );		
+		
+		$sFromEmail = $this->getFromEmail();
+		
+		$sTransEmail = NULL;
+		if (
+			( $oTransport = $this->getTransport() ) && 
+			( $oTrpt = $oTransport->geko_trpt )
+		) {
+			$sTransEmail = $oTrpt->getUsername();
+			if ( !is_email( $sTransEmail ) ) $sTransEmail = NULL;
 		}
+		
+		$sDefaultEmail = get_bloginfo( 'admin_email' );
+		
+		return Geko_String::coalesce( $sFromEmail, $sTransEmail, $sDefaultEmail );
 	}
 	
 	//

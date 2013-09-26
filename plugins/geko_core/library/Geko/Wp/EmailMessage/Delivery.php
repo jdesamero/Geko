@@ -130,11 +130,11 @@ class Geko_Wp_EmailMessage_Delivery
 	}
 	
 	//
-	public function getSenderEmail() {
+	public function getSenderEmail( $oTransport = NULL ) {
+		
 		return Geko_String::coalesce(
 			$this->aMergeParams[ '__sender_email' ],
-			$this->oEmsg->getTheFromEmail(),
-			get_bloginfo( 'admin_email' )
+			$this->oEmsg->getTheFromEmail()
 		);
 	}
 	
@@ -142,8 +142,7 @@ class Geko_Wp_EmailMessage_Delivery
 	public function getSenderName() {
 		return Geko_String::coalesce(
 			$this->aMergeParams[ '__sender_name' ],
-			$this->oEmsg->getTheFromName(),
-			get_bloginfo( 'name' )
+			$this->oEmsg->getTheFromName()
 		);
 	}
 	

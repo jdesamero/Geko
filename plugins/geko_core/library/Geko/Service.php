@@ -51,13 +51,36 @@ class Geko_Service extends Geko_Singleton_Abstract
 	
 	
 	
-	//// status stuff
+	
+	
+	//// action/status/response stuff
+	
+	// TO DO: HACKISH!!!!!!!!
+	public function isAction( $sAction ) {
+		return ( $sAction == $_REQUEST[ 'subaction' ] ) ? TRUE : FALSE ;
+	}
 	
 	//
-	public function setStatus( $iStatus ) {
+	public function setStatus( $iStatus, $bArray = FALSE ) {
 		
-		$this->aAjaxResponse[ 'status' ] = $iStatus;
+		if ( $bArray ) {
+			
+			if ( !is_array( $this->aAjaxResponse[ 'status' ] ) ) {
+				$this->aAjaxResponse[ 'status' ] = array();
+			}
+			
+			$this->aAjaxResponse[ 'status' ][] = $iStatus;
+			
+		} else {
+			$this->aAjaxResponse[ 'status' ] = $iStatus;		
+		}
 		
+		return $this;
+	}
+	
+	//
+	public function setStatusMulti( $iStatus ) {
+		$this->setStatus( $iStatus, TRUE );
 		return $this;
 	}
 	
@@ -69,6 +92,11 @@ class Geko_Service extends Geko_Singleton_Abstract
 		}
 		
 		return $this;
+	}
+	
+	//
+	public function hasStatus() {
+		return ( $this->aAjaxResponse[ 'status' ] ) ? TRUE : FALSE ;
 	}
 	
 	//
@@ -86,6 +114,9 @@ class Geko_Service extends Geko_Singleton_Abstract
 		
 		return $this;
 	}
+	
+	
+	
 	
 	
 	

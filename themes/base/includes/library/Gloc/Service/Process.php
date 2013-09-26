@@ -5,7 +5,9 @@ class Gloc_Service_Process extends Geko_Wp_Service
 {
 
 	const STAT_SUCCESS = 1;
-	const STAT_ERROR = 2;
+	
+	
+	const STAT_ERROR = 999;
 	
 	
 	//
@@ -13,18 +15,14 @@ class Gloc_Service_Process extends Geko_Wp_Service
 		
 		global $wpdb;
 		
-		if ( 'some_action' == $_REQUEST['subaction'] ) {
+		if ( $this->isAction( 'some_action' ) ) {
 			
 			// do DB stuff
-			$aAjaxResponse['status'] = self::STAT_SUCCESS;
+			$this->setStatus( self::STAT_SUCCESS );
 			
 		}
 		
-		if ( !$aAjaxResponse['status'] ) {
-			$aAjaxResponse['status'] = self::STAT_ERROR;
-		}
-		
-		$this->aAjaxResponse = $aAjaxResponse;
+		$this->setIfNoStatus( self::STAT_ERROR );
 		
 		return $this;
 	}

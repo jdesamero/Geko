@@ -33,7 +33,7 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 		
 		global $wpdb;
 		
-		if ( 'login' == $_REQUEST[ 'subaction' ] ) {
+		if ( $this->isAction( 'login' ) ) {
 			
 			$sEmail = trim( $_POST[ 'email' ] );
 			$sPassword = trim( $_POST[ 'password' ] );
@@ -51,17 +51,17 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 					) );
 					
 					if ( !is_wp_error( $oWpUser ) ) {
-						$aAjaxResponse[ 'status' ] = self::STAT_LOGIN;
+						$this->setStatus( self::STAT_LOGIN );
 					}
 					
 				} else {
-					$aAjaxResponse[ 'status' ] = self::STAT_NOT_ACTIVATED;
+					$this->setStatus( self::STAT_NOT_ACTIVATED );
 				}
 					
 				
 			}
 			
-		} elseif ( 'register' == $_REQUEST[ 'subaction' ] ) {
+		} elseif ( $this->isAction( 'register' ) ) {
 			
 			$sEmail = trim( $_POST[ 'email' ] );
 			$sFirstName = trim( $_POST[ 'first_name' ] );
@@ -71,7 +71,7 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 			
 			// do initial validation
 			if ( $sEmail && $sFirstName && $sLastName && $sPassword && $sConfirmPass && ( $sPassword == $sConfirmPass ) ) {
-			
+				
 				// do checks
 				if ( !email_exists( $sEmail ) ) {
 					
@@ -101,28 +101,28 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 					
 					try {
 						
-						$oDeliverMail = new Geko_Wp_EmailMessage_Delivery( 'activate-account-notification' );
-						$oDeliverMail
-							->addRecipient( $sEmail, $sFirstName . ' ' . $sLastName )
-							->setMergeParams( array(
+						$this->deliverMail( 'activate-account-notification', array(
+							'recipients' => array(
+								array( $sEmail, $sFirstName . ' ' . $sLastName )
+							),
+							'merge_params' => array(
 								'activation_link' => get_bloginfo( 'url' ) . '/login/activate-account/?key=' . $sActivationKey
-							) )
-							->send()
-						;
+							)
+						) )->send();
 						
-						$aAjaxResponse[ 'status' ] = self::STAT_REGISTER;
+						$this->setStatus( self::STAT_REGISTER );
 						
 					} catch ( Zend_Mail_Transport_Exception $e ) {
-						$aAjaxResponse[ 'status' ] = self::STAT_SEND_NOTIFICATION_FAILED;
+						$this->setStatus( self::STAT_SEND_NOTIFICATION_FAILED );
 					}
 					
 				} else {
-					$aAjaxResponse[ 'status' ] = self::STAT_EMAIL_EXISTS;
+					$this->setStatus( self::STAT_EMAIL_EXISTS );
 				}
 				
 			}
 			
-		} elseif ( 'activate_account' == $_REQUEST[ 'subaction' ] ) {
+		} elseif ( $this->isAction( 'activate_account' ) ) {
 			
 			if ( $sKey = trim( $_REQUEST[ 'key' ] ) ) {
 				
@@ -135,23 +135,23 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 					// send notification
 			
 					try {
-						
-						$oDeliverMail = new Geko_Wp_EmailMessage_Delivery( 'activate-account-confirm-notification' );
-						$oDeliverMail
-							->addRecipient( $oUser->getEmail(), $oUser->getFullName() )
-							->send()
-						;
-						
-						$aAjaxResponse[ 'status' ] = self::STAT_ACTIVATE_ACCOUNT;
 
+						$this->deliverMail( 'activate-account-confirm-notification', array(
+							'recipients' => array(
+								array( $oUser->getEmail(), $oUser->getFullName() )
+							)
+						) )->send();
+						
+						$this->setStatus( self::STAT_ACTIVATE_ACCOUNT );
+						
 					} catch ( Zend_Mail_Transport_Exception $e ) {
-						$aAjaxResponse[ 'status' ] = self::STAT_SEND_NOTIFICATION_FAILED;
+						$this->setStatus( self::STAT_SEND_NOTIFICATION_FAILED );
 					}
 					
 				}
 			}
 			
-		} elseif ( 'update_profile' == $_REQUEST[ 'subaction' ] ) {
+		} elseif ( $this->isAction( 'update_profile' ) ) {
 			
 			global $user_ID;
 			global $wpdb;
@@ -187,19 +187,19 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 				
 				// make sure email given does not exist in the system
 				if ( $bNewEmail && email_exists( $sEmail ) ) {
-					$aAjaxResponse[ 'status' ] = self::STAT_EMAIL_EXISTS;
+					$this->setStatus( self::STAT_EMAIL_EXISTS );
 				}
 				
 				// make sure current password given was good, if changing email and/or password
 				if (
-					( !$aAjaxResponse[ 'status' ] ) && 
+					( !$this->hasStatus() ) && 
 					( ( $bNewEmail || $bNewPass ) && !wp_check_password( $sPassword, $oUser->getUserPass() ) )
 				) {
-					$aAjaxResponse[ 'status' ] = self::STAT_BAD_PASSWORD;				
+					$this->setStatus( self::STAT_BAD_PASSWORD );
 				}
 				
 				// proceed if checks are okay
-				if ( !$aAjaxResponse[ 'status' ] ) {
+				if ( !$this->hasStatus() ) {
 				
 					update_usermeta( $iUserId, 'first_name', $sFirstName );
 					update_usermeta( $iUserId, 'last_name', $sLastName );
@@ -228,19 +228,19 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 						// send notification
 						try {
 							
-							$oDeliverMail = new Geko_Wp_EmailMessage_Delivery( 'activate-account-notification' );
-							$oDeliverMail
-								->addRecipient( $sEmail, $sFirstName . ' ' . $sLastName )
-								->setMergeParams( array(
+							$this->deliverMail( 'activate-account-notification', array(
+								'recipients' => array(
+									array( $sEmail, $sFirstName . ' ' . $sLastName )
+								),
+								'merge_params' => array(
 									'activation_link' => get_bloginfo( 'url' ) . '/login/activate-account/?key=' . $sActivationKey
-								) )
-								->send()
-							;
+								)
+							) )->send();
 							
-							$aAjaxResponse[ 'status' ][] = self::STAT_CHANGE_EMAIL;
+							$this->setStatusMulti( self::STAT_CHANGE_EMAIL );
 							
 						} catch ( Zend_Mail_Transport_Exception $e ) {
-							$aAjaxResponse[ 'status' ] = self::STAT_SEND_NOTIFICATION_FAILED;
+							$this->setStatus( self::STAT_SEND_NOTIFICATION_FAILED );
 						}
 						
 					}
@@ -248,7 +248,7 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 					// password was changed
 					if ( $bNewPass ) {
 						wp_set_password( $sNewPass, $iUserId );
-						$aAjaxResponse[ 'status' ][] = self::STAT_CHANGE_PASSWORD;
+						$this->setStatusMulti( self::STAT_CHANGE_PASSWORD );
 					}
 					
 					// if email and/or password was changed
@@ -257,14 +257,14 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 						wp_logout();
 					} else {
 						// no re-login required
-						$aAjaxResponse[ 'status' ] = self::STAT_UPDATE_PROFILE;
+						$this->setStatus( self::STAT_UPDATE_PROFILE );
 					}
 					
 				}
 				
 			}
 			
-		} elseif ( 'forgot_password' == $_REQUEST[ 'subaction' ] ) {
+		} elseif ( $this->isAction( 'forgot_password' ) ) {
 	
 			// do checks
 			$sEmail = strtolower( trim( $_REQUEST[ 'email' ] ) );
@@ -282,24 +282,24 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 				
 				try {
 					
-					$oDeliverMail = new Geko_Wp_EmailMessage_Delivery( 'set-password-notification' );
-					$oDeliverMail
-						->addRecipient( $oUser->getEmail(), $oUser->getFullName() )
-						->setMergeParams( array(
+					$this->deliverMail( 'set-password-notification', array(
+						'recipients' => array(
+							array( $oUser->getEmail(), $oUser->getFullName() )
+						),
+						'merge_params' => array(
 							'password_reset_link' => get_bloginfo( 'url' ) . '/login/set-password/?key=' . $sKey
-						) )
-						->send()
-					;
+						)
+					) )->send();
 					
-					$aAjaxResponse[ 'status' ] = self::STAT_FORGOT_PASSWORD;
+					$this->setStatus( self::STAT_FORGOT_PASSWORD );
 					
 				} catch ( Zend_Mail_Transport_Exception $e ) {
-					$aAjaxResponse[ 'status' ] = self::STAT_SEND_NOTIFICATION_FAILED;
+					$this->setStatus( self::STAT_SEND_NOTIFICATION_FAILED );
 				}
 				
 			}
 			
-		} elseif ( 'set_password' == $_REQUEST[ 'subaction' ] ) {
+		} elseif ( $this->isAction( 'set_password' ) ) {
 			
 			// do checks
 			$sKey = $_REQUEST[ 'key' ];
@@ -319,22 +319,22 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 				// send notification
 				
 				try {
+
+					$this->deliverMail( 'set-password-confirm-notification', array(
+						'recipients' => array(
+							array( $oUser->getEmail(), $oUser->getFullName() )
+						)
+					) )->send();
 					
-					$oDeliverMail = new Geko_Wp_EmailMessage_Delivery( 'set-password-confirm-notification' );
-					$oDeliverMail
-						->addRecipient( $oUser->getEmail(), $oUser->getFullName() )
-						->send()
-					;
-					
-					$aAjaxResponse[ 'status' ] = self::STAT_SET_PASSWORD;
+					$this->setStatus( self::STAT_SET_PASSWORD );
 					
 				} catch ( Zend_Mail_Transport_Exception $e ) {
-					$aAjaxResponse[ 'status' ] = self::STAT_SEND_NOTIFICATION_FAILED;
+					$this->setStatus( self::STAT_SEND_NOTIFICATION_FAILED );
 				}
 				
 			}
 			
-		} elseif ( 'unsubscribe' == $_REQUEST[ 'subaction' ] ) {
+		} elseif ( $this->isAction( 'unsubscribe' ) ) {
 			
 			// do checks
 			$sEmail = strtolower( trim( $_REQUEST[ 'email' ] ) );
@@ -346,17 +346,13 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 				
 				wp_delete_user( $iUserId, 1 );
 				
-				$aAjaxResponse[ 'status' ] = self::STAT_UNSUBSCRIBE;
+				$this->setStatus( self::STAT_UNSUBSCRIBE );
 				
 			}
 			
 		}
 		
-		if ( !$aAjaxResponse[ 'status' ] ) {
-			$aAjaxResponse[ 'status' ] = self::STAT_ERROR;
-		}
-		
-		$this->aAjaxResponse = $aAjaxResponse;
+		$this->setIfNoStatus( self::STAT_ERROR );
 		
 		return $this;
 	}
