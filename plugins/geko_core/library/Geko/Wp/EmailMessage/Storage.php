@@ -228,7 +228,7 @@ class Geko_Wp_EmailMessage_Storage extends Geko_Wp_Entity
 			// allows the use of the same bounce handler account for multiple sites
 			if (
 				( $bMatchBloginfoUrlHash ) && 
-				( md5( get_bloginfo( 'url' ) ) != $aCustom[ 'wp_bloginfo_url_hash' ] )
+				( md5( Geko_Wp::getUrl() ) != $aCustom[ 'wp_bloginfo_url_hash' ] )
 			) {
 				// no match, so don't insert
 				continue;

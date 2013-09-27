@@ -28,7 +28,7 @@ class Geko_Wp_Admin_Menu
 			( FALSE === strpos( $sUrl, 'http://' ) ) && 
 			( FALSE === strpos( $sUrl, 'https://' ) )
 		) {
-			$sUrl = get_bloginfo( 'url' ) . $sUrl;
+			$sUrl = Geko_Wp::getUrl() . $sUrl;
 		}
 		
 		self::$aMenuItems[ $sHandle ][] = array(

@@ -97,7 +97,7 @@ class Geko_Wp_Post_Clone extends Geko_Wp_Initialize
 	public function getCloneUrl( $iPostId ) {
 		return sprintf(
 			'%s/wp-admin/post.php?post=%d&action=geko_clone',
-			get_bloginfo( 'url' ),
+			Geko_Wp::getUrl(),
 			$iPostId
 		);
 	}
@@ -323,7 +323,7 @@ class Geko_Wp_Post_Clone extends Geko_Wp_Initialize
 		global $wpdb;
 		
 		$sPath = substr( ABSPATH, 0, strlen( ABSPATH ) - 1 );
-		$sUrl = get_bloginfo( 'url' );
+		$sUrl = Geko_Wp::getUrl();
 		
 		$aAtts = $wpdb->get_results( $wpdb->prepare(
 			"SELECT * FROM $wpdb->posts WHERE post_parent = %d AND post_type = 'attachment'",

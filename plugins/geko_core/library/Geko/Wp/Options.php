@@ -1091,7 +1091,7 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 			
 			$sUrl = sprintf(
 				'%s%s?%s=%d',
-				get_bloginfo( 'url' ), $sLink, $this->_sEntityIdVarName, $oEntity->getId()
+				Geko_Wp::getUrl(), $sLink, $this->_sEntityIdVarName, $oEntity->getId()
 			);
 			
 			$sValue = sprintf( '<a href="%s">%s</a>', $sUrl, $sValue );

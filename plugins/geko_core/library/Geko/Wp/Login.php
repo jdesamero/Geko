@@ -155,7 +155,7 @@ class Geko_Wp_Login extends Geko_Singleton_Abstract
 		}
 		
 		// add bloginfo url to the front
-		return get_bloginfo( 'url' ) . $sUrl;
+		return Geko_Wp::getUrl() . $sUrl;
 	}
 	
 	

@@ -141,7 +141,7 @@ class Geko_Wp_Plugin extends Geko_Wp_Initialize
 	
 	//
 	public function getPluginUrl() {
-		return get_bloginfo( 'url' ) . '/' . $this->getPluginDir();
+		return Geko_Wp::getUrl() . '/' . $this->getPluginDir();
 	}	
 	
 	//

@@ -2510,7 +2510,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		$aHeaders = array(
 			'Date Created' => date( 'l, F j, Y - h:i:s A' ),
 			'Site' => get_bloginfo( 'name' ),
-			'Site URL' => get_bloginfo( 'url' ),
+			'Site URL' => Geko_Wp::getUrl(),
 			'Class' => $this->_sInstanceClass
 		);
 		

@@ -134,7 +134,7 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 	//
 	public function columnValue( $oEntity ) {
 		?>
-		<td class="column-user-email"><a href="<?php bloginfo( 'url' ); ?>/wp-admin/user-edit.php?user_id=<?php $oEntity->echoUserId(); ?>"><?php $oEntity->echoUserEmail(); ?></a></td>
+		<td class="column-user-email"><a href="<?php Geko_Wp::echoUrl(); ?>/wp-admin/user-edit.php?user_id=<?php $oEntity->echoUserId(); ?>"><?php $oEntity->echoUserEmail(); ?></a></td>
 		<td class="column-event"><?php $oEntity->echoEvent(); ?></td>
 		<td class="column-value"><?php $oEntity->echoValue(); ?></td>
 		<td class="column-status"><?php $oEntity->echoApprovalStatus(); ?></td>
@@ -164,7 +164,7 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 				</tr>
 				<tr>
 					<th>User Email</th>
-					<td><a href="<?php bloginfo( 'url' ); ?>/wp-admin/user-edit.php?user_id=<?php $oEntity->echoUserId(); ?>"><?php $oEntity->echoUserEmail(); ?></a></td>
+					<td><a href="<?php Geko_Wp::echoUrl(); ?>/wp-admin/user-edit.php?user_id=<?php $oEntity->echoUserId(); ?>"><?php $oEntity->echoUserEmail(); ?></a></td>
 				</tr>
 				<tr>
 					<th>Event</th>

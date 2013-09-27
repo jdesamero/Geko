@@ -293,8 +293,8 @@ class Geko_Wp_EmailMessage_Delivery
 						
 						// default headers
 						$oMail
-							->addHeader( 'X-WpBloginfoUrl', get_bloginfo( 'url' ) )
-							->addHeader( 'X-WpBloginfoUrlHash', md5( get_bloginfo( 'url' ) ) )
+							->addHeader( 'X-WpBloginfoUrl', Geko_Wp::getUrl() )
+							->addHeader( 'X-WpBloginfoUrlHash', md5( Geko_Wp::getUrl() ) )
 							->addHeader( 'X-GekoEmsgId', $oEmsg->getId() )
 							->addHeader( 'X-GekoEmsgRecipient', $sRecipientEmail )
 						;

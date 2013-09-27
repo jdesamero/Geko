@@ -127,7 +127,7 @@ class Geko_Wp_Media extends Geko_Wp_Post
 		) {
 			// remove the http:// portion of the image path
 			$sSrcDir = Geko_PhpQuery_FormTransform_Plugin_File::getDefaultFileDocRoot();
-			$sImage = str_replace( get_bloginfo( 'url' ), '', $sImage );
+			$sImage = str_replace( Geko_Wp::getUrl(), '', $sImage );
 			$sImage = $sSrcDir . '/' . trim( $sImage, "/" );
 			
 			$aParams[ 'src' ] = $sImage;

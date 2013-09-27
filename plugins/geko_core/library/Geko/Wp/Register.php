@@ -13,25 +13,25 @@ class Geko_Wp_Register {
 	//// methods
 	
 	// call this method before calling output()
-	public static function init()
-	{
+	public static function init() {
+		
 		global $user_ID;
 		
-		$sFormUrl = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-		$sAction = $_REQUEST['action'];
-		$aMailLinkActions = array('retrievepassword', 'lostpassword', 'resetpass', 'rp');
+		$sFormUrl = parse_url( $_SERVER[ 'REQUEST_URI' ], PHP_URL_PATH );
+		$sAction = $_REQUEST[ 'action' ];
+		$aMailLinkActions = array( 'retrievepassword', 'lostpassword', 'resetpass', 'rp' );
 		
 		// do overrides to $_REQUEST before loading wp-login.php
-		if ('logout' == $sAction) {
+		if ( 'logout' == $sAction ) {
 			$sFormUrl .= '?loggedout=true';
-		} elseif (TRUE == in_array($sAction, $aMailLinkActions)) {
-			$_REQUEST['mail_link'] = get_bloginfo('url') . $sFormUrl;
+		} elseif ( TRUE == in_array( $sAction, $aMailLinkActions ) ) {
+			$_REQUEST[ 'mail_link' ] = Geko_Wp::getUrl() . $sFormUrl;
 		}
 		
-		$_REQUEST['redirect_to'] = $sFormUrl;
+		$_REQUEST[ 'redirect_to' ] = $sFormUrl;
 		
 		ob_start();
-		require_once('./wp-login.php');		// loads wp-load.php and various functions
+		require_once( './wp-login.php' );		// loads wp-load.php and various functions
 		
 		// user is not logged in
 				

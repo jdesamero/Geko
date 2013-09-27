@@ -8,14 +8,13 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	
 	
 	//
-	public function getRoleAssignedCountUrl( Geko_Wp_Role $oRole )
-	{
-		return get_bloginfo('url') . '/wp-admin/users.php?role=' . $oRole->getSlug();
+	public function getRoleAssignedCountUrl( Geko_Wp_Role $oRole ) {
+		return Geko_Wp::getUrl() . '/wp-admin/users.php?role=' . $oRole->getSlug();
 	}
 	
 	//
-	public function getRoleCapabilities( Geko_Wp_Role $oRole )
-	{
+	public function getRoleCapabilities( Geko_Wp_Role $oRole ) {
+		
 		global $wp_roles;
 		
 		$oWpRole = $wp_roles->get_role( $oRole->getSlug() );
@@ -24,8 +23,8 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	}
 		
 	//
-	public function getRoleLevel( Geko_Wp_Role $oRole )
-	{
+	public function getRoleLevel( Geko_Wp_Role $oRole ) {
+		
 		$iMaxLevel = FALSE;
 		$aCaps = $this->getRoleCapabilities( $oRole );
 		foreach ( $aCaps as $sCap => $bGrant ) {
@@ -46,8 +45,8 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	
 	
 	//
-	public function addAdmin()
-	{
+	public function addAdmin() {
+		
 		add_filter( 'admin_user_role_select_pq', array( $this, 'removeInvalidRoles' ) );
 		add_filter( 'admin_user_fields_pq', array( $this, 'removeWpAdditionalCaps' ) );
 		
@@ -65,10 +64,10 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	
 	
 	//
-	public function editUserProfile()
-	{
+	public function editUserProfile() {
+		
 		// get current user info
-		$oWpUser = new WP_User( $_GET['user_id'] );
+		$oWpUser = new WP_User( $_GET[ 'user_id' ] );
 		
 		if ( $oWpUser->data->_geko_role_id ) {
 			$oRole = new Geko_Wp_Role( $oWpUser->data->_geko_role_id );
@@ -138,8 +137,8 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	}
 	
 	//
-	public function editFields( $oRole )
-	{
+	public function editFields( $oRole ) {
+		
 		if ( $this->getName() == $oRole->getType() ) {
 		
 			$aCaps = self::getCapabilitiesList();
@@ -158,8 +157,8 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 								for ( $j = 0; $j < $oCapGrid->cols(); $j++ ):
 									$aCap = $oCapGrid->item( $i, $j );
 									if ( $aCap ):
-										$sKey = $aCap['key'];
-										$sLabel = $aCap['label'];
+										$sKey = $aCap[ 'key' ];
+										$sLabel = $aCap[ 'label' ];
 										$sChecked = ( $aRoleCaps[ $sKey ] ) ? ' checked="checked" ' : '';
 										?><td>
 											<input id="user_role_caps-<?php echo $sKey; ?>" name="user_role_caps[<?php echo $sKey; ?>]" type="checkbox" class="checkbox" value="1" <?php echo $sChecked; ?> /> 
@@ -194,8 +193,8 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	
 	
 	//
-	public function updateUser( $iUserId )
-	{
+	public function updateUser( $iUserId ) {
+		
 		global $wpdb;
 		
 		$aCaps = get_usermeta( $iUserId, $wpdb->prefix . 'capabilities' );
@@ -210,8 +209,8 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	
 	
 	//
-	public function editUserProfileUpdate()
-	{
+	public function editUserProfileUpdate() {
+		
 		global $user_id;
 
 		// deal with capabilities
@@ -242,10 +241,10 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	
 	//
 	// public function updateUserCaps( $sSlug, $sOldSlug, $bTypeChanged )
-	public function updateUserCaps( $oOldRole, $oNewRole )
-	{
-		if ( $this->_sTypeName == $oNewRole->getType() )
-		{
+	public function updateUserCaps( $oOldRole, $oNewRole ) {
+		
+		if ( $this->_sTypeName == $oNewRole->getType() ) {
+			
 			//// only make changes if there was no change in type
 			
 			global $wp_roles;
@@ -297,8 +296,8 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	//// phpQuery
 	
 	//
-	public function removeInvalidRoles( $oPqSel )
-	{
+	public function removeInvalidRoles( $oPqSel ) {
+		
 		$aRoleHash = $this->getRoleHash();		// get role hash
 		
 		foreach ( $oPqSel['option'] as $oElemOption ) {
@@ -314,8 +313,8 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	}
 	
 	//
-	public function removeWpAdditionalCaps( $oPqForm )
-	{
+	public function removeWpAdditionalCaps( $oPqForm ) {
+		
 		foreach ( $oPqForm['table.editform'] as $oElemTable ) {
 			$oPqTable = pq( $oElemTable );
 			if ( 'Additional Capabilities' == $oPqTable['th']->html() ) {
@@ -329,8 +328,8 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	
 	
 	//
-	public function reconcileAssigned()
-	{
+	public function reconcileAssigned() {
+		
 		global $wpdb;
 		
 		$sQuery = "
@@ -368,8 +367,8 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	
 	
 	//
-	public function reconcileRoleOnUpdate( Geko_Wp_Role $oOldRole, Geko_Wp_Role $oNewRole )
-	{
+	public function reconcileRoleOnUpdate( Geko_Wp_Role $oOldRole, Geko_Wp_Role $oNewRole ) {
+		
 		// check if the slugs have changed
 		$sOldSlug = $oOldRole->getSlug();
 		$sNewSlug = $oNewRole->getSlug();
@@ -411,8 +410,8 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	
 	
 	//
-	public function populateCounts()
-	{
+	public function populateCounts() {
+		
 		global $wpdb;
 		
 		$sQuery = "
@@ -440,8 +439,8 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	//// helpers
 	
 	//
-	protected function getRoleHash()
-	{
+	protected function getRoleHash() {
+		
 		// create a role hash
 		$aRoles = new Geko_Wp_Role_Query( array( 'role_type' => $this->getName() ) );
 		$aRoleHash = array();
@@ -452,8 +451,8 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	}
 	
 	//
-	public static function getRoleIdFromMetaArray( $aMeta, $aRoleHash )
-	{
+	public static function getRoleIdFromMetaArray( $aMeta, $aRoleHash ) {
+		
 		foreach ( $aRoleHash as $sSlug => $iId ) {
 			if ( isset( $aMeta[ $sSlug ] ) ) {
 				return $iId;
@@ -464,8 +463,8 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	}
 	
 	//
-	protected static function getCapabilitiesList( $aOtherCaps = array() )
-	{
+	protected static function getCapabilitiesList( $aOtherCaps = array() ) {
+		
 		global $wp_roles;
 		
 		// Get Role List
@@ -501,7 +500,7 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 				'label' => ucwords( str_replace( array('_','-') , ' ', $sCap) )
 			);
 			if ( isset( $aOtherCaps[ $sCap ] ) ) {
-				$aCap['other'] = 1;
+				$aCap[ 'other' ] = 1;
 			}
 			$aCaps[] = $aCap;
 		}

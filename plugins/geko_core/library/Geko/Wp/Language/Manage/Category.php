@@ -205,25 +205,25 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 	//
 	public function getSelExistLink( $aParams ) {
 		
-		if ( $_GET['cat_ID'] ) {
+		if ( $_GET[ 'cat_ID' ] ) {
 			$sLink = '<a href="%s/wp-admin/categories.php?action=edit&cat_ID=%d">%s</a>';
 		} else {
 			$sLink = '<a href="%s/wp-admin/edit-tags.php?action=edit&taxonomy=category&post_type=post&tag_ID=%d">%s</a>';		
 		}
 		
-		return sprintf( $sLink, get_bloginfo('url'), $aParams['obj_id'], $aParams['title'] );
+		return sprintf( $sLink, Geko_Wp::getUrl(), $aParams[ 'obj_id' ], $aParams[ 'title' ] );
 	}
 	
 	//
 	public function getSelNonExistLink( $aParams ) {
 
-		if ( $_GET['cat_ID'] ) {
+		if ( $_GET[ 'cat_ID' ] ) {
 			$sLink = '<a href="%s/wp-admin/categories.php?action=edit&cat_lgroup_id=%d&cat_lang_id=%d">%s</a>';
 		} else {
 			$sLink = '<a href="%s/wp-admin/edit-tags.php?action=edit&taxonomy=category&post_type=post&cat_lgroup_id=%d&cat_lang_id=%d">%s</a>';		
 		}
 		
-		return sprintf( $sLink, get_bloginfo('url'), $aParams['lgroup_id'], $aParams['lang_id'], $aParams['title'] );
+		return sprintf( $sLink, Geko_Wp::getUrl(), $aParams[ 'lgroup_id' ], $aParams[ 'lang_id' ], $aParams[ 'title' ] );
 	}
 	
 	//
@@ -231,9 +231,9 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 		
 		global $wpdb;
 				
-		if ( $iLangId = intval( $_POST['geko_lang_id'] ) ) {
+		if ( $iLangId = intval( $_POST[ 'geko_lang_id' ] ) ) {
 			
-			if ( !$iLangGroupId = intval( $_POST['geko_lgroup_id'] ) )
+			if ( !$iLangGroupId = intval( $_POST[ 'geko_lgroup_id' ] ) )
 			{
 				// create a lang group
 				$wpdb->insert(
@@ -242,7 +242,7 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 				);
 				
 				// create a lang group member
-				$iLangGroupId = $wpdb->get_var('SELECT LAST_INSERT_ID()');
+				$iLangGroupId = $wpdb->insert_id;
 			}
 			
 			$wpdb->insert(
@@ -256,7 +256,7 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 			
 		}
 		
-		if ( ( 'editedcat' == $_POST['action'] ) || ( 'editedtag' == $_POST['action'] ) ) $this->triggerNotifyMsg( 'm102' );		
+		if ( ( 'editedcat' == $_POST[ 'action' ] ) || ( 'editedtag' == $_POST[ 'action' ] ) ) $this->triggerNotifyMsg( 'm102' );		
 	}
 	
 	//

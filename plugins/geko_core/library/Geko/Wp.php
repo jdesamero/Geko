@@ -34,7 +34,7 @@ class Geko_Wp
 		$sRet = ( $sTitle ? $sTitle : get_bloginfo( 'name' ) ) . ' | ';
 		
 		if ( self::isHome() ) {
-			$sRet .= get_bloginfo('description');
+			$sRet .= get_bloginfo( 'description' );
 		} elseif ( is_search() ) {
 			$sRet .= 'Search Results';
 		} elseif ( is_author() ) {
@@ -192,14 +192,14 @@ class Geko_Wp
 	
 	//
 	public static function version() {
-		return explode( '.', get_bloginfo('version') );
+		return explode( '.', get_bloginfo( 'version' ) );
 	}
 	
 	
 	//
 	public static function getSessionPath() {
 		
-		$sPath = parse_url( get_bloginfo( 'url' ), PHP_URL_PATH );
+		$sPath = parse_url( self::getUrl(), PHP_URL_PATH );
 		
 		if ( !$sPath ) {
 			$sPath = '/';
@@ -262,7 +262,7 @@ class Geko_Wp
 	
 	//
 	public static function getHomepageUrl( $sInvokerClass = NULL ) {
-		return apply_filters( __METHOD__, get_bloginfo( 'url' ) . '/', $sInvokerClass );
+		return apply_filters( __METHOD__, self::getUrl() . '/', $sInvokerClass );
 	}
 	
 	// ensures get_query_var( 'paged' ) is set correctly when in the homepage
@@ -374,14 +374,14 @@ class Geko_Wp
 			$aBloginfo = array(
 				'url', 'name', 'description', 'admin_email',
 				'stylesheet_url', 'stylesheet_directory',
-				'template_url', 'template_directory'
+				'template_url', 'template_directory', 'wpurl'
 			);
 			
 			foreach ( $aBloginfo as $sBloginfo ) {
 				$aRet[ '__bloginfo_' . $sBloginfo ] = get_bloginfo( $sBloginfo );
 			}
 			
-			$aRet[ '__bloginfo_server' ] = parse_url( get_bloginfo( 'url' ), PHP_URL_HOST );
+			$aRet[ '__bloginfo_server' ] = parse_url( self::getUrl(), PHP_URL_HOST );
 			
 			self::$aStandardPlaceholders = $aRet;
 		}
@@ -417,6 +417,16 @@ class Geko_Wp
 	}
 	
 	//
+	public static function echoUrl() {
+		echo self::getUrl();
+	}
+	
+	//
+	public static function getUrl() {
+		return get_bloginfo( 'wpurl' );
+	}
+	
+	//
 	public static function getScriptUrls( $aOther = NULL ) {
 		
 		$oUrl = Geko_Uri::getGlobal();
@@ -435,7 +445,7 @@ class Geko_Wp
 			
 			'curpage' => strval( $oUrl ),
 			'template_dir' => get_bloginfo( 'template_directory' ),
-			'url' => get_bloginfo( 'url' ),
+			'url' => self::getUrl(),
 			'wp_login' => Geko_Uri::getUrl( 'wp_login' )
 			
 		);

@@ -100,7 +100,7 @@ abstract class Geko_Wp_Rewrite_Abstract
 		if ( $this->_sListKeyTag ) {
 			$sPermastruct = '/' . $this->_sListKeyTag . '/%s/';
 			if ( $bFullUrl ) {
-				return get_bloginfo('url') . $sPermastruct;
+				return Geko_Wp::getUrl() . $sPermastruct;
 			} else {
 				return $bFullUrl;
 			}
@@ -115,7 +115,7 @@ abstract class Geko_Wp_Rewrite_Abstract
 		if ( $this->_sSingleKeyTag ) {
 			$sPermastruct = '/' . $this->_sSingleKeyTag . '/%s/';
 			if ( $bFullUrl ) {
-				return get_bloginfo('url') . $sPermastruct;
+				return Geko_Wp::getUrl() . $sPermastruct;
 			} else {
 				return $bFullUrl;
 			}
@@ -133,7 +133,7 @@ abstract class Geko_Wp_Rewrite_Abstract
 		
 		if ( 0 === strpos(
 			strval( $oUrl = new Geko_Uri() ),
-			get_bloginfo('url') . '/' . $this->_sListKeyTag . '/'
+			Geko_Wp::getUrl() . '/' . $this->_sListKeyTag . '/'
 		) ) {
 			
 			$bRet = FALSE;
@@ -171,7 +171,7 @@ abstract class Geko_Wp_Rewrite_Abstract
 
 		if ( 0 === strpos(
 			strval( $oUrl = new Geko_Uri() ),
-			get_bloginfo('url') . '/' . $this->_sSingleKeyTag . '/'
+			Geko_Wp::getUrl() . '/' . $this->_sSingleKeyTag . '/'
 		) ) {
 			
 			$bRet = isset( $wp_query->query_vars[ $this->_sSingleVarName ] );

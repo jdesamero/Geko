@@ -218,7 +218,7 @@ abstract class Geko_Wp_Entity extends Geko_Entity
 	
 	//
 	public function _getBaseUrl() {
-		return get_bloginfo( 'url' );
+		return Geko_Wp::getUrl();
 	}
 	
 	//

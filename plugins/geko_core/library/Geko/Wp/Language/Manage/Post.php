@@ -112,7 +112,7 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 	public function getSelExistLink( $aParams ) {
 		return sprintf(
 			'<a href="%s/wp-admin/%s.php?action=edit&post=%d">%s</a>',
-			get_bloginfo('url'),
+			Geko_Wp::getUrl(),
 			$aParams[ 'type' ],
 			$aParams[ 'obj_id' ],
 			$aParams[ 'title' ]
@@ -128,7 +128,7 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 		
 		return sprintf(
 			'<a href="%s/wp-admin/%s-new.php?post_lgroup_id=%d&post_lang_id=%d%s">%s</a>',
-			get_bloginfo('url'),
+			Geko_Wp::getUrl(),
 			$aParams[ 'type' ],
 			$aParams[ 'lgroup_id' ],
 			$aParams[ 'lang_id' ],
