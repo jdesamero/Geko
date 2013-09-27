@@ -34,9 +34,7 @@ class Gloc_Layout_Main extends Gloc_Layout
 	
 	
 	//
-	public function init( $bUnshift = FALSE ) {
-		
-		parent::init( $bUnshift );
+	public function start() {
 		
 		global $user_ID;
 		
@@ -48,8 +46,6 @@ class Gloc_Layout_Main extends Gloc_Layout
 			if ( $this->bIsLoggedIn ) $this->oUser = $oUser;
 			
 		}
-				
-		return $this;
 		
 	}
 	

@@ -22,7 +22,7 @@ class Gloc_Layout_Template extends Gloc_Layout
 	
 	
 	//
-	public function init( $bUnshift = FALSE ) {
+	public function start() {
 		
 		global $user_ID;
 		if ( $user_ID ) {
@@ -30,15 +30,11 @@ class Gloc_Layout_Template extends Gloc_Layout
 			die();
 		}
 		
-		parent::init( $bUnshift );
-		
 		if ( $this->sActivationKey = $_GET[ 'key' ] ) {
 			$oUser = $this->newUser_Query( array( 'geko_activation_key' => $this->sActivationKey ) )->getOne();
 			$this->oUser = ( $oUser->isValid() && $oUser->getActivationKey() ) ? $oUser : NULL ;
 		}
 		
-		return $this;
-	
 	}
 	
 	//

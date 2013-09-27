@@ -23,9 +23,7 @@ class Gloc_Layout_Entity extends Gloc_Layout
 	
 	
 	//
-	public function init( $bUnshift = FALSE ) {
-		
-		parent::init( $bUnshift );
+	public function start() {
 		
 		
 		

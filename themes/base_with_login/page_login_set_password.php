@@ -26,15 +26,13 @@ class Gloc_Layout_Template extends Gloc_Layout
 	
 	
 	//
-	public function init( $bUnshift = FALSE ) {
+	public function start() {
 		
 		global $user_ID;
 		if ( $user_ID ) {
 			header( 'Location: ' . Geko_Wp::getUrl() );
 			die();
 		}
-		
-		parent::init( $bUnshift );
 		
 		if ( $this->sPasswordResetKey = $_GET[ 'key' ] ) {
 			$oUser = $this->newUser_Query( array( 'geko_password_reset_key' => $this->sPasswordResetKey ) )->getOne();
@@ -45,8 +43,6 @@ class Gloc_Layout_Template extends Gloc_Layout
 			}
 		}
 		
-		return $this;
-	
 	}
 	
 	//
