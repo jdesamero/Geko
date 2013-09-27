@@ -154,9 +154,9 @@ class Gloc_Layout_Entity extends Gloc_Layout
 		$sEntityVarName = $oManage->getEntityIdVarName();
 		$sEditPage = sprintf(
 			'%s%s?mode=edit&%s=',
-			get_bloginfo( 'url' ), $oUrl->getPath(), $sEntityVarName
+			Geko_Wp::getUrl(), $oUrl->getPath(), $sEntityVarName
 		);
-		$sListingPage = get_bloginfo( 'url' ) . $oUrl->getPath();
+		$sListingPage = Geko_Wp::getUrl() . $oUrl->getPath();
 		
 		//// create json params
 		

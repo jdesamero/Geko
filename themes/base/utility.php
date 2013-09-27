@@ -17,9 +17,7 @@ class Gloc_Layout_Template extends Gloc_Layout
 	public function echoHeadLate() {
 		
 		$aJsonParams = array(
-			'script' => array(
-				'url' => get_bloginfo( 'url' )
-			)
+			'script' => $this->getScriptUrls()
 		);
 		
 		?>

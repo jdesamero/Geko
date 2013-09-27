@@ -18,7 +18,7 @@ class Gloc_Post_Meta extends Geko_Wp_Post_Meta
 	protected function preFormFields() {
 		
 		$aJsonParams = array(
-			'url' => get_bloginfo( 'url' ),
+			'url' => Geko_Wp::getUrl(),
 			'prefix' => $this->getPrefixWithSep()
 		);
 		

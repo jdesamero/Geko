@@ -18,7 +18,7 @@ class Gloc_Layout_Template extends Gloc_Layout
 			<div class="entry-content">
 				<p><?php $this->e_102(); ?></p>
 			</div>
-			<form id="error404-searchform" method="get" action="<?php bloginfo( 'home' ); ?>">
+			<form id="error404-searchform" method="get" action="<?php Geko_Wp::echoUrl(); ?>">
 				<div>
 					<input id="error404-s" name="s" type="text" value="<?php $this->doSearchTerm(); ?>" size="40" />
 					<input id="error404-searchsubmit" name="searchsubmit" type="submit" value="<?php $this->e_103(); ?>" />

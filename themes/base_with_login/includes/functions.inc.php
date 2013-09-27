@@ -13,14 +13,14 @@ function geko_render_template() {
 
 // ---------------------------------------------------------------------------------------------- //
 
-define( 'ABS_WP_URL_ROOT', str_replace( 'http://' . $_SERVER[ 'SERVER_NAME' ], '', get_bloginfo( 'url' ) ) );
+define( 'ABS_WP_URL_ROOT', str_replace( 'http://' . $_SERVER[ 'SERVER_NAME' ], '', Geko_Wp::getUrl() ) );
 
 // ---------------------------------------------------------------------------------------------- //
 
 // form transformation hooks
 
 Geko_PhpQuery_FormTransform_Plugin_File::setDefaultFileDocRoot( substr( ABSPATH, 0, strlen( ABSPATH ) - 1 ) );
-Geko_PhpQuery_FormTransform_Plugin_File::setDefaultFileUrlRoot( get_bloginfo( 'url' ) );
+Geko_PhpQuery_FormTransform_Plugin_File::setDefaultFileUrlRoot( Geko_Wp::getUrl() );
 
 Geko_PhpQuery_FormTransform::registerPlugin( 'Geko_PhpQuery_FormTransform_Plugin_File' );
 Geko_PhpQuery_FormTransform::registerPlugin( 'Geko_PhpQuery_FormTransform_Plugin_RowTemplate' );

@@ -127,8 +127,8 @@ class Gloc_Layout_Template extends Gloc_Layout
 						</tr>
 						<tr>
 							<td colspan="2">
-								<a href="<?php bloginfo( 'url' ); ?>/login/register/"><?php $this->e_104(); ?></a> | 
-								<a href="<?php bloginfo( 'url' ); ?>/login/forgot-password/"><?php $this->e_105(); ?></a>
+								<a href="<?php Geko_Wp::getUrl(); ?>/login/register/"><?php $this->e_104(); ?></a> | 
+								<a href="<?php Geko_Wp::getUrl(); ?>/login/forgot-password/"><?php $this->e_105(); ?></a>
 							</td>
 						</tr>
 					</table>

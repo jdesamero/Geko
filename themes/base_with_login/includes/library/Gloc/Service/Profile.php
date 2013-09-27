@@ -106,7 +106,7 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 								array( $sEmail, $sFirstName . ' ' . $sLastName )
 							),
 							'merge_params' => array(
-								'activation_link' => get_bloginfo( 'url' ) . '/login/activate-account/?key=' . $sActivationKey
+								'activation_link' => Geko_Wp::getUrl() . '/login/activate-account/?key=' . $sActivationKey
 							)
 						) )->send();
 						
@@ -233,7 +233,7 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 									array( $sEmail, $sFirstName . ' ' . $sLastName )
 								),
 								'merge_params' => array(
-									'activation_link' => get_bloginfo( 'url' ) . '/login/activate-account/?key=' . $sActivationKey
+									'activation_link' => Geko_Wp::getUrl() . '/login/activate-account/?key=' . $sActivationKey
 								)
 							) )->send();
 							
@@ -287,7 +287,7 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 							array( $oUser->getEmail(), $oUser->getFullName() )
 						),
 						'merge_params' => array(
-							'password_reset_link' => get_bloginfo( 'url' ) . '/login/set-password/?key=' . $sKey
+							'password_reset_link' => Geko_Wp::getUrl() . '/login/set-password/?key=' . $sKey
 						)
 					) )->send();
 					

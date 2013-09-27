@@ -301,7 +301,7 @@ class Gloc_Layout_Main extends Gloc_Layout
 		
 		?><div id="topnav"><?php $this->doNavMenu( 'top', array( 'renderDepth' => 0 ) ); ?></div>
 		<div id="header">
-			<a href="<?php bloginfo( 'url' ); ?>" class="logo"><img src="<?php bloginfo( 'template_directory' ); ?>/images/toplogo.gif" alt="<?php bloginfo( 'name' ); ?>" width="221" height="69" border="0" /></a>
+			<a href="<?php Geko_Wp::echoUrl(); ?>" class="logo"><img src="<?php bloginfo( 'template_directory' ); ?>/images/toplogo.gif" alt="<?php bloginfo( 'name' ); ?>" width="221" height="69" border="0" /></a>
 			<div id="login">
 				<?php if ( !$this->bIsLoggedIn ): ?>
 					<form id="loginform" class="loginform">
@@ -320,8 +320,8 @@ class Gloc_Layout_Main extends Gloc_Layout
 							</tr>
 							<tr>
 								<td colspan="2">
-									<a href="<?php bloginfo( 'url' ); ?>/login/register/"><?php $this->e_108(); ?></a> | 
-									<a href="<?php bloginfo( 'url' ); ?>/login/forgot-password/"><?php $this->e_109(); ?></a>
+									<a href="<?php Geko_Wp::echoUrl(); ?>/login/register/"><?php $this->e_108(); ?></a> | 
+									<a href="<?php Geko_Wp::echoUrl(); ?>/login/forgot-password/"><?php $this->e_109(); ?></a>
 								</td>
 							</tr>
 						</table>
@@ -330,14 +330,14 @@ class Gloc_Layout_Main extends Gloc_Layout
 					<div class="logged">
 						<p>
 							<?php $this->e_110(); ?> <?php $oUser->echoTheTitle(); ?><br />
-							<a href="<?php bloginfo( 'url' ); ?>/login/update-profile/"><?php $this->e_111(); ?></a> | 
-							<a href="<?php echo wp_logout_url( get_bloginfo( 'url' ) ); ?>"><?php $this->e_112(); ?></a>
+							<a href="<?php Geko_Wp::echoUrl(); ?>/login/update-profile/"><?php $this->e_111(); ?></a> | 
+							<a href="<?php echo wp_logout_url( Geko_Wp::getUrl() ); ?>"><?php $this->e_112(); ?></a>
 						</p>
 					</div>
 				<?php endif; ?>
 			</div>
 			<div id="search">
-				<form id="searchform" method="get" action="<?php bloginfo( 'home' ); ?>">
+				<form id="searchform" method="get" action="<?php Geko_Wp::echoUrl(); ?>">
 					<input id="s" name="s" type="text" value="<?php $this->doSearchTerm(); ?>" size="20" tabindex="1" />
 					<input id="searchsubmit" name="searchsubmit" type="submit" value="<?php $this->e_104(); ?>" tabindex="2" />
 					<?php $this->doHiddenSearchFields(); ?>
@@ -361,7 +361,7 @@ class Gloc_Layout_Main extends Gloc_Layout
 			<div id="bottomnav"><?php $this->doNavMenu( 'bottom', array( 'renderDepth' => 0 ) ); ?></div>
 			<div class="bottomcopy">
 				<div class="copyright"><?php $this->pw( $this->l_101(), date( 'Y' ) ); ?></div>
-				<div class="blogo"><a href="<?php bloginfo('url'); ?>"><img src="<?php bloginfo( 'template_directory' ); ?>/images/bottomlogo.gif" alt="Bottom Logo" border="0" /></a></div>
+				<div class="blogo"><a href="<?php Geko_Wp::echoUrl(); ?>"><img src="<?php bloginfo( 'template_directory' ); ?>/images/bottomlogo.gif" alt="Bottom Logo" border="0" /></a></div>
 			</div><div class="clear"></div>
 		</div><?php	
 	}

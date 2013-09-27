@@ -26,7 +26,7 @@ class Gloc_Layout_Template extends Gloc_Layout
 		
 		global $user_ID;
 		if ( $user_ID ) {
-			header( 'Location: ' . get_bloginfo( 'url' ) );
+			header( 'Location: ' . Geko_Wp::getUrl() );
 			die();
 		}
 		

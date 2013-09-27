@@ -125,9 +125,9 @@ class Gloc_Layout_Main extends Gloc_Layout
 	public function echoBodyHeader() {
 		?><div id="topnav"><?php $this->doNavMenu( 'top', array( 'renderDepth' => 0 ) ); ?></div>
 		<div id="header">
-			<a href="<?php bloginfo('url'); ?>"><img src="<?php bloginfo('template_directory'); ?>/images/toplogo.gif" alt="<?php bloginfo('name') ?>" width="221" height="69" border="0" /></a>
+			<a href="<?php Geko_Wp::echoUrl(); ?>"><img src="<?php bloginfo( 'template_directory' ); ?>/images/toplogo.gif" alt="<?php bloginfo('name') ?>" width="221" height="69" border="0" /></a>
 			<div id="search">
-				<form id="searchform" method="get" action="<?php bloginfo('home') ?>">
+				<form id="searchform" method="get" action="<?php Geko_Wp::echoUrl(); ?>">
 					<input id="s" name="s" type="text" value="<?php $this->doSearchTerm(); ?>" size="20" tabindex="1" />
 					<input id="searchsubmit" name="searchsubmit" type="submit" value="<?php $this->e_104(); ?>" tabindex="2" />
 					<?php $this->doHiddenSearchFields(); ?>
@@ -150,7 +150,7 @@ class Gloc_Layout_Main extends Gloc_Layout
 			<div id="bottomnav"><?php $this->doNavMenu( 'bottom', array( 'renderDepth' => 0 ) ); ?></div>
 			<div class="bottomcopy">
 				<div class="copyright"><?php $this->pw( $this->l_101(), '2010' ); ?></div>
-				<div class="blogo"><a href="<?php bloginfo('url'); ?>"><img src="<?php bloginfo('template_directory'); ?>/images/bottomlogo.gif" alt="Bottom Logo" border="0" /></a></div>
+				<div class="blogo"><a href="<?php Geko_Wp::echoUrl(); ?>"><img src="<?php bloginfo( 'template_directory' ); ?>/images/bottomlogo.gif" alt="Bottom Logo" border="0" /></a></div>
 			</div><div class="clear"></div>
 		</div><?php	
 	}

@@ -57,7 +57,7 @@ class Gloc_Layout_Template extends Gloc_Layout
 				<div class="entry-content">
 					<p><?php $this->e_107(); ?></p>
 				</div>
-				<form id="noresults-searchform" method="get" action="<?php bloginfo( 'home' ); ?>">
+				<form id="noresults-searchform" method="get" action="<?php Geko_Wp::echoUrl(); ?>">
 					<div>
 						<input id="noresults-s" name="s" type="text" value="<?php $this->doSearchTerm(); ?>" size="40" />
 						<input id="noresults-searchsubmit" name="searchsubmit" type="submit" value="<?php $this->e_108(); ?>" />
