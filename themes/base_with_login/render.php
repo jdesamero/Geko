@@ -1,19 +1,30 @@
 <?php
 
-require_once( TEMPLATEPATH . '/layout_main.php' );
-require_once( TEMPLATEPATH . '/layout_widgets.php' );
+$oResolve = new Geko_Wp_Resolver();
+$oResolve
+	->setClassFileMapping( array(
+		'Main' => TEMPLATEPATH . '/layout_main.php',
+		'Widgets' => TEMPLATEPATH . '/layout_widgets.php',
+		'Template' => get_page_template()
+	) )
+	->addPath( 'default', new Geko_Wp_Resolver_Path_Default() )
+	->run()
+;
+
 
 
 // initialize the various layout classes
 // layout classes are an instance of Geko_Layout
 
-Gloc_Layout_Main::getInstance()->init();
-Gloc_Layout_Widgets::getInstance()->init();
-Gloc_Layout_Template::getInstance()->init();
+$aSuffixes = $oResolve->getClassSuffixes();
+foreach ( $aSuffixes as $sSuffix ) {
+	Geko_Singleton_Abstract::getInstance( $oResolve->getClass( $sSuffix ) )->init();
+}
 
 
 
 // render the final layout
 // the layout renderer class is an instance of Geko_Layout_Renderer
-Gloc_Layout_Renderer::getInstance()->render();
+Geko_Singleton_Abstract::getInstance( $oResolve->getClass( 'Renderer' ) )->render();
+
 
