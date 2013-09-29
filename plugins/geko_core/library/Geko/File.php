@@ -103,5 +103,13 @@ class Geko_File
 	}
 	
 	
+	//
+	public static function requireOnceIfExists( $sFile ) {
+		if ( is_file( $sFile ) ) {
+			require_once( $sFile );
+		}	
+	}
+	
+	
 }
 
