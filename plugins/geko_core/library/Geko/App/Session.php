@@ -395,18 +395,35 @@ class Geko_App_Session extends Geko_Singleton_Abstract
 	
 	//
 	public function __destruct() {
+
+		$oDb = $this->_oDb;
 		
 		if ( $this->_bCalledSet ) {
 			
 			// update session time
-			$oDb = $this->_oDb;
-			
 			$oDb->update( '##pfx##session', array(
 				'date_modified' => $oDb->getTimestamp()
 			), array(
 				'sess_id = ?' => $this->_iSessionId
 			) );
 			
+		}
+		
+		// TO DO: This should be run once a day, and not every request
+		// clean-up old session data
+		
+		$oSql = new Geko_Sql_Select( $oDb );
+		$oSql
+			->field( 'sess_id' )
+			->from( '##pfx##session', 's' )
+			->where( 's.date_modified < DATE_SUB( ?, INTERVAL 2 DAY )', $oDb->getTimestamp() )
+		;
+		
+		$aStale = $oDb->fetchCol( strval( $oSql ) );
+		if ( count( $aStale ) > 0 ) {
+			$sArg = 'sess_id IN ( ' . implode( ', ', $aStale ) . ' )';
+			$oDb->delete( '##pfx##session_data', array( $sArg ) );
+			$oDb->delete( '##pfx##session', array( $sArg ) );		
 		}
 		
 	}
