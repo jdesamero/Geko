@@ -218,7 +218,7 @@
 		<file id="geko-jquery-prettyphoto" src="##geko_core_uri##/external/js/jquery.prettyPhoto.3.0.3.js" dependencies="jquery" />
 		<file id="geko-jquery-scrollpath" src="##geko_core_uri##/external/js/jquery.scrollpath.js" dependencies="jquery" />
 		<file id="geko-jquery-sfhover" src="##geko_core_uri##/external/js/jquery.sfhover.js" dependencies="jquery" />
-		<file id="geko-jquery-simplemodal" src="##geko_core_uri##/external/js/jquery.simplemodal-1.4.4.min.js" dependencies="jquery" />
+		<file id="geko-jquery-simplemodal" src="##geko_core_uri##/external/js/jquery.simplemodal-1.4.4.1.min.js" dependencies="jquery" />
 		<file id="geko-jquery-smoothzoom" src="##geko_core_uri##/external/js/jquery.smoothZoom.min.js" dependencies="jquery" />
 		<file id="geko-jquery-swfobject" src="##geko_core_uri##/external/js/jquery.swfobject.1-1-1.min.js" dependencies="jquery" />
 		<file id="geko-jquery-syger" src="##geko_core_uri##/external/js/jquery-syger.js" dependencies="jquery" />
