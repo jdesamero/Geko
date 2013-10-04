@@ -122,6 +122,20 @@ class Gloc_Page_Meta extends Geko_Wp_Page_Meta
 						<input type="hidden" id="slideshow_images" name="slideshow_images" class="imgpck_field" _member_ids="yes" />
 					</div></td>
 				</tr>
+			<?php elseif ( $oPage && ( 'page_form.php' == $oPage->getPageTemplate() ) ):
+				
+				$aForms = new Geko_Wp_Form_Query( array(
+					'showposts' => -1,
+					'posts_per_page' => -1
+				), FALSE );
+				
+				?><tr>
+					<th><label for="form">Form</label></th>
+					<td><select id="form" name="form">
+						<option value="">- Select -</option>
+						<?php echo $aForms->implode( array( '<option value="##Id##">##Title##</option>', '' ) ); ?>
+					</select></td>
+				</tr>
 			<?php endif; ?>
 		</table>
 		<?php
