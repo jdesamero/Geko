@@ -33,6 +33,7 @@ class Geko_Wp_Form_Render extends Geko_Singleton_Abstract
 		$bSections = $aParams[ 'show_sections' ];
 		$bTabbed = $aParams[ 'tabbed' ];
 		$bShowMainTitle = $aParams[ 'show_main_title' ];
+		$bDisableSave = $aParams[ 'disable_save' ];
 		$aResponses = $aParams[ 'responses' ];
 		$aHiddenValues = $aParams[ 'hidden_values' ];
 		$sListType = ( $aParams[ 'list_type' ] ) ? $aParams[ 'list_type' ] : 'ol' ;
@@ -98,13 +99,20 @@ class Geko_Wp_Form_Render extends Geko_Singleton_Abstract
 			
 			<div class="geko-form-buttons">
 				
-				<input type="button" id="geko-form-prev" value="Prev" />
-				<input type="button" id="geko-form-next" value="Next" />
-				
-				<div class="geko-form-spacer spacer-1"></div>
+				<?php if ( $bSections ): ?>
+					
+					<input type="button" id="geko-form-prev" value="Prev" />
+					<input type="button" id="geko-form-next" value="Next" />
+					
+					<div class="geko-form-spacer spacer-1"></div>
+					
+				<?php endif; ?>
 				
 				<input type="reset" value="Reset" /> 
-				<input type="button" value="Save and Complete Later" class="geko-form-save" />
+				
+				<?php if ( !$bDisableSave ): ?>
+					<input type="button" value="Save and Complete Later" class="geko-form-save" />
+				<?php endif; ?>
 				
 				<div class="geko-form-spacer spacer-2"></div>
 				
