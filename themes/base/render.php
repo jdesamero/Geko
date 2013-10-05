@@ -1,11 +1,16 @@
 <?php
 
+// $sTemplate = get_page_template();
+
+$aBt = debug_backtrace();
+$sTemplate = $aBt[ 1 ][ 'file' ];
+
 $oResolve = new Geko_Wp_Resolver();
 $oResolve
 	->setClassFileMapping( array(
 		'Main' => TEMPLATEPATH . '/layout_main.php',
 		'Widgets' => TEMPLATEPATH . '/layout_widgets.php',
-		'Template' => get_page_template()
+		'Template' => $sTemplate
 	) )
 	->addPath( 'default', new Geko_Wp_Resolver_Path_Default() )
 	->run()
