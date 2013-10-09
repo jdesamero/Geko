@@ -155,9 +155,6 @@ class Gloc_Layout_Main extends Gloc_Layout
 						<?php endif; ?>
 											
 					</div>
-				
-				</td></tr><tr><td class="bottom">
-					
 					<?php $this->doBodyFooter(); ?>
 					
 				</td></tr></table>
