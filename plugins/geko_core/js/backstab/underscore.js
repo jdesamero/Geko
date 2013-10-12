@@ -11,6 +11,7 @@
 ( function() {
 	
 	var _ = this._;
+	var $ = this.jQuery;
 	
 	//// added functions
 	

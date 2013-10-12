@@ -7,7 +7,7 @@
 		
 		<!-- non-jquery libraries -->
 		
-		<file id="geko-backbone" src="##geko_core_uri##/external/js/backbone-min.js" dependencies="geko-underscore jquery" />
+		<file id="geko-backbone" src="##geko_core_uri##/external/js/backbone-min.js" dependencies="geko-underscore" />
 		<file id="geko-compatibility" src="##geko_core_uri##/external/js/compatibility.js" />
 		<file id="geko-css_query" src="##geko_core_uri##/external/js/cssQuery-p.js" />
 		<file id="geko-css_sandpaper" src="##geko_core_uri##/external/js/cssSandpaper.js" dependencies="geko-event_helpers geko-css_query geko-sylvester" />
@@ -38,7 +38,7 @@
 		<file id="geko-string_format" src="##geko_core_uri##/external/js/string_format.js" />
 		<file id="geko-swf-object" src="##geko_core_uri##/external/js/swfobject.js" />
 		<file id="geko-sylvester" src="##geko_core_uri##/external/js/sylvester.js" />
-		<file id="geko-underscore" src="##geko_core_uri##/external/js/underscore-min.js" />
+		<file id="geko-underscore" src="##geko_core_uri##/external/js/underscore-min.js" dependencies="jquery" />
 		
 		
 		
