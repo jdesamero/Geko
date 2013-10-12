@@ -219,15 +219,25 @@ class Geko_Layout extends Geko_Singleton_Abstract
 	//// render tags
 	
 	//
+	public function getEnqueueScriptCb() {
+		return array( Geko_Loader_ExternalFiles::getInstance(), 'enqueueScript' );
+	}
+	
+	//
 	public function enqueueScript() {
 		
 		$aArgs = func_get_args();
 		
 		foreach ( $aArgs as $sId ) {
-			Geko_Loader_ExternalFiles::getInstance()->enqueueScript( $sId );
+			call_user_func( $this->getEnqueueScriptCb(), $sId );
 		}
 		
 		return $this;
+	}
+
+	//
+	public function getEnqueueStyleCb() {
+		return array( Geko_Loader_ExternalFiles::getInstance(), 'enqueueStyle' );
 	}
 	
 	//
@@ -236,7 +246,7 @@ class Geko_Layout extends Geko_Singleton_Abstract
 		$aArgs = func_get_args();
 
 		foreach ( $aArgs as $sId ) {
-			Geko_Loader_ExternalFiles::getInstance()->enqueueStyle( $sId );		
+			call_user_func( $this->getEnqueueStyleCb(), $sId );
 		}
 		
 		return $this;

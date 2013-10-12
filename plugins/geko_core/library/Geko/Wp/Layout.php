@@ -208,6 +208,18 @@ class Geko_Wp_Layout extends Geko_Layout
 		
 	
 	
+	//// render tags
+	
+	//
+	public function getEnqueueScriptCb() {
+		return 'wp_enqueue_script';
+	}
+	
+	//
+	public function getEnqueueStyleCb() {
+		return 'wp_enqueue_style';
+	}
+	
 	
 	
 	//// magic methods
