@@ -216,6 +216,7 @@
 		<file id="geko-jquery-pngfix" src="##geko_core_uri##/external/js/jquery.pngFix.js" dependencies="jquery" />
 		<file id="geko-jquery-popupwindow" src="##geko_core_uri##/external/js/jquery.popupWindow.js" dependencies="jquery" />
 		<file id="geko-jquery-prettyphoto" src="##geko_core_uri##/external/js/jquery.prettyPhoto.3.0.3.js" dependencies="jquery" />
+		<file id="geko-jquery-scrollingcarousel" src="##geko_core_uri##/external/js/jquery.scrollingcarousel.2.0.min.js" dependencies="jquery" />
 		<file id="geko-jquery-scrollpath" src="##geko_core_uri##/external/js/jquery.scrollpath.js" dependencies="jquery" />
 		<file id="geko-jquery-sfhover" src="##geko_core_uri##/external/js/jquery.sfhover.js" dependencies="jquery" />
 		<file id="geko-jquery-simplemodal" src="##geko_core_uri##/external/js/jquery.simplemodal-1.4.4.1.min.js" dependencies="jquery" />
