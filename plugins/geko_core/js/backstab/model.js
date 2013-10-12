@@ -56,6 +56,7 @@
 		return [ _target, fcont, defer ];
 	};
 	
+	var $ = this.jQuery;
 	var Backbone = this.Backbone;
 	var Backstab = this.Backstab;
 	

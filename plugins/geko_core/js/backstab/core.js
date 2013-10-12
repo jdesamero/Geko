@@ -12,6 +12,7 @@
 	
 	this.Backstab = {};
 	
+	var $ = this.jQuery;
 	var Backstab = this.Backstab;
 	
 	//

@@ -12,6 +12,7 @@
  
 ( function() {
 	
+	var $ = this.jQuery;
 	var Backbone = this.Backbone;
 	var Backstab = this.Backstab;
 	

@@ -1,5 +1,6 @@
 ( function() {
 	
+	var $ = this.jQuery;
 	var Backstab = this.Backstab;
 	
 	// helpers
