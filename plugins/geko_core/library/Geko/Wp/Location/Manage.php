@@ -587,7 +587,7 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	public function getGmap() {
 		
 		if ( !isset( self::$aCache[ 'gmap' ] ) ) {
-			self::$aCache[ 'gmap' ] = new Geko_Google_Map( GOOGLEMAPS_API_KEY );
+			self::$aCache[ 'gmap' ] = new Geko_Google_Map();
 		}
 		
 		return self::$aCache[ 'gmap' ];

@@ -1,49 +1,76 @@
 <?php
 
 //
-class Geko_Google_Map_QueryResult
+class Geko_Google_Map_Query_V1 extends Geko_Google_Map_Query
 {
 	
-	protected $_aQueryResult = array();
-	
-	// 
-	public function __construct( $aQueryResult ) {
-		
-		if ( is_array( $aQueryResult ) ) $this->_aQueryResult = $aQueryResult;
-		
-	}
+	protected $_sApiKey = NULL;
+	protected $_sRequestUrl = 'http://maps.google.com/maps/geo';
 	
 	//
-	public function getRawResult() {
-		return $this->_aQueryResult;
-	}
-	
-	//
-	public function getCoordinates() {
+	public function __construct( $aParams = array() ) {
 		
-		if ( $aCoords = $this->_aQueryResult[ 'Placemark' ][ 0 ][ 'Point' ][ 'coordinates' ] ) {
-			// let's switch so that it's the expected lat/lon order
-			return array( $aCoords[ 1 ], $aCoords[ 0 ] );
+		if (
+			( NULL === $this->_sApiKey ) && 
+			( $sApiKey = $aParams[ 'api_key' ] )
+		) {
+			$this->_sApiKey = $sApiKey;
+		}
+
+		if (
+			( NULL === $this->_sApiKey ) && 
+			( defined( 'GOOGLEMAPS_API_KEY' ) )
+		) {
+			$this->_sApiKey = GOOGLEMAPS_API_KEY;
 		}
 		
-		return NULL;
+		parent::__construct( $aParams );
 	}
 	
-	//
-	public function getZoomLevel() {
+	
+	// implement hook method
+	public function formatGetParams( $sQuery ) {
 		
-		if ( $aCoords = $this->_aQueryResult[ 'Placemark' ][ 0 ][ 'Point' ][ 'coordinates' ] ) {
-			return $aCoords[ 2 ];
+		$aRet = array(
+			'sensor' => 'false',
+			'output' => 'json',
+			'q' => $sQuery
+		);
+		
+		if ( $this->_sApiKey ) {
+			$aRet[ 'key' ] = $this->_sApiKey;
 		}
 		
-		return NULL;
+		return $aRet;
 	}
+	
+	
+	// implement hook method
+	public function normalizeResult( $aRes ) {
+		
+		$aResFmt = array(
+			'raw_result' => $aRes
+		);
+		
+		if ( $aCoords = $aRes[ 'Placemark' ][ 0 ][ 'Point' ][ 'coordinates' ] ) {
+			$aResFmt = array_merge( $aResFmt, array(
+				'lat' => $aCoords[ 1 ],
+				'lng' => $aCoords[ 0 ],
+				'zoom' => $aCoords[ 2 ]
+			) );
+		}
+		
+		return $aResFmt;
+	}
+	
+	
 	
 }
 
 
 /*
 
+// version 1 result
 Array
 (
     [name] => Canada
@@ -98,7 +125,6 @@ Array
         )
 
 )
-
 
 */
 

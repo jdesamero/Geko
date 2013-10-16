@@ -4,28 +4,19 @@
 class Geko_Google_Map
 {
 	
-	protected $_sApiKey;
-	protected $_sRequestUrl = 'http://maps.google.com/maps/geo';
-	
-	protected static $_aHttp = array();
-	
+	protected $_oGquery = NULL;
 	
 	//
-	public function __construct( $sApiKey, $sRequestUrl = NULL ) {
+	public function __construct( $sVersion = NULL, $aParams = array() ) {
 		
-		$this->_sApiKey = $sApiKey;
-		if ( NULL === $this->_sRequestUrl ) $this->_sRequestUrl = $sRequestUrl;
-		
-	}
-	
-	//
-	public function getHttp() {
-		
-		if ( !self::$_aHttp[ $this->_sRequestUrl ] ) {			
-			self::$_aHttp[ $this->_sRequestUrl ] = new Zend_Http_Client( $this->_sRequestUrl );
+		if ( NULL === $sVersion ) {
+			$sVersion = 'V2';
 		}
 		
-		return self::$_aHttp[ $this->_sRequestUrl ];
+		$sClass = 'Geko_Google_Map_Query_' . $sVersion;
+		if ( class_exists( $sClass ) ) {
+			$this->_oGquery = new $sClass( $aParams );
+		}
 	}
 	
 	//
@@ -33,23 +24,11 @@ class Geko_Google_Map
 		
 		$aRes = array();
 		
-		// get coordinates
-		$oHttp = $this->getHttp();
-		$oHttp->setParameterGet( array(
-			'key' => $this->_sApiKey,
-			'sensor' => 'false',
-			'output' => 'json',
-			'q' => $sQuery
-		) );
-		
-		$oResponse = $oHttp->request();
-		
-		if ( 200 == $oResponse->getStatus() ) {
-			$aRes = Zend_Json::decode( $oResponse->getBody() );
+		if ( $oGquery = $this->_oGquery ) {
+			$aRes = $oGquery->getResult( $sQuery );
 		}
 		
-		return new Geko_Google_Map_QueryResult( $aRes );
-		
+		return new Geko_Google_Map_Result( $aRes );
 	}
 	
 }
