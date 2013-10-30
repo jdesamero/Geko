@@ -221,7 +221,8 @@ class Geko_PhpQuery_FormTransform
 		
 		} elseif ( 'textarea' == $sElemType ) {
 			
-			$aElem[ 'elem' ]->html( $mOptionVal );
+			// $aElem[ 'elem' ]->html( $mOptionVal );
+			$aElem[ 'elem' ]->text( $mOptionVal );			// fixes issues with entities
 			
 		} elseif ( 'select' == $sNodeName ) {
 			
