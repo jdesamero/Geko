@@ -26,6 +26,8 @@ class Geko_Html_Element
 		'contenteditable', 'contextmenu', 'draggable', 'dropzone', 'hidden', 'spellcheck'
 	);
 	
+	
+	
 	//// element attributes
 	
 	// standard
@@ -36,6 +38,9 @@ class Geko_Html_Element
 	
 	// html 5 only
 	protected $_aValidAtts5 = array();
+	
+	// allowed attribute prefixes
+	protected $_aAllowedAttPrefixes = array( 'data' );
 	
 	
 	
@@ -256,7 +261,10 @@ class Geko_Html_Element
 		foreach ( $this->_aAtts as $sAtt => $sValue ) {
 			if (
 				( isset( $this->_aAtts[ $sAtt ] ) ) && 
-				( in_array( $sAtt, $aValidAtts ) )
+				(
+					( in_array( $sAtt, $aValidAtts ) ) || 
+					Geko_Array::beginsWith( $sAtt, $this->_aAllowedAttPrefixes )
+				)
 			) {
 				$aAttFmt[] = sprintf( '%s="%s"', $sAtt, htmlspecialchars( $sValue ) );
 			}
