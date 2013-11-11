@@ -57,8 +57,8 @@ class Geko_Wp_Admin_Hooks_Category extends Geko_Wp_Admin_Hooks_PluginAbstract
 	
 	
 	//
-	public function applyFilters( $sContent, $sState )
-	{
+	public function applyFilters( $sContent, $sState ) {
+		
 		if ( 'category_edit' == $sState ) {
 			
 			if ( 2 == $this->getValue( 'version' ) ) {

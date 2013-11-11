@@ -12,14 +12,14 @@ class Geko_Wp_Admin_Hooks
 	protected static $sDisplayMode = FALSE;
 	
 	//
-	public static function init() {
+	public static function init( $aPlugins = array() ) {
 		
 		if ( !self::$bCalledInit ) {
 			
 			if ( is_admin() ) {
 				
-				// generate list of plugin classes
-				$aPlugins = array_map(
+				// generate list of default plugin classes
+				$aDefaultPlugins = array_map(
 					create_function(
 						'$sVal',
 						'return "' . __CLASS__ . '_" . str_replace( ".php", "", $sVal );'
@@ -27,9 +27,11 @@ class Geko_Wp_Admin_Hooks
 					array_diff(
 						scandir( dirname( __FILE__ ) . '/Hooks' ),
 						array( '.', '..', 'PluginAbstract.php' )
-					)				
+					)	
 				);
-								
+				
+				$aPlugins = array_merge( $aPlugins, $aDefaultPlugins );
+				
 				// check for any matching states
 				foreach ( $aPlugins as $sPluginClass ) {
 					$oPlugin = new $sPluginClass();

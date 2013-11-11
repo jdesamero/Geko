@@ -14,9 +14,26 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 			
 			Geko_Wp_Db::addPrefix( 'cart66_products' );
 			
+			add_action( 'init', array( $this, 'wpInit' ) );
+			
 			$this->bCalledInit = TRUE;
 		}
 	}
+	
+	
+	//
+	public function wpInit() {
+		
+		$oScm = new Geko_Wp_Cart66_ShortcodeManager();
+		add_shortcode( 'checkout_beanstream', array( $oScm, 'beanstreamCheckout' ) );
+		
+		if ( is_admin() ) {
+			
+			$oBsGw = Geko_Wp_Cart66_Gateway_Beanstream::getInstance();
+			add_filter( 'admin_cart66_settings_gateways_form_pq', array( $oBsGw, 'settingsForm' ) );		
+		}
+	}
+	
 	
 	
 	//
@@ -97,9 +114,15 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	
 	
 	//
-	public function outputCart() {
+	public function outputCart( $sMode = '' ) {
 		
-		$sCart = do_shortcode( '[cart]' );
+		$sModeAtt = '';
+		
+		if ( $sMode ) {
+			$sModeAtt = sprintf( ' mode="%s"', $sMode );
+		}
+		
+		$sCart = do_shortcode( sprintf( '[cart%s]', $sModeAtt ) );
 		
 		$oDoc = Geko_PhpQuery_FormTransform::createDoc( $sCart );
 		
@@ -117,7 +140,12 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 				$oDescTdPq = $aTd->eq( 2 );
 				$oTotalTdPq = $aTd->eq( 3 );
 				
-				$iQty = intval( $oQtyTdPq->find( 'input' )->val() );
+				if ( 'read' == $sMode ) {
+					$iQty = intval( $oQtyTdPq->text() );				
+				} else {
+					$iQty = intval( $oQtyTdPq->find( 'input' )->val() );
+				}
+				
 				$fTotal = floatval( trim( str_replace( '$', '', $oTotalTdPq->text() ) ) );
 				$sProdDesc = trim( $oDescTdPq->text() );
 				
@@ -127,6 +155,74 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 		}
 		
 		echo strval( $oDoc );
+		
+		// echo $sCart;
+		
+		return $this;
+	}
+	
+	//
+	public function outputCheckout( $sGateway = 'mijireh', $aValues = NULL ) {
+		
+		$oDoc = NULL;
+		$sCheckout = do_shortcode( sprintf( '[checkout_%s]', $sGateway ) );
+		
+		if ( is_array( $aValues ) ) {
+			
+			if ( in_array( $sGateway, array( 'payleap', 'beanstream' ) ) ) {
+				
+				if ( isset( $aValues[ 'billing' ] ) ) {
+					
+					$aBilling = $aValues[ 'billing' ];
+					
+					$oDoc = $this->getDoc( $sCheckout, $oDoc );
+					
+					$oDoc = $this->mapValues( $oDoc, $aBilling, array(
+						'first_name' => '#billing-firstName',
+						'last_name' => '#billing-lastName',
+						'address' => '#billing-address',
+						'address2' => '#billing-address2',
+						'city' => '#billing-city',
+						'state' => '#billing-state',
+						'zip' => '#billing-zip'
+					) );
+					
+				}
+				
+			}
+			
+		}
+		
+		if ( $oDoc ) $sCheckout = strval( $oDoc );
+		
+		echo $sCheckout;
+		
+		return $this;
+	}
+	
+	
+	//// helpers
+	
+	//
+	public function getDoc( $sContent, $oDoc ) {
+		
+		if ( $oDoc ) return $oDoc;
+		
+		return Geko_PhpQuery_FormTransform::createDoc( $sContent );
+	}
+	
+	//
+	public function mapValues( $oDoc, $aValues, $aMap ) {
+		
+		foreach ( $aMap as $sKey => $sSelector ) {
+			if ( isset( $aValues[ $sKey ] ) ) {
+				$oDoc->find( $sSelector )->val(
+					trim( $aValues[ $sKey ] )
+				);
+			}
+		}
+		
+		return $oDoc;
 	}
 	
 	
