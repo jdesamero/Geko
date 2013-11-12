@@ -29,8 +29,11 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 		
 		if ( is_admin() ) {
 			
-			$oBsGw = Geko_Wp_Cart66_Gateway_Beanstream::getInstance();
-			add_filter( 'admin_cart66_settings_gateways_form_pq', array( $oBsGw, 'settingsForm' ) );		
+			$oBsGw = Geko_Wp_Cart66_Gateway_Beanstream::getInstance( FALSE );
+			
+			add_filter( 'admin_cart66_settings_gateways_form_pq', array( $oBsGw, 'settingsForm' ) );
+			add_filter( 'admin_cart66_settings_gateways_script_pq', array( $oBsGw, 'settingsForm' ) );
+			
 		}
 	}
 	
@@ -199,6 +202,14 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 		
 		return $this;
 	}
+	
+	
+	//
+	public function outputReceipt() {
+		
+		echo do_shortcode( '[receipt]' );
+	}
+	
 	
 	
 	//// helpers

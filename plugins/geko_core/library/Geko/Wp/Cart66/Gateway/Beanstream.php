@@ -1,12 +1,8 @@
 <?php
 
 //
-class Geko_Wp_Cart66_Gateway_Beanstream extends Cart66GatewayAbstract
+class Geko_Wp_Cart66_Gateway_Beanstream extends Geko_Wp_Cart66_Gateway
 {
-
-	protected $_apiData;
-	protected $_apiEndPoint;
-	
 	
 	protected $_sTitle = 'Beanstream';
 	protected $_sSlug = 'beanstream';
@@ -14,94 +10,38 @@ class Geko_Wp_Cart66_Gateway_Beanstream extends Cart66GatewayAbstract
 	
 	
 	
-	//
-	public function getInstance() {
-		
-		static $oInstance;
-		
-		if ( !$oInstance ) {
-			$sClass = __CLASS__;
-			$oInstance = new $sClass();
-		}
-		
-		return $oInstance;
-	}
-	
 	
 	//
-	public function __construct() {
-		
-		parent::__construct();
-		
+	public function preInitCheckout() {
+
 		// initialize error arrays
 		$this->_errors = array();
 		$this->_jqErrors = array();
 		
-		$mode = 'LIVE';
-		if ( Cart66Setting::getValue( 'payleap_test_mode' ) ) {
-			$mode = 'TEST';
-		}
+		
+		$bTestMode = $this->getSettingValue( 'test_mode' ) ? TRUE : FALSE ;
 		
 		$this->clearErrors();
 		
 		// Set end point and api credentials
-		$apiUsername = Cart66Setting::getValue( 'payleap_api_username' );
-		$apiTransactionKey = Cart66Setting::getValue( 'payleap_transaction_key' );
+		
 		$apiEndPoint = Cart66Setting::getValue( 'auth_url' );
 		
-		if ( 'TEST' == $mode ) {
-			$apiEndPoint = 'https://uat.payleap.com/TransactServices.svc/ProcessCreditCard';
-			$apiUsername = Cart66Setting::getValue( 'payleap_test_api_username' );
-			$apiTransactionKey = Cart66Setting::getValue( 'payleap_test_transaction_key' );
+		$apiMerchantId = $this->getSettingValue( 'merchant_id' );		
+		
+		if ( $bTestMode ) {
+			$apiMerchantId = $this->getSettingValue( 'test_merchant_id' );		
 		}
 		
 		$this->_apiEndPoint = $apiEndPoint;
 		
 		// Set api data
-		$this->_apiData[ 'APIUSERNAME' ] = $apiUsername;
-		$this->_apiData[ 'TRANSACTIONKEY' ] = $apiTransactionKey;
+		$this->_apiData[ 'MERCHANTID' ] = $apiMerchantId;
 		
-		if ( !( $this->_apiData[ 'APIUSERNAME' ] && $this->_apiData[ 'TRANSACTIONKEY' ] ) ) {
-			throw new Cart66Exception( 'Invalid Beanstream Configuration', 66520 ); 
+		if ( !$this->_apiData[ 'MERCHANTID' ] ) {
+			throw new Cart66Exception( sprintf( 'Invalid %s Configuration', $this->_sTitle ), 66520 ); 
 		}
 		
-	}
-	
-	
-	
-	/**
-	 * Return an array of accepted credit card types where the keys are the diplay values and the values are the gateway values
-	 * 
-	 * @return array
-	 */
-	public function getCreditCardTypes() {
-	
-		$cardTypes = array();
-		$setting = new Cart66Setting();
-		$cards = Cart66Setting::getValue( 'auth_card_types' );
-		
-		if ( $cards ) {
-			
-			$cards = explode( '~', $cards );
-		
-			if ( in_array( 'mastercard', $cards ) ) {
-				$cardTypes[ 'MasterCard' ] = 'mastercard';
-			}
-		
-			if ( in_array( 'visa', $cards ) ) {
-				$cardTypes[ 'Visa' ] = 'visa';
-			}
-		
-			if ( in_array( 'amex', $cards ) ) {
-				$cardTypes[ 'American Express' ] = 'amex';
-			}
-		
-			if ( in_array( 'discover', $cards ) ) {
-				$cardTypes[ 'Discover' ] = 'discover';
-			}
-		}
-		
-		return $cardTypes;
 	}
 	
 	
@@ -118,11 +58,13 @@ class Geko_Wp_Cart66_Gateway_Beanstream extends Cart66GatewayAbstract
 	
 		$expMonth = $p[ 'cardExpirationMonth' ];
 		$expYear = substr( $p[ 'cardExpirationYear' ], -2 );
+		
 		// $this->addField( 'Username', $this->_apiData[ 'APIUSERNAME' ] );
 		// $this->addField( 'Password', $this->_apiData[ 'TRANSACTIONKEY' ] );
+		
 		$this->addField( 'requestType', 'BACKEND' );
-		$this->addField( 'merchant_id', '117586520' );
-		$this->addField( 'trnCardOwner', $b[ 'firstName' ] . '+' . $b[ 'lastName' ] );
+		$this->addField( 'merchant_id', $this->_apiData[ 'MERCHANTID' ] );
+		$this->addField( 'trnCardOwner', $b[ 'firstName' ] . ' ' . $b[ 'lastName' ] );
 		$this->addField( 'trnCardNumber', $p[ 'cardNumber' ] );
 		$this->addField( 'trnExpMonth', $expMonth );
 		$this->addField( 'trnExpYear', $expYear );
@@ -173,103 +115,9 @@ class Geko_Wp_Cart66_Gateway_Beanstream extends Cart66GatewayAbstract
 		/* */
 		
 	}
-
-
-	//
-	private function generateExtendedData() {
-		
-		$b = $this->getBilling();
-		$p = $this->getPayment();
-		
-		$billTo = array(
-			'Name' => $b[ 'firstName' ] . ' ' . $b[ 'lastName' ],
-			'Address' => array(
-				'Street' => $b[ 'address' ],
-				'City' => $b[ 'city' ],
-				'State' => $b[ 'state' ],
-				'Zip' => $b[ 'zip' ],
-				'Country' => $b[ 'country' ]
-			),
-			'Email' => $p[ 'email' ],
-			'Phone' => preg_replace( '/\D/', '', $p[ 'phone' ] )
-		);
-		
-		$invoice = array(
-			'InvNum' => '',
-			'BillTo' => $billTo
-		);
-		
-		$data = array(
-			'TrainingMode' => 'F',
-			'Invoice' => $invoice
-		);
-		
-		$xml = trim( $this->arrayToXml( $data ) );
-		$xml = preg_replace( '/>\s+</', '><', $xml );
-		
-		return $xml;
-	}
 	
 	
-	//
-	public static function arrayToXml( $array, $name = false, $space = '', $standalone = false, $beginning = true, $nested = 0 ) {
 	
-		$output = '';
-	
-		if ( $beginning ) {
-			
-			if ( $standalone ) header( 'content-type:text/xml;charset=utf-8' );
-			if ( !isset( $output ) ) { $output = ''; }
-			if ( $standalone ) $output .= '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-			
-			if ( !empty( $space ) ) {
-				$output .= '<' . $name . ' xmlns="' . $space . '">' . "\n";
-			} elseif( $name ) {
-				$output .= '<' . $name . '>' . "\n";
-			}
-			
-			$nested = 0;
-		}
-		
-		// This is required because XML standards do not allow a tag to start with a number or symbol, you can change this value to whatever you like:
-		$ArrayNumberPrefix = 'ARRAY_NUMBER_';
-		
-		foreach ( $array as $root => $child ) {
-			
-			if ( is_array( $child ) ) {
-				
-				$output .= str_repeat( ' ', ( 2 * $nested ) ) . '  <' . ( is_string( $root ) ? $root : $ArrayNumberPrefix . $root ) . '>' . "\n";
-				$nested++;
-				$output .= self::arrayToXml( $child, NULL, NULL, NULL, FALSE, $nested );
-				$nested--;
-				$tag = is_string( $root ) ? $root : $ArrayNumberPrefix . $root;
-				$ex = explode( ' ', $tag );
-				$tag = array_shift( $ex );
-				$output .= str_repeat( ' ', ( 2 * $nested ) ) . '  </' . $tag . '>' . "\n";
-			
-			} else {
-				
-				if ( !isset( $output ) ) { $output = ''; }
-				$tag = is_string( $root ) ? $root : $ArrayNumberPrefix . $root;
-				$ex = explode( ' ', $tag );
-				$tag = array_shift( $ex );
-				$output .= str_repeat( ' ', ( 2 * $nested ) ) . '  <' . ( is_string( $root ) ? $root : $ArrayNumberPrefix . $root ) . '>' . $child . '</' . $tag . '>' . "\n";
-				
-			}
-		}
-		
-		$ex = explode( ' ', $name );
-		$name = array_shift( $ex );
-		if ( $beginning && $name ) $output .= '</' . $name . '>';
-		
-		return $output;
-	}
-	
-	//
-	public function addField( $field, $value ) {
-		$this->fields[ $field ] = $value;
-	}
-
 	//
 	public function doSale() {
     	
@@ -278,18 +126,22 @@ class Geko_Wp_Cart66_Gateway_Beanstream extends Cart66GatewayAbstract
     	if ( $this->fields[ 'Amount' ] > 0 ) {
     		
     		foreach( $this->fields as $key => $value ) {
-    			$this->field_string .= $key . '=' . urlencode( $value ) . '&';
+    			$this->field_string .= sprintf( '%s=%s&', $key, urlencode( $value ) );
     		}
     		
     		$header = array( 'MIME-Version: 1.0', 'Content-type: application/x-www-form-urlencoded', 'Contenttransfer-encoding: text' ); 
 			$ch = curl_init();
 			
 			// set URL and other appropriate options 
-			curl_setopt( $ch, CURLOPT_URL, 'https://www.beanstream.com/scripts/process_transaction.asp' ); 
+			
+			// $this->_apiEndPoint is the same as $this->_sUrl
+			curl_setopt( $ch, CURLOPT_URL, $this->_apiEndPoint ); 
 			curl_setopt( $ch, CURLOPT_VERBOSE, 1 ); 
+			
 			curl_setopt( $ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP ); 
 			// uncomment for host with proxy server
 			// curl_setopt( $ch, CURLOPT_PROXY, 'http://proxyaddress:port' ); 
+			
 			curl_setopt( $ch, CURLOPT_HTTPHEADER, $header ); 
 			curl_setopt( $ch, CURLOPT_SSL_VERIFYHOST, 0 );
 			curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, FALSE ); 
@@ -329,12 +181,13 @@ class Geko_Wp_Cart66_Gateway_Beanstream extends Cart66GatewayAbstract
 			
 			if ( $this->response[ 'Approved' ] == 1 ) {
 				
-				//// TO DO!!!!!!!!!!!!!!!!!
-				/* /
 				$sale = $this->response[ 'Transaction ID' ];
 				
+				//// TO DO!!!!!!!!!!!!!!!!!
+				/* /
+				
 				$oPtMng = Geko_Wp_Point_Manage::getInstance();
-
+				
 				$oMainLayout = Gloc_Layout_Main::getInstance();
 
 				if ( $oMainLayout->isLoggedIn() ) {
@@ -400,102 +253,10 @@ class Geko_Wp_Cart66_Gateway_Beanstream extends Cart66GatewayAbstract
 	public function getTransactionId() {
 		return $this->response[ 'Transaction ID' ];
 	}
-  
-
-	//
-	public function getTransactionResponseDescription() {
-		
-		$description[ 'errormessage' ] = $this->getResponseReasonText();
-		$description[ 'errorcode' ] = $this->response[ 'Response Code' ];
-		
-		$this->_logFields();
-		$this->_logResponse();
-		
-		return $description;
-	}
-
-
-	//   
-	protected function _logResponse() {
-		
-		$out = "Beanstream Response Log\n";
-	
-		foreach ( $this->response as $key => $value ) {
-			$out .= "\t$key = $value\n";
-		}
-		
-		Cart66Common::log( sprintf( '[%s - line %s] %s', basename( __FILE__ ), __LINE__, $out ) );
-	}
+	  
 	
 	
-	//
-	protected function _logFields() {
-		
-		$out = "Beanstream Field Log\n";
-	
-		foreach ( $this->fields as $key => $value ) {
-			$out .= "\t$key = $value\n";
-		}
-		
-		Cart66Common::log( sprintf( '[%s - line %s] %s', basename( __FILE__ ), __LINE__, $out ) );
-	}
-	
-	//
-	public function dumpFields() {
-		
-		// Used for debugging, this function will output all the field/value pairs
-		// that are currently defined in the instance of the class using the
-		// add_field() function.
-		
-		?>
-		<h3>beanstream_class->dump_fields() Output:</h3>
-		<table width="95%" border="1" cellpadding="2" cellspacing="0">
-			<tr>
-				<td bgcolor="black"><b><font color="white">Field Name</font></b></td>
-				<td bgcolor="black"><b><font color="white">Value</font></b></td>
-			</tr>
-			<?php foreach ( $this->fields as $key => $value ): ?>
-				<tr>
-					<td><?php echo $key; ?></td>
-					<td><?php echo urldecode( $value ); ?></td>
-				</tr>
-			<?php endforeach; ?>
-		</table>
-		<br />
-		<?php
-	}
-	
-	
-	//
-	public function dumpResponse() {
-		
-		// Used for debugging, this function will output all the response field
-		// names and the values returned for the payment submission.  This should
-		// be called AFTER the process() function has been called to view details
-		// about payleap's response.
-		
-		?>
-		<h3>payleap_class->dump_response() Output:</h3>
-		<table width="95%" border="1" cellpadding="2" cellspacing="0">
-			<tr>
-				<td bgcolor="black"><b><font color="white">Index&nbsp;</font></b></td>
-				<td bgcolor="black"><b><font color="white">Field Name</font></b></td>
-				<td bgcolor="black"><b><font color="white">Value</font></b></td>
-			</tr>
-			<?php $i = 0; foreach ( $this->response as $key => $value ): ?>
-				<tr>
-					<td valign="top" align="center"><?php echo $i; ?></td>
-					<td valign="top"><?php echo $key; ?></td>
-					<td valign="top"><?php echo $value; ?>&nbsp;</td>
-				</tr>
-			<?php $i++; endforeach; ?>
-		</table>
-		<br />
-		<?php
-	}
-	
-	
-	//// settings form methods
+	//// settings form manipulation methods
 	
 	//
 	public function settingsForm( $oDoc ) {
@@ -509,6 +270,8 @@ class Geko_Wp_Cart66_Gateway_Beanstream extends Cart66GatewayAbstract
 		
 		$oAfter = $oDoc->find( 'option#authorize_test_url' );
 		$oSel = $oDoc->find( 'select#auth_url' );
+		$oSettingsDiv = $oDoc->find( '#gateway-other_gateways' );
+		$oTable = $oSettingsDiv->find( 'table.form-table' );
 		
 		if ( $oAfter->length() > 0 ) {
 			$oAfter->after( $sOption );
@@ -516,10 +279,83 @@ class Geko_Wp_Cart66_Gateway_Beanstream extends Cart66GatewayAbstract
 			$oSel->append( $sOption );
 		}
 		
-		// $oSel->removeAttr( 'selected' );
+		// logo
+		$oSettingsDiv->prepend( sprintf( '
+			<a class="%srow" target="_blank" href="#" style="display: inline;">
+				<img align="left" alt="%s" src="%s/beanstream_logo.png" />
+			</a>		
+		', $this->_sPrefix, $this->_sTitle, Geko_Uri::getUrl( 'geko_ext_images' ) ) );
+		
+		
+		// fields
+		$oTable->find( 'tbody' )->append(
+			Geko_String::fromOb( array( $this, 'outputFields' ) )
+		);
+		
+		// populate form values
+		$oTable = Geko_Html::populateForm( $oTable, $this->getFormValues( array(
+			'merchant_id', 'test_mode', 'test_merchant_id'
+		) ), TRUE );
 		
 		return $oDoc;
 	}
+	
+	
+	//
+	public function outputFields() {
+		
+		$sTitle = $this->_sTitle;
+		$sPrefix = $this->_sPrefix;
+		
+		?>
+		<tr class="<?php echo $sPrefix; ?>row" valign="top" style="display: table-row;">
+			<th scope="row">Merchant ID</th>
+			<td>
+				<input id="<?php echo $sPrefix; ?>merchant_id" class="regular-text" type="text" value="" name="<?php echo $sPrefix; ?>merchant_id">
+			</td>
+		</tr>
+		<tr class="<?php echo $sPrefix; ?>row" valign="top" style="display: table-row;">
+			<th scope="row"><?php echo $sTitle; ?> Test Mode</th>
+			<td>
+				<input id="<?php echo $sPrefix; ?>test_mode_yes" type="radio" value="1" name="<?php echo $sPrefix; ?>test_mode">
+				<label for="<?php echo $sPrefix; ?>test_mode_yes">Yes</label>
+				<input id="<?php echo $sPrefix; ?>test_mode_no" type="radio" value="0" name="<?php echo $sPrefix; ?>test_mode">
+				<label for="<?php echo $sPrefix; ?>test_mode_no">No</label>
+			</td>
+		</tr>
+		<tr class="<?php echo $sPrefix; ?>row" valign="top" style="display: table-row;">
+			<th scope="row">Test Merchant ID</th>
+			<td>
+				<input id="<?php echo $sPrefix; ?>test_merchant_id" class="regular-text" type="text" value="" name="<?php echo $sPrefix; ?>test_merchant_id">
+			</td>
+		</tr>
+		<?php
+	}
+	
+	
+	//
+	public function settingsScript( $oDoc ) {
+		
+		$oFirst = $oDoc->find( ':first' );
+		
+		$sJs = $oFirst->text();
+		
+		$sFind = 'function setGatewayDisplay() {';
+		
+		$sReplace = $sFind . sprintf( "
+			
+			\$jq( '.%s_row' ).hide();
+			if ( \$jq( '#auth_url :selected' ).attr( 'id' ) == '%s_url' ) {
+				\$jq( '.%s_row' ).show();
+			}
+			
+		", $this->_sSlug, $this->_sSlug, $this->_sSlug );
+		
+		$oFirst->text( str_replace( $sFind, $sReplace, $sJs ) );
+		
+		return $oDoc;
+	}
+	
 	
 	
 }

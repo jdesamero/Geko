@@ -30,14 +30,32 @@ class Geko_Wp_Cart66_Hooks extends Geko_Wp_Admin_Hooks_PluginAbstract
 	
 	//
 	public function applyFilters( $sContent, $sState ) {
-		
+
 		if ( 'cart66_settings_gateways' == $sState ) {
-			$sContent = $this->replace(
-				$sContent,
-				'admin_cart66_settings_gateways_form_pq',
-				'/<form id="gatewaySettingsForm" action="" method="post" class="ajaxSettingForm".+?<\/form>/s'
-			);
+			
+			$aRegs = array();
+			if ( preg_match( '/(<div id="cart66-inner-tabs">.+?)(<script type="text\/javascript">.+?<\/script>)/s', $sContent, $aRegs ) ) {
+				
+				$sPart1 = $this->replace(
+					$aRegs[ 1 ],
+					'admin_cart66_settings_gateways_form_pq',
+					'/<form.+?<\/form>/s'
+				);
+				
+				$sPart2 = $this->replace(
+					$aRegs[ 2 ],
+					'admin_cart66_settings_gateways_script_pq',
+					'/<script.+?<\/script>/s'
+				);
+				
+				$sContent = str_replace( $aRegs[ 1 ], $sPart1, $sContent );
+				$sContent = str_replace( $aRegs[ 2 ], $sPart2, $sContent );
+				
+			}
+			
+			
 		}
+		
 		
 		return $sContent;
 	}

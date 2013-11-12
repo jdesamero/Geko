@@ -17,7 +17,7 @@ class Geko_Html
 	}
 	
 	//
-	public static function populateForm( $sHtml, $mValues, $bReturnDoc = FALSE ) {
+	public static function populateForm( $mTarget, $mValues, $bReturnDoc = FALSE ) {
 		
 		if ( is_object( $mValues ) ) {
 			$aValues = array();
@@ -26,8 +26,11 @@ class Geko_Html
 			$aValues = $mValues;
 		}
 		
-		
-		$oDoc = Geko_PhpQuery_FormTransform::createDoc( $sHtml );
+		if ( is_string( $mTarget ) ) {
+			$oDoc = Geko_PhpQuery_FormTransform::createDoc( $mTarget );
+		} else {
+			$oDoc = $mTarget;
+		}
 		
 		list( $oDoc, $aValues ) = Geko_PhpQuery_FormTransform::modifyDoc( $oDoc, $aValues );
 		
