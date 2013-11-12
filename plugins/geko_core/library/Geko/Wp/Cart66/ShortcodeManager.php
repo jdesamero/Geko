@@ -27,6 +27,14 @@ class Geko_Wp_Cart66_ShortcodeManager extends Cart66ShortcodeManager
 				try {
 					
 					$oBsGw = Geko_Wp_Cart66_Gateway_Beanstream::getInstance();
+					
+					$oGekoCart66 = Geko_Wp_Cart66::getInstance();
+					
+					$oBsGw
+						->populateBilling( $oGekoCart66->getBilling() )
+						->populatePayment( $oGekoCart66->getPayment() )
+					;
+					
 					$view = $this->_buildCheckoutView( $oBsGw );
 					
 				} catch( Cart66Exception $e ) {

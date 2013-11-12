@@ -125,6 +125,8 @@ class Geko_Wp_Cart66_Gateway_Beanstream extends Geko_Wp_Cart66_Gateway
     	
     	if ( $this->fields[ 'Amount' ] > 0 ) {
     		
+    		/* /
+    		
     		foreach( $this->fields as $key => $value ) {
     			$this->field_string .= sprintf( '%s=%s&', $key, urlencode( $value ) );
     		}
@@ -177,9 +179,49 @@ class Geko_Wp_Cart66_Gateway_Beanstream extends Geko_Wp_Cart66_Gateway
 			$this->response[ 'Approved' ] = $responseVars[ 'trnApproved' ];
 			// $this->dump_response();
 			
+			/* */
+			
+			$oClient = new Zend_Http_Client( $this->_apiEndPoint );
+			$oClient
+				->setHeaders( array(
+					'MIME-Version' => '1.0',
+					'Content-type' => 'application/x-www-form-urlencoded',
+					'Contenttransfer-encoding' => 'text'
+				) )
+				->setParameterPost( $this->fields )
+			;
+			
+			$oResponse = $oClient->request( 'POST' );
+			
+			$this->response = array();
+			
+			if ( 200 == $oResponse->getStatus() ) {
+				
+				$this->response_string = $oResponse->getBody();
+				
+				$responseVars = array();
+				
+				parse_str( $this->response_string, $responseVars );
+				
+				$this->response = array_merge( $this->response, array(
+					'Response Reason Text' => $responseVars[ 'messageText' ],
+					'Transaction ID' => $responseVars[ 'trnId' ],
+					'Response Code' => $responseVars[ 'errorType' ],
+					'Approved' => $responseVars[ 'trnApproved' ]
+				) );
+				
+			} else {
+				
+				$this->response[ 'Response Reason Text' ] = sprintf(
+					'%d: %s', $oResponse->getStatus(), $oResponse->getMessage()
+				);
+			}
+			
+			
+			
 			// Prepare to return the transaction id for this sale.
 			
-			if ( $this->response[ 'Approved' ] == 1 ) {
+			if ( 1 == $this->response[ 'Approved' ] ) {
 				
 				$sale = $this->response[ 'Transaction ID' ];
 				

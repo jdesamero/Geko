@@ -60,12 +60,29 @@ class Geko_Wp_Cart66_Gateway extends Cart66GatewayAbstract
 	
 	
 	
+	// accessors
 	
-	/**
-	 * Return an array of accepted credit card types where the keys are the diplay values and the values are the gateway values
-	 * 
-	 * @return array
-	 */
+	//
+	public function populateBilling( $aBilling ) {
+		if ( is_array( $aBilling ) ) {
+			$this->_billing = array_merge( $this->_billing, $aBilling );
+		}
+		return $this;
+	}
+	
+	//
+	public function populatePayment( $aPayment ) {
+		if ( is_array( $aPayment ) ) {
+			$this->_payment = array_merge( $this->_payment, $aPayment );
+		}
+		return $this;
+	}
+	
+	
+	
+	
+	// return an array of accepted credit card types where the keys are the diplay values
+	// and the values are the gateway values
 	public function getCreditCardTypes() {
 	
 		$cardTypes = array();

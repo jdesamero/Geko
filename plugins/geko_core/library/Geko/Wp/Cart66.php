@@ -5,6 +5,9 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	
 	protected $bCalledInit = FALSE;
 	
+	protected $_aBilling = array();
+	protected $_aPayment = array();
+	
 	
 	
 	//
@@ -38,6 +41,38 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	}
 	
 	
+	
+	//// accessors
+	
+	//
+	public function setBilling( $aBilling ) {
+		if ( is_array( $aBilling ) ) {
+			$this->_aBilling = array_merge( $this->_aBilling, $aBilling );
+		}
+		return $this;
+	}
+	
+	//
+	public function setPayment( $aPayment ) {
+		if ( is_array( $aPayment ) ) {
+			$this->_aPayment = array_merge( $this->_aPayment, $aPayment );
+		}
+		return $this;
+	}
+	
+	//
+	public function getBilling() {
+		return $this->_aBilling;
+	}
+	
+	//
+	public function getPayment() {
+		return $this->_aPayment;
+	}
+	
+	
+	
+	//// db
 	
 	//
 	public function getProductGroupHash() {
@@ -127,6 +162,7 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 		
 		$sCart = do_shortcode( sprintf( '[cart%s]', $sModeAtt ) );
 		
+		/*
 		$oDoc = Geko_PhpQuery_FormTransform::createDoc( $sCart );
 		
 		$aTr = $oDoc->find( 'tbody > tr' );
@@ -158,19 +194,20 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 		}
 		
 		echo strval( $oDoc );
+		*/
 		
-		// echo $sCart;
+		echo $sCart;
 		
 		return $this;
 	}
 	
 	//
-	public function outputCheckout( $sGateway = 'mijireh', $aValues = NULL ) {
+	public function outputCheckout( $sGateway = 'mijireh' ) {
 		
 		$oDoc = NULL;
 		$sCheckout = do_shortcode( sprintf( '[checkout_%s]', $sGateway ) );
 		
-		if ( is_array( $aValues ) ) {
+		/* if ( is_array( $aValues ) ) {
 			
 			if ( in_array( $sGateway, array( 'payleap', 'beanstream' ) ) ) {
 				
@@ -196,7 +233,7 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 			
 		}
 		
-		if ( $oDoc ) $sCheckout = strval( $oDoc );
+		if ( $oDoc ) $sCheckout = strval( $oDoc ); */
 		
 		echo $sCheckout;
 		
