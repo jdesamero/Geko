@@ -31,6 +31,7 @@ class Geko_Wp_Cart66_ShortcodeManager extends Cart66ShortcodeManager
 					$oGekoCart66 = Geko_Wp_Cart66::getInstance();
 					
 					$oBsGw
+						->setCalculation( $oGekoCart66->getCalculation() )
 						->populateBilling( $oGekoCart66->getBilling() )
 						->populatePayment( $oGekoCart66->getPayment() )
 					;

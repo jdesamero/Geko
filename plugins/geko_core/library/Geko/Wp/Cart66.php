@@ -8,6 +8,8 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	protected $_aBilling = array();
 	protected $_aPayment = array();
 	
+	protected $_oCalculation = NULL;
+	
 	
 	
 	//
@@ -16,6 +18,7 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 		if ( !$this->bCalledInit ) {
 			
 			Geko_Wp_Db::addPrefix( 'cart66_products' );
+			Geko_Wp_Db::addPrefix( 'cart66_orders' );
 			
 			add_action( 'init', array( $this, 'wpInit' ) );
 			
@@ -68,6 +71,18 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	//
 	public function getPayment() {
 		return $this->_aPayment;
+	}
+	
+	
+	//
+	public function setCalculation( $oCalculation ) {
+		$this->_oCalculation = $oCalculation;
+		return $this;
+	}
+	
+	//
+	public function getCalculation() {
+		return $this->_oCalculation;
 	}
 	
 	

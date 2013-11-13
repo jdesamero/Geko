@@ -15,6 +15,9 @@ class Geko_Wp_Cart66_Gateway extends Cart66GatewayAbstract
 	
 	protected $_sInstanceClass = NULL;
 	
+	protected $_oCalculation = NULL;
+	
+	
 	
 	
 	//
@@ -78,6 +81,34 @@ class Geko_Wp_Cart66_Gateway extends Cart66GatewayAbstract
 		return $this;
 	}
 	
+	
+	//
+	public function setCalculation( $oCalculation ) {
+		$this->_oCalculation = $oCalculation;
+		return $this;
+	}
+	
+	//
+	public function getCalculation() {
+		return $this->_oCalculation;
+	}
+	
+	
+	//
+	public function saveDiscountedOrder( $fDiscount, $total, $tax, $transactionId, $status, $accountId ) {
+		
+		global $wpdb;
+		
+		$iOrderId = $this->saveOrder( $total, $tax, $transactionId, $status, $accountId );
+		
+		$wpdb->update( $wpdb->cart66_orders, array(
+			'discount_amount' => $fDiscount
+		), array(
+			'id' => $iOrderId
+		) );
+		
+		return $iOrderId;
+	}
 	
 	
 	
