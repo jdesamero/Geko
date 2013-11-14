@@ -8,6 +8,8 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 	//
 	public function render( $data = NULL, $notices = TRUE, $minify = FALSE ) {
 		
+		$this->_sThisFile = __FILE__;
+		
 		$oGekoCart66 = Geko_Wp_Cart66::getInstance();
 		
 		$oCalculation = $oGekoCart66->getCalculation();
@@ -171,24 +173,39 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 					<tbody>
 						<?php foreach( $items as $itemIndex => $item ):
 							
-							Cart66Common::log('[' . basename(__FILE__) . ' - line ' . __LINE__ . "] Item option info: " . $item->getOptionInfo());
-							$product->load($item->getProductId());
+							$this->logMsg( __LINE__, 'Item option info', $item->getOptionInfo() );
+							
+							$product->load( $item->getProductId() );
 							$price = $item->getProductPrice() * $item->getQuantity();
 							
+							$sProdTitle = sprintf( '%s - %s', $item->getFullDisplayName(), $item->getProductPriceDescription() );
+							
+							$sNbbClass = '';
+							if ( $item->hasAttachedForms() ) {
+								$sNbbClass = 'noBottomBorder';
+							}
+							
 							?><tr>
-								<td <?php if($item->hasAttachedForms()) { echo "class=\"noBottomBorder\""; } ?> >
-									<?php if(Cart66Setting::getValue('display_item_number_cart')): ?>
+								<td class="<?php echo $sNbbClass; ?>" >
+									
+									<?php if ( Cart66Setting::getValue( 'display_item_number_cart' ) ): ?>
 										<span class="cart66-cart-item-number"><?php echo $item->getItemNumber(); ?></span>
 									<?php endif; ?>
-									<?php #echo $item->getItemNumber(); ?>
-									<?php if($item->getProductUrl() != '' && Cart66Setting::getValue('product_links_in_cart') == 1 && $fullMode): ?>
-										<a class="product_url" href="<?php echo $item->getProductUrl(); ?>"><?php echo $item->getFullDisplayName(); ?></a>
-										<span> - <?php echo $item->getProductPriceDescription(); ?></span>
+									
+									<?php if (
+										( '' != $item->getProductUrl() ) && 
+										( 1 == Cart66Setting::getValue( 'product_links_in_cart' ) ) && 
+										( $fullMode )
+									): ?>
+										<a class="product_url" href="<?php echo $item->getProductUrl(); ?>"><?php echo $sProdTitle; ?></a>
 									<?php else: ?>
-										<?php echo $item->getFullDisplayName(); ?>
+										<?php echo $sProdTitle; ?>
 									<?php endif; ?>
-									<?php echo $item->getCustomField($itemIndex, $fullMode); ?>
-									<?php Cart66Session::drop('Cart66CustomFieldWarning'); ?>
+									
+									<?php echo $item->getCustomField( $itemIndex, $fullMode ); ?>
+									
+									<?php Cart66Session::drop( 'Cart66CustomFieldWarning' ); ?>
+									
 								</td>
 								
 								<?php if ( $fullMode ):
@@ -200,34 +217,35 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 									}
 									
 									?>
-									<td <?php if($item->hasAttachedForms()) { echo "class=\"noBottomBorder\""; } ?>>
+									<td class="<?php echo $sNbbClass; ?>" >
 										
-										<?php if($item->isSubscription() || $item->isMembershipProduct() || $product->is_user_price==1): ?>
+										<?php if ( $item->isSubscription() || $item->isMembershipProduct() || ( 1 == $product->is_user_price ) ): ?>
 											<span class="subscriptionOrMembership"><?php echo $item->getQuantity() ?></span>
 										<?php else: ?>
-											<input type="text" name="quantity[<?php echo $itemIndex ?>]" value="<?php echo $item->getQuantity() ?>" class="itemQuantity"/>
+											<input type="text" name="quantity[<?php echo $itemIndex ?>]" value="<?php echo $item->getQuantity(); ?>" class="itemQuantity" />
 										<?php endif; ?>
 										
 										<?php
 											$removeLink = get_permalink( $cartPage->ID );
-											$taskText = (strpos($removeLink, '?')) ? '&task=removeItem&' : '?task=removeItem&';
+											$sDelim = ( strpos( $removeLink, '?' ) ) ? '&' : '?' ;
+											$sRemoveUrl = sprintf( '%s%stask=removeItem&itemIndex=%d', $removeLink, $sDelim, $itemIndex );
 										?>
-										<a href="<?php echo $removeLink . $taskText ?>itemIndex=<?php echo $itemIndex ?>" title="<?php _e('Remove item from cart', 'cart66'); ?>"><img src="<?php echo $removeItemImg ?>" alt="<?php _e('Remove Item', 'cart66'); ?>" /></a>
+										<a href="<?php echo $sRemoveUrl; ?>" title="<?php _e( 'Remove item from cart', 'cart66' ); ?>"><img src="<?php echo $removeItemImg; ?>" alt="<?php _e( 'Remove Item', 'cart66' ); ?>" /></a>
 										
 									</td>
 								<?php else: ?>
-									<td class="cart66-align-center <?php if($item->hasAttachedForms()) { echo "noBottomBorder"; } ?>"><?php echo $item->getQuantity() ?></td>
+									<td class="cart66-align-center <?php echo $sNbbClass; ?>"><?php echo $item->getQuantity(); ?></td>
 								<?php endif; ?>
 								
-								<td class="cart66-align-right <?php if($item->hasAttachedForms()) { echo "noBottomBorder"; } ?>">$<?php echo $item->getProductPrice(); ?></td>
-								<td class="cart66-align-right <?php if($item->hasAttachedForms()) { echo "noBottomBorder"; } ?>"><?php echo Cart66Common::currency($price);?></td>
+								<td class="cart66-align-right <?php echo $sNbbClass; ?>"><?php echo Cart66Common::currency( $item->getProductPrice() ); ?></td>
+								<td class="cart66-align-right <?php echo $sNbbClass; ?>"><?php echo Cart66Common::currency( $price );?></td>
 							</tr>
 							<?php if ( $item->hasAttachedForms() ): ?>
 								<tr>
 									<td colspan="4">
-										<a href="#" class="showEntriesLink" rel="<?php echo 'entriesFor_' . $itemIndex ?>"><?php _e( 'Show Details' , 'cart66' ); ?> <?php #echo count($item->getFormEntryIds()); ?></a>
-										<div id="<?php echo 'entriesFor_' . $itemIndex ?>" class="showGfFormData" style="display: none;">
-											<?php echo $item->showAttachedForms($fullMode); ?>
+										<a href="#" class="showEntriesLink" rel="entriesFor_<?php echo $itemIndex; ?>"><?php _e( 'Show Details' , 'cart66' ); ?> <?php #echo count($item->getFormEntryIds()); ?></a>
+										<div id="entriesFor_<?php echo $itemIndex; ?>" class="showGfFormData" style="display: none;">
+											<?php echo $item->showAttachedForms( $fullMode ); ?>
 										</div>
 									</td>
 								</tr>
@@ -259,22 +277,30 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 												&nbsp;
 												
 												<?php
-													$liveRates = Cart66Session::get('Cart66Cart')->getLiveRates();
+													$liveRates = Cart66Session::get( 'Cart66Cart' )->getLiveRates();
 													$rates = $liveRates->getRates();
-													Cart66Common::log('[' . basename(__FILE__) . ' - line ' . __LINE__ . "] LIVE RATES: " . print_r($rates, true));
+													
+													$this->logMsg( __LINE__, 'LIVE RATES', print_r( $rates, TRUE ) );
+													
 													$selectedRate = $liveRates->getSelected();
 													// $shipping = Cart66Session::get('Cart66Cart')->getShippingCost();
 												?>
 												
 												<select name="live_rates" id="live_rates">
-													<?php foreach( $rates as $rate ): ?>
-														<option value="<?php echo $rate->service ?>" <?php if($selectedRate->service == $rate->service) { echo 'selected="selected"'; } ?>>
-															<?php if ( $rate->rate !== false ) {
-																echo "$rate->service: \$$rate->rate";
-															} else {
-																echo "$rate->service";
-															} ?>
-														</option>
+													<?php foreach( $rates as $rate ):
+														
+														$sSelectedAtt = '';
+														if ( $selectedRate->service == $rate->service ) {
+															$sSelectedAtt = ' selected="selected" ';
+														}
+														
+														$sOptTitle = $rate->service;
+														if ( FALSE !== $rate->rate ) {
+															$sOptTitle .= ': $' . $rate->rate;
+														}
+														
+														?>
+														<option value="<?php echo $rate->service; ?>" <?php echo $sSelectedAtt; ?> ><?php echo $sOptTitle; ?></option>
 													<?php endforeach; ?>
 												</select>
 											
@@ -288,20 +314,21 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 											
 											<input type="text" name="shipping_zip" value="" id="shipping_zip" size="5" />
 											
-											<?php if ( Cart66Setting::getValue( 'international_sales' ) ): ?>
-												<select name="shipping_country_code">
-													<?php
-														$customCountries = Cart66Common::getCustomCountries();
-														foreach($customCountries as $code => $name) {
-															echo "<option value='$code'>$name</option>\n";
-														}
-													?>
+											<?php if ( Cart66Setting::getValue( 'international_sales' ) ):
+												
+												$customCountries = Cart66Common::getCustomCountries();
+												
+												?><select name="shipping_country_code">
+													<?php foreach ( $customCountries as $code => $name ): ?>
+														<option value="<?php echo $code; ?>"><?php echo $name; ?></option>
+													<?php endforeach; ?>
 												</select>
+												
 											<?php else: ?>
 												<input type="hidden" name="shipping_country_code" value="<?php echo Cart66Common::getHomeCountryCode(); ?>" id="shipping_country_code">
 											<?php endif; ?>
 											
-											<?php if($cartImgPath && Cart66Common::urlIsLIve($calculateShippingImg)): ?>
+											<?php if ( $cartImgPath && Cart66Common::urlIsLIve( $calculateShippingImg ) ): ?>
 												<input class="Cart66CalculateShippingButton" type="image" src="<?php echo $calculateShippingImg ?>" value="<?php _e( 'Calculate Shipping' , 'cart66' ); ?>" name="calculateShipping" />
 											<?php else: ?>
 												<input type="submit" name="calculateShipping" value="<?php _e('Calculate Shipping', 'cart66'); ?>" id="shipping_submit" class="Cart66CalculateShippingButton Cart66ButtonSecondary" />
@@ -316,9 +343,9 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 										<th colspan="4" class="alignRight">
 											<?php
 												$liveRates = Cart66Session::get('Cart66Cart')->getLiveRates();
-												if ( $liveRates && Cart66Session::get('cart66_shipping_zip') && Cart66Session::get('cart66_shipping_country_code')) {
+												if ( $liveRates && Cart66Session::get( 'cart66_shipping_zip' ) && Cart66Session::get( 'cart66_shipping_country_code' ) ) {
 													$selectedRate = $liveRates->getSelected();
-													echo __("Shipping to", "cart66") . " " . Cart66Session::get('cart66_shipping_zip') . " " . __("via","cart66") . " " . $selectedRate->service;
+													printf( '%s %s %s %s', __( 'Shipping to', 'cart66' ), Cart66Session::get( 'cart66_shipping_zip' ), $selectedRate->service );
 												}
 											?>
 										</th>
@@ -334,18 +361,22 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 										<th colspan="4" class="alignRight"><?php _e( 'Shipping Method' , 'cart66' ); ?>: &nbsp;
 											
 											
-											<?php if ( Cart66Setting::getValue('international_sales')): ?>
-												<select name="shipping_country_code" id="shipping_country_code">
-												<?php
-													$customCountries = Cart66Common::getCustomCountries();
-													foreach ( $customCountries as $code => $name) {
-														$selected_country = '';
-														if($code == Cart66Session::get('Cart66ShippingCountryCode')) {
-															$selected_country = ' selected="selected"';
-														}
-														echo "<option value='$code'$selected_country>$name</option>\n";
-													}
+											<?php if ( Cart66Setting::getValue( 'international_sales' ) ):
+												
+												$customCountries = Cart66Common::getCustomCountries();
+												
 												?>
+												<select name="shipping_country_code" id="shipping_country_code">
+													<?php foreach ( $customCountries as $code => $name ):
+														
+														$sSelectedAtt = '';
+														if ( $code == Cart66Session::get( 'Cart66ShippingCountryCode' ) ) {
+															$sSelectedAtt = ' selected="selected" ';
+														}
+														
+														?>
+														<option value="<?php echo $code; ?>" <?php echo $sSelectedAtt; ?> ><?php echo $name; ?></option>
+													<?php endforeach; ?>
 												</select>
 											<?php else: ?>
 												<input type="hidden" name="shipping_country_code" value="<?php echo Cart66Common::getHomeCountryCode(); ?>" id="shipping_country_code">
@@ -353,27 +384,33 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 											
 											
 											<select name="shipping_method_id" id="shipping_method_id">
-												<?php foreach ( $shippingMethods as $name => $id ): ?>
-												<?php
-													
+												<?php foreach ( $shippingMethods as $name => $id ):
+												
 													$method_class = 'methods-country ';
-													$method = new Cart66ShippingMethod($id);
-													$methods = unserialize($method->countries);
+													$method = new Cart66ShippingMethod( $id );
+													$methods = unserialize( $method->countries );
 													
 													if ( is_array( $methods ) ) {
-														foreach ( $methods as $code => $country) {
+														foreach ( $methods as $code => $country ) {
 															$method_class .= $code . ' ';
 														}
 													}
 													
-													if ( $id == 'select' ) {
-														$method_class = "select";
-													} elseif ( $method_class == 'methods-country ' ) {
+													if ( 'select' == $id ) {
+														$method_class = 'select';
+													} elseif ( 'methods-country ' == $method_class ) {
 														$method_class = 'all-countries';
 													}
 													
+													$method_class = trim( $method_class );
+													
+													$sSelectedAtt = '';
+													if ( $id == Cart66Session::get( 'Cart66Cart' )->getShippingMethodId() ) {
+														$sSelectedAtt = ' selected="selected" ';
+													}
+													
 													?>
-													<option class="<?php echo trim($method_class); ?>" value="<?php echo $id ?>" <?php echo ($id == Cart66Session::get('Cart66Cart')->getShippingMethodId())? 'selected' : ''; ?>><?php echo $name ?></option>
+													<option class="<?php echo $method_class; ?>" value="<?php echo $id; ?>" <?php echo $sSelectedAtt; ?> ><?php echo $name; ?></option>
 												<?php endforeach; ?>
 											</select>
 										</th>
@@ -415,14 +452,14 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 												
 						<!-- DISCOUNT ONE -->
 
-						<?php if ( $promotion ): ?>
+						<?php if ( $promotion ):
+							
+							$sPromoName = ( $promotion->name ) ? $promotion->name : Cart66Session::get( 'Cart66PromotionCode' );
+							$sTitle = sprintf( '%s (%s):', __( 'Coupon' , 'cart66' ), $sPromoName );
+							
+							?>
 							<tr class="coupon">
-								<td colspan="3" class="alignRight strong"><?php _e( 'Coupon' , 'cart66' ); ?> 
-								<?php if ( $promotion->name ) { 
-									echo "(" .$promotion->name .")"; 
-								} else {
-									echo "(" . Cart66Session::get('Cart66PromotionCode') . ")";
-								} ?>:</td>
+								<td colspan="3" class="alignRight strong"><?php echo $sTitle; ?></td>
 								<td class="strong cart66-align-right">
 									-&nbsp;<?php echo $oCalculation->getCurrDiscountOne(); ?>
 								</td>
