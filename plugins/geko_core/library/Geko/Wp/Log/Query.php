@@ -39,10 +39,10 @@ class Geko_Wp_Log_Query extends Geko_Wp_Entity_Query
 				$sPfx = '_mt' . $i;
 				
 				$oQuery
-					->field( $sPfx . '.meta_value', $sKey )
+					->field( sprintf( '%s.meta_value', $sPfx ), $sKey )
 					->joinLeft( $sMetaTableName, $sPfx )
-						->on( $sPfx . '.log_id = l.log_id' )
-						->on( $sPfx . '.mkey_id = ?', Geko_Wp_Options_MetaKey::getId( $sKey ) )
+						->on( sprintf( '%s.log_id = l.log_id', $sPfx ) )
+						->on( sprintf( '%s.mkey_id = ?', $sPfx ), Geko_Wp_Options_MetaKey::getId( $sKey ) )
 				;
 				
 				$sType = $aParams[ 'type' ];
@@ -50,11 +50,11 @@ class Geko_Wp_Log_Query extends Geko_Wp_Entity_Query
 				
 				if ( $sType && $mVal ) {
 					
-					$sClause = $sPfx . '.meta_value = ?';
+					$sClause = sprintf( '%s.meta_value = ?', $sPfx );
 					
 					if ( 'int' == strtolower( $sType ) ) {
 						$mVal = intval( $mVal );
-						$sClause = 'CAST( ' . $sPfx . '.meta_value AS UNSIGNED ) = ?';
+						$sClause = sprintf( 'CAST( %s.meta_value AS UNSIGNED ) = ?', $sPfx );
 					}
 					
 					$oQuery->having( $sClause, $mVal );
@@ -80,6 +80,11 @@ class Geko_Wp_Log_Query extends Geko_Wp_Entity_Query
 		// apply default sorting
 		if ( !isset( $aParams[ 'orderby' ] ) ) {		
 			$oQuery->order( 'l.date_created', 'DESC' );
+		}
+		
+		
+		if ( $iLogId = $aParams[ 'log_id' ] ) {
+			$oQuery->where( 'l.log_id = ?', $iLogId );
 		}
 		
 		return $oQuery;

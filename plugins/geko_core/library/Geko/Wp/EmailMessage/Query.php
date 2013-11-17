@@ -37,6 +37,26 @@ class Geko_Wp_EmailMessage_Query extends Geko_Wp_Entity_Query
 			$oQuery->where( 'e.slug = ?', $aParams[ 'geko_emsg_slug' ] );
 		}
 		
+		//
+		if ( $aHeaderMatch = $aParams[ 'header' ] ) {
+			
+			$i = 0;
+			
+			foreach ( $aHeaderMatch as $sKey => $sValue ) {
+				
+				$sPfx = sprintf( 'h_%d', $i );
+				
+				$oQuery
+					->joinLeft( $wpdb->geko_emsg_header, $sPfx )
+						->on( sprintf( '%s.emsg_id = e.emsg_id', $sPfx ) )
+						->on( sprintf( '%s.name = ?', $sPfx ), $sKey )
+					->where( sprintf( '%s.val = ?', $sPfx ), $sValue )
+				;
+				
+				$i++;
+			}
+		}
+		
 		
 		return $oQuery;
 	}

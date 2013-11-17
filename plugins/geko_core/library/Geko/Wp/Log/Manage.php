@@ -552,6 +552,7 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 							<th><label for="max_date">End Date</label></th>
 							<td><input type="text" id="max_date" name="max_date" /></td>
 						</tr>
+						<?php $oCurLog->outputFilters( $oCurLog ); ?>
 					</table>
 					<input type="hidden" name="action" value="<?php echo $sOpAction; ?>" />
 					<?php echo $sCurLogHiddenFields; ?>
@@ -577,6 +578,9 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 		return $aRet;
 	}
 	
+	
+	// hook
+	public function outputFilters( $oCurLog ) { }
 	
 	
 	
@@ -610,6 +614,8 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 				$aParams[ 'max_date' ] = str_replace( '/', '-', $sMaxDate ) . ' 23:59:59';	
 			}
 			
+			$aParams = $this->modifyExportParams( $aParams );
+			
 			$sQueryClass = $this->_sQueryClass;
 			$sHelperClass = $this->_sExportExcelHelperClass;
 			
@@ -622,7 +628,12 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 		}
 		
 	}
-
+	
+	
+	// hook method
+	public function modifyExportParams( $aParams ) {
+		return $aParams;
+	}
 	
 	
 	

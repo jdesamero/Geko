@@ -44,7 +44,8 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	protected $_bUpdateRelatedEntities = FALSE;			// for mix-in use only
 	protected $_bExtraForms = FALSE;
 	protected $_sEditFormId = 'editform';
-
+	protected $_bHideAddUpdateButton = FALSE;
+	
 	protected $_aCustomActions = array();
 	protected $_aNormalizedCustomActions = array();
 	protected $_aJsParams = array();
@@ -1256,27 +1257,33 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		$this->outputBeforeSubmitDefault();
 		$this->outputBeforeSubmit();
 		
+		$bSkipSpacer = TRUE;
+		
 		?>
 		
 		<p class="submit">
 			
-			<input type="submit" class="button-primary" name="submit" value="<?php echo $sSubmitLabel; ?>" />
+			<?php if ( !$this->_bHideAddUpdateButton ): $bSkipSpacer = FALSE; ?>
+				<input type="submit" class="button-primary" name="submit" value="<?php echo $sSubmitLabel; ?>" />
+			<?php endif; ?>
 			
 			<?php if ( $this->isDisplayMode( 'edit' ) ): ?>
 				
-				<?php if ( $this->_bCanDuplicate ): ?>
+				<?php if ( $this->_bCanDuplicate ): $bSkipSpacer = FALSE; ?>
 					<input type="button" class="button-primary" id="duplicate_<?php echo $this->_sType; ?>_btn" value="Duplicate <?php echo $this->_sSubject; ?>" />
 				<?php endif; ?>
-				<?php if ( $this->_bCanExport ): ?>
+				<?php if ( $this->_bCanExport ): $bSkipSpacer = FALSE; ?>
 					<input type="button" class="button-primary" id="export_<?php echo $this->_sType; ?>_btn" value="Export <?php echo $this->_sSubject; ?>" />		
 				<?php endif; ?>
-				<?php if ( $this->_bCanRestore ): ?>
+				<?php if ( $this->_bCanRestore ): $bSkipSpacer = FALSE; ?>
 					<input type="button" class="button-primary" id="restore_<?php echo $this->_sType; ?>_btn" value="Restore <?php echo $this->_sSubject; ?>" />		
 				<?php endif; ?>
 				
 			<?php endif; ?>
 			
-			<span class="btn_spacer"></span>
+			<?php if ( !$bSkipSpacer ): ?>
+				<span class="btn_spacer"></span>
+			<?php endif; ?>
 			
 			<?php $this->outputAppendSubmitDefault(); ?>
 			<?php $this->outputAppendSubmit(); ?>
