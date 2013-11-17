@@ -10,6 +10,8 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 		
 		$this->_sThisFile = __FILE__;
 		
+		
+		
 		$errors = array();
 		$createAccount = FALSE;
 		
@@ -328,7 +330,7 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 							$newOrder = new Cart66Order( $orderId );
           					
 							// Send email receipts
-							if ( CART66_PRO && CART66_EMAILS && ( 1 == Cart66Setting::getValue( 'enable_advanced_notifications' ) ) ) {
+							if ( CART66_PRO && CART66_EMAILS && ( 1 == $this->getVal( 'enable_advanced_notifications' ) ) ) {
 								
 								$notify = new Cart66AdvancedNotifications( $orderId );
 								$notify->sendAdvancedEmailReceipts();
@@ -373,12 +375,12 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 		
 		
 		// Build checkout form action URL
-		$checkoutPage = get_page_by_path('store/checkout');
-		$ssl = Cart66Setting::getValue('auth_force_ssl');
-		$url = get_permalink($checkoutPage->ID);
+		$checkoutPage = get_page_by_path( 'store/checkout' );
+		$ssl = $this->getVal( 'auth_force_ssl' );
+		$url = get_permalink( $checkoutPage->ID );
 		
-		if(Cart66Common::isHttps()) {
-			$url = str_replace('http:', 'https:', $url);
+		if ( Cart66Common::isHttps() ) {
+			$url = str_replace( 'http:', 'https:', $url );
 		}
 
 		// Make it easier to get to payment, billing, and shipping data
@@ -407,15 +409,15 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 		Cart66Common::log('[' . basename(__FILE__) . ' - line ' . __LINE__ . "] Using Checkout Form File :: $checkoutFormFile");
 
 		ob_start();
-		include($checkoutFormFile);
+		include( $checkoutFormFile );
 		$checkoutFormFileContents = ob_get_contents();
 		ob_end_clean();
-		echo Cart66Common::minifyMarkup($checkoutFormFileContents);
+		echo Cart66Common::minifyMarkup( $checkoutFormFileContents );
 		
 		// Include the client side javascript validation
 		$same_as_billing = FALSE;
 		
-		if($_SERVER['REQUEST_METHOD'] == 'GET' && Cart66Setting::getValue('sameAsBillingOff') != 1) {
+		if ( ( $_SERVER['REQUEST_METHOD'] == 'GET' ) && ( $this->getVal( 'sameAsBillingOff' ) != 1 ) ) {
 			$same_as_billing = TRUE;
 		} elseif(isset($_POST['sameAsBilling']) && $_POST['sameAsBilling'] == '1') {
 			$same_as_billing = TRUE;

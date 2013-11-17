@@ -10,6 +10,8 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 		
 		$this->_sThisFile = __FILE__;
 		
+		
+		
 		global $wpdb;
 		
 		$product = new Cart66Product();
@@ -61,8 +63,8 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 			// End processing affiliate information
 			
 			// Begin iDevAffiliate Tracking
-			if(CART66_PRO && $url = Cart66Setting::getValue('idevaff_url')) {
-				require_once(CART66_PATH . "/pro/idevaffiliate-award.php");
+			if ( CART66_PRO && ( $url = $this->getVal( 'idevaff_url' ) ) ) {
+				require_once( CART66_PATH . '/pro/idevaffiliate-award.php' );
 			}
 			// End iDevAffiliate Tracking
 			
@@ -118,7 +120,7 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 						
 					} else {
 						
-						$dir = Cart66Setting::getValue( 'product_folder' );
+						$dir = $this->getVal( 'product_folder' );
 						$path = $dir . DIRECTORY_SEPARATOR . $product->download_path;
 						Cart66Common::downloadFile($path);
 					
@@ -128,7 +130,7 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 					
 				} else {
 				
-					echo '<p>' . __( 'You have exceeded the maximum number of downloads for this product', 'cart66' ) . '.</p>';
+					echo '<p>' . $this->_t( 'You have exceeded the maximum number of downloads for this product' ) . '.</p>';
 					$order = new Cart66Order();
 					$order->loadByDuid( $_GET[ 'duid' ] );
 					
@@ -145,10 +147,10 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 		
 		if ( !$ajaxRefresh ) :
 			
-			if ( ( 1 == Cart66Setting::getValue( 'enable_google_analytics' ) ) && !Cart66Setting::getValue( 'use_other_analytics_plugin' ) ):
+			if ( ( 1 == $this->getVal( 'enable_google_analytics' ) ) && !$this->getVal( 'use_other_analytics_plugin' ) ):
 				
 				$aJsonParams = array(
-					'google_analytics_wpid' => Cart66Setting::getValue( 'google_analytics_wpid' )
+					'google_analytics_wpid' => $this->getVal( 'google_analytics_wpid' )
 				);
 				
 				?>
@@ -167,7 +169,7 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 			
 			<?php if ( FALSE !== $order ): ?>
 				
-				<h2><?php _e( 'Order Number' , 'cart66' ); ?>: <?php echo $order->trans_id ?></h2>
+				<h2><?php $this->_e( 'Order Number' ); ?>: <?php echo $order->trans_id ?></h2>
 				
 				<?php if(CART66_PRO && $order->hasAccount() == 1) {
 					
@@ -177,9 +179,9 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 					if ( $logInLink !== false ) {
 						echo '<h2>Your Account Is Ready</h2>';
 						if(Cart66Common::isLoggedIn() && $memberHomePageLink !== false) {
-							echo "<p><a href=\"$memberHomePageLink\">" . __("Members Home","cart66") . "</a>.</p>";
+							echo "<p><a href=\"$memberHomePageLink\">" . $this->_t( 'Members Home' ) . "</a>.</p>";
 						} else {
-							echo "<p><a href=\"$logInLink\">" . __("Log into your account","cart66") . "</a>.</p>";
+							echo "<p><a href=\"$logInLink\">" . $this->_t( 'Log into your account' ) . "</a>.</p>";
 						}
 					}
 				
@@ -230,8 +232,8 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 									<p class="description">Repeat password</p>
 								</li>
 								<li>
-									<label for="Cart66CheckoutButton" class="Cart66Hidden"><?php _e( 'Save' , 'cart66' ); ?></label>
-									<input id="Cart66CheckoutButton" class="Cart66ButtonPrimary Cart66CompleteOrderButton" type="submit" value="<?php _e( 'Create Account' , 'cart66' ); ?>" name="Create Account" />
+									<label for="Cart66CheckoutButton" class="Cart66Hidden"><?php $this->_e( 'Save' ); ?></label>
+									<input id="Cart66CheckoutButton" class="Cart66ButtonPrimary Cart66CompleteOrderButton" type="submit" value="<?php $this->_e( 'Create Account' ); ?>" name="Create Account" />
 								</li>
 							</ul>
 						</form>
@@ -249,7 +251,7 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 						<tr>
 							<td valign="top">
 								<p>
-									<strong><?php _e( 'Billing Information' , 'cart66' ); ?></strong><br />
+									<strong><?php $this->_e( 'Billing Information' ); ?></strong><br />
 									
 									<?php echo $order->bill_first_name ?> <?php echo $order->bill_last_name ?><br />
 									<?php echo $order->bill_address ?><br />
@@ -277,16 +279,16 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 							<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
 							<td valign="top">
 								<p>
-									<strong><?php _e( 'Contact Information' , 'cart66' ); ?></strong>
+									<strong><?php $this->_e( 'Contact Information' ); ?></strong>
 									
 									<br/>
 									
 									<?php if(!empty($order->phone)): ?>
-										<?php _e( 'Phone' , 'cart66' ); ?>: <?php echo Cart66Common::formatPhone($order->phone) ?><br/>
+										<?php $this->_e( 'Phone' ); ?>: <?php echo Cart66Common::formatPhone($order->phone) ?><br/>
 									<?php endif; ?>
 									
-									<?php _e( 'Email' , 'cart66' ); ?>: <?php echo $order->email ?><br />
-									<?php _e( 'Date' , 'cart66' ); ?>: <?php echo date(get_option('date_format'), strtotime($order->ordered_on)) ?> <?php echo date(get_option('time_format'), strtotime($order->ordered_on)) ?>
+									<?php $this->_e( 'Email' ); ?>: <?php echo $order->email ?><br />
+									<?php $this->_e( 'Date' ); ?>: <?php echo date(get_option('date_format'), strtotime($order->ordered_on)) ?> <?php echo date(get_option('time_format'), strtotime($order->ordered_on)) ?>
 									
 									<?php if(is_array($additional_fields = maybe_unserialize($order->additional_fields)) && isset($additional_fields['payment'])): ?>
 										<br />
@@ -306,7 +308,7 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 								<p>								
 									<?php if($order->hasShippingInfo()): ?>
 										
-										<strong><?php _e( 'Shipping Information' , 'cart66' ); ?></strong><br />
+										<strong><?php $this->_e( 'Shipping Information' ); ?></strong><br />
 										
 										<?php echo $order->ship_first_name ?> <?php echo $order->ship_last_name ?><br />
 										<?php echo $order->ship_address ?><br />
@@ -332,7 +334,7 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 										
 									<?php endif; ?>
 										
-									<br /><em><?php _e( 'Delivery via' , 'cart66' ); ?>: <?php echo $order->shipping_method ?></em><br />
+									<br /><em><?php $this->_e( 'Delivery via' ); ?>: <?php echo $order->shipping_method ?></em><br />
 								</p>
 									
 							<?php endif; ?>
@@ -347,14 +349,14 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 							<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
 							<td valign="top">
 								<p>
-									<strong><?php _e( 'Contact Information' , 'cart66' ); ?></strong><br />
+									<strong><?php $this->_e( 'Contact Information' ); ?></strong><br />
 									
 									<?php if(!empty($order->phone)): ?>
-										<?php _e( 'Phone' , 'cart66' ); ?>: <?php echo Cart66Common::formatPhone($order->phone) ?><br />
+										<?php $this->_e( 'Phone' ); ?>: <?php echo Cart66Common::formatPhone($order->phone) ?><br />
 									<?php endif; ?>
 									
-									<?php _e( 'Email' , 'cart66' ); ?>: <?php echo $order->email ?><br />
-									<?php _e( 'Date' , 'cart66' ); ?>: <?php echo date(get_option('date_format'), strtotime($order->ordered_on)) ?> <?php echo date(get_option('time_format'), strtotime($order->ordered_on)) ?>
+									<?php $this->_e( 'Email' ); ?>: <?php echo $order->email ?><br />
+									<?php $this->_e( 'Date' ); ?>: <?php echo date(get_option('date_format'), strtotime($order->ordered_on)) ?> <?php echo date(get_option('time_format'), strtotime($order->ordered_on)) ?>
 									
 									<?php if(is_array($additional_fields = maybe_unserialize($order->additional_fields)) && isset($additional_fields['payment'])): ?>
 										<br />
@@ -367,7 +369,7 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 						<?php endif; ?>
 					</tr>
 					
-					<?php if(CART66_PRO && Cart66Setting::getValue('enable_advanced_notifications') ==1): ?>
+					<?php if ( CART66_PRO && ( 1 == $this->getVal( 'enable_advanced_notifications' ) ) ): ?>
 						<?php $tracking = explode(',', $order->tracking_number); if(!empty($order->tracking_number)): ?>
 							<tr>
           						<td colspan="3" class="receipt_tracking_numbers">
@@ -380,7 +382,7 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 										?>
 										
 										<div id="tracking_<?php echo $i; ?>_<?php echo $carrierName; ?>" class="tracking_number">
-											<span class="carrier_<?php echo $carrierName; ?>"><?php echo $carrierName ?></span><span class="tracking_text"> <?php _e("Tracking Number","cart66") ?></span><span class="tracking_divider">:</span>
+											<span class="carrier_<?php echo $carrierName; ?>"><?php echo $carrierName ?></span><span class="tracking_text"> <?php $this->_e( 'Tracking Number' ); ?></span><span class="tracking_divider">:</span>
 											<span class="tracking_link"><a href="<?php echo $link; ?>" target="_blank" id="<?php echo $carrierName . '_' . $number; ?>"><?php echo $number ?></a></span>
 										</div>
 									<?php $i++; } ?>
@@ -392,10 +394,10 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 					<?php if(isset($order->custom_field) && $order->custom_field != ''): ?>
 						<tr>
 							<td colspan="3">
-								<?php if(Cart66Setting::getValue('checkout_custom_field_label')): ?>
-									<p><strong><?php echo Cart66Setting::getValue('checkout_custom_field_label'); ?></strong><br />
+								<?php if ( $this->getVal( 'checkout_custom_field_label' ) ): ?>
+									<p><strong><?php $this->echoVal( 'checkout_custom_field_label' ); ?></strong><br />
 								<?php else: ?>
-									<p><strong><?php _e('Enter any special instructions you have for this order:', 'cart66'); ?></strong><br />
+									<p><strong><?php $this->_e( 'Enter any special instructions you have for this order:' ); ?></strong><br />
 								<?php endif; ?>
 								<p><?php echo $order->custom_field; ?></p>
 							</td>
@@ -410,13 +412,13 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 				
 				<table id='viewCartTable' cellspacing="0" cellpadding="0">
 					<tr>
-						<th style='text-align: left;'><?php _e( 'Product' , 'cart66' ); ?></th>
-						<th style='text-align: center;'><?php _e( 'Quantity' , 'cart66' ); ?></th>
-						<th style='text-align: left;'><?php _e( 'Item Price' , 'cart66' ); ?></th>
-						<th style='text-align: left;'><?php _e( 'Item Total' , 'cart66' ); ?></th>
+						<th style='text-align: left;'><?php $this->_e( 'Product' ); ?></th>
+						<th style='text-align: center;'><?php $this->_e( 'Quantity' ); ?></th>
+						<th style='text-align: left;'><?php $this->_e( 'Item Price' ); ?></th>
+						<th style='text-align: left;'><?php $this->_e( 'Item Total' ); ?></th>
 					</tr>
 					
-					<?php if ( ( 1 == Cart66Setting::getValue( 'enable_google_analytics' ) ) && ( 0 == $order->viewed ) ):
+					<?php if ( ( 1 == $this->getVal( 'enable_google_analytics' ) ) && ( 0 == $order->viewed ) ):
 						
 						$aJsonParams = array(
 							'addtrans' => array(
@@ -454,45 +456,43 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 						
 						<tr>
 							<td>
-								<?php if(Cart66Setting::getValue('display_item_number_cart')): ?>
+								<?php if ( $this->getVal( 'display_item_number_cart' ) ): ?>
 									<span class="cart66-receipt-item-number"><?php echo $item->item_number; ?></span>
 								<?php endif; ?>
 								
-								<b><?php echo nl2br($item->description) ?></b>
+								<b><?php echo nl2br( $item->description ); ?></b>
 								
 								<?php
 								
-								$product->load($item->product_id);
+								$product->load( $item->product_id );
 								
-								if($product->isDigital()) {
-									$receiptPage = get_page_by_path('store/receipt');
-									$receiptPageLink = get_permalink($receiptPage);
-									$receiptPageLink .= (strstr($receiptPageLink, '?')) ? '&duid=' . $item->duid : '?duid=' . $item->duid;
-									echo '<br/><a class="download-link" href="' . $receiptPageLink . '">' . __('Download', 'cart66') . '</a>';
-								}
+								if ( $product->isDigital() ):
+									?><br /><a class="download-link" href="<?php $this->echoLink( $item, 'store/receipt', 'duid' ); ?>"><?php $this->_e( 'Download' ); ?></a><?php
+								endif;
 								?>
 							</td>
 							<td style='text-align: center;'><?php echo $item->quantity ?></td>
-							<td><?php echo Cart66Common::currency($item->product_price) ?></td>
-							<td><?php echo Cart66Common::currency($item->product_price * $item->quantity) ?></td>
+							<td><?php $this->echoCurr( $item->product_price ); ?></td>
+							<td><?php $this->echoCurr( $item->product_price * $item->quantity ); ?></td>
 						</tr>
       					
 						<?php if ( !empty( $item->form_entry_ids ) ) {
 							
 							$entries = explode( ',', $item->form_entry_ids );
+
+							if ( class_exists( 'RGFormsModel' ) ):
+								foreach( $entries as $entryId ):
+									if ( RGFormsModel::get_lead( $entryId ) ):
+										?><tr><td colspan="4"><div class="Cart66GravityFormDisplay"><?php echo Cart66GravityReader::displayGravityForm( $entryId ); ?></div></td></tr><?php
+									endif;
+								endforeach;
+							else:
+								?><tr><td colspan="5" style="color: #955;"><?php $this->_e( 'This order requires Gravity Forms in order to view all of the order information' ); ?></td></tr><?php
+							endif;
 							
-							foreach( $entries as $entryId ) {
-								if ( class_exists( 'RGFormsModel' ) ) {
-									if ( RGFormsModel::get_lead( $entryId ) ) {
-										echo "<tr><td colspan='4'><div class='Cart66GravityFormDisplay'>" . Cart66GravityReader::displayGravityForm($entryId) . "</div></td></tr>";
-									}
-								} else {
-									echo "<tr><td colspan='5' style='color: #955;'>" . __('This order requires Gravity Forms in order to view all of the order information', 'cart66') . "</td></tr>";
-								}
-							}
 						} ?>
 						
-						<?php if ( ( 1 == Cart66Setting::getValue( 'enable_google_analytics' ) ) && ( 0 == $order->viewed ) ):
+						<?php if ( ( 1 == $this->getVal( 'enable_google_analytics' ) ) && ( 0 == $order->viewed ) ):
 											
 							$aJsonParams = array(
 								'additem' => array(
@@ -519,7 +519,7 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 						<?php endif; ?>
 					<?php endforeach; ?>
 					
-					<?php if ( ( 1 == Cart66Setting::getValue( 'enable_google_analytics' ) ) && ( 0 == $order->viewed ) ): ?>
+					<?php if ( ( 1 == $this->getVal( 'enable_google_analytics' ) ) && ( 0 == $order->viewed ) ): ?>
 						<script type="text/javascript">
 						/* <![CDATA[ */
 							
@@ -532,46 +532,46 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 					<tr class="noBorder">
 						<td colspan='1'>&nbsp;</td>
 						<td colspan="1" style='text-align: center;'>&nbsp;</td>
-						<td colspan="1" style='text-align: right; font-weight: bold;'><?php _e( 'Subtotal' , 'cart66' ); ?>:</td>
-						<td colspan="1" style="text-align: left; font-weight: bold;"><?php echo Cart66Common::currency($order->subtotal); ?></td>
+						<td colspan="1" style='text-align: right; font-weight: bold;'><?php $this->_e( 'Subtotal' ); ?>:</td>
+						<td colspan="1" style="text-align: left; font-weight: bold;"><?php $this->echoCurr( $order->subtotal ); ?></td>
 					</tr>
 
 					<?php if($order->shipping_method != 'None' && $order->shipping_method != 'Download'): ?>
 						<tr class="noBorder">
 							<td colspan='1'>&nbsp;</td>
 							<td colspan="1" style='text-align: center;'>&nbsp;</td>
-							<td colspan="1" style='text-align: right; font-weight: bold;'><?php _e( 'Shipping' , 'cart66' ); ?>:</td>
-							<td colspan="1" style="text-align: left; font-weight: bold;"><?php echo Cart66Common::currency($order->shipping); ?></td>
+							<td colspan="1" style='text-align: right; font-weight: bold;'><?php $this->_e( 'Shipping' ); ?>:</td>
+							<td colspan="1" style="text-align: left; font-weight: bold;"><?php $this->echoCurr( $order->shipping ); ?></td>
 						</tr>
 					<?php endif; ?>
   
 					<?php if($order->discount_amount > 0): ?>
 						<tr class="noBorder">
 							<td colspan='2'>&nbsp;</td>
-							<td colspan="1" style='text-align: right; font-weight: bold;'><?php _e( 'Discount' , 'cart66' ); ?>:</td>
-							<td colspan="1" style="text-align: left; font-weight: bold;">-&nbsp;<?php echo Cart66Common::currency($order->discount_amount); ?></td>
+							<td colspan="1" style='text-align: right; font-weight: bold;'><?php $this->_e( 'Discount' ); ?>:</td>
+							<td colspan="1" style="text-align: left; font-weight: bold;">-&nbsp;<?php $this->echoCurr( $order->discount_amount ); ?></td>
 						</tr>
 					<?php endif; ?>
   
 					<?php if($order->tax > 0): ?>
 						<tr class="noBorder">
 							<td colspan='2'>&nbsp;</td>
-							<td colspan="1" style='text-align: right; font-weight: bold;'><?php _e( 'Tax' , 'cart66' ); ?>:</td>
-							<td colspan="1" style="text-align: left; font-weight: bold;"><?php echo Cart66Common::currency($order->tax); ?></td>
+							<td colspan="1" style='text-align: right; font-weight: bold;'><?php $this->_e( 'Tax' ); ?>:</td>
+							<td colspan="1" style="text-align: left; font-weight: bold;"><?php $this->echoCurr( $order->tax ); ?></td>
 						</tr>
 					<?php endif; ?>
   
 					<tr class="noBorder">
 						<td colspan='2' style='text-align: center;'>&nbsp;</td>
-						<td colspan="1" style='text-align: right; font-weight: bold;'><?php _e( 'Total' , 'cart66' ); ?>:</td>
-						<td colspan="1" style="text-align: left; font-weight: bold;"><?php echo Cart66Common::currency($order->total); ?></td>
+						<td colspan="1" style='text-align: right; font-weight: bold;'><?php $this->_e( 'Total' ); ?>:</td>
+						<td colspan="1" style="text-align: left; font-weight: bold;"><?php $this->echoCurr( $order->total ); ?></td>
 					</tr>
 					
 				</table>
 				
-				<p><a href='#' id="print_version"><?php _e( 'Printer Friendly Receipt' , 'cart66' ); ?></a></p>
+				<p><a href='#' id="print_version"><?php $this->_e( 'Printer Friendly Receipt' ); ?></a></p>
 				
-				<?php if(Cart66Setting::getValue('enable_performance_based_integration')): ?>
+				<?php if ( $this->getVal( 'enable_performance_based_integration' ) ): ?>
 					<!-- Begin Performance-Based.com Affiliate Integration -->
 					<img src="https://net.performance-based.com/l/298?amount=<?php echo $order->total; ?>;id=<?php echo $order->trans_id; ?>" height="1" width="1" border="0" />
 					<!-- End Performance-Based.com Affiliate Integration -->
@@ -592,7 +592,7 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 				?>
 				
 			<?php else: ?>
-				<p><?php _e( 'Receipt not available' , 'cart66' ); ?></p>
+				<p><?php $this->_e( 'Receipt not available' ); ?></p>
 			<?php endif; ?>
 			
 			<?php if ( FALSE !== $order ) {
@@ -627,7 +627,7 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 				</script>
 			<?php } ?>
 			
-			<?php if ( 1 == Cart66Setting::getValue( 'enable_google_analytics' ) ): ?>
+			<?php if ( 1 == $this->getVal( 'enable_google_analytics' ) ): ?>
 				<?php
 					$url = admin_url( 'admin-ajax.php' );
 					if ( Cart66Common::isHttps() ) {
@@ -636,12 +636,12 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 						$url = preg_replace( '/http[s]*:/', 'http:', $url );
 					}
 				?>
-				<?php if ( !Cart66Setting::getValue( 'use_other_analytics_plugin' ) ): ?>
+				<?php if ( !$this->getVal( 'use_other_analytics_plugin' ) ): ?>
 					<script type="text/javascript">
 					/* <![CDATA[ */
 						( function() {
 							var ga = document.createElement( 'script' ); ga.type = 'text/javascript'; ga.async = true;
-							ga.src = ( 'https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+							ga.src = ( 'https:' == document.location.protocol ? 'https://ssl' : 'http://www' ) + '.google-analytics.com/ga.js';
 							var s = document.getElementsByTagName( 'script' )[ 0 ]; s.parentNode.insertBefore( ga, s );
 						} )();
 					/* ]]> */
@@ -655,17 +655,17 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 				<?php
 			
 				$ajaxLoaderImg = '';
-				$cartImgPath = Cart66Setting::getValue('cart_images_url');
+				$cartImgPath = $this->getVal( 'cart_images_url' );
 				
-				if($cartImgPath) {
-					if(strpos(strrev($cartImgPath), '/') !== 0) {
+				if ( $cartImgPath ) {
+					if ( strpos( strrev( $cartImgPath ), '/' ) !== 0 ) {
 						$cartImgPath .= '/';
 					}
 					$ajaxLoaderImg = $cartImgPath . 'ajax-loader.gif';
 				}
 				
 				?>
-				<?php if($cartImgPath && Cart66Common::urlIsLIve($ajaxLoaderImg)): ?>
+				<?php if ( $cartImgPath && Cart66Common::urlIsLIve( $ajaxLoaderImg ) ): ?>
 					<img src="<?php echo $ajaxLoaderImg; ?>" />
 				<?php else: ?>
 					<img src="<?php echo CART66_URL; ?>/images/ajax-loader.gif" />
@@ -675,14 +675,14 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 			<h2>We are retrieving your order.  Thank you for your patience!<br>This may take a few minutes.</h2>
   
 			<?php
-				$url = Cart66Common::appendWurlQueryString('cart66AjaxCartRequests');
-				if(Cart66Common::isHttps()) {
-					$url = preg_replace('/http[s]*:/', 'https:', $url);
+				$url = Cart66Common::appendWurlQueryString( 'cart66AjaxCartRequests' );
+				if ( Cart66Common::isHttps() ) {
+					$url = preg_replace( '/http[s]*:/', 'https:', $url );
 				} else {
-					$url = preg_replace('/http[s]*:/', 'http:', $url);
+					$url = preg_replace( '/http[s]*:/', 'http:', $url );
 				}
 			?>
-  
+  			
 			<input type="hidden" name="lookup-url" id="lookup-url" value="<?php echo $url; ?>" />
 			<input type="hidden" name="ouid" id="ouid" value="<?php echo Cart66Session::get('Cart66PendingOUID'); ?>" />
 			<input type="hidden" name="current-page" id="current-page" value="<?php echo Cart66Common::getCurrentPageUrl(); ?>" />

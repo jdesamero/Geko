@@ -21,16 +21,7 @@ class Geko_Wp_Cart66_Calculation_Discount extends Geko_Wp_Cart66_Calculation
 		
 		$this->_fDiscountOne = Cart66Session::get( 'Cart66Cart' )->getDiscountAmount();
 		
-		
-		// tax rate
-		
-		$taxRate = isset( $aData[ 'rate' ] ) ? 
-			Cart66Common::tax( $aData[ 'rate' ] ) : 
-			Cart66Session::get( 'Cart66TaxRate' )
-		;
-		
-		$this->_fTaxRate = $taxRate / 100 ;
-		
+				
 		// tax amount
 		
 		$taxData = 0;
@@ -44,6 +35,18 @@ class Geko_Wp_Cart66_Calculation_Discount extends Geko_Wp_Cart66_Calculation
 		}
 		
 		$this->_fTax = ( $taxData > 0 ) ? $taxData : Cart66Session::get( 'Cart66Cart' )->getTax( 'All Sales' );
+		
+		
+		
+		// IMPORTANT!!! This must be calculated after $taxData
+		// tax rate
+		
+		$taxRate = isset( $aData[ 'rate' ] ) ? 
+			Cart66Common::tax( $aData[ 'rate' ] ) : 
+			Cart66Session::get( 'Cart66TaxRate' )
+		;
+		
+		$this->_fTaxRate = $taxRate / 100 ;
 		
 	}
 	

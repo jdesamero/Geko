@@ -10,6 +10,8 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 		
 		$this->_sThisFile = __FILE__;
 		
+		
+		
 		$oGekoCart66 = Geko_Wp_Cart66::getInstance();
 		
 		$oCalculation = $oGekoCart66->getCalculation();
@@ -31,10 +33,10 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 		
 		
 		// Try to return buyers to the last page they were on when the click to continue shopping
-		if ( 1 == Cart66Setting::getValue( 'continue_shopping' ) ) {
+		if ( 1 == $this->getVal( 'continue_shopping' ) ) {
 			
 			// force the last page to be store home
-			$lastPage = Cart66Setting::getValue('store_url') ? Cart66Setting::getValue('store_url') : get_bloginfo('url');
+			$lastPage = $this->getVal( 'store_url' ) ? $this->getVal( 'store_url' ) : get_bloginfo( 'url' );
 			Cart66Session::set('Cart66LastPage', $lastPage);
 			
 		} else {
@@ -46,7 +48,7 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 			
 			if(!Cart66Session::get('Cart66LastPage')) {
 				// If the last page is not set, use the store url
-				$lastPage = Cart66Setting::getValue('store_url') ? Cart66Setting::getValue('store_url') : get_bloginfo('url');
+				$lastPage = $this->getVal( 'store_url' ) ? $this->getVal( 'store_url' ) : get_bloginfo( 'url' );
 				Cart66Session::set('Cart66LastPage', $lastPage);
 			}  
 		}
@@ -59,7 +61,7 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 		
 		
 		
-		$cartImgPath = Cart66Setting::getValue('cart_images_url');
+		$cartImgPath = $this->getVal( 'cart_images_url' );
 		if ( 0 !== $cartImgPath && stripos( strrev( $cartImgPath ), '/' ) ) {
 			$cartImgPath .= '/';
 		}
@@ -91,9 +93,9 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 			
 			endif; ?>
 			
-			<?php if(number_format(Cart66Setting::getValue('minimum_amount'), 2, '.', '') > number_format(Cart66Session::get('Cart66Cart')->getSubTotal(), 2, '.', '') && Cart66Setting::getValue('minimum_cart_amount') == 1): ?>
+			<?php if ( number_format( $this->getVal( 'minimum_amount' ), 2, '.', '' ) > number_format(Cart66Session::get('Cart66Cart')->getSubTotal(), 2, '.', '') && $this->getVal( 'minimum_cart_amount' ) == 1): ?>
 				<div id="minAmountMessage" class="alert-message alert-error Cart66Unavailable">
-					<?php echo (Cart66Setting::getValue('minimum_amount_label')) ? Cart66Setting::getValue('minimum_amount_label') : 'You have not yet reached the required minimum amount in order to checkout.' ?>
+					<?php echo ( $this->getVal( 'minimum_amount_label' ) ) ? $this->getVal( 'minimum_amount_label' ) : 'You have not yet reached the required minimum amount in order to checkout.' ?>
 				</div>
 			<?php endif;?>
 			
@@ -188,13 +190,13 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 							?><tr>
 								<td class="<?php echo $sNbbClass; ?>" >
 									
-									<?php if ( Cart66Setting::getValue( 'display_item_number_cart' ) ): ?>
+									<?php if ( $this->getVal( 'display_item_number_cart' ) ): ?>
 										<span class="cart66-cart-item-number"><?php echo $item->getItemNumber(); ?></span>
 									<?php endif; ?>
 									
 									<?php if (
 										( '' != $item->getProductUrl() ) && 
-										( 1 == Cart66Setting::getValue( 'product_links_in_cart' ) ) && 
+										( 1 == $this->getVal( 'product_links_in_cart' ) ) && 
 										( $fullMode )
 									): ?>
 										<a class="product_url" href="<?php echo $item->getProductUrl(); ?>"><?php echo $sProdTitle; ?></a>
@@ -237,8 +239,8 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 									<td class="cart66-align-center <?php echo $sNbbClass; ?>"><?php echo $item->getQuantity(); ?></td>
 								<?php endif; ?>
 								
-								<td class="cart66-align-right <?php echo $sNbbClass; ?>"><?php echo Cart66Common::currency( $item->getProductPrice() ); ?></td>
-								<td class="cart66-align-right <?php echo $sNbbClass; ?>"><?php echo Cart66Common::currency( $price );?></td>
+								<td class="cart66-align-right <?php echo $sNbbClass; ?>"><?php $this->echoCurr( $item->getProductPrice() ); ?></td>
+								<td class="cart66-align-right <?php echo $sNbbClass; ?>"><?php $this->echoCurr( $price ); ?></td>
 							</tr>
 							<?php if ( $item->hasAttachedForms() ): ?>
 								<tr>
@@ -254,7 +256,7 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 						
 						<?php if ( Cart66Session::get( 'Cart66Cart' )->requireShipping() ): ?>
 							
-							<?php if ( CART66_PRO && Cart66Setting::getValue( 'use_live_rates' ) ): ?>
+							<?php if ( CART66_PRO && $this->getVal( 'use_live_rates' ) ): ?>
 								
 								<?php $zipStyle = "style=''"; ?>
 								
@@ -268,7 +270,7 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 											<th colspan="4" class="alignRight">
 												
 												<?php _e( 'Shipping to' , 'cart66' ); ?> <?php echo Cart66Session::get('cart66_shipping_zip'); ?>
-												<?php if ( Cart66Setting::getValue( 'international_sales' ) ) {
+												<?php if ( $this->getVal( 'international_sales' ) ) {
 													echo Cart66Session::get('cart66_shipping_country_code');
 												} ?>
 												
@@ -314,7 +316,7 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 											
 											<input type="text" name="shipping_zip" value="" id="shipping_zip" size="5" />
 											
-											<?php if ( Cart66Setting::getValue( 'international_sales' ) ):
+											<?php if ( $this->getVal( 'international_sales' ) ):
 												
 												$customCountries = Cart66Common::getCustomCountries();
 												
@@ -361,7 +363,7 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 										<th colspan="4" class="alignRight"><?php _e( 'Shipping Method' , 'cart66' ); ?>: &nbsp;
 											
 											
-											<?php if ( Cart66Setting::getValue( 'international_sales' ) ):
+											<?php if ( $this->getVal( 'international_sales' ) ):
 												
 												$customCountries = Cart66Common::getCustomCountries();
 												
@@ -555,11 +557,11 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 					// dont show checkout until terms are accepted (if necessary)
 					
 					if (
-						(Cart66Setting::getValue('require_terms') != 1) ||
-						(Cart66Setting::getValue('require_terms') == 1 && (isset($_POST['terms_acceptance']) || Cart66Session::get("terms_acceptance")=="accepted"))
+						( $this->getVal( 'require_terms' ) != 1 ) ||
+						( $this->getVal( 'require_terms' ) == 1 && (isset($_POST['terms_acceptance']) || Cart66Session::get("terms_acceptance")=="accepted"))
 					):
 					
-						if ( Cart66Setting::getValue( 'require_terms' ) == 1 ) {
+						if ( $this->getVal( 'require_terms' ) == 1 ) {
 							Cart66Session::set( 'terms_acceptance', 'accepted', TRUE );        
 						}
 						
@@ -569,12 +571,12 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 						}
 						
 						
-						if ( number_format(Cart66Setting::getValue('minimum_amount'), 2, '.', '') > number_format(Cart66Session::get('Cart66Cart')->getSubTotal(), 2, '.', '') && Cart66Setting::getValue('minimum_cart_amount') == 1):
+						if ( number_format( $this->getVal( 'minimum_amount' ), 2, '.', '' ) > number_format(Cart66Session::get('Cart66Cart')->getSubTotal(), 2, '.', '') && $this->getVal( 'minimum_cart_amount' ) == 1):
 							// do nothing
 						else: ?>
 							<div id="checkoutShopping">
 								
-								<?php $checkoutUrl = Cart66Setting::getValue('auth_force_ssl') ? str_replace('http://', 'https://', get_permalink($checkoutPage->ID)) : get_permalink($checkoutPage->ID); ?>
+								<?php $checkoutUrl = $this->getVal( 'auth_force_ssl' ) ? str_replace('http://', 'https://', get_permalink($checkoutPage->ID)) : get_permalink($checkoutPage->ID); ?>
 								
 								<?php if($checkoutImg): ?>
 									<a id="Cart66CheckoutButton" href="<?php echo $checkoutUrl; ?>"><img src="<?php echo $checkoutImg ?>" /></a>
@@ -586,11 +588,11 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 						endif;
 					else: ?>
 						<div id="Cart66CheckoutReplacementText">
-							<?php echo Cart66Setting::getValue('cart_terms_replacement_text');  ?>
+							<?php $this->echoVal( 'cart_terms_replacement_text' );  ?>
 						</div><?php
 					endif;
 					
-					if ( CART66_PRO && Cart66Setting::getValue('require_terms') == 1 && (!isset($_POST['terms_acceptance']) && Cart66Session::get("terms_acceptance")!="accepted") ){
+					if ( CART66_PRO && $this->getVal( 'require_terms' ) == 1 && (!isset($_POST['terms_acceptance']) && Cart66Session::get("terms_acceptance")!="accepted") ){
 						echo Cart66Common::getView("pro/views/terms.php",array("location"=>"Cart66CartTOS"));
 					} 
 				

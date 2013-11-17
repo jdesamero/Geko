@@ -10,6 +10,8 @@ class Geko_Wp_Cart66_View_ReceiptPrintVersion extends Geko_Wp_Cart66_View
 		
 		$this->_sThisFile = __FILE__;
 		
+		
+		
 		$product = new Cart66Product();
 		$order = $data[ 'order' ];
 		
@@ -28,7 +30,7 @@ class Geko_Wp_Cart66_View_ReceiptPrintVersion extends Geko_Wp_Cart66_View
 			
 			<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 			
-			<title><?php _e( 'Your Receipt' , 'cart66' ); ?></title>
+			<title><?php $this->_e( 'Your Receipt' ); ?></title>
 			
 			<style type="text/css" media="print">
 			/*<![CDATA[*/
@@ -104,7 +106,7 @@ class Geko_Wp_Cart66_View_ReceiptPrintVersion extends Geko_Wp_Cart66_View
 			
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
-					<td colspan="3"><p><strong><?php _e( 'Order Number' , 'cart66' ); ?>: <?php echo $order->trans_id ?></strong></p></td>
+					<td colspan="3"><p><strong><?php $this->_e( 'Order Number' ); ?>: <?php echo $order->trans_id ?></strong></p></td>
 					<!--
 						<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
 						<td align="left"><p><strong>Date: <?php echo date(get_option('date_format'), strtotime($order->ordered_on)); ?></strong></p></td>
@@ -115,7 +117,7 @@ class Geko_Wp_Cart66_View_ReceiptPrintVersion extends Geko_Wp_Cart66_View
 					?><tr>
 						<td valign="top">
 							<p>
-								<strong><?php _e( 'Billing Information' , 'cart66' ); ?></strong><br />
+								<strong><?php $this->_e( 'Billing Information' ); ?></strong><br />
 								
 								<?php echo $order->bill_first_name; ?> <?php echo $order->bill_last_name; ?><br />
 								<?php echo $order->bill_address; ?><br />
@@ -136,7 +138,7 @@ class Geko_Wp_Cart66_View_ReceiptPrintVersion extends Geko_Wp_Cart66_View
 						<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
 						<td valign="top">
 							<p>
-								<strong><?php _e( 'Contact Information' , 'cart66' ); ?></strong><br />
+								<strong><?php $this->_e( 'Contact Information' ); ?></strong><br />
 								<?php if ( !empty( $order->phone ) ): ?>
 									Phone: <?php echo Cart66Common::formatPhone( $order->phone ); ?><br />
 								<?php endif; ?>
@@ -151,7 +153,7 @@ class Geko_Wp_Cart66_View_ReceiptPrintVersion extends Geko_Wp_Cart66_View
 					<td>
 						<?php if ( $order->shipping_method != 'None' ): ?>
 							<p>
-								<strong><?php _e( 'Shipping Information' , 'cart66' ); ?></strong><br />
+								<strong><?php $this->_e( 'Shipping Information' ); ?></strong><br />
 								
 								<?php echo $order->ship_first_name; ?> <?php echo $order->ship_last_name; ?><br />
 								<?php echo $order->ship_address; ?><br />
@@ -168,7 +170,7 @@ class Geko_Wp_Cart66_View_ReceiptPrintVersion extends Geko_Wp_Cart66_View
 									<?php echo $order->ship_country ?><br />
 								<?php endif; ?>
 								
-								<br /><em><?php _e( 'Delivery via' , 'cart66' ); ?>: <?php echo $order->shipping_method; ?></em><br />
+								<br /><em><?php $this->_e( 'Delivery via' ); ?>: <?php echo $order->shipping_method; ?></em><br />
 							</p>
 						<?php endif; ?>
 					</td>
@@ -183,7 +185,7 @@ class Geko_Wp_Cart66_View_ReceiptPrintVersion extends Geko_Wp_Cart66_View
 						<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
 						<td valign="top">
 							<p>
-								<strong><?php _e( 'Contact Information' , 'cart66' ); ?></strong><br />
+								<strong><?php $this->_e( 'Contact Information' ); ?></strong><br />
 								<?php if ( !empty( $order->phone ) ): ?>
 									Phone: <?php echo Cart66Common::formatPhone( $order->phone ); ?><br />
 								<?php endif; ?>
@@ -195,11 +197,11 @@ class Geko_Wp_Cart66_View_ReceiptPrintVersion extends Geko_Wp_Cart66_View
 					<?php endif; ?>
 				</tr>
 				
-				<?php if(isset($order->custom_field) && $order->custom_field != ''): ?>    
+				<?php if ( isset( $order->custom_field ) && ( $order->custom_field != '' ) ): ?>    
 					<tr>
 						<td colspan="3">
 							<p>
-								<strong><?php echo Cart66Setting::getValue( 'checkout_custom_field_label' ); ?></strong><br />
+								<strong><?php $this->echoVal( 'checkout_custom_field_label' ); ?></strong><br />
 								<?php echo $order->custom_field; ?>
 							</p>
 						</td>
@@ -215,34 +217,27 @@ class Geko_Wp_Cart66_View_ReceiptPrintVersion extends Geko_Wp_Cart66_View
 			<table id="viewCartTable" cellspacing="0" cellpadding="0">
 				
 				<tr>
-					<th style="text-align: left;"><?php _e( 'Product' , 'cart66' ); ?></th>
-					<th style="text-align: center;"><?php _e( 'Quantity' , 'cart66' ); ?></th>
-					<th style="text-align: left;"><?php _e( 'Item Price' , 'cart66' ); ?></th>
-					<th style="text-align: left;"><?php _e( 'Item Total' , 'cart66' ); ?></th>
+					<th style="text-align: left;"><?php $this->_e( 'Product' ); ?></th>
+					<th style="text-align: center;"><?php $this->_e( 'Quantity' ); ?></th>
+					<th style="text-align: left;"><?php $this->_e( 'Item Price' ); ?></th>
+					<th style="text-align: left;"><?php $this->_e( 'Item Total' ); ?></th>
 				</tr>
 				
 				<?php foreach ( $order->getItems() as $item ):
 					
-					$product->load($item->product_id);
+					$product->load( $item->product_id );
 					$price = $item->product_price * $item->quantity;
-				
-					if ( $product->isDigital() ) {
-						$receiptPage = get_page_by_path( 'store/receipt' );
-						$receiptPageLink = get_permalink( $receiptPage );
-						$sDelim = ( strstr( $receiptPageLink, '?' ) ) ? '&' : '?' ;
-						$sReceiptPageUrl = sprintf( '%s%sduid=%d', $receiptPageLink, $sDelim, $item->duid );
-					}
 					
 					$sDescription = str_replace( "'", "&#039;", $item->description );
 					
 					?><tr>
 						<td>
 							<?php echo $sDescription; ?>
-							<!-- <br/><a href="<?php echo $sReceiptPageUrl; ?>">Download</a> -->
+							<!-- <br/><a href="<?php $this->echoLink( $item, 'store/receipt', 'duid' ); ?>">Download</a> -->
 						</td>
 						<td style="text-align: center;"><?php echo $item->quantity; ?></td>
-						<td><?php echo Cart66Common::currency( $item->product_price ); ?></td>
-						<td><?php echo Cart66Common::currency( $item->product_price * $item->quantity ); ?></td>
+						<td><?php $this->echoCurr( $item->product_price ); ?></td>
+						<td><?php $this->echoCurr( $item->product_price * $item->quantity ); ?></td>
 					</tr>
 					
 					<?php if ( !empty( $item->form_entry_ids ) ):
@@ -267,39 +262,39 @@ class Geko_Wp_Cart66_View_ReceiptPrintVersion extends Geko_Wp_Cart66_View
 				<tr>
 					<td class="noBorder" colspan="1">&nbsp;</td>
 					<td class="noBorder" colspan="1" style='text-align: center;'>&nbsp;</td>
-					<td class="noBorder" colspan="1" style='text-align: right; font-weight: bold;'><?php _e( 'Subtotal' , 'cart66' ); ?>:</td>
-					<td class="noBorder" colspan="1" style="text-align: left; font-weight: bold;"><?php echo Cart66Common::currency($order->subtotal); ?></td>
+					<td class="noBorder" colspan="1" style='text-align: right; font-weight: bold;'><?php $this->_e( 'Subtotal' ); ?>:</td>
+					<td class="noBorder" colspan="1" style="text-align: left; font-weight: bold;"><?php $this->echoCurr( $order->subtotal ); ?></td>
 				</tr>
 				
 				<?php if ( ( 'None' != $order->shipping_method ) && ( 'Download' != $order->shipping_method ) ): ?>
 					<tr>
 						<td class="noBorder" colspan="1">&nbsp;</td>
 						<td class="noBorder" colspan="1" style='text-align: center;'>&nbsp;</td>
-						<td class="noBorder" colspan="1" style='text-align: right; font-weight: bold;'><?php _e( 'Shipping' , 'cart66' ); ?>:</td>
-						<td class="noBorder" colspan="1" style="text-align: left; font-weight: bold;"><?php echo Cart66Common::currency($order->shipping); ?></td>
+						<td class="noBorder" colspan="1" style='text-align: right; font-weight: bold;'><?php $this->_e( 'Shipping' ); ?>:</td>
+						<td class="noBorder" colspan="1" style="text-align: left; font-weight: bold;"><?php $this->echoCurr( $order->shipping ); ?></td>
 					</tr>
 				<?php endif; ?>
 				
 				<?php if ( $order->discount_amount > 0 ): ?>
 					<tr>
 						<td class="noBorder" colspan="2">&nbsp;</td>
-						<td class="noBorder" colspan="1" style='text-align: right; font-weight: bold;'><?php _e( 'Discount' , 'cart66' ); ?>:</td>
-						<td class="noBorder" colspan="1" style="text-align: left; font-weight: bold;">-&nbsp;<?php echo Cart66Common::currency($order->discount_amount); ?></td>
+						<td class="noBorder" colspan="1" style='text-align: right; font-weight: bold;'><?php $this->_e( 'Discount' ); ?>:</td>
+						<td class="noBorder" colspan="1" style="text-align: left; font-weight: bold;">-&nbsp;<?php $this->echoCurr( $order->discount_amount ); ?></td>
 					</tr>
 				<?php endif; ?>
 				
 				<?php if ( $order->tax > 0 ): ?>
 					<tr>
 						<td class="noBorder" colspan="2">&nbsp;</td>
-						<td class="noBorder" colspan="1" style='text-align: right; font-weight: bold;'><?php _e( 'Tax' , 'cart66' ); ?>:</td>
-						<td class="noBorder" colspan="1" style="text-align: left; font-weight: bold;"><?php echo Cart66Common::currency($order->tax); ?></td>
+						<td class="noBorder" colspan="1" style='text-align: right; font-weight: bold;'><?php $this->_e( 'Tax' ); ?>:</td>
+						<td class="noBorder" colspan="1" style="text-align: left; font-weight: bold;"><?php $this->echoCurr( $order->tax ); ?></td>
 					</tr>
 				<?php endif; ?>
 
 				<tr>
-					<td class='noBorder' colspan='2' style='text-align: center;'>&nbsp;</td>
-					<td class='noBorder' colspan="1" style='text-align: right; font-weight: bold;'><?php _e( 'Total' , 'cart66' ); ?>:</td>
-					<td class='noBorder' colspan="1" style="text-align: left; font-weight: bold;"><?php echo Cart66Common::currency($order->total); ?></td>
+					<td class="noBorder" colspan="2" style='text-align: center;'>&nbsp;</td>
+					<td class="noBorder" colspan="1" style='text-align: right; font-weight: bold;'><?php $this->_e( 'Total' ); ?>:</td>
+					<td class="noBorder" colspan="1" style="text-align: left; font-weight: bold;"><?php $this->echoCurr( $order->total ); ?></td>
 				</tr>
 			
 			</table>

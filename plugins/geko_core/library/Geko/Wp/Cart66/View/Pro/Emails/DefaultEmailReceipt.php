@@ -15,13 +15,13 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 		
 		if ( $test ) {
 			
-			$subject = __( 'TEST - Email Receipt', 'cart66' );
+			$subject = $this->_t( 'TEST - Email Receipt' );
 			$order = new Geko_Wp_Cart66_Mock_Order();
 			
 			
 		} else {
 			
-			$subject = Cart66Setting::getValue( 'receipt_subject' );
+			$subject = $this->getVal( 'receipt_subject' );
 			$order = $data[ 0 ];
 		}
 		
@@ -40,6 +40,10 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 	
 	//
 	public function outputHtml( $subject, $order ) {
+		
+		$this->_sThisFile = __FILE__;
+		
+		
 		
 		$iOrderTs = strtotime( $order->ordered_on );
 		
@@ -136,10 +140,10 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 				<table width="562" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="color: #333; font-weight:bold;  padding: 16px 0px 16px 14px; font-family: Arial, Verdana, sans-serif; ">
 					<tr>
 						<td>
-							<span style="font-size: 20px;"><?php _e( 'Order Number', 'cart66' ); ?>: <?php echo $order->trans_id; ?></span>
+							<span style="font-size: 20px;"><?php $this->_e( 'Order Number' ); ?>: <?php echo $order->trans_id; ?></span>
 						</td>
 						<td style="font-weight:normal;font-size: 11px;">
-							<span style="font-weight:bold;"><?php _e( 'Purchased', 'cart66' ); ?></span>
+							<span style="font-weight:bold;"><?php $this->_e( 'Purchased' ); ?></span>
 							<br /><?php echo $sOrderDate; ?>
 						</td>
 					</tr>
@@ -147,10 +151,10 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 				<!-- End Header -->
 	
 				<!-- Start Message Intro -->
-				<?php if(Cart66Setting::getValue('receipt_message_intro')): ?>
+				<?php if ( $this->getVal( 'receipt_message_intro' ) ): ?>
 					<table width="562" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="font-family: Arial, Verdana, sans-serif; padding: 10px 25px 0px 15px; font-size: 14px; color:#333;">
 						<tr>
-							<td><?php echo Cart66Setting::getValue('receipt_html_email'); ?></td>
+							<td><?php $this->echoVal( 'receipt_html_email' ); ?></td>
 						</tr>
 					</table>
 				<?php endif; ?>
@@ -160,7 +164,7 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 				<table cellpadding="0" cellspacing="0"  width="562"  bgcolor="#f9f9f9">
 					<tr>
 						<td bgcolor="#f9f9f9" style="font-family: Arial, Verdana, sans-serif; padding: 10px 25px 0px 15px; font-size: 12px; color:#333;width:48%;text-align:left;vertical-align:top;" >
-							<span style="text-transform: uppercase; font-size: 18px; font-weight: bold;"><?php _e('Billing Information', 'cart66'); ?></span>
+							<span style="text-transform: uppercase; font-size: 18px; font-weight: bold;"><?php $this->_e( 'Billing Information' ); ?></span>
 							<br />
 							<br />
 							<span style="font-weight: bold;">
@@ -184,7 +188,7 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 							</span>
 						</td>
 						<td bgcolor="#f9f9f9" style="font-family: Arial, Verdana, sans-serif; padding: 10px 25px 0px 15px; font-size: 12px; color:#333;width:51%;text-align:left;vertical-align:top;" >
-							<span style="text-transform: uppercase; font-size: 18px; font-weight: bold;"><?php _e('Contact Information', 'cart66'); ?></span>
+							<span style="text-transform: uppercase; font-size: 18px; font-weight: bold;"><?php $this->_e( 'Contact Information' ); ?></span>
 							<br />
 							<br />
 							<span style="font-weight: bold;">
@@ -193,8 +197,8 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 									<?php echo __('Phone', 'cart66'); ?>: <?php echo Cart66Common::formatPhone( $order->phone ); ?><br />
 								<?php endif; ?>
 								
-								<?php _e( 'Email' , 'cart66' ); ?>: <?php echo $order->email; ?><br />
-								<?php _e( 'Date' , 'cart66' ); ?>: <?php echo $sOrderDateTime; ?><br /><br />
+								<?php $this->_e( 'Email' ); ?>: <?php echo $order->email; ?><br />
+								<?php $this->_e( 'Date' ); ?>: <?php echo $sOrderDateTime; ?><br /><br />
 								
 								<?php if(is_array($additional_fields = maybe_unserialize($order->additional_fields)) && isset($additional_fields['payment'])): ?><br />
 									<?php foreach($additional_fields['payment'] as $af): ?>
@@ -211,7 +215,7 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 								
 								<?php if($order->hasShippingInfo()): ?>
 									
-									<span style="text-transform: uppercase; font-size: 18px; font-weight: bold;"><?php _e('Shipping Information', 'cart66'); ?></span>
+									<span style="text-transform: uppercase; font-size: 18px; font-weight: bold;"><?php $this->_e( 'Shipping Information' ); ?></span>
 									<br />
 									<br />
 
@@ -240,7 +244,7 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 										
 									</span>
 									
-									<br /><em><?php _e( 'Delivery via' , 'cart66' ); ?>: <?php echo $order->shipping_method ?></em><br />
+									<br /><em><?php $this->_e( 'Delivery via' ); ?>: <?php echo $order->shipping_method ?></em><br />
 									
 								<?php endif; ?>
 							</td>
@@ -251,10 +255,10 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 					<?php if(isset($order->custom_field) && $order->custom_field != ''): ?>
 						<tr>
 							<td bgcolor="#f9f9f9" style="font-family: Arial, Verdana, sans-serif; padding: 10px 25px 0px 15px; font-size: 12px; color:#333;text-align:left;vertical-align:top;" colspan="2">
-								<?php if(Cart66Setting::getValue('checkout_custom_field_label')): ?>
-									<strong><?php echo Cart66Setting::getValue('checkout_custom_field_label'); ?></strong>
+								<?php if ( $this->getVal( 'checkout_custom_field_label' ) ): ?>
+									<strong><?php $this->echoVal( 'checkout_custom_field_label' ); ?></strong>
 								<?php else: ?>
-									<strong><?php _e('Enter any special instructions you have for this order:', 'cart66'); ?></strong>
+									<strong><?php $this->_e( 'Enter any special instructions you have for this order:' ); ?></strong>
 								<?php endif; ?>
 							</td>
 						</tr>
@@ -278,18 +282,10 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 					<table cellpadding="0" cellspacing="0" width="562" bgcolor="#FFFFFF" style="border:1px solid #dfdfdf;background-color:#f9f9f9;-webkit-border-radius:3px;-moz-border-radius:3px;-ms-border-radius:3px;-o-border-radius:3px;border-radius:3px;border-spacing:0;clear:both;">
 						
 						<tr>
-							<td class="table_title">
-								<?php _e( 'Product', 'cart66' ); ?>
-							</td>
-							<td class="table_title align_center">
-								<?php _e( 'Quantity', 'cart66' ); ?>
-							</td>
-							<td class="table_title align_right">
-								<?php _e( 'Item Price', 'cart66' ); ?>
-							</td>
-							<td class="table_title align_right">
-								<?php _e( 'Item Total', 'cart66' ); ?>
-							</td>
+							<td class="table_title"><?php $this->_e( 'Product' ); ?></td>
+							<td class="table_title align_center"><?php $this->_e( 'Quantity' ); ?></td>
+							<td class="table_title align_right"><?php $this->_e( 'Item Price' ); ?></td>
+							<td class="table_title align_right"><?php $this->_e( 'Item Total' ); ?></td>
 						</tr>
 						
 						<?php $hasDigital = FALSE; ?>
@@ -299,34 +295,31 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 							$product = new Cart66Product();
 							$product->load($item->product_id);
 							
-							if($product->isDigital()) {
-								$hasDigital = true;
-								$receiptPage = get_page_by_path('store/receipt');
-								$receiptPageLink = get_permalink($receiptPage);
-								$receiptPageLink .= (strstr($receiptPageLink, '?')) ? '&duid=' . $item->duid : '?duid=' . $item->duid;
-							}
-							
 							$price = $item->product_price * $item->quantity;
 							
 							?>
 							<tr>
 								<td class="table_border_top">
-									<?php if(Cart66Setting::getValue('display_item_number_receipt')): ?>
+									
+									<?php if ( $this->getVal( 'display_item_number_receipt' ) ): ?>
 										<?php echo $item->item_number; ?>
 									<?php endif; ?>
+									
 									<b><?php echo $item->description; ?></b>
-									<?php if($product->isDigital()): ?>
-										<br /><a href='<?php echo $receiptPageLink; ?>'><?php _e('Download', 'cart66'); ?></a>
+									
+									<?php if ( $product->isDigital() ): ?>
+										<br /><a href="<?php $this->echoLink( $item, 'store/receipt', 'duid' ); ?>"><?php $this->_e( 'Download' ); ?></a>
 									<?php endif; ?>
+									
 								</td>
 								<td class="table_border_top align_center">
 									<?php echo $item->quantity; ?>
 								</td>
 								<td class="table_border_top align_right">
-									<?php echo Cart66Common::currency($item->product_price); ?>
+									<?php $this->echoCurr( $item->product_price ); ?>
 								</td>
 								<td class="table_border_top align_right">
-									<?php echo Cart66Common::currency($price); ?>
+									<?php $this->echoCurr( $price ); ?>
 								</td>
 							</tr>
 							<?php
@@ -334,49 +327,37 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 							if ( !empty( $item->form_entry_ids ) && class_exists( 'RGFormsModel' ) ):
 								$entries = explode( ',', $item->form_entry_ids );
 								foreach ( $entries as $entryId ):
-									if(RGFormsModel::get_lead($entryId)) {
+									if ( RGFormsModel::get_lead( $entryId ) ):
 										?><tr><td colspan="4" style="background-color:#ffffff;"><div class="Cart66GravityFormDisplay"><?php echo Cart66GravityReader::displayGravityForm( $entryId, FALSE, TRUE ); ?></div></td></tr><?php
-									}
+									endif;
 								endforeach;
 							endif; ?>
 						<?php endforeach; ?>
 						
 						<!-- Start Subtotal -->
 						<tr>
-							<td colspan="3" class="table_td_bg">
-								<?php _e('Subtotal', 'cart66'); ?>
-							</td>
-							<td class="table_td_bg">
-								<?php echo Cart66Common::currency($order->subtotal); ?>
-							</td>
+							<td colspan="3" class="table_td_bg"><?php $this->_e( 'Subtotal' ); ?></td>
+							<td class="table_td_bg"><?php $this->echoCurr( $order->subtotal ); ?></td>
 						</tr>
 						<!-- End Subtotal -->
-		
-						<?php if($order->shipping_method != 'None'): ?>
+						
+						<?php if ( $order->shipping_method != 'None' ): ?>
 							
 							<!-- Start Shipping -->
 							<tr>
-								<td colspan="3" class="table_td_bg">
-									<?php _e('Shipping', 'cart66'); ?>
-								</td>
-								<td class="table_td_bg">
-									<?php echo Cart66Common::currency($order->shipping); ?>
-								</td>
+								<td colspan="3" class="table_td_bg"><?php $this->_e( 'Shipping' ); ?></td>
+								<td class="table_td_bg"><?php $this->echoCurr( $order->shipping ); ?></td>
 							</tr>
 							<!-- End Shipping -->
 							
 						<?php endif; ?>
 		
-						<?php if($order->discount_amount > 0): ?>
+						<?php if ( $order->discount_amount > 0 ): ?>
 		
 							<!-- Start Coupon -->
 							<tr>
-								<td colspan="3" class="table_td_bg">
-									<?php _e('Discount', 'cart66'); ?>
-								</td>
-								<td class="table_td_bg">
-									-&nbsp;<?php echo Cart66Common::currency($order->discount_amount); ?>
-								</td>
+								<td colspan="3" class="table_td_bg"><?php $this->_e( 'Discount' ); ?></td>
+								<td class="table_td_bg">-&nbsp;<?php $this->echoCurr( $order->discount_amount ); ?></td>
 							</tr>
 							<!-- End Coupon -->
 							
@@ -386,12 +367,8 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 		
 							<!-- Start Tax -->
 							<tr>
-								<td colspan="3" class="table_td_bg">
-									<?php _e('Tax', 'cart66'); ?>
-								</td>
-								<td class="table_td_bg">
-									<?php echo Cart66Common::currency($order->tax); ?>
-								</td>
+								<td colspan="3" class="table_td_bg"><?php $this->_e( 'Tax' ); ?></td>
+								<td class="table_td_bg"><?php $this->echoCurr( $order->tax ); ?></td>
 							</tr>
 							<!-- End Tax -->
 							
@@ -401,12 +378,8 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 		
 						<!-- Start Grand Total -->
 						<tr>
-							<td colspan="3" class="table_td_bg">
-								<?php _e('Total', 'cart66'); ?>
-							</td>
-							<td class="table_td_bg">
-								<?php echo Cart66Common::currency($order->total); ?>
-							</td>
+							<td colspan="3" class="table_td_bg"><?php $this->_e( 'Total' ); ?></td>
+							<td class="table_td_bg"><?php $this->echoCurr( $order->total ); ?></td>
 						</tr>
 						<!-- End Grand Total -->
 						
@@ -418,25 +391,17 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 				<!-- Start Footer -->
 				<table cellpadding="0" cellspacing="0" width="562" height="100">
 					<tr>
-						<?php
-							$receiptPage = get_page_by_path('store/receipt');
-							$link = get_permalink($receiptPage->ID);
-							if(strstr($link,"?")){
-								$link .= '&ouid=' . $order->ouid;
-							} else {
-								$link .= '?ouid=' . $order->ouid;
-							}
-						?>
+						<?php $link = $this->getLink( $order, 'store/receipt', 'ouid' ); ?>
 						<td bgcolor="#f9f9f9" style="font-size: 11px; font-family: Arial, Verdana, sans-serif; color:#333; padding-left: 15px; width:350px;">
-							<?php if($hasDigital): ?>
-								<span style="text-transform: uppercase; font-size: 16px; font-weight: bold;"><?php _e('View Receipt Online and Download Order', 'cart66'); ?></span>
+							<?php if ( $hasDigital ): ?>
+								<span style="text-transform: uppercase; font-size: 16px; font-weight: bold;"><?php $this->_e( 'View Receipt Online and Download Order' ); ?></span>
 								<br /><br />
-								<?php _e('Click the link below to view your receipt online and download your order', 'cart66'); ?>.<br />
+								<?php $this->_e( 'Click the link below to view your receipt online and download your order' ); ?>.<br />
 								<a href="<?php echo $link; ?>" style="color:#333"><?php echo $link; ?></a><br />
 							<?php else: ?>
 								<span style="text-transform: uppercase; font-size: 16px; font-weight: bold;"><?php _e('View Receipt Online', 'cart66'); ?></span>
 								<br /><br />
-								<?php _e('Click the link below to view your receipt online', 'cart66'); ?>.<br />
+								<?php $this->_e( 'Click the link below to view your receipt online' ); ?>.<br />
 								<a href="<?php echo $link; ?>" style="color:#333"><?php echo $link; ?></a><br />
 							<?php endif; ?>
 						</td>
@@ -461,9 +426,9 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 	//
 	public function outputText( $subject, $order ) {
 		
-		$msg = __("ORDER NUMBER","cart66") . ": " . $order->trans_id . "\n\n";
+		$msg = sprintf( "%s: %s\n\n", $this->_t( 'ORDER NUMBER' ), $order->trans_id );
 		
-		$hasDigital = false;
+		$hasDigital = FALSE;
 		
 		if ( $order && ( $order instanceof Geko_Wp_Cart66_Mock_Order ) ) {
 			$product = new Geko_Wp_Cart66_Mock_Product();
@@ -476,82 +441,76 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 			$product->load( $item->product_id );
 				
 			if ( $product->isDigital() ) {
-				$hasDigital = true;
+				$hasDigital = TRUE;
 			}
 			
 			$price = $item->product_price * $item->quantity;
-			// $msg .= "Item: " . $item->item_number . ' ' . $item->description . "\n";
-			$msg .= __("Item","cart66") . ": ";
+			// $msg .= sprintf( '%s: %s %s', $this->_t( 'Item' ), $item->item_number, $item->description );
+			$msg .= sprintf( '%s: ', $this->_t( 'Item' ) );
 			
-			if ( Cart66Setting::getValue( 'display_item_number_receipt' ) ) {
-				$msg .= $item->item_number . ' ';
+			if ( $this->getVal( 'display_item_number_receipt' ) ) {
+				$msg .= sprintf( '%s ', $item->item_number );
 			}
 			
-			$msg .= $item->description . "\n";
+			$msg .= sprintf( "%s\n", $item->description );
 			
-			if ( $product->isDigital() ) {
-				$receiptPage = get_page_by_path('store/receipt');
-				$receiptPageLink = get_permalink($receiptPage);
-				$receiptPageLink .= (strstr($receiptPageLink, '?')) ? '&duid=' . $item->duid : '?duid=' . $item->duid;
-				$msg .= $receiptPageLink . "\n\n";
+			if ( $product->isDigital() ) {				
+				$msg .= sprintf( "%s\n\n", $this->getLink( $item, 'store/receipt', 'duid' ) );
 			}
 			
-			if($item->quantity > 1) {
-				$msg .= __("Quantity","cart66") . ": " . $item->quantity . "\n";
+			if ( $item->quantity > 1 ) {
+				$msg .= sprintf( "%s: %d\n", $this->_t( 'Quantity' ), $item->quantity );
 			}
 			
-			$msg .= __("Item Price","cart66") . ": " . Cart66Common::currency($item->product_price, false) . "\n";
-			$msg .= __("Item Total","cart66") . ": " . Cart66Common::currency($item->product_price * $item->quantity, false) . "\n\n";
+			$msg .= sprintf( "%s: %s\n", $this->_t( 'Item Price' ), $this->getCurr( $item->product_price, FALSE ) );
+			$msg .= sprintf( "%s: %s\n\n", $this->_t( 'Item Total' ), $this->getCurr( $item->product_price * $item->quantity, FALSE ) );
 			
-			if($product->isGravityProduct()) {
-				$msg .= Cart66GravityReader::displayGravityForm($item->form_entry_ids, true);
+			if ( $product->isGravityProduct() ) {
+				$msg .= Cart66GravityReader::displayGravityForm( $item->form_entry_ids, TRUE );
 			}
-		
 		}
 		
 		
-		if($order->shipping_method != 'None' && $order->shipping_method != 'Download') {
-			$msg .= __("Shipping","cart66") . ": " . Cart66Common::currency($order->shipping, false) . "\n";
+		if ( ( $order->shipping_method != 'None' ) && ( $order->shipping_method != 'Download' ) ) {
+			$msg .= sprintf( "%s: %s\n", $this->_t( 'Shipping' ), $this->getCurr( $order->shipping, FALSE ) );
 		}
 		
-		if(!empty($order->coupon) && $order->coupon != 'none') {
-			$msg .= __("Coupon","cart66") . ": " . $order->coupon . "\n";
+		if ( $order->discount_amount > 0 ) {
+			$msg .= sprintf( "%s: - %s\n", $this->_t( 'Discount' ), $this->getCurr( $order->discount_amount, FALSE ) );
 		}
 		
-		if($order->tax > 0) {
-			$msg .= __("Tax","cart66") . ": " . Cart66Common::currency($order->tax, false) . "\n";
+		if ( $order->tax > 0 ) {
+			$msg .= sprintf( "%s: %s\n", $this->_t( 'Tax' ), $this->getCurr( $order->tax, FALSE ) );
 		}
 		
-		$msg .= "\n" . __("TOTAL","cart66") . ": " . Cart66Common::currency($order->total, false) . "\n";
+		$msg .= sprintf( "\n%s: %s\n", $this->_t( 'TOTAL' ), $this->getCurr( $order->total, FALSE ) );
 		
-		if($order->shipping_method != 'None' && $order->shipping_method != 'Download') {
+		if ( ( $order->shipping_method != 'None' ) && ( $order->shipping_method != 'Download' ) ) {
 			
-			$msg .= "\n\n" . __("SHIPPING INFORMATION","cart66") . "\n\n";
-
-			$msg .= $order->ship_first_name . ' ' . $order->ship_last_name . "\n";
-			$msg .= $order->ship_address . "\n";
+			$msg .= sprintf( "\n\n%s\n\n", $this->_t( 'SHIPPING INFORMATION' ) );
 			
-			if(!empty($order->ship_address2)) {
-				$msg .= $order->ship_address2 . "\n";
+			$msg .= sprintf( "%s %s\n%s\n", $order->ship_first_name, $order->ship_last_name, $order->ship_address );
+			
+			if ( !empty( $order->ship_address2 ) ) {
+				$msg .= sprintf( "%s\n", $order->ship_address2 );
 			}
 			
-			$msg .= $order->ship_city . ' ' . $order->ship_state . ' ' . $order->ship_zip . "\n" . $order->ship_country . "\n";
+			$msg .= sprintf( "%s %s %s\n%s\n", $order->ship_city, $order->ship_state, $order->ship_zip, $order->ship_country );
 			
-			if(is_array($additional_fields = maybe_unserialize($order->additional_fields)) && isset($additional_fields['shipping'])) {
-				foreach($additional_fields['shipping'] as $af) {
-					$msg .= html_entity_decode($af['label']) . ': ' . $af['value'] . "\n";
+			if ( is_array( $additional_fields = maybe_unserialize( $order->additional_fields ) ) && isset( $additional_fields[ 'shipping' ] ) ) {
+				foreach ( $additional_fields[ 'shipping' ] as $af ) {
+					$msg .= sprintf( "%s: %s\n", html_entity_decode( $af[ 'label' ] ), $af[ 'value' ] );
 				}
 			}
 			
-			$msg .= "\n" . __("Delivery via","cart66") . ": " . $order->shipping_method . "\n";
+			$msg .= sprintf( "\n%s: %s\n", $this->_t( 'Delivery via' ), $order->shipping_method );
 		}
 		
-		$msg .= "\n\n" . __("BILLING INFORMATION","cart66") . "\n\n";
-
-		$msg .= $order->bill_first_name . ' ' . $order->bill_last_name . "\n";
-		$msg .= $order->bill_address . "\n";
+		$msg .= sprintf( "\n\n%s\n\n", $this->_t( 'BILLING INFORMATION' ) );
 		
-		if(!empty($order->bill_address2)) {
+		$msg .= sprintf( "%s %s\n%s\n", $order->bill_first_name, $order->bill_last_name, $order->bill_address );
+		
+		if ( !empty( $order->bill_address2 ) ) {
 			$msg .= $order->bill_address2 . "\n";
 		}
 		
@@ -567,11 +526,11 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 		
 		if(!empty($order->phone)) {
 			$phone = Cart66Common::formatPhone($order->phone);
-			$msg .= "\n" . __("Phone","cart66") . ": $phone\n";
+			$msg .= "\n" . $this->_t( 'Phone' ) . ": $phone\n";
 		}
 		
 		if(!empty($order->email)) {
-			$msg .= __("Email","cart66") . ': ' . $order->email . "\n";
+			$msg .= $this->_t( 'Email' ) . ': ' . $order->email . "\n";
 		}
 		
 		if(is_array($additional_fields = maybe_unserialize($order->additional_fields)) && isset($additional_fields['payment'])) {
@@ -581,30 +540,24 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 		}
 		
 		if(isset($order->custom_field) && $order->custom_field != '') {
-			if(Cart66Setting::getValue('checkout_custom_field_label')) {
-				$msg .= "\n" . Cart66Setting::getValue('checkout_custom_field_label');
+			if ( $this->getVal( 'checkout_custom_field_label' ) ) {
+				$msg .= "\n" . $this->getVal( 'checkout_custom_field_label' );
 			} else {
-				$msg .= "\n" . __('Enter any special instructions you have for this order:', 'cart66');
+				$msg .= "\n" . $this->_t( 'Enter any special instructions you have for this order:' );
 			}
 			$msg .= "\n" . $order->custom_field . "\n";
 		}
-
-		$receiptPage = get_page_by_path('store/receipt');
-		$link = get_permalink($receiptPage->ID);
-		if(strstr($link,"?")){
-			$link .= '&ouid=' . $order->ouid;
-		} else{
-			$link .= '?ouid=' . $order->ouid;
-		}
 		
-		if($hasDigital) {
-			$msg .= "\n" . __('DOWNLOAD LINK','cart66') . "\n" . __('Click the link below to download your order.','cart66') . "\n$link";
+		$link = $this->getLink( $order, 'store/receipt', 'ouid' );
+		
+		if ( $hasDigital ) {
+			$msg .= "\n" . $this->_t( 'DOWNLOAD LINK' ) . "\n" . $this->_t( 'Click the link below to download your order.' ) . "\n$link";
 		} else {
-			$msg .= "\n" . __('VIEW RECEIPT ONLINE','cart66') . "\n" . __('Click the link below to view your receipt online.','cart66') . "\n$link";
+			$msg .= "\n" . $this->_t( 'VIEW RECEIPT ONLINE' ) . "\n" . $this->_t( 'Click the link below to view your receipt online.' ) . "\n$link";
 		}
 		
-		$msgIntro = Cart66Setting::getValue('receipt_intro') && !Cart66Setting::getValue('enable_advanced_notifications') ? Cart66Setting::getValue('receipt_intro') : '';
-		$msgIntro .= Cart66Setting::getValue('receipt_message_intro') && Cart66Setting::getValue('enable_advanced_notifications') ? Cart66Setting::getValue('receipt_plain_email') : '';
+		$msgIntro = $this->getVal( 'receipt_intro' ) && !$this->getVal( 'enable_advanced_notifications' ) ? $this->getVal( 'receipt_intro' ) : '';
+		$msgIntro .= $this->getVal( 'receipt_message_intro' ) && $this->getVal( 'enable_advanced_notifications' ) ? $this->getVal( 'receipt_plain_email' ) : '';
 		
 		$msg = $msgIntro . " \n----------------------------------\n\n" . $msg;
 		echo $msg;
