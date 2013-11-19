@@ -5,7 +5,20 @@ class Geko_Wp_Cart66_View extends Geko_Singleton_Abstract
 {
 	
 	protected $_sThisFile = '';
+	protected $_sInstanceClass = NULL;
 	
+	protected $data;
+	protected $notices;
+	protected $minify;
+	
+	
+	
+	//
+	protected function __construct() {
+		
+		$this->_sInstanceClass = get_class( $this );
+		
+	}
 	
 	//
 	public function logMsg( $sLine, $sTitle, $sDetails ) {
@@ -23,21 +36,34 @@ class Geko_Wp_Cart66_View extends Geko_Singleton_Abstract
 	
 	
 	//
-	public function render( $data = NULL, $notices = TRUE, $minify = FALSE ) {
-	
+	public function init( $data = NULL, $notices = TRUE, $minify = FALSE ) {
+		
+		$this->data = $data;
+		$this->notices = $notices;
+		$this->minify = $minify;
+		
+		return $this;
 	}
 	
 	
 	
+	// hook method
+	public function render() { }
+	
+	
+	
+	//// link
+	
 	//
-	public function getLink( $item, $path, $var ) {
+	public function getLink( $subject, $path, $var ) {
 		
 		$page = get_page_by_path( $path );
 		$link = get_permalink( $page );
 		
-		$delim = ( strstr( $link, '?' ) ) ? '&' : '?' ;
+		$oUrl = new Geko_Uri( $link );
+		$oUrl->setVar( $var, $subject->$var );
 		
-		return sprintf( '%s%s%s=%s', $link, $delim, $var, $item->$var );
+		return strval( $oUrl );
 	}
 	
 	//
@@ -46,6 +72,7 @@ class Geko_Wp_Cart66_View extends Geko_Singleton_Abstract
 	}
 	
 	
+	//// string translation
 	
 	//
 	public function _t( $sMsg ) {
@@ -58,6 +85,7 @@ class Geko_Wp_Cart66_View extends Geko_Singleton_Abstract
 	}
 	
 	
+	//// currency
 	
 	//
 	public function getCurr( $val, $html ) {
@@ -70,6 +98,7 @@ class Geko_Wp_Cart66_View extends Geko_Singleton_Abstract
 	}
 	
 	
+	//// setting value
 	
 	//
 	public function getVal( $key ) {
@@ -79,6 +108,37 @@ class Geko_Wp_Cart66_View extends Geko_Singleton_Abstract
 	//
 	public function echoVal( $key ) {
 		echo Cart66Setting::getValue( $key );
+	}
+	
+	
+	//// session value
+	
+	//
+	public function transSessKey( $sKey ) {
+		$sPfx = ( 0 === strpos( $sKey, '_' ) ) ? 'cart66' : 'Cart66' ;
+		return $sPfx . $sKey;
+	}
+	
+	//
+	public function getSess( $sKey ) {
+		return Cart66Session::get( $this->transSessKey( $sKey ) );
+	}
+
+	//
+	public function setSess( $sKey, $mVal ) {
+		Cart66Session::set( $this->transSessKey( $sKey ), $mVal );
+		return $this;
+	}
+	
+	//
+	public function echoSess( $sKey ) {
+		echo Cart66Session::get( $this->transSessKey( $sKey ) );
+	}
+	
+	//
+	public function dropSess( $sKey ) {
+		Cart66Session::drop( $this->transSessKey( $sKey ) );	
+		return $this;
 	}
 	
 	

@@ -10,7 +10,13 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 		
 		$this->_sThisFile = __FILE__;
 		
+		$data = $this->data;
+		$notices = $this->notices;
+		$minify = $this->minify;
 		
+		
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		
 		global $wpdb;
 		
@@ -19,46 +25,50 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 		$order = FALSE;
 		$ajaxRefresh = FALSE;
 		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		
+		
+		
 		if ( isset( $_GET[ 'ouid' ] ) ) {
 			
-			// Cart66Session::drop( 'Cart66PendingOUID' );
+			// $this->dropSess( 'PendingOUID' );
 			$order = new Cart66Order();
-			$order->loadByOuid($_GET['ouid']);
+			$order->loadByOuid( $_GET[ 'ouid' ] );
 			
-			if(empty($order->id)) {
-				echo "<h2>This order is no longer in the system</h2>";
+			if ( empty( $order->id ) ) {
+				?><h2>This order is no longer in the system</h2><?php
 				exit();
 			}
 		
-		} elseif(Cart66Session::get('Cart66PendingOUID')) {
+		} elseif ( $this->getSess( 'PendingOUID' ) ) {
 			
 			$order = new Cart66Order();
-			$order->loadByOuid(Cart66Session::get('Cart66PendingOUID'));
+			$order->loadByOuid( $this->getSess( 'PendingOUID ' ) );
 			
-			if(empty($order->id) || $order->status == 'checkout_pending') {
-				$ajaxRefresh = true;
+			if ( empty( $order->id ) || ( $order->status == 'checkout_pending' ) ) {
+				$ajaxRefresh = TRUE;
 			} else {
-				$url = add_query_arg('ouid', Cart66Session::get('Cart66PendingOUID'), Cart66Common::getCurrentPageUrl());
-				Cart66Session::drop('Cart66PendingOUID');
-				wp_redirect($url);
+				$url = add_query_arg( 'ouid', $this->getSess( 'PendingOUID' ), Cart66Common::getCurrentPageUrl() );
+				$this->dropSess( 'PendingOUID' );
+				wp_redirect( $url );
 				exit;
 			}
 		}
-
+		
 		// Process Affiliate Payments
 		// Begin processing affiliate information
-		if(Cart66Session::get('ap_id')) {
-			$referrer = Cart66Session::get('ap_id');
-		} elseif(isset($_COOKIE['ap_id'])) {
-			$referrer = $_COOKIE['ap_id'];
+		if ( Cart66Session::get( 'ap_id' ) ) {
+			$referrer = Cart66Session::get( 'ap_id' );
+		} elseif( isset( $_COOKIE[ 'ap_id' ] ) ) {
+			$referrer = $_COOKIE[ 'ap_id' ];
 		}
-
-
-		if(is_object($order) && $order->viewed == 0){
+		
+		
+		if ( is_object( $order ) && ( 0 == $order->viewed ) ){
 		
 			// only process affiliate logging if this is the first time the receipt is viewed
-			if (!empty($referrer)) {
-				Cart66Common::awardCommission($order->id, $referrer);
+			if ( !empty( $referrer ) ) {
+				Cart66Common::awardCommission( $order->id, $referrer );
 			}
 			// End processing affiliate information
 			
@@ -68,12 +78,12 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 			}
 			// End iDevAffiliate Tracking
 			
-			if(isset($_COOKIE['ap_id']) && $_COOKIE['ap_id']) {
-				setcookie('ap_id',$referrer, time() - 3600, "/");
-				unset($_COOKIE['ap_id']);
+			if ( isset( $_COOKIE[ 'ap_id' ] ) && $_COOKIE[ 'ap_id' ] ) {
+				setcookie( 'ap_id', $referrer, time() - 3600, '/' );
+				unset( $_COOKIE[ 'ap_id' ] );
 			}
 			
-			Cart66Session::drop('app_id');
+			Cart66Session::drop( 'app_id' );
 		}
 		
 		
@@ -122,7 +132,7 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 						
 						$dir = $this->getVal( 'product_folder' );
 						$path = $dir . DIRECTORY_SEPARATOR . $product->download_path;
-						Cart66Common::downloadFile($path);
+						Cart66Common::downloadFile( $path );
 					
 					}
 					
@@ -130,12 +140,13 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 					
 				} else {
 				
-					echo '<p>' . $this->_t( 'You have exceeded the maximum number of downloads for this product' ) . '.</p>';
+					?><p><?php $this->_e( 'You have exceeded the maximum number of downloads for this product' ); ?></p><?php
+					
 					$order = new Cart66Order();
 					$order->loadByDuid( $_GET[ 'duid' ] );
 					
 					if ( empty( $order->id ) ) {
-						echo '<h2>This order is no longer in the system</h2>';
+						?><h2>This order is no longer in the system</h2><?php
 						exit();
 					}
 				
@@ -177,52 +188,54 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 					$memberHomePageLink = Cart66AccessManager::getMemberHomePageLink();
 					
 					if ( $logInLink !== false ) {
-						echo '<h2>Your Account Is Ready</h2>';
-						if(Cart66Common::isLoggedIn() && $memberHomePageLink !== false) {
-							echo "<p><a href=\"$memberHomePageLink\">" . $this->_t( 'Members Home' ) . "</a>.</p>";
+						
+						?><h2>Your Account Is Ready</h2><?php
+						
+						if ( Cart66Common::isLoggedIn() && ( FALSE !== $memberHomePageLink ) ) {
+							?><p><a href="<?php echo $memberHomePageLink; ?>"><?php $this->_e( 'Members Home' ); ?></a>.</p><?php
 						} else {
-							echo "<p><a href=\"$logInLink\">" . $this->_t( 'Log into your account' ) . "</a>.</p>";
+							?><p><a href="<?php echo $logInLink; ?>"><?php $this->_e( 'Log into your account' ); ?></a>.</p><?php
 						}
 					}
-				
+					
 				} ?>
 				
-				<?php if($order->hasAccount() == -1): ?>
+				<?php if ( $order->hasAccount() == -1 ): ?>
 					
-					<?php if(!Cart66Common::isLoggedIn()): ?>
+					<?php if ( !Cart66Common::isLoggedIn() ): ?>
 						
 						<h2>Please Create Your Account</h2>
 						
 						<?php
 						
-							if(isset($data['errors'])) {
-								Cart66Common::log('[' . basename(__FILE__) . ' - line ' . __LINE__ . "] Account creation errors: " . print_r($data, true));
-								echo Cart66Common::showErrors($data['errors'], 'Your account could not be created.');
-								echo Cart66Common::getJqErrorScript($data['jqErrors']);
+							if ( isset( $data[ 'errors' ] ) ) {
+								$this->logMsg( __LINE__, 'Account creation errors', print_r( $data, TRUE ) );
+								echo Cart66Common::showErrors( $data[ 'errors' ], 'Your account could not be created.' );
+								echo Cart66Common::getJqErrorScript( $data[ 'jqErrors' ] );
 							}
 							
-							$account = $data['account'];
+							$account = $data[ 'account' ];
 							
-							if(!is_object($account)) {
+							if ( !is_object( $account ) ) {
 								$account = new Cart66Account();
 							}
-						
+							
 						?>
 						
 						<form action="" method='post' id="account_form" class="phorm2">
 							<input type="hidden" name="ouid" value="<?php echo $order->ouid; ?>">
 							<ul class="shortLabels">
 								<li>
-									<label for="account-first_name">First name:</label><input type="text" name="account[first_name]" value="<?php echo $account->firstName ?>" id="account-first_name">
+									<label for="account-first_name">First name:</label><input type="text" name="account[first_name]" value="<?php echo $account->firstName; ?>" id="account-first_name">
 								</li>
 								<li>
-									<label for="account-last_name">Last name:</label><input type="text" name="account[last_name]" value="<?php echo $account->lastName ?>" id="account-last_name">
+									<label for="account-last_name">Last name:</label><input type="text" name="account[last_name]" value="<?php echo $account->lastName; ?>" id="account-last_name">
 								</li>
 								<li>
-									<label for="account-email">Email:</label><input type="text" name="account[email]" value="<?php echo $account->email ?>" id="account-email">
+									<label for="account-email">Email:</label><input type="text" name="account[email]" value="<?php echo $account->email; ?>" id="account-email">
 								</li>
 								<li>
-									<label for="account-username">Username:</label><input type="text" name="account[username]" value="<?php echo $account->username ?>" id="account-username">
+									<label for="account-username">Username:</label><input type="text" name="account[username]" value="<?php echo $account->username; ?>" id="account-username">
 								</li>
 								<li>
 									<label for="account-password">Password:</label><input type="password" name="account[password]" value="" id="account-password">
@@ -237,7 +250,7 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 								</li>
 							</ul>
 						</form>
-					
+						
 					<?php endif; ?>
 				<?php endif; ?>
 				
@@ -253,25 +266,25 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 								<p>
 									<strong><?php $this->_e( 'Billing Information' ); ?></strong><br />
 									
-									<?php echo $order->bill_first_name ?> <?php echo $order->bill_last_name ?><br />
-									<?php echo $order->bill_address ?><br />
+									<?php echo $order->bill_first_name; ?> <?php echo $order->bill_last_name; ?><br />
+									<?php echo $order->bill_address; ?><br />
 									
-									<?php if(!empty($order->bill_address2)): ?>
-										<?php echo $order->bill_address2 ?><br />
+									<?php if ( !empty( $order->bill_address2 ) ): ?>
+										<?php echo $order->bill_address2; ?><br />
 									<?php endif; ?>
 									
-									<?php if(!empty($order->bill_city)): ?>
-										<?php echo $order->bill_city ?> <?php echo $order->bill_state ?>, <?php echo $order->bill_zip ?><br/>
+									<?php if ( !empty( $order->bill_city ) ): ?>
+										<?php echo $order->bill_city; ?> <?php echo $order->bill_state; ?>, <?php echo $order->bill_zip; ?><br />
 									<?php endif; ?>
       
-									<?php if(!empty($order->bill_country)): ?>
-										<?php echo $order->bill_country ?><br/>
+									<?php if ( !empty( $order->bill_country ) ): ?>
+										<?php echo $order->bill_country; ?><br/>
 									<?php endif; ?>
 									
-									<?php if(is_array($additional_fields = maybe_unserialize($order->additional_fields)) && isset($additional_fields['billing'])): ?>
+									<?php if ( is_array( $additional_fields = maybe_unserialize( $order->additional_fields ) ) && isset( $additional_fields[ 'billing' ] ) ): ?>
 										<br />
-										<?php foreach($additional_fields['billing'] as $af): ?>
-											<?php echo $af['label']; ?>: <?php echo $af['value']; ?><br />
+										<?php foreach ( $additional_fields[ 'billing' ] as $af ): ?>
+											<?php echo $af[ 'label' ]; ?>: <?php echo $af[ 'value' ]; ?><br />
 										<?php endforeach; ?>
 									<?php endif; ?>
 								</p>
@@ -283,17 +296,21 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 									
 									<br/>
 									
-									<?php if(!empty($order->phone)): ?>
-										<?php $this->_e( 'Phone' ); ?>: <?php echo Cart66Common::formatPhone($order->phone) ?><br/>
+									<?php
+									$sDateOrderedOn = date( sprintf( '%s %s', get_option( 'date_format' ), get_option( 'time_format' ) ), strtotime( $order->ordered_on ) );
+									?>
+									
+									<?php if ( !empty( $order->phone ) ): ?>
+										<?php $this->_e( 'Phone' ); ?>: <?php echo Cart66Common::formatPhone( $order->phone ); ?><br />
 									<?php endif; ?>
 									
-									<?php $this->_e( 'Email' ); ?>: <?php echo $order->email ?><br />
-									<?php $this->_e( 'Date' ); ?>: <?php echo date(get_option('date_format'), strtotime($order->ordered_on)) ?> <?php echo date(get_option('time_format'), strtotime($order->ordered_on)) ?>
+									<?php $this->_e( 'Email' ); ?>: <?php echo $order->email; ?><br />
+									<?php $this->_e( 'Date' ); ?>: <?php echo $sDateOrderedOn; ?>
 									
-									<?php if(is_array($additional_fields = maybe_unserialize($order->additional_fields)) && isset($additional_fields['payment'])): ?>
+									<?php if ( is_array( $additional_fields = maybe_unserialize( $order->additional_fields ) ) && isset( $additional_fields[ 'payment' ] ) ): ?>
 										<br />
-										<?php foreach($additional_fields['payment'] as $af): ?>
-											<?php echo $af['label']; ?>: <?php echo $af['value']; ?><br />
+										<?php foreach ( $additional_fields[ 'payment' ] as $af ): ?>
+											<?php echo $af[ 'label' ]; ?>: <?php echo $af[ 'value' ]; ?><br />
 										<?php endforeach; ?>
 									<?php endif; ?>
 								</p>
@@ -303,65 +320,69 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 					
 					<tr>
 						<td>
-							<?php if($order->shipping_method != 'None'): ?>
+							<?php if ( $order->shipping_method != 'None' ): ?>
 								
 								<p>								
-									<?php if($order->hasShippingInfo()): ?>
+									<?php if ( $order->hasShippingInfo() ): ?>
 										
 										<strong><?php $this->_e( 'Shipping Information' ); ?></strong><br />
 										
-										<?php echo $order->ship_first_name ?> <?php echo $order->ship_last_name ?><br />
-										<?php echo $order->ship_address ?><br />
-		  
-										<?php if(!empty($order->ship_address2)): ?>
-											<?php echo $order->ship_address2 ?><br/>
+										<?php echo $order->ship_first_name; ?> <?php echo $order->ship_last_name; ?><br />
+										<?php echo $order->ship_address; ?><br />
+		  								
+										<?php if ( !empty( $order->ship_address2 ) ): ?>
+											<?php echo $order->ship_address2; ?><br />
 										<?php endif; ?>
-		  
-										<?php if($order->ship_city != ''): ?>
-											<?php echo $order->ship_city ?> <?php echo $order->ship_state ?>, <?php echo $order->ship_zip ?><br/>
+		  								
+										<?php if ( $order->ship_city != '' ): ?>
+											<?php echo $order->ship_city; ?> <?php echo $order->ship_state; ?>, <?php echo $order->ship_zip; ?><br />
 										<?php endif; ?>
-		  
-										<?php if(!empty($order->ship_country)): ?>
-											<?php echo $order->ship_country ?><br/>
+		  								
+										<?php if ( !empty( $order->ship_country ) ): ?>
+											<?php echo $order->ship_country; ?><br />
 										<?php endif; ?>
 										
-										<?php if(is_array($additional_fields = maybe_unserialize($order->additional_fields)) && isset($additional_fields['shipping'])): ?>
+										<?php if ( is_array( $additional_fields = maybe_unserialize( $order->additional_fields ) ) && isset( $additional_fields[ 'shipping' ] ) ): ?>
 											<br />
-											<?php foreach($additional_fields['shipping'] as $af): ?>
-												<?php echo $af['label']; ?>: <?php echo $af['value']; ?><br />
+											<?php foreach ( $additional_fields[ 'shipping' ] as $af ): ?>
+												<?php echo $af[ 'label' ]; ?>: <?php echo $af[ 'value' ]; ?><br />
 											<?php endforeach; ?>
 										<?php endif; ?>
 										
 									<?php endif; ?>
 										
-									<br /><em><?php $this->_e( 'Delivery via' ); ?>: <?php echo $order->shipping_method ?></em><br />
+									<br /><em><?php $this->_e( 'Delivery via' ); ?>: <?php echo $order->shipping_method; ?></em><br />
 								</p>
 									
 							<?php endif; ?>
 						</td>
 						
-						<?php if(strlen($order->bill_last_name) > 2): ?>
+						<?php if ( strlen( $order->bill_last_name ) > 2 ): ?>
 							
 							<td>&nbsp;</td>
 							<td>&nbsp;</td>
 						
-						<?php else: ?>
+						<?php else:
+							
+							$sDateOrderedOn = date( sprintf( '%s %s', get_option( 'date_format' ), get_option( 'time_format' ) ), strtotime( $order->ordered_on ) );
+							
+							?>
 							<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
 							<td valign="top">
 								<p>
 									<strong><?php $this->_e( 'Contact Information' ); ?></strong><br />
 									
-									<?php if(!empty($order->phone)): ?>
-										<?php $this->_e( 'Phone' ); ?>: <?php echo Cart66Common::formatPhone($order->phone) ?><br />
+									<?php if ( !empty( $order->phone ) ): ?>
+										<?php $this->_e( 'Phone' ); ?>: <?php echo Cart66Common::formatPhone( $order->phone ); ?><br />
 									<?php endif; ?>
 									
-									<?php $this->_e( 'Email' ); ?>: <?php echo $order->email ?><br />
-									<?php $this->_e( 'Date' ); ?>: <?php echo date(get_option('date_format'), strtotime($order->ordered_on)) ?> <?php echo date(get_option('time_format'), strtotime($order->ordered_on)) ?>
+									<?php $this->_e( 'Email' ); ?>: <?php echo $order->email; ?><br />
+									<?php $this->_e( 'Date' ); ?>: <?php echo $sDateOrderedOn; ?>
 									
-									<?php if(is_array($additional_fields = maybe_unserialize($order->additional_fields)) && isset($additional_fields['payment'])): ?>
+									<?php if ( is_array( $additional_fields = maybe_unserialize( $order->additional_fields ) ) && isset( $additional_fields[ 'payment' ] ) ): ?>
 										<br />
-										<?php foreach($additional_fields['payment'] as $af): ?>
-											<?php echo $af['label']; ?>: <?php echo $af['value']; ?><br />
+										<?php foreach( $additional_fields[ 'payment' ] as $af ): ?>
+											<?php echo $af[ 'label' ]; ?>: <?php echo $af[ 'value' ]; ?><br />
 										<?php endforeach; ?>
 									<?php endif; ?>
 								</p>
@@ -373,11 +394,12 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 						<?php $tracking = explode(',', $order->tracking_number); if(!empty($order->tracking_number)): ?>
 							<tr>
           						<td colspan="3" class="receipt_tracking_numbers">
-          							<?php $i = 1; foreach($tracking as $key => $value) {
-										$number = substr(strstr($value, '_'), 1);
-										$carrier = mb_strstr($value,'_', true);
-										$carrierName = Cart66AdvancedNotifications::convertCarrierNames($carrier);
-										$link = Cart66AdvancedNotifications::getCarrierLink($carrier, $number);
+          							<?php $i = 1; foreach( $tracking as $key => $value ) {
+										
+										$number = substr( strstr( $value, '_' ), 1 );
+										$carrier = mb_strstr( $value, '_', TRUE );
+										$carrierName = Cart66AdvancedNotifications::convertCarrierNames( $carrier );
+										$link = Cart66AdvancedNotifications::getCarrierLink( $carrier, $number );
 										
 										?>
 										
@@ -391,7 +413,7 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 						<?php endif; ?>
 					<?php endif; ?>
 					
-					<?php if(isset($order->custom_field) && $order->custom_field != ''): ?>
+					<?php if ( isset( $order->custom_field ) && ( '' != $order->custom_field ) ): ?>
 						<tr>
 							<td colspan="3">
 								<?php if ( $this->getVal( 'checkout_custom_field_label' ) ): ?>
@@ -530,42 +552,48 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 					<?php endif; ?>
 					
 					<tr class="noBorder">
-						<td colspan='1'>&nbsp;</td>
-						<td colspan="1" style='text-align: center;'>&nbsp;</td>
-						<td colspan="1" style='text-align: right; font-weight: bold;'><?php $this->_e( 'Subtotal' ); ?>:</td>
+						<td colspan="1">&nbsp;</td>
+						<td colspan="1" style="text-align: center;">&nbsp;</td>
+						<td colspan="1" style="text-align: right; font-weight: bold;"><?php $this->_e( 'Subtotal' ); ?>:</td>
 						<td colspan="1" style="text-align: left; font-weight: bold;"><?php $this->echoCurr( $order->subtotal ); ?></td>
 					</tr>
-
-					<?php if($order->shipping_method != 'None' && $order->shipping_method != 'Download'): ?>
+					
+					<?php if ( ( 'None' != $order->shipping_method ) && ( 'Download' != $order->shipping_method ) ): ?>
 						<tr class="noBorder">
-							<td colspan='1'>&nbsp;</td>
-							<td colspan="1" style='text-align: center;'>&nbsp;</td>
-							<td colspan="1" style='text-align: right; font-weight: bold;'><?php $this->_e( 'Shipping' ); ?>:</td>
+							<td colspan="1">&nbsp;</td>
+							<td colspan="1" style="text-align: center;">&nbsp;</td>
+							<td colspan="1" style="text-align: right; font-weight: bold;"><?php $this->_e( 'Shipping' ); ?>:</td>
 							<td colspan="1" style="text-align: left; font-weight: bold;"><?php $this->echoCurr( $order->shipping ); ?></td>
 						</tr>
 					<?php endif; ?>
-  
-					<?php if($order->discount_amount > 0): ?>
+					
+					<?php if ( $order->discount_amount > 0 ): ?>
 						<tr class="noBorder">
-							<td colspan='2'>&nbsp;</td>
-							<td colspan="1" style='text-align: right; font-weight: bold;'><?php $this->_e( 'Discount' ); ?>:</td>
+							<td colspan="2">&nbsp;</td>
+							<td colspan="1" style="text-align: right; font-weight: bold;"><?php $this->_e( 'Discount' ); ?>:</td>
 							<td colspan="1" style="text-align: left; font-weight: bold;">-&nbsp;<?php $this->echoCurr( $order->discount_amount ); ?></td>
 						</tr>
 					<?php endif; ?>
   
-					<?php if($order->tax > 0): ?>
+					<?php if ( $order->tax > 0 ): ?>
 						<tr class="noBorder">
-							<td colspan='2'>&nbsp;</td>
-							<td colspan="1" style='text-align: right; font-weight: bold;'><?php $this->_e( 'Tax' ); ?>:</td>
+							<td colspan="2">&nbsp;</td>
+							<td colspan="1" style="text-align: right; font-weight: bold;"><?php $this->_e( 'Tax' ); ?>:</td>
 							<td colspan="1" style="text-align: left; font-weight: bold;"><?php $this->echoCurr( $order->tax ); ?></td>
 						</tr>
 					<?php endif; ?>
-  
+					
 					<tr class="noBorder">
-						<td colspan='2' style='text-align: center;'>&nbsp;</td>
-						<td colspan="1" style='text-align: right; font-weight: bold;'><?php $this->_e( 'Total' ); ?>:</td>
+						<td colspan="2" style="text-align: center;">&nbsp;</td>
+						<td colspan="1" style="text-align: right; font-weight: bold;"><?php $this->_e( 'Total' ); ?>:</td>
 						<td colspan="1" style="text-align: left; font-weight: bold;"><?php $this->echoCurr( $order->total ); ?></td>
 					</tr>
+					
+					<?php if ( $sNotes = trim( $order->notes ) ): ?>
+						<tr class="noBorder"><td colspan="4">&nbsp;<br />&nbsp;<br /></td></tr>
+						<tr class="noBorder"><th colspan="4" style="text-align: left;"><?php $this->_e( 'Notes' ); ?>:</th></tr>
+						<tr class="noBorder"><td colspan="4"><?php echo nl2br( $sNotes ); ?></td></tr>
+					<?php endif; ?>
 					
 				</table>
 				
@@ -582,13 +610,15 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 				<!-- End Newsletter Signup Form -->
 
 				<?php
+					
 					// Erase the shopping cart from the session at the end of viewing the receipt
-					Cart66Session::drop( 'Cart66Cart' );
+					$this->dropSess( 'Cart' );
+					$this->dropSess( 'Tax' );
+					$this->dropSess( 'Promotion' );
+					$this->dropSess( 'ShippingCountryCode' );
+
 					Cart66Session::drop( 'PayPalProToken' );
-					Cart66Session::drop( 'Cart66Tax' );
-					Cart66Session::drop( 'Cart66Promotion' );
 					Cart66Session::drop( 'terms_acceptance' );
-					Cart66Session::drop( 'Cart66ShippingCountryCode' );
 				?>
 				
 			<?php else: ?>
@@ -684,7 +714,7 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 			?>
   			
 			<input type="hidden" name="lookup-url" id="lookup-url" value="<?php echo $url; ?>" />
-			<input type="hidden" name="ouid" id="ouid" value="<?php echo Cart66Session::get('Cart66PendingOUID'); ?>" />
+			<input type="hidden" name="ouid" id="ouid" value="<?php $this->echoSess( 'PendingOUID' ); ?>" />
 			<input type="hidden" name="current-page" id="current-page" value="<?php echo Cart66Common::getCurrentPageUrl(); ?>" />
 			
 			<script type="text/javascript">

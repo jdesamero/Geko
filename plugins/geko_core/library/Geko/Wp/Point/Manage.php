@@ -336,38 +336,25 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 		
 		$aFormat = array( '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s' );
 		
+		
 		// meta data
 		
 		$aMetaInsert = array();
 		
-		if (
-			( !$oPointEvent->getOneTimeOnly() ) && 
-			( $sMetaKeys = trim( $oPointEvent->getMetaKeys() ) )
-		) {			
-			
-			//
-			$aMetaKeys = explode( ',', $sMetaKeys );
-			
-			$aMetaKeysFmt = array();
-			foreach ( $aMetaKeys as $sKey ) {
-				if ( $sKey = trim( $sKey ) ) {
-					$aMetaKeysFmt[] = $sKey;
-				}
-			}
-
-			//
-			foreach ( $aMetaKeysFmt as $sMetaKey ) {
-				$aMetaInsert[] = array(
-					'mkey_id' => Geko_Wp_Options_MetaKey::getId( $sMetaKey ),
-					'meta_value' => $aMetaValues[ $sMetaKey ]
-				);
-			}
-			
+		foreach ( $aMetaValues as $sMetaKey => $mMetaValue ) {
+			$aMetaInsert[] = array(
+				'mkey_id' => Geko_Wp_Options_MetaKey::getId( $sMetaKey ),
+				'meta_value' => $mMetaValue
+			);
 		}
 		
+		
+		//
 		if ( $bTestingOnly ) {
+			
 			print_r( $aInsert );
 			print_r( $aMetaInsert );
+			
 		} else {
 			
 			$wpdb->insert( $this->_sPrimaryTable, $aInsert, $aFormat );
@@ -479,15 +466,31 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 				'parent_ids' => $aPoints->gatherId()
 			) );
 			
+			
+			// obtain/format valid meta-keys for comparison
+			$aMetaKeys = explode( ',', $sMetaKeys );
+			
+			$aMetaKeysFmt = array();
+			foreach ( $aMetaKeys as $sKey ) {
+				if ( $sKey = trim( $sKey ) ) {
+					$aMetaKeysFmt[] = $sKey;
+				}
+			}
+			
+			
 			// do comparison
 			foreach ( $aPointMeta as $aMeta ) {
+				
 				$bMatched = TRUE;
-				foreach ( $aMeta as $sKey => $mValue ) {
+				
+				foreach ( $aMetaKeysFmt as $sKey ) {
+					$mValue = $aMeta[ $sKey ];
 					if ( $aMetaValues[ $sKey ] && ( $aMetaValues[ $sKey ] != $mValue ) ) {
 						$bMatched = FALSE;
 						break;
 					}
 				}
+				
 				if ( $bMatched ) {
 					$iErrorCode = Geko_Wp_Point::getErrorCode( 'duplicate' );
 					return TRUE;			// matching point was found

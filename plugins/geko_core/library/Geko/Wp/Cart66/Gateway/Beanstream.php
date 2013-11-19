@@ -51,10 +51,11 @@ class Geko_Wp_Cart66_Gateway_Beanstream extends Geko_Wp_Cart66_Gateway
 	
 		$p = $this->getPayment();
 		$b = $this->getBilling();
-	
+		$ship = $this->getShipping();
+		
 		Cart66Common::log( 'Payment info for checkout: ' . print_r( $p, true ) );
 		
-		$extData = $this->generateExtendedData();
+		// $extData = $this->generateExtendedData();
 	
 		$expMonth = $p[ 'cardExpirationMonth' ];
 		$expYear = substr( $p[ 'cardExpirationYear' ], -2 );
@@ -82,37 +83,33 @@ class Geko_Wp_Cart66_Gateway_Beanstream extends Geko_Wp_Cart66_Gateway
 		$this->addField( 'ordPostalCode', $b[ 'zip' ] );
 		$this->addField( 'ordCountry', $b[ 'country' ] );
 		
+		
+		// optional fields
+		
+		if ( $oCart = Cart66Session::get( 'Cart66Cart' ) ) {
+			
+			$items = $oCart->getItems();
+			
+			foreach ( $items as $i => $item ) {
+				
+				$idx = $i + 1;
+				$sProdTitle = sprintf( '%s - %s', $item->getFullDisplayName(), $item->getProductPriceDescription() );
+				
+				$this->addField( 'prod_id_' . $idx, $item->getItemNumber() );
+				$this->addField( 'prod_name_' . $idx, $sProdTitle );
+				$this->addField( 'prod_quantity_' . $idx, $item->getQuantity() );
+				$this->addField( 'prod_cost_' . $idx, $item->getProductPrice() );
+				
+			}
+			
+		}
+		
+		
 		// set b for redeemPoints
 		// $this->addField( 'ref1', $b[ 'redeemPoints' ] );
 		
 		$this->addField( 'ExpDate', $expMonth . $expYear );
 		$this->addField( 'trnCardCvd', $p[ 'securityId' ] );
-		
-		//// TO DO!!!!!
-		
-		/* /
-		// Update User Info if not exist.
-		
-		$oMainLayout = Gloc_Layout_Main::getInstance();
-		
-		if ( $oMainLayout->isLoggedIn() ) {
-			
-			$oUser = $oMainLayout->getUser();
-			
-			global $wpdb;
-			
-			$strSQL = "select * from wp_geko_location_address where object_id = " . $oUser->getId();
-			
-			$result = $wpdb->get_results( $strSQL );
-			
-			if ( !$result ) {
-				$strSQL = "INSERT INTO wp_geko_location_address (object_id, objtype_id, address_line_1, address_line_2, city, province_id, postal_code) VALUES (" . $oUser->getId() . ",3,'" . $b['address'] . "','" . $b['address2'] . "','" . $b['city'] . "','0','" . $b['zip'] . "')";
-				// echo $strSQL;
-				// break;
-				$result = $wpdb->query( $strSQL );
-			}
-		}
-		/* */
 		
 	}
 	
@@ -162,69 +159,18 @@ class Geko_Wp_Cart66_Gateway_Beanstream extends Geko_Wp_Cart66_Gateway
 			}
 			
 			
-			
 			// Prepare to return the transaction id for this sale.
 			
 			if ( 1 == $this->response[ 'Approved' ] ) {
-				
 				$sale = $this->response[ 'Transaction ID' ];
-				
-				//// TO DO!!!!!!!!!!!!!!!!!
-				/* /
-				
-				$oPtMng = Geko_Wp_Point_Manage::getInstance();
-				
-				$oMainLayout = Gloc_Layout_Main::getInstance();
-
-				if ( $oMainLayout->isLoggedIn() ) {
-					
-					$oUser = $oMainLayout->getUser();
-					
-					// Remove points if discount was selected
-					if ( _e( 'Discount', 'cart66' ) ) {
-					
-						$mRes = $oPtMng->getPoints( $oUser->getId() );
-						
-						$aPoints = array(
-							'user_id' => $oUser->getId(),
-							'point_event_slug' => 'shop-redeem', 
-							'point_value' => $mRes,
-							'meta' => array(
-								'order_id' => $this->response[ 'Transaction ID' ]					
-							)					
-						);
-						
-						$mRes = $oPtMng->awardPoints( $aPoints );
-					}
-					
-					// specify parameters for awarding the points using test parameters.
-					$aPoints = array(
-						'user_id' => $oUser->getId(),
-						'point_event_slug' => 'shop-earn',
-						'meta' => array(
-							'order_id' => $this->response[ 'Transaction ID' ],
-							'point_value' => intval( $total * BODYPLUS_POINTS_PER_DOLLAR )
-						)	
-					);
-					
-					// returns TRUE when successful, and a numerical error code if it fails
-					$mRes = $oPtMng->awardPoints( $aPoints );
-					
-					if ( TRUE === $mRes ) {
-						// do stuff
-					} else {
-						// point could not be awarded due to error
-					} 
-          
-				}
-				/* */
-				
 			}
 			
 		} else {
+			
 			// Process free orders without sending to the Auth.net gateway
 			$this->response[ 'Transaction ID' ] = 'MT-' . Cart66Common::getRandString();
 			$sale = $this->response[ 'Transaction ID' ];
+			
 		}
 	
 		return $sale;

@@ -6,24 +6,48 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 	
 	
 	//
+	public function getFullMode() {
+		
+		$data = $this->data;
+		
+		return ( isset( $data[ 'mode' ] ) && ( 'read' == $data[ 'mode' ] ) ) ? FALSE : TRUE ;
+	}
+	
+	
+	//
 	public function render( $data = NULL, $notices = TRUE, $minify = FALSE ) {
 		
 		$this->_sThisFile = __FILE__;
 		
+		$data = $this->data;
+		$notices = $this->notices;
+		$minify = $this->minify;
 		
+		
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		
 		$oGekoCart66 = Geko_Wp_Cart66::getInstance();
 		
 		$oCalculation = $oGekoCart66->getCalculation();
+		
+		do_action( $this->_sInstanceClass . '::init_start', $oCalculation, $this );
+		
 		$oCalculation
 			->setData( $data )
 			->calculate()
 		;
 		
-		$items = Cart66Session::get( 'Cart66Cart' )->getItems();
-		$shippingMethods = Cart66Session::get( 'Cart66Cart' )->getShippingMethods();
+		$oCart = $this->getSess( 'Cart' );
 		
-		$promotion = Cart66Session::get( 'Cart66Promotion' );
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		
+		
+		
+		$items = $oCart->getItems();
+		$shippingMethods = $oCart->getShippingMethods();
+		
+		$promotion = $this->getSess( 'Promotion' );
 		$product = new Cart66Product();
 		
 		
@@ -37,27 +61,23 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 			
 			// force the last page to be store home
 			$lastPage = $this->getVal( 'store_url' ) ? $this->getVal( 'store_url' ) : get_bloginfo( 'url' );
-			Cart66Session::set('Cart66LastPage', $lastPage);
+			$this->setSess( 'LastPage', $lastPage );
 			
 		} else {
-		
-			if ( isset($_SERVER['HTTP_REFERER']) && isset($_POST['task']) && $_POST['task'] == "addToCart"){
-				$lastPage = $_SERVER['HTTP_REFERER'];
-				Cart66Session::set('Cart66LastPage', $lastPage);
+			
+			if ( isset( $_SERVER[ 'HTTP_REFERER' ] ) && isset( $_POST[ 'task' ] ) && ( 'addToCart' == $_POST[ 'task' ] ) ){
+				$lastPage = $_SERVER[ 'HTTP_REFERER' ];
+				$this->setSess( 'LastPage', $lastPage );
 			}
 			
-			if(!Cart66Session::get('Cart66LastPage')) {
+			if ( !$this->getSess( 'LastPage' ) ) {
 				// If the last page is not set, use the store url
 				$lastPage = $this->getVal( 'store_url' ) ? $this->getVal( 'store_url' ) : get_bloginfo( 'url' );
-				Cart66Session::set('Cart66LastPage', $lastPage);
+				$this->setSess( 'LastPage', $lastPage );
 			}  
 		}
 		
-		$fullMode = TRUE;
-		if ( isset( $data[ 'mode' ] ) && ( 'read' == $data[ 'mode' ] ) ) {
-			$fullMode = FALSE;
-		}
-		
+		$fullMode = $this->getFullMode();
 		
 		
 		
@@ -73,57 +93,56 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 			$applyCouponImg = $cartImgPath . 'apply-coupon.png';
 		}
 		
-		?>
-		<?php if ( Cart66Session::get( 'Cart66InvalidOptions' ) ): ?>
+		if ( $this->getSess( 'InvalidOptions' ) ): ?>
 			<div id="Cart66InvalidOptions" class="alert-message alert-error Cart66Unavailable">
-				<h2 class="header"><?php _e( 'Invalid Product Options' , 'cart66' ); ?></h2>
+				<h2 class="header"><?php $this->_e( 'Invalid Product Options' ); ?></h2>
 				<p><?php 
-					echo Cart66Session::get( 'Cart66InvalidOptions' );
-					Cart66Session::drop('Cart66InvalidOptions');
+					$this->echoSess( 'InvalidOptions' );
+					$this->dropSess( 'InvalidOptions' );
 				?></p>
 			</div>
 		<?php endif; ?>
 		
 		<?php if ( count( $items ) ): ?>
 			
-			<?php if ( Cart66Session::get( 'Cart66InventoryWarning' ) && $fullMode ):
-			
-				echo Cart66Session::get( 'Cart66InventoryWarning' );
-				Cart66Session::drop( 'Cart66InventoryWarning' );
+			<?php if ( $this->getSess( 'InventoryWarning' ) && $fullMode ):
+				
+				$this->echoSess( 'InventoryWarning' );
+				$this->dropSess( 'InventoryWarning' );
 			
 			endif; ?>
 			
-			<?php if ( number_format( $this->getVal( 'minimum_amount' ), 2, '.', '' ) > number_format(Cart66Session::get('Cart66Cart')->getSubTotal(), 2, '.', '') && $this->getVal( 'minimum_cart_amount' ) == 1): ?>
+			<?php if ( number_format( $this->getVal( 'minimum_amount' ), 2, '.', '' ) > number_format( $oCart->getSubTotal(), 2, '.', '' ) && $this->getVal( 'minimum_cart_amount' ) == 1): ?>
 				<div id="minAmountMessage" class="alert-message alert-error Cart66Unavailable">
 					<?php echo ( $this->getVal( 'minimum_amount_label' ) ) ? $this->getVal( 'minimum_amount_label' ) : 'You have not yet reached the required minimum amount in order to checkout.' ?>
 				</div>
 			<?php endif;?>
 			
-			<?php if(Cart66Session::get('Cart66ZipWarning')): ?>
+			<?php if ( $this->getSess( 'ZipWarning' ) ): ?>
 				
 				<div id="Cart66ZipWarning" class="alert-message alert-error Cart66Unavailable">
-					<h2 class="header"><?php _e( 'Please Provide Your Zip Code' , 'cart66' ); ?></h2>
-					<p><?php _e( 'Before you can checkout, please provide the zip code for where we will be shipping your order and click' , 'cart66' ); ?> "<?php _e( 'Calculate Shipping' , 'cart66' ); ?>".</p>
-					<?php Cart66Session::drop('Cart66ZipWarning'); ?>
+					<h2 class="header"><?php $this->_e( 'Please Provide Your Zip Code' ); ?></h2>
+					<p><?php $this->_e( 'Before you can checkout, please provide the zip code for where we will be shipping your order and click' ); ?> "<?php $this->_e( 'Calculate Shipping' ); ?>".</p>
+					<?php $this->dropSess( 'ZipWarning' ); ?>
 					<input type="button" name="close" value="Ok" id="close" class="Cart66ButtonSecondary modalClose" />
 				</div>
 			
-			<?php elseif(Cart66Session::get('Cart66ShippingWarning')): ?>
+			<?php elseif ( $this->getSess( 'ShippingWarning' ) ): ?>
 				
 				<div id="Cart66ShippingWarning" class="alert-message alert-error Cart66Unavailable">
-					<h2 class="header"><?php _e( 'No Shipping Service Selected' , 'cart66' ); ?></h2>
-					<p><?php _e( 'We cannot process your order because you have not selected a shipping method. If there are no shipping services available, we may not be able to ship to your location.' , 'cart66' ); ?></p>
-					<?php Cart66Session::drop('Cart66ShippingWarning'); ?>
+					<h2 class="header"><?php $this->_e( 'No Shipping Service Selected' ); ?></h2>
+					<p><?php $this->_e( 'We cannot process your order because you have not selected a shipping method. If there are no shipping services available, we may not be able to ship to your location.' ); ?></p>
+					<?php $this->dropSess( 'ShippingWarning' ); ?>
 					<input type="button" name="close" value="Ok" id="close" class="Cart66ButtonSecondary modalClose" />
 				</div>
 				
-			<?php elseif(Cart66Session::get('Cart66CustomFieldWarning')): ?>
+			<?php elseif ( $this->getSess( 'CustomFieldWarning' ) ): ?>
 			  
 				<div id="Cart66CustomFieldWarning" class="alert-message alert-error Cart66Unavailable">
-					<h2 class="header"><?php _e( 'Custom Field Error' , 'cart66' ); ?></h2>
-					<p><?php _e( 'We cannot process your order because you have not filled out the custom field required for these products:' , 'cart66' ); ?></p>
+					<h2 class="header"><?php $this->_e( 'Custom Field Error' ); ?></h2>
+					<p><?php $this->_e( 'We cannot process your order because you have not filled out the custom field required for these products:' ); ?></p>
 					<ul>
-						<?php foreach(Cart66Session::get('Cart66CustomFieldWarning') as $customField): ?>
+						<?php foreach( $this->getSess( 'CustomFieldWarning' ) as $customField ): ?>
 							<li><?php echo $customField; ?></li>
 						<?php endforeach;?>
 					</ul>
@@ -132,31 +151,39 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 			  
 			<?php endif; ?>
 
-			<?php if(Cart66Session::get('Cart66SubscriptionWarning')): ?>
+			<?php if ( $this->getSess( 'SubscriptionWarning' ) ): ?>
 				<div id="Cart66SubscriptionWarning" class="alert-message alert-error Cart66Unavailable">
-					<h2 class="header"><?php _e( 'Too Many Subscriptions' , 'cart66' ); ?></h2>
-					<p><?php _e( 'Only one subscription may be purchased at a time.' , 'cart66' ); ?></p>
-					<?php Cart66Session::drop('Cart66SubscriptionWarning'); ?>
+					<h2 class="header"><?php $this->_e( 'Too Many Subscriptions' ); ?></h2>
+					<p><?php $this->_e( 'Only one subscription may be purchased at a time.' ); ?></p>
+					<?php $this->dropSess( 'SubscriptionWarning' ); ?>
 					<input type="button" name="close" value="Ok" id="close" class="Cart66ButtonSecondary modalClose" />
 				</div>
 			<?php endif; ?>
 
-			<?php if ( $accountId = Cart66Common::isLoggedIn() ) {
+			<?php
+			
+			if ( $accountId = Cart66Common::isLoggedIn() ):
 				
 				$account = new Cart66Account( $accountId );
 				
-				if ( $sub = $account->getCurrentAccountSubscription() ) {
-					if ( $sub->isPayPalSubscription() && Cart66Session::get( 'Cart66Cart' )->hasPayPalSubscriptions() ) {
+				if ( $sub = $account->getCurrentAccountSubscription() ):
+					if ( $sub->isPayPalSubscription() && $oCart->hasPayPalSubscriptions() ):
 						?>
-						<p id="Cart66SubscriptionChangeNote"><?php _e( 'Your current subscription will be canceled when you purchase your new subscription.' , 'cart66' ); ?></p>
+						<p id="Cart66SubscriptionChangeNote"><?php $this->_e( 'Your current subscription will be canceled when you purchase your new subscription.' ); ?></p>
 						<?php
-					}
-				}
-			} ?>
-
-
+					endif;
+				endif;
+				
+			endif;
+			
+			do_action( $this->_sInstanceClass . '::pre_form', $oCalculation, $this );
+			
+			?>
+			
 			<form id="Cart66CartForm" action="" method="post">
+				
 				<input type="hidden" name="task" value="updateCart" />
+				
 				<table id="viewCartTable">
 					<colgroup>
 						<col class="col1" />
@@ -166,13 +193,16 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 					</colgroup>
 					<thead>
 						<tr>
-							<th><?php _e( 'Product', 'cart66' ); ?></th>
-							<th class="cart66-align-center"><?php _e( 'Quantity' , 'cart66' ); ?></th>
-							<th class="cart66-align-right"><?php _e( 'Item Price' , 'cart66' ); ?></th>
-							<th class="cart66-align-right"><?php _e( 'Item Total' , 'cart66' ); ?></th>
+							<th><?php $this->_e( 'Product' ); ?></th>
+							<th class="cart66-align-center"><?php $this->_e( 'Quantity' ); ?></th>
+							<th class="cart66-align-right"><?php $this->_e( 'Item Price' ); ?></th>
+							<th class="cart66-align-right"><?php $this->_e( 'Item Total' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>
+						
+						<?php do_action( $this->_sInstanceClass . '::form_start', $oCalculation, $this ); ?>
+						
 						<?php foreach( $items as $itemIndex => $item ):
 							
 							$this->logMsg( __LINE__, 'Item option info', $item->getOptionInfo() );
@@ -206,7 +236,7 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 									
 									<?php echo $item->getCustomField( $itemIndex, $fullMode ); ?>
 									
-									<?php Cart66Session::drop( 'Cart66CustomFieldWarning' ); ?>
+									<?php $this->dropSess( 'CustomFieldWarning' ); ?>
 									
 								</td>
 								
@@ -232,7 +262,7 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 											$sDelim = ( strpos( $removeLink, '?' ) ) ? '&' : '?' ;
 											$sRemoveUrl = sprintf( '%s%stask=removeItem&itemIndex=%d', $removeLink, $sDelim, $itemIndex );
 										?>
-										<a href="<?php echo $sRemoveUrl; ?>" title="<?php _e( 'Remove item from cart', 'cart66' ); ?>"><img src="<?php echo $removeItemImg; ?>" alt="<?php _e( 'Remove Item', 'cart66' ); ?>" /></a>
+										<a href="<?php echo $sRemoveUrl; ?>" title="<?php $this->_e( 'Remove item from cart' ); ?>"><img src="<?php echo $removeItemImg; ?>" alt="<?php $this->_e( 'Remove Item' ); ?>" /></a>
 										
 									</td>
 								<?php else: ?>
@@ -245,7 +275,7 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 							<?php if ( $item->hasAttachedForms() ): ?>
 								<tr>
 									<td colspan="4">
-										<a href="#" class="showEntriesLink" rel="entriesFor_<?php echo $itemIndex; ?>"><?php _e( 'Show Details' , 'cart66' ); ?> <?php #echo count($item->getFormEntryIds()); ?></a>
+										<a href="#" class="showEntriesLink" rel="entriesFor_<?php echo $itemIndex; ?>"><?php $this->_e( 'Show Details' ); ?> <?php #echo count($item->getFormEntryIds()); ?></a>
 										<div id="entriesFor_<?php echo $itemIndex; ?>" class="showGfFormData" style="display: none;">
 											<?php echo $item->showAttachedForms( $fullMode ); ?>
 										</div>
@@ -254,7 +284,7 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 							<?php endif;?>      
 						<?php endforeach; ?>
 						
-						<?php if ( Cart66Session::get( 'Cart66Cart' )->requireShipping() ): ?>
+						<?php if ( $oCart->requireShipping() ): ?>
 							
 							<?php if ( CART66_PRO && $this->getVal( 'use_live_rates' ) ): ?>
 								
@@ -262,30 +292,31 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 								
 								<?php if ( $fullMode ): ?>
 								
-									<?php if ( Cart66Session::get( 'cart66_shipping_zip' ) ): ?>
+									<?php if ( $this->getSess( '_shipping_zip' ) ): ?>
 										
 										<?php $zipStyle = "style='display: none;'"; ?>
 										
 										<tr id="shipping_to_row">
 											<th colspan="4" class="alignRight">
 												
-												<?php _e( 'Shipping to' , 'cart66' ); ?> <?php echo Cart66Session::get('cart66_shipping_zip'); ?>
+												<?php $this->_e( 'Shipping to' ); ?> <?php $this->echoSess( '_shipping_zip' ); ?>
+												
 												<?php if ( $this->getVal( 'international_sales' ) ) {
-													echo Cart66Session::get('cart66_shipping_country_code');
+													$this->echoSess( '_shipping_country_code' );
 												} ?>
 												
-												(<a href="#" id="change_shipping_zip_link"><?php _e('change', 'cart66'); ?></a>)
+												(<a href="#" id="change_shipping_zip_link"><?php $this->_e( 'change' ); ?></a>)
 												
 												&nbsp;
 												
 												<?php
-													$liveRates = Cart66Session::get( 'Cart66Cart' )->getLiveRates();
+													$liveRates = $oCart->getLiveRates();
 													$rates = $liveRates->getRates();
 													
 													$this->logMsg( __LINE__, 'LIVE RATES', print_r( $rates, TRUE ) );
 													
 													$selectedRate = $liveRates->getSelected();
-													// $shipping = Cart66Session::get('Cart66Cart')->getShippingCost();
+													// $shipping = $oCart->getShippingCost();
 												?>
 												
 												<select name="live_rates" id="live_rates">
@@ -312,7 +343,7 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 									<?php endif; ?>
 									
 									<tr id="set_shipping_zip_row" <?php echo $zipStyle; ?>>
-										<th colspan="4" class="alignRight"><?php _e( 'Enter Your Zip Code' , 'cart66' ); ?>:
+										<th colspan="4" class="alignRight"><?php $this->_e( 'Enter Your Zip Code' ); ?>:
 											
 											<input type="text" name="shipping_zip" value="" id="shipping_zip" size="5" />
 											
@@ -331,9 +362,9 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 											<?php endif; ?>
 											
 											<?php if ( $cartImgPath && Cart66Common::urlIsLIve( $calculateShippingImg ) ): ?>
-												<input class="Cart66CalculateShippingButton" type="image" src="<?php echo $calculateShippingImg ?>" value="<?php _e( 'Calculate Shipping' , 'cart66' ); ?>" name="calculateShipping" />
+												<input class="Cart66CalculateShippingButton" type="image" src="<?php echo $calculateShippingImg ?>" value="<?php $this->_e( 'Calculate Shipping' ); ?>" name="calculateShipping" />
 											<?php else: ?>
-												<input type="submit" name="calculateShipping" value="<?php _e('Calculate Shipping', 'cart66'); ?>" id="shipping_submit" class="Cart66CalculateShippingButton Cart66ButtonSecondary" />
+												<input type="submit" name="calculateShipping" value="<?php $this->_e( 'Calculate Shipping' ); ?>" id="shipping_submit" class="Cart66CalculateShippingButton Cart66ButtonSecondary" />
 											<?php endif; ?>
 										
 										</th>
@@ -344,10 +375,10 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 									<tr>
 										<th colspan="4" class="alignRight">
 											<?php
-												$liveRates = Cart66Session::get('Cart66Cart')->getLiveRates();
-												if ( $liveRates && Cart66Session::get( 'cart66_shipping_zip' ) && Cart66Session::get( 'cart66_shipping_country_code' ) ) {
+												$liveRates = $oCart->getLiveRates();
+												if ( $liveRates && $this->getSess( '_shipping_zip' ) && $this->getSess( '_shipping_country_code' ) ) {
 													$selectedRate = $liveRates->getSelected();
-													printf( '%s %s %s %s', __( 'Shipping to', 'cart66' ), Cart66Session::get( 'cart66_shipping_zip' ), $selectedRate->service );
+													printf( '%s %s %s %s', $this->_t( 'Shipping to' ), $this->getSess( '_shipping_zip' ), $selectedRate->service );
 												}
 											?>
 										</th>
@@ -360,7 +391,7 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 								<?php if ( count( $shippingMethods ) > 1 && $fullMode ): ?>
 									
 									<tr>
-										<th colspan="4" class="alignRight"><?php _e( 'Shipping Method' , 'cart66' ); ?>: &nbsp;
+										<th colspan="4" class="alignRight"><?php $this->_e( 'Shipping Method' ); ?>: &nbsp;
 											
 											
 											<?php if ( $this->getVal( 'international_sales' ) ):
@@ -372,7 +403,7 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 													<?php foreach ( $customCountries as $code => $name ):
 														
 														$sSelectedAtt = '';
-														if ( $code == Cart66Session::get( 'Cart66ShippingCountryCode' ) ) {
+														if ( $code == $this->getSess( 'ShippingCountryCode' ) ) {
 															$sSelectedAtt = ' selected="selected" ';
 														}
 														
@@ -407,7 +438,7 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 													$method_class = trim( $method_class );
 													
 													$sSelectedAtt = '';
-													if ( $id == Cart66Session::get( 'Cart66Cart' )->getShippingMethodId() ) {
+													if ( $id == $oCart->getShippingMethodId() ) {
 														$sSelectedAtt = ' selected="selected" ';
 													}
 													
@@ -421,9 +452,9 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 								<?php elseif ( !$fullMode ): ?>
 									
 									<tr>
-										<th colspan="4" class="alignRight"><?php _e( 'Shipping Method' , 'cart66' ); ?>: 
+										<th colspan="4" class="alignRight"><?php $this->_e( 'Shipping Method' ); ?>: 
 										<?php
-											$method = new Cart66ShippingMethod(Cart66Session::get('Cart66Cart')->getShippingMethodId());
+											$method = new Cart66ShippingMethod( $oCart->getShippingMethodId() );
 											echo $method->name;
 										?>
 										</th>
@@ -439,16 +470,16 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 							<?php if ( $fullMode ): ?>
 								<td>&nbsp;</td>
 								<td>
-									<?php if($cartImgPath && Cart66Common::urlIsLIve($updateTotalImg)): ?>
-										<input class="Cart66UpdateTotalButton" type="image" src="<?php echo $updateTotalImg ?>" value="<?php _e( 'Update Total' , 'cart66' ); ?>" name="updateCart"/>
+									<?php if ( $cartImgPath && Cart66Common::urlIsLIve( $updateTotalImg ) ): ?>
+										<input class="Cart66UpdateTotalButton" type="image" src="<?php echo $updateTotalImg ?>" value="<?php $this->_e( 'Update Total' ); ?>" name="updateCart"/>
 									<?php else: ?>
-										<input type="submit" name="updateCart" value="<?php _e( 'Update Total' , 'cart66' ); ?>" class="Cart66UpdateTotalButton Cart66ButtonSecondary" />
+										<input type="submit" name="updateCart" value="<?php $this->_e( 'Update Total' ); ?>" class="Cart66UpdateTotalButton Cart66ButtonSecondary" />
 									<?php endif; ?>
 								</td>
 							<?php else: ?>
 								<td colspan="2">&nbsp;</td>
 							<?php endif; ?>
-							<td class="alignRight strong"><?php _e( 'Subtotal' , 'cart66' ); ?>:</td>
+							<td class="alignRight strong"><?php $this->_e( 'Subtotal' ); ?>:</td>
 							<td class="strong cart66-align-right"><?php echo $oCalculation->getCurrSubTotal(); ?></td>
 						</tr>
 												
@@ -456,8 +487,8 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 
 						<?php if ( $promotion ):
 							
-							$sPromoName = ( $promotion->name ) ? $promotion->name : Cart66Session::get( 'Cart66PromotionCode' );
-							$sTitle = sprintf( '%s (%s):', __( 'Coupon' , 'cart66' ), $sPromoName );
+							$sPromoName = ( $promotion->name ) ? $promotion->name : $this->getSess( 'PromotionCode' );
+							$sTitle = sprintf( '%s (%s):', $this->_t( 'Coupon' ), $sPromoName );
 							
 							?>
 							<tr class="coupon">
@@ -468,35 +499,29 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 							</tr>
 						<?php endif; ?>
 						
-						<!-- DISCOUNT TWO -->
-						
-						<?php if ( $oCalculation->getDiscountTwo() ): ?>
-							<tr class="coupon">
-								<td colspan="2">&nbsp;</td>
-								<td class="alignRight strong"><?php _e( 'Points Discount' , 'cart66' ); ?>:</td>
-								<td class="strong cart66-align-right">
-									-&nbsp;<?php echo $oCalculation->getCurrDiscountTwo(); ?>
-								</td>
-							</tr>
-						<?php endif; ?>
-						
+						<?php do_action( $this->_sInstanceClass . '::form_discount', $oCalculation, $this ); ?>
+												
 						<!-- SHIPPING -->
 						
-						<?php if ( Cart66Session::get( 'Cart66Cart' )->requireShipping() ): ?>
+						<?php if ( $oCart->requireShipping() ): ?>
 							<tr class="shipping">
 								<td colspan="2">&nbsp;</td>
-								<td class="alignRight strong"><?php _e( 'Shipping' , 'cart66' ); ?>:</td>
+								<td class="alignRight strong"><?php $this->_e( 'Shipping' ); ?>:</td>
 								<td class="strong cart66-align-right"><?php echo $oCalculation->getCurrShipping(); ?></td>
 							</tr>
 						<?php endif; ?>
 						
 						<!-- TAX -->
 						
-						<tr class="tax-row <?php echo $oCalculation->getTax() > 0 ? 'show-tax-row' : 'hide-tax-row'; ?>">
+						<?php
+						
+						$sTaxRowClass = ( $oCalculation->getTax() > 0 ) ? 'show-tax-row' : 'hide-tax-row' ;
+						
+						?><tr class="tax-row <?php echo $sTaxRowClass; ?>">
 							<td colspan="2">&nbsp;</td>
 							<td class="alignRight strong">
 								<span class="ajax-spin"><img src="<?php echo CART66_URL; ?>/images/ajax-spin.gif" /></span> 
-								<?php _e( 'Tax' , 'cart66' ); ?> (<span class="tax-rate"><?php echo $oCalculation->getTaxRatePercent(); ?>%</span>):
+								<?php $this->_e( 'Tax' ); ?> (<span class="tax-rate"><?php echo $oCalculation->getTaxRatePercent(); ?>%</span>):
 							</td>
 							<td class="strong tax-amount cart66-align-right"><?php echo $oCalculation->getCurrTax(); ?></td>
 						</tr>
@@ -504,27 +529,27 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 						<!-- TOTAL -->
 						
 						<tr class="total">
-							<?php if(Cart66Session::get('Cart66Cart')->getNonSubscriptionAmount() > 0): ?>
+							<?php if ( $oCart->getNonSubscriptionAmount() > 0): ?>
 								<td class="alignRight" colspan="2">
 									
-									<?php if($fullMode && Cart66Common::activePromotions()): ?>
-										<p class="haveCoupon"><?php _e( 'Do you have a coupon?' , 'cart66' ); ?></p>
+									<?php if ( $fullMode && Cart66Common::activePromotions() ): ?>
+										<p class="haveCoupon"><?php $this->_e( 'Do you have a coupon?' ); ?></p>
 										
-										<?php if(Cart66Session::get('Cart66PromotionErrors')):
-											$promoErrors = Cart66Session::get('Cart66PromotionErrors');
-											foreach($promoErrors as $type=>$error): ?>
+										<?php if ( $this->getSess( 'PromotionErrors' ) ):
+											$promoErrors = $this->getSess( 'PromotionErrors' );
+											foreach ( $promoErrors as $type => $error ): ?>
 												<p class="promoMessage warning"><?php echo $error; ?></p>
 											<?php endforeach;?>
-											<?php Cart66Session::get('Cart66Cart')->clearPromotion();
+											<?php $oCart->clearPromotion();
 										endif; ?>
 									
 										<div id="couponCode"><input type="text" name="couponCode" value="" /></div>
 										
 										<div id="updateCart">
-											<?php if($cartImgPath && Cart66Common::urlIsLIve($applyCouponImg)): ?>
-												<input class="Cart66ApplyCouponButton" type="image" src="<?php echo $applyCouponImg ?>" value="<?php _e( 'Apply Coupon' , 'cart66' ); ?>" name="updateCart"/>
+											<?php if ( $cartImgPath && Cart66Common::urlIsLIve( $applyCouponImg ) ): ?>
+												<input class="Cart66ApplyCouponButton" type="image" src="<?php echo $applyCouponImg ?>" value="<?php $this->_e( 'Apply Coupon' ); ?>" name="updateCart"/>
 											<?php else: ?>
-												<input type="submit" name="updateCart" value="<?php _e( 'Apply Coupon' , 'cart66' ); ?>" class="Cart66ApplyCouponButton Cart66ButtonSecondary" />
+												<input type="submit" name="updateCart" value="<?php $this->_e( 'Apply Coupon' ); ?>" class="Cart66ApplyCouponButton Cart66ButtonSecondary" />
 											<?php endif; ?>
 										</div>
 										
@@ -533,12 +558,17 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 							<?php else: ?>
 								<td colspan="2">&nbsp;</td>
 							<?php endif; ?>
-							<td class="alignRight strong Cart66CartTotalLabel"><span class="ajax-spin"><img src="<?php echo CART66_URL; ?>/images/ajax-spin.gif" /></span> <?php _e( 'Total' , 'cart66' ); ?>:</td>
+							<td class="alignRight strong Cart66CartTotalLabel"><span class="ajax-spin"><img src="<?php echo CART66_URL; ?>/images/ajax-spin.gif" /></span> <?php $this->_e( 'Total' ); ?>:</td>
 							<td class="strong grand-total-amount cart66-align-right"><?php echo $oCalculation->getCurrTotal(); ?></td>
 						</tr>
+						
+						<?php do_action( $this->_sInstanceClass . '::form_end', $oCalculation, $this ); ?>
+						
 					</tbody>
 				</table>
 			</form>
+			
+			<?php do_action( $this->_sInstanceClass . '::post_form', $oCalculation, $this ); ?>
 			
 			<?php if ( $fullMode ): ?>
 			
@@ -546,9 +576,9 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 					
 					<div id="continueShopping">
 						<?php if($cartImgPath): ?>
-							<a href="<?php echo Cart66Session::get('Cart66LastPage'); ?>" class="Cart66CartContinueShopping" ><img src="<?php echo $continueShoppingImg ?>" /></a>
+							<a href="<?php $this->echoSess( 'LastPage' ); ?>" class="Cart66CartContinueShopping" ><img src="<?php echo $continueShoppingImg ?>" /></a>
 						<?php else: ?>
-							<a href="<?php echo Cart66Session::get('Cart66LastPage'); ?>" class="Cart66ButtonSecondary Cart66CartContinueShopping" title="Continue Shopping"><?php _e( 'Continue Shopping' , 'cart66' ); ?></a>
+							<a href="<?php $this->echoSess( 'LastPage' ); ?>" class="Cart66ButtonSecondary Cart66CartContinueShopping" title="Continue Shopping"><?php $this->_e( 'Continue Shopping' ); ?></a>
 						<?php endif; ?>
 					</div>
 					
@@ -558,9 +588,12 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 					
 					if (
 						( $this->getVal( 'require_terms' ) != 1 ) ||
-						( $this->getVal( 'require_terms' ) == 1 && (isset($_POST['terms_acceptance']) || Cart66Session::get("terms_acceptance")=="accepted"))
+						( ( $this->getVal( 'require_terms' ) == 1 ) && (
+							( isset( $_POST[ 'terms_acceptance' ] ) ) || 
+							( Cart66Session::get( 'terms_acceptance' ) == 'accepted' )
+						) )
 					):
-					
+						
 						if ( $this->getVal( 'require_terms' ) == 1 ) {
 							Cart66Session::set( 'terms_acceptance', 'accepted', TRUE );        
 						}
@@ -571,17 +604,17 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 						}
 						
 						
-						if ( number_format( $this->getVal( 'minimum_amount' ), 2, '.', '' ) > number_format(Cart66Session::get('Cart66Cart')->getSubTotal(), 2, '.', '') && $this->getVal( 'minimum_cart_amount' ) == 1):
+						if ( number_format( $this->getVal( 'minimum_amount' ), 2, '.', '' ) > number_format( $oCart->getSubTotal(), 2, '.', '' ) && ( 1 == $this->getVal( 'minimum_cart_amount' ) ) ):
 							// do nothing
 						else: ?>
 							<div id="checkoutShopping">
 								
-								<?php $checkoutUrl = $this->getVal( 'auth_force_ssl' ) ? str_replace('http://', 'https://', get_permalink($checkoutPage->ID)) : get_permalink($checkoutPage->ID); ?>
+								<?php $checkoutUrl = $this->getVal( 'auth_force_ssl' ) ? str_replace( 'http://', 'https://', get_permalink( $checkoutPage->ID ) ) : get_permalink( $checkoutPage->ID ); ?>
 								
 								<?php if($checkoutImg): ?>
 									<a id="Cart66CheckoutButton" href="<?php echo $checkoutUrl; ?>"><img src="<?php echo $checkoutImg ?>" /></a>
 								<?php else: ?>
-									<a id="Cart66CheckoutButton" href="<?php echo $checkoutUrl; ?>" class="Cart66ButtonPrimary" title="Continue to Checkout"><?php _e( 'Checkout' , 'cart66' ); ?></a>
+									<a id="Cart66CheckoutButton" href="<?php echo $checkoutUrl; ?>" class="Cart66ButtonPrimary" title="Continue to Checkout"><?php $this->_e( 'Checkout' ); ?></a>
 								<?php endif; ?>
 							
 							</div><?php
@@ -592,8 +625,8 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 						</div><?php
 					endif;
 					
-					if ( CART66_PRO && $this->getVal( 'require_terms' ) == 1 && (!isset($_POST['terms_acceptance']) && Cart66Session::get("terms_acceptance")!="accepted") ){
-						echo Cart66Common::getView("pro/views/terms.php",array("location"=>"Cart66CartTOS"));
+					if ( CART66_PRO && ( 1 == $this->getVal( 'require_terms' ) ) && ( !isset( $_POST[ 'terms_acceptance' ] ) && ( Cart66Session::get( 'terms_acceptance' ) != 'accepted' ) ) ) {
+						echo Cart66Common::getView( 'pro/views/terms.php', array( 'location' => 'Cart66CartTOS' ) );
 					} 
 				
 				?></div>
@@ -602,21 +635,21 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 		<?php else: ?>
 			
 			<div id="emptyCartMsg">
-				<h3><?php _e('Your Cart Is Empty','cart66'); ?></h3>
-				<?php if($cartImgPath): ?>
-					<a href="<?php echo Cart66Session::get('Cart66LastPage'); ?>" title="Continue Shopping" class="Cart66CartContinueShopping"><img alt="Continue Shopping" class="continueShoppingImg" src="<?php echo $continueShoppingImg ?>" /></a>
+				<h3><?php $this->_e( 'Your Cart Is Empty' ); ?></h3>
+				<?php if ( $cartImgPath ): ?>
+					<a href="<?php $this->echoSess( 'LastPage' ); ?>" title="Continue Shopping" class="Cart66CartContinueShopping"><img alt="Continue Shopping" class="continueShoppingImg" src="<?php echo $continueShoppingImg ?>" /></a>
 				<?php else: ?>
-					<a href="<?php echo Cart66Session::get('Cart66LastPage'); ?>" class="Cart66ButtonSecondary" title="Continue Shopping"><?php _e( 'Continue Shopping' , 'cart66' ); ?></a>
+					<a href="<?php $this->echoSess( 'LastPage' ); ?>" class="Cart66ButtonSecondary" title="Continue Shopping"><?php $this->_e( 'Continue Shopping' ); ?></a>
 				<?php endif; ?>
 			</div>
 			
 			<?php
 			
 			if ( $promotion ) {
-				Cart66Session::get('Cart66Cart')->clearPromotion();
+				$oCart->clearPromotion();
 			}
 			
-			Cart66Session::drop("terms_acceptance");
+			Cart66Session::drop( 'terms_acceptance' );
 			
 			?>
 			

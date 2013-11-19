@@ -10,7 +10,15 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 		
 		$this->_sThisFile = __FILE__;
 		
+		global $wpdb;
 		
+		$data = $this->data;
+		$notices = $this->notices;
+		$minify = $this->minify;
+		
+		
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		
 		$errors = array();
 		$createAccount = FALSE;
@@ -19,10 +27,13 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 		$gateway = $data[ 'gateway' ];
 		$gatewayName = ( is_object( $gateway ) ) ? get_class( $gateway ) : NULL ;
 		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		
+		
 		
 		if ( 'POST' == $_SERVER[ 'REQUEST_METHOD' ] ) {
-		
-			$cart = Cart66Session::get( 'Cart66Cart' );
+			
+			$cart = $this->getSess( 'Cart' );
 			
 			$account = FALSE;
 			
@@ -52,7 +63,7 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 						$jqErrors = $account->getJqErrors();
 						
 						if ( $acctData[ 'password' ] != $acctData[ 'password2' ] ) {
-							$errors[] = __( 'Passwords do not match', 'cart66' );
+							$errors[] = $this->_t( 'Passwords do not match' );
 							$jqErrors[] = 'account-password';
 							$jqErrors[] = 'account-password2';
 						}
@@ -68,7 +79,7 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 								try {
 									
 									$this->logMsg( __LINE__, 'Unable to process order', print_r( $errors, TRUE ) );
-									throw new Cart66Exception( __( 'Your order could not be processed for the following reasons:', 'cart66' ), 66500 );
+									throw new Cart66Exception( $this->_t( 'Your order could not be processed for the following reasons:' ), 66500 );
 									
 								} catch ( Cart66Exception $e ) {
 									$exception = Cart66Exception::exceptionMessages( $e->getCode(), $e->getMessage(), $errors );
@@ -116,8 +127,8 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 						$tax = $gateway->getTaxAmount();
 					}
 					
-					Cart66Session::set( 'Cart66Tax', $tax );
-					Cart66Session::set( 'Cart66TaxRate', Cart66Common::tax( $rate ) );
+					$this->setSess( 'Tax', $tax );
+					$this->setSess( 'TaxRate', Cart66Common::tax( $rate ) );
 					
 					$this->logMsg( __LINE__, 'Tax PreCalculated', $tax );
 				}
@@ -131,7 +142,7 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 						try {
 							
 							$this->logMsg( __LINE__, 'Unable to process order', print_r( $errors, TRUE ) );
-							throw new Cart66Exception(__('Your order could not be processed for the following reasons:', 'cart66'), 66500);
+							throw new Cart66Exception( $this->_t( 'Your order could not be processed for the following reasons:' ), 66500);
 							
 						} catch( Cart66Exception $e ) {
 							$exception = Cart66Exception::exceptionMessages( $e->getCode(), $e->getMessage(), $errors );
@@ -146,7 +157,7 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 					
 					// Calculate final billing amounts
 					
-					$subscriptionAmt = Cart66Session::get( 'Cart66Cart' )->getSubscriptionAmount();
+					$subscriptionAmt = $cart->getSubscriptionAmount();
 					
 					if ( $oCalculation ) {
 						
@@ -157,7 +168,7 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 					} else {
 						
 						// standard calculation
-						$total = Cart66Session::get( 'Cart66Cart' )->getGrandTotal() + $tax;
+						$total = $cart->getGrandTotal() + $tax;
 					}
 					
 					$oneTimeTotal = $total - $subscriptionAmt;
@@ -168,24 +179,24 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 					) );
 					
 					// Throttle checkout attempts
-					if ( !Cart66Session::get( 'Cart66CheckoutThrottle' ) ) {
-						Cart66Session::set( 'Cart66CheckoutThrottle', Cart66CheckoutThrottle::getInstance(), TRUE );
+					if ( !$this->getSess( 'CheckoutThrottle' ) ) {
+						$this->setSess( 'CheckoutThrottle', Cart66CheckoutThrottle::getInstance(), TRUE );
 					}
 					
 					try {
 						
-						if ( !Cart66Session::get( 'Cart66CheckoutThrottle' )->isReady( $gateway->getCardNumberTail(), $oneTimeTotal ) ) {
+						if ( !$this->getSess( 'CheckoutThrottle' )->isReady( $gateway->getCardNumberTail(), $oneTimeTotal ) ) {
 							$this->logMsg( __LINE__, 'Unable to process order', print_r( $errors, TRUE ) );
-							throw new Cart66Exception( __( 'Your order could not be processed for the following reasons:', 'cart66' ), 66500 );
+							throw new Cart66Exception( $this->_t( 'Your order could not be processed for the following reasons:' ), 66500 );
 						}
 						
 					} catch( Cart66Exception $e ) {
 						
 						$exception = Cart66Exception::exceptionMessages(
-							$e->getCode(), $e->getMessage(), array( __( sprintf(
+							$e->getCode(), $e->getMessage(), array( $this->_t( sprintf(
 								'You must wait %d more seconds before trying to checkout again',
-								Cart66Session::get( 'Cart66CheckoutThrottle' )->getTimeRemaining()
-							), 'cart66' ) )
+								$this->getSess( 'CheckoutThrottle' )->getTimeRemaining()
+							) ) )
 						);
 						
 						echo Cart66Common::getView( 'views/error-messages.php', $exception );
@@ -194,7 +205,7 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 				}
 				
 				// Charge credit card for one time transaction using Authorize.net API
-				if ( count( $errors ) == 0 && !Cart66Session::get( 'Cart66InventoryWarning' ) ) {
+				if ( count( $errors ) == 0 && !$this->getSess( 'InventoryWarning' ) ) {
 					
 					$this->logMsg( __LINE__, 'start working on charging the credit card' );
 					
@@ -202,10 +213,10 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 					// = Start Spreedly Processing =
 					// =============================
 					
-					if ( Cart66Session::get( 'Cart66Cart' )->hasSpreedlySubscriptions() ) {
+					if ( $cart->hasSpreedlySubscriptions() ) {
 						
 						$accountErrors = $account->validate();
-
+						
 						if ( count( $accountErrors ) == 0 ) {
 							
 							$account->save(); // Save account data locally which will create an account id and/or update local values
@@ -216,33 +227,35 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 							
 								$spreedlyCard = new SpreedlyCreditCard();
 								$spreedlyCard->hydrateFromCheckout();
-								$subscriptionId = Cart66Session::get('Cart66Cart')->getSpreedlySubscriptionId();
-								$productId = Cart66Session::get('Cart66Cart')->getSpreedlyProductId();
-								Cart66Common::log('[' . basename(__FILE__) . ' - line ' . __LINE__ . "] About to create a new spreedly account subscription: Account ID: $account->id | Subscription ID: $subscriptionId");
+								$subscriptionId = $cart->getSpreedlySubscriptionId();
+								$productId = $cart->getSpreedlyProductId();
+								
+								$this->logMsg( __LINE__, 'About to create a new spreedly account subscription', sprintf( 'Account ID: %s | Subscription ID: %s', $account->id, $subscriptionId ) );
+								
 								$accountSubscription = new Cart66AccountSubscription();
-								$accountSubscription->createSpreedlySubscription($account->id, $subscriptionId, $productId, $spreedlyCard);
-
+								$accountSubscription->createSpreedlySubscription( $account->id, $subscriptionId, $productId, $spreedlyCard );
+								
 							} catch ( SpreedlyException $e ) {
-							
-								Cart66Common::log('[' . basename(__FILE__) . ' - line ' . __LINE__ . "] Failed to checkout: " . $e->getCode() . ' ' . $e->getMessage());
-								$errors['spreedly failed'] = $e->getMessage();
+								
+								$this->logMsg( __LINE__, 'Failed to checkout', sprintf( '%s %s', $e->getCode(), $e->getMessage() ) );
+								$errors[ 'spreedly failed' ] = $e->getMessage();
 								$accountSubscription->refresh();
 								
-								if(empty($accountSubscription->subscriberToken)) {
-									Cart66Common::log('[' . basename(__FILE__) . ' - line ' . __LINE__ . "] About to delete local account after spreedly failure: " . print_r($account->getData(), true));
+								if ( empty( $accountSubscription->subscriberToken ) ) {
+									$this->logMsg( __LINE__, 'About to delete local account after spreedly failure', print_r( $account->getData(), TRUE ) );
 									$account->deleteMe();
 								} else {
 									// Set the subscriber token in the session for repeat attempts to create the subscription
-									Cart66Session::set('Cart66SubscriberToken', $account->subscriberToken);
+									$this->setSess( 'SubscriberToken', $account->subscriberToken );
 								}
-            
-								if(count($errors)) {
+								
+								if ( count( $errors ) ) {
 									try {
-										Cart66Common::log('[' . basename(__FILE__) . ' - line ' . __LINE__ . "] Unable to process order: " . print_r($errors, true));
-										throw new Cart66Exception(__('Your order could not be processed for the following reasons:', 'cart66'), 66500);
-									} catch(Cart66Exception $e) {
-										$exception = Cart66Exception::exceptionMessages($e->getCode(), $e->getMessage(), $errors);
-										echo Cart66Common::getView('views/error-messages.php', $exception);
+										$this->logMsg( __LINE__, 'Unable to process order', print_r( $errors, TRUE ) );
+										throw new Cart66Exception( $this->_t( 'Your order could not be processed for the following reasons:' ), 66500 );
+									} catch( Cart66Exception $e ) {
+										$exception = Cart66Exception::exceptionMessages( $e->getCode(), $e->getMessage(), $errors );
+										echo Cart66Common::getView( 'views/error-messages.php', $exception );
 									}
 								}
 							}
@@ -253,11 +266,11 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 							
 							if ( count( $errors ) ) {
 								try {
-									Cart66Common::log('[' . basename(__FILE__) . ' - line ' . __LINE__ . "] Unable to process order: " . print_r($errors, true));
-									throw new Cart66Exception(__('Your order could not be processed for the following reasons:', 'cart66'), 66500);
-								} catch(Cart66Exception $e) {
-									$exception = Cart66Exception::exceptionMessages($e->getCode(), $e->getMessage(), $errors);
-									echo Cart66Common::getView('views/error-messages.php', $exception);
+									$this->logMsg( __LINE__, 'Unable to process order', print_r( $errors, TRUE ) );
+									throw new Cart66Exception( $this->_t( 'Your order could not be processed for the following reasons:' ), 66500 );
+								} catch( Cart66Exception $e ) {
+									$exception = Cart66Exception::exceptionMessages( $e->getCode(), $e->getMessage(), $errors );
+									echo Cart66Common::getView( 'views/error-messages.php', $exception );
 								}
 							}
 							
@@ -309,7 +322,7 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 								$this->logMsg( __LINE__, 'Just created account with id', $accountId );
 							}
           					
-							if ( $mp = Cart66Session::get( 'Cart66Cart' )->getMembershipProduct() ) { 
+							if ( $mp = $cart->getMembershipProduct() ) { 
 								$account->attachMembershipProduct( $mp, $account->firstName, $account->lastName );
 								$accountId = $account->id;
 								$this->logMsg( __LINE__, 'Attached membership to account id', $accountId );
@@ -322,13 +335,30 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 								$orderId = $gateway->saveOrder( $total, $tax, $transactionId, $status, $accountId );
 							}
 							
-							Cart66Session::drop( 'Cart66SubscriberToken' );
+							$this->dropSess( 'SubscriberToken' );
 							Cart66Session::set( 'order_id', $orderId );
-							Cart66Session::drop( 'Cart66ProRateAmount' );
+							$this->dropSess( 'ProRateAmount' );
 							
-							$receiptLink = Cart66Common::getPageLink( 'store/receipt' );
 							$newOrder = new Cart66Order( $orderId );
           					
+          					
+          					
+          					// correct the product descriptions in the order table
+							$wpdb->query( sprintf( "
+								UPDATE				%s oi
+								SET					oi.description = (
+									SELECT				CONCAT( p.name, ' - ', p.price_description )
+									FROM				%s p
+									WHERE				p.id = oi.product_id
+													)
+								WHERE				oi.order_id = %d
+							", $wpdb->cart66_order_items, $wpdb->cart66_products, $orderId ) );
+							
+							
+							
+          					// action hook
+          					do_action( $this->_sInstanceClass . '::order_success', $newOrder, $oCalculation, $this );
+							
 							// Send email receipts
 							if ( CART66_PRO && CART66_EMAILS && ( 1 == $this->getVal( 'enable_advanced_notifications' ) ) ) {
 								
@@ -340,25 +370,39 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 								$notify = new Cart66Notifications( $orderId );
 								$notify->sendEmailReceipts();
 							}
-          					
+							
 							// Send buyer to receipt page
-							$receiptVars = strpos( $receiptLink, '?' ) ? '&' : '?';
-							$receiptVars .= 'ouid=' . $newOrder->ouid;
-							wp_redirect( $receiptLink . $receiptVars );
+							wp_redirect( $this->getLink( $newOrder, 'store/receipt', 'ouid' ) );
 							exit;
         					
 						} else {
+							
 							// Attempt to discover reason for transaction failure
-          
+          					
 							try {
-								throw new Cart66Exception(__('Your order could not be completed for the following reasons:', 'cart66'), 66500);
-							} catch(Cart66Exception $e) {
+								
+								throw new Cart66Exception( $this->_t( 'Your order could not be completed for the following reasons:' ), 66500 );
+								
+							} catch ( Cart66Exception $e ) {
+								
 								$gatewayResponse = $gateway->getTransactionResponseDescription();
-								$exception = Cart66Exception::exceptionMessages($e->getCode(), $e->getMessage(), array('error_code' => 'Error: ' . $gatewayResponse['errorcode'], strtolower($gatewayResponse['errormessage'])));
-								echo Cart66Common::getView('views/error-messages.php', $exception);
+								
+								$exception = Cart66Exception::exceptionMessages(
+									$e->getCode(),
+									$e->getMessage(),
+									array(
+										'error_code' => 'Error: ' . $gatewayResponse[ 'errorcode' ],
+										strtolower ( $gatewayResponse[ 'errormessage' ] )
+									)
+								);
+								
+	          					// action hook
+    	      					do_action( $this->_sInstanceClass . '::order_failed', $exception, $oCalculation, $this );
+								
+								echo Cart66Common::getView( 'views/error-messages.php', $exception );
 							}
 							
-							//$errors['Could Not Process Transaction'] = $gateway->getTransactionResponseDescription();
+							// $errors[ 'Could Not Process Transaction' ] = $gateway->getTransactionResponseDescription();
 						}
 					}
 				
@@ -368,9 +412,9 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 
 
 		// Show inventory warning if there is one
-		if ( Cart66Session::get( 'Cart66InventoryWarning' ) ) {
-			echo Cart66Session::get( 'Cart66InventoryWarning' );
-			Cart66Session::drop( 'Cart66InventoryWarning' );
+		if ( $this->getSess( 'InventoryWarning' ) ) {
+			$this->echoSess( 'InventoryWarning' );
+			$this->dropSess( 'InventoryWarning' );
 		}
 		
 		
@@ -389,24 +433,24 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 		$s = $gateway->getShipping();
 		
 		// Set initial country codes for billing and shipping addresses
-		$billingCountryCode =  (isset($b['country']) && !empty($b['country'])) ? $b['country'] : Cart66Common::getHomeCountryCode();
-		$shippingCountryCode = (isset($s['country']) && !empty($s['country'])) ? $s['country'] : Cart66Common::getHomeCountryCode();
+		$billingCountryCode =  ( isset( $b[ 'country' ] ) && !empty( $b[ 'country' ] ) ) ? $b[ 'country' ] : Cart66Common::getHomeCountryCode();
+		$shippingCountryCode = ( isset( $s[ 'country' ] ) && !empty( $s[ 'country' ] ) ) ? $s[ 'country' ] : Cart66Common::getHomeCountryCode();
 
 		// Include the HTML markup for the checkout form
 		$checkoutFormFile = CART66_PATH . '/views/checkout-form.php';
 		
 		if ( 'Cart66Mijireh' == $gatewayName ) {
-			$checkoutFormFile =  CART66_PATH . '/views/mijireh/shipping_address.php';
-		} elseif($gatewayName == 'Cart662Checkout') {
-			$checkoutFormFile =  CART66_PATH . '/views/2checkout.php';
+			$checkoutFormFile = CART66_PATH . '/views/mijireh/shipping_address.php';
+		} elseif( $gatewayName == 'Cart662Checkout' ) {
+			$checkoutFormFile = CART66_PATH . '/views/2checkout.php';
 		} else {
 			$userViewFile = get_stylesheet_directory() . '/cart66-templates/views/checkout-form.php';
-			if(file_exists($userViewFile) && filesize($userViewFile) > 10 && CART66_PRO && Cart66Common::isRegistered()) {
+			if ( file_exists( $userViewFile ) && ( filesize( $userViewFile ) > 10 ) && CART66_PRO && Cart66Common::isRegistered() ) {
 				$checkoutFormFile = $userViewFile;
 			}
 		}
 		
-		Cart66Common::log('[' . basename(__FILE__) . ' - line ' . __LINE__ . "] Using Checkout Form File :: $checkoutFormFile");
+		$this->logMsg( __LINE__, 'Using Checkout Form File', $checkoutFormFile );
 
 		ob_start();
 		include( $checkoutFormFile );
@@ -417,25 +461,25 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 		// Include the client side javascript validation
 		$same_as_billing = FALSE;
 		
-		if ( ( $_SERVER['REQUEST_METHOD'] == 'GET' ) && ( $this->getVal( 'sameAsBillingOff' ) != 1 ) ) {
+		if ( ( $_SERVER[ 'REQUEST_METHOD' ] == 'GET' ) && ( $this->getVal( 'sameAsBillingOff' ) != 1 ) ) {
 			$same_as_billing = TRUE;
-		} elseif(isset($_POST['sameAsBilling']) && $_POST['sameAsBilling'] == '1') {
+		} elseif( isset( $_POST[ 'sameAsBilling' ] ) && ( $_POST[ 'sameAsBilling' ] == '1' ) ) {
 			$same_as_billing = TRUE;
 		}
-
-		$shipping_address_display = (!$same_as_billing || $gatewayName == 'Cart66Mijireh' || $gatewayName == 'Cart662Checkout') ? 'block' : 'none';
+		
+		$shipping_address_display = ( !$same_as_billing || ( $gatewayName == 'Cart66Mijireh' ) || ( $gatewayName == 'Cart662Checkout' ) ) ? 'block' : 'none';
 
 		$billing_country = '';
 		
-		if(isset($b['country']) && !empty($b['country'])) {
-			$billing_country = $b['country'];
-			$shipping_country = isset($s['country']) ? $s['country'] : $b['country'];
+		if ( isset( $b[ 'country' ] ) && !empty( $b[ 'country' ] ) ) {
+			$billing_country = $b[ 'country' ];
+			$shipping_country = isset( $s[ 'country' ] ) ? $s[ 'country' ] : $b[ 'country' ];
 		}
 
 		$error_field_names = array();
 		
-		if(isset($jqErrors) && is_array($jqErrors)) {
-			foreach($jqErrors as $field_name) {
+		if ( isset( $jqErrors ) && is_array( $jqErrors ) ) {
+			foreach( $jqErrors as $field_name ) {
 				$error_field_names[] = '#' . $field_name;
 			}
 		}
@@ -446,20 +490,20 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 			'shipping_address_display' => $shipping_address_display,
 			'billing_country' => $billing_country,
 			'shipping_country' => $shipping_country,
-			'billing_state' => isset($b['state']) ? $b['state'] : '',
-			'shipping_state' => $s['state'],
-			'card_type' => isset($p['cardType']) ? $p['cardType'] : '',
+			'billing_state' => isset( $b[ 'state' ] ) ? $b[ 'state' ] : '',
+			'shipping_state' => $s[ 'state' ],
+			'card_type' => isset( $p[ 'cardType' ] ) ? $p[ 'cardType' ] : '',
 			'form_name' => '#' . $gatewayName . '_form',
 			'error_field_names' => $error_field_names,
-			'text_state' => __('State', 'cart66'),
-			'text_zip_code' => __('Zip code', 'cart66'),
-			'text_post_code' => __('Post code', 'cart66'),
-			'text_province' => __('Province', 'cart66')
+			'text_state' => $this->_t( 'State' ),
+			'text_zip_code' => $this->_t( 'Zip code' ),
+			'text_post_code' => $this->_t( 'Post code' ),
+			'text_province' => $this->_t( 'Province' )
 		);
-
+		
 		$path = CART66_URL . '/js/checkout.js';
-		wp_enqueue_script('checkout_js', $path, array('jquery'), false, true);
-		wp_localize_script('checkout_js', 'C66', $checkout_data);
+		wp_enqueue_script( 'checkout_js', $path, array( 'jquery' ), FALSE, TRUE );
+		wp_localize_script( 'checkout_js', 'C66', $checkout_data );
 		
 	}
 	

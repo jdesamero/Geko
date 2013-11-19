@@ -10,14 +10,25 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 		
 		$this->_sThisFile = __FILE__;
 		
+		$data = $this->data;
+		$notices = $this->notices;
+		$minify = $this->minify;
+		
+		
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		
 		$html = $data[ 1 ];
 		$test = $data[ 2 ];
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		
+		
 		
 		if ( $test ) {
 			
 			$subject = $this->_t( 'TEST - Email Receipt' );
 			$order = new Geko_Wp_Cart66_Mock_Order();
-			
 			
 		} else {
 			
@@ -40,10 +51,6 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 	
 	//
 	public function outputHtml( $subject, $order ) {
-		
-		$this->_sThisFile = __FILE__;
-		
-		
 		
 		$iOrderTs = strtotime( $order->ordered_on );
 		
@@ -113,7 +120,10 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 					font-size: 12px;
 					padding: 4px 7px;
 					vertical-align: top;
-					text-align: right;
+				}
+
+				.align_left {
+					text-align: left;
 				}
 				
 				.align_center {
@@ -121,7 +131,7 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 				}
 				
 				.align_right {
-					text-align: center;
+					text-align: right;
 				}
 				
 			</style>
@@ -193,8 +203,8 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 							<br />
 							<span style="font-weight: bold;">
 								
-								<?php if(!empty($order->phone)): ?>
-									<?php echo __('Phone', 'cart66'); ?>: <?php echo Cart66Common::formatPhone( $order->phone ); ?><br />
+								<?php if ( !empty( $order->phone ) ): ?>
+									<?php echo $this->_t( 'Phone' ); ?>: <?php echo Cart66Common::formatPhone( $order->phone ); ?><br />
 								<?php endif; ?>
 								
 								<?php $this->_e( 'Email' ); ?>: <?php echo $order->email; ?><br />
@@ -290,10 +300,10 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 						
 						<?php $hasDigital = FALSE; ?>
 						
-						<?php foreach($order->getItems() as $item):
+						<?php foreach( $order->getItems() as $item ):
 							
 							$product = new Cart66Product();
-							$product->load($item->product_id);
+							$product->load( $item->product_id );
 							
 							$price = $item->product_price * $item->quantity;
 							
@@ -336,8 +346,8 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 						
 						<!-- Start Subtotal -->
 						<tr>
-							<td colspan="3" class="table_td_bg"><?php $this->_e( 'Subtotal' ); ?></td>
-							<td class="table_td_bg"><?php $this->echoCurr( $order->subtotal ); ?></td>
+							<td colspan="3" class="table_td_bg align_right"><?php $this->_e( 'Subtotal' ); ?></td>
+							<td class="table_td_bg align_right"><?php $this->echoCurr( $order->subtotal ); ?></td>
 						</tr>
 						<!-- End Subtotal -->
 						
@@ -345,8 +355,8 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 							
 							<!-- Start Shipping -->
 							<tr>
-								<td colspan="3" class="table_td_bg"><?php $this->_e( 'Shipping' ); ?></td>
-								<td class="table_td_bg"><?php $this->echoCurr( $order->shipping ); ?></td>
+								<td colspan="3" class="table_td_bg align_right"><?php $this->_e( 'Shipping' ); ?></td>
+								<td class="table_td_bg align_right"><?php $this->echoCurr( $order->shipping ); ?></td>
 							</tr>
 							<!-- End Shipping -->
 							
@@ -356,8 +366,8 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 		
 							<!-- Start Coupon -->
 							<tr>
-								<td colspan="3" class="table_td_bg"><?php $this->_e( 'Discount' ); ?></td>
-								<td class="table_td_bg">-&nbsp;<?php $this->echoCurr( $order->discount_amount ); ?></td>
+								<td colspan="3" class="table_td_bg align_right"><?php $this->_e( 'Discount' ); ?></td>
+								<td class="table_td_bg align_right">-&nbsp;<?php $this->echoCurr( $order->discount_amount ); ?></td>
 							</tr>
 							<!-- End Coupon -->
 							
@@ -367,8 +377,8 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 		
 							<!-- Start Tax -->
 							<tr>
-								<td colspan="3" class="table_td_bg"><?php $this->_e( 'Tax' ); ?></td>
-								<td class="table_td_bg"><?php $this->echoCurr( $order->tax ); ?></td>
+								<td colspan="3" class="table_td_bg align_right"><?php $this->_e( 'Tax' ); ?></td>
+								<td class="table_td_bg align_right"><?php $this->echoCurr( $order->tax ); ?></td>
 							</tr>
 							<!-- End Tax -->
 							
@@ -378,10 +388,16 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 		
 						<!-- Start Grand Total -->
 						<tr>
-							<td colspan="3" class="table_td_bg"><?php $this->_e( 'Total' ); ?></td>
-							<td class="table_td_bg"><?php $this->echoCurr( $order->total ); ?></td>
+							<td colspan="3" class="table_td_bg align_right"><?php $this->_e( 'Total' ); ?></td>
+							<td class="table_td_bg align_right"><?php $this->echoCurr( $order->total ); ?></td>
 						</tr>
 						<!-- End Grand Total -->
+						
+						<?php if ( $order->notes ): ?>
+							<tr><td colspan="4" class="table_td_bg table_border_top">&nbsp;<br />&nbsp;<br /></td></tr>
+							<tr><th colspan="4" class="table_td_bg table_border_top align_left"><?php $this->_e( 'Notes' ); ?>:</th></tr>
+							<tr><td colspan="4" class="table_td_bg "><?php echo nl2br( $order->notes ); ?></td></tr>
+						<?php endif; ?>
 						
 					</table>
 					<!-- End Products Table -->
@@ -518,28 +534,28 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 		$msg .= $order->bill_zip != null ? ', ' : ' ';
 		$msg .= $order->bill_zip . "\n" . $order->bill_country . "\n";
 		
-		if(is_array($additional_fields = maybe_unserialize($order->additional_fields)) && isset($additional_fields['billing'])) {
-			foreach($additional_fields['billing'] as $af) {
-				$msg .= html_entity_decode($af['label']) . ': ' . $af['value'] . "\n";
+		if ( is_array( $additional_fields = maybe_unserialize( $order->additional_fields ) ) && isset( $additional_fields[ 'billing' ] ) ) {
+			foreach( $additional_fields[ 'billing' ] as $af ) {
+				$msg .= html_entity_decode( $af[ 'label' ] ) . ': ' . $af[ 'value' ] . "\n";
 			}
 		}
 		
-		if(!empty($order->phone)) {
-			$phone = Cart66Common::formatPhone($order->phone);
+		if ( !empty( $order->phone ) ) {
+			$phone = Cart66Common::formatPhone( $order->phone );
 			$msg .= "\n" . $this->_t( 'Phone' ) . ": $phone\n";
 		}
 		
-		if(!empty($order->email)) {
+		if ( !empty( $order->email ) ) {
 			$msg .= $this->_t( 'Email' ) . ': ' . $order->email . "\n";
 		}
 		
-		if(is_array($additional_fields = maybe_unserialize($order->additional_fields)) && isset($additional_fields['payment'])) {
-			foreach($additional_fields['payment'] as $af) {
-				$msg .= html_entity_decode($af['label']) . ': ' . $af['value'] . "\n";
+		if ( is_array( $additional_fields = maybe_unserialize( $order->additional_fields ) ) && isset( $additional_fields[ 'payment' ] ) ) {
+			foreach( $additional_fields[ 'payment' ] as $af ) {
+				$msg .= html_entity_decode( $af[ 'label' ] ) . ': ' . $af[ 'value' ] . "\n";
 			}
 		}
 		
-		if(isset($order->custom_field) && $order->custom_field != '') {
+		if ( isset( $order->custom_field ) && ( '' != $order->custom_field ) ) {
 			if ( $this->getVal( 'checkout_custom_field_label' ) ) {
 				$msg .= "\n" . $this->getVal( 'checkout_custom_field_label' );
 			} else {

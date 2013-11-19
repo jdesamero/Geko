@@ -10,16 +10,24 @@ class Geko_Wp_Cart66_View_ReceiptPrintVersion extends Geko_Wp_Cart66_View
 		
 		$this->_sThisFile = __FILE__;
 		
+		$data = $this->data;
+		$notices = $this->notices;
+		$minify = $this->minify;
 		
+		
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		
 		$product = new Cart66Product();
 		$order = $data[ 'order' ];
 		
-		
 		$iOrderedOnTs = strtotime( $order->ordered_on );
 		$sFormat = sprintf( '%s %s', get_option( 'date_format' ), get_option( 'time_format' ) );
 		$sOrderDateTime = date( $sFormat, $iOrderedOnTs );
-
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		
+		
 		
 		?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 		<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -261,16 +269,16 @@ class Geko_Wp_Cart66_View_ReceiptPrintVersion extends Geko_Wp_Cart66_View
 				
 				<tr>
 					<td class="noBorder" colspan="1">&nbsp;</td>
-					<td class="noBorder" colspan="1" style='text-align: center;'>&nbsp;</td>
-					<td class="noBorder" colspan="1" style='text-align: right; font-weight: bold;'><?php $this->_e( 'Subtotal' ); ?>:</td>
+					<td class="noBorder" colspan="1" style="text-align: center;">&nbsp;</td>
+					<td class="noBorder" colspan="1" style="text-align: right; font-weight: bold;"><?php $this->_e( 'Subtotal' ); ?>:</td>
 					<td class="noBorder" colspan="1" style="text-align: left; font-weight: bold;"><?php $this->echoCurr( $order->subtotal ); ?></td>
 				</tr>
 				
 				<?php if ( ( 'None' != $order->shipping_method ) && ( 'Download' != $order->shipping_method ) ): ?>
 					<tr>
 						<td class="noBorder" colspan="1">&nbsp;</td>
-						<td class="noBorder" colspan="1" style='text-align: center;'>&nbsp;</td>
-						<td class="noBorder" colspan="1" style='text-align: right; font-weight: bold;'><?php $this->_e( 'Shipping' ); ?>:</td>
+						<td class="noBorder" colspan="1" style="text-align: center;">&nbsp;</td>
+						<td class="noBorder" colspan="1" style="text-align: right; font-weight: bold;"><?php $this->_e( 'Shipping' ); ?>:</td>
 						<td class="noBorder" colspan="1" style="text-align: left; font-weight: bold;"><?php $this->echoCurr( $order->shipping ); ?></td>
 					</tr>
 				<?php endif; ?>
@@ -278,7 +286,7 @@ class Geko_Wp_Cart66_View_ReceiptPrintVersion extends Geko_Wp_Cart66_View
 				<?php if ( $order->discount_amount > 0 ): ?>
 					<tr>
 						<td class="noBorder" colspan="2">&nbsp;</td>
-						<td class="noBorder" colspan="1" style='text-align: right; font-weight: bold;'><?php $this->_e( 'Discount' ); ?>:</td>
+						<td class="noBorder" colspan="1" style="text-align: right; font-weight: bold;"><?php $this->_e( 'Discount' ); ?>:</td>
 						<td class="noBorder" colspan="1" style="text-align: left; font-weight: bold;">-&nbsp;<?php $this->echoCurr( $order->discount_amount ); ?></td>
 					</tr>
 				<?php endif; ?>
@@ -286,17 +294,23 @@ class Geko_Wp_Cart66_View_ReceiptPrintVersion extends Geko_Wp_Cart66_View
 				<?php if ( $order->tax > 0 ): ?>
 					<tr>
 						<td class="noBorder" colspan="2">&nbsp;</td>
-						<td class="noBorder" colspan="1" style='text-align: right; font-weight: bold;'><?php $this->_e( 'Tax' ); ?>:</td>
+						<td class="noBorder" colspan="1" style="text-align: right; font-weight: bold;"><?php $this->_e( 'Tax' ); ?>:</td>
 						<td class="noBorder" colspan="1" style="text-align: left; font-weight: bold;"><?php $this->echoCurr( $order->tax ); ?></td>
 					</tr>
 				<?php endif; ?>
-
+				
 				<tr>
-					<td class="noBorder" colspan="2" style='text-align: center;'>&nbsp;</td>
-					<td class="noBorder" colspan="1" style='text-align: right; font-weight: bold;'><?php $this->_e( 'Total' ); ?>:</td>
+					<td class="noBorder" colspan="2" style="text-align: center;">&nbsp;</td>
+					<td class="noBorder" colspan="1" style="text-align: right; font-weight: bold;"><?php $this->_e( 'Total' ); ?>:</td>
 					<td class="noBorder" colspan="1" style="text-align: left; font-weight: bold;"><?php $this->echoCurr( $order->total ); ?></td>
 				</tr>
-			
+				
+				<?php if ( $sNotes = trim( $order->notes ) ): ?>
+					<tr class="noBorder"><td colspan="4">&nbsp;<br />&nbsp;<br /></td></tr>
+					<tr class="noBorder"><th colspan="4" style="text-align: left;"><?php $this->_e( 'Notes' ); ?>:</th></tr>
+					<tr class="noBorder"><td colspan="4"><?php echo nl2br( $sNotes ); ?></td></tr>
+				<?php endif; ?>
+
 			</table>
 			
 			<form>

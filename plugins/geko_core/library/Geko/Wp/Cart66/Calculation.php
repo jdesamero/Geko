@@ -5,6 +5,7 @@ class Geko_Wp_Cart66_Calculation
 {
 	
 	protected $_aData = array();
+	protected $_aVars = array();
 	
 	
 	protected $_fSubTotal = 0;
@@ -37,6 +38,18 @@ class Geko_Wp_Cart66_Calculation
 	public function calculate() { }
 	
 	
+	//
+	public function setVar( $sKey, $mValue ) {
+		$this->_aVars[ $sKey ] = $mValue;
+		return $this;
+	}
+	
+	//
+	public function getVar( $sKey ) {
+		return $this->_aVars[ $sKey ];
+	}
+	
+	
 	
 	//
 	public function getSubTotal() {
@@ -50,6 +63,14 @@ class Geko_Wp_Cart66_Calculation
 	
 	//
 	public function getDiscountTwo() {
+		
+		$fAmount = $this->getSubTotal() - $this->getDiscountOne();
+		
+		if ( $this->_fDiscountTwo > $fAmount ) {
+			// this is the max allowable discount
+			return $fAmount;
+		}
+		
 		return $this->_fDiscountTwo;
 	}
 	
@@ -99,17 +120,18 @@ class Geko_Wp_Cart66_Calculation
 	}
 	
 	//
+	public function getDiscountedSubTotal() {
+		return $this->getSubTotal() - $this->getDiscount();
+	}
+	
+	//
 	public function getPreTaxTotal() {
 		
 		if ( $this->_fPreTaxTotal ) {
 			return $this->_fPreTaxTotal;
 		}
 		
-		return (
-			$this->getSubTotal() - 
-			$this->getDiscount()
-		) + 
-		$this->getShipping();
+		return $this->getDiscountedSubTotal() + $this->getShipping();
 	}
 	
 	//
@@ -122,6 +144,11 @@ class Geko_Wp_Cart66_Calculation
 		return $this->getPreTaxTotal() + $this->getTax();
 	}
 	
+	
+	//
+	public function hasExcessDiscount() {
+		return ( $this->_fDiscountTwo > $this->getDiscountTwo() ) ? TRUE : FALSE ;
+	}
 	
 	
 	
