@@ -6,15 +6,15 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 
 	
 	//
-	public function render( $data = NULL, $notices = TRUE, $minify = FALSE ) {
+	public function render() {
 		
 		$this->_sThisFile = __FILE__;
 		
 		global $wpdb;
 		
-		$data = $this->data;
-		$notices = $this->notices;
-		$minify = $this->minify;
+		$data = $this->getParam( 'data' );
+		$notices = $this->getParam( 'notices' );
+		$minify = $this->getParam( 'minify' );
 		
 		
 		
@@ -82,8 +82,10 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 									throw new Cart66Exception( $this->_t( 'Your order could not be processed for the following reasons:' ), 66500 );
 									
 								} catch ( Cart66Exception $e ) {
+									
 									$exception = Cart66Exception::exceptionMessages( $e->getCode(), $e->getMessage(), $errors );
 									echo Cart66Common::getView( 'views/error-messages.php', $exception );
+									
 								}
 							}
 						}
@@ -136,17 +138,31 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 				if ( 0 == count( $errors ) ) {
 					
 					$errors = $gateway->getErrors();     // Error info for server side error code
+					$errors = apply_filters( $this->_sInstanceClass . '::validate_gateway_checkout', $errors, $gateway, $this );
 					
 					if ( count( $errors ) ) {
+						
+						// remove duplicates
+						$errorChk = array();
+						foreach ( $errors as $sKey => $sValue ) {
+							$sKeyNorm = strtolower( trim( $sKey ) );
+							if ( !in_array( $sKeyNorm, $errorChk ) ) {
+								$errorChk[] = $sKeyNorm;
+							} else {
+								unset( $errors[ $sKey ] );
+							}
+						}
 						
 						try {
 							
 							$this->logMsg( __LINE__, 'Unable to process order', print_r( $errors, TRUE ) );
-							throw new Cart66Exception( $this->_t( 'Your order could not be processed for the following reasons:' ), 66500);
+							throw new Cart66Exception( $this->_t( 'Your order could not be processed for the following reasons:' ), 66500 );
 							
 						} catch( Cart66Exception $e ) {
+							
 							$exception = Cart66Exception::exceptionMessages( $e->getCode(), $e->getMessage(), $errors );
 							echo Cart66Common::getView( 'views/error-messages.php', $exception );
+							
 						}
 					}
 					
@@ -387,19 +403,46 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 								
 								$gatewayResponse = $gateway->getTransactionResponseDescription();
 								
+								$sErrorMsg = sprintf( 'Error: %s', $gatewayResponse[ 'errorcode' ] );
+								
 								$exception = Cart66Exception::exceptionMessages(
 									$e->getCode(),
 									$e->getMessage(),
 									array(
-										'error_code' => 'Error: ' . $gatewayResponse[ 'errorcode' ],
-										strtolower ( $gatewayResponse[ 'errormessage' ] )
+										'error_code' => $sErrorMsg,
+										strtolower( $gatewayResponse[ 'errormessage' ] )
 									)
 								);
 								
-	          					// action hook
-    	      					do_action( $this->_sInstanceClass . '::order_failed', $exception, $oCalculation, $this );
+								// action hook
+								do_action( $this->_sInstanceClass . '::order_failed', $exception, $oCalculation, $this );
 								
 								echo Cart66Common::getView( 'views/error-messages.php', $exception );
+								
+								$errorsRaw = array( $sErrorMsg );
+								$errorsRaw = array_merge( $errorsRaw, explode( '<br>', $gatewayResponse[ 'errormessage' ] ) );
+								
+								if ( count( $errorsRaw ) > 0 ) {
+									
+									$errors = array();
+									
+									$aDetect = array(
+										'Payment Card Number' => 'card number',
+										'Payment phone' => 'phone number'
+									);
+									
+									foreach ( $errorsRaw as $sValue ) {
+										foreach ( $aDetect as $sDetKey => $sDetVal ) {
+											if ( FALSE !== stripos( $sValue, $sDetVal ) ) {
+												$errors[ $sDetKey ] = $sValue;
+											} else {
+												$errors[] = $sValue;
+											}
+										}
+									}
+									
+								}
+								
 							}
 							
 							// $errors[ 'Could Not Process Transaction' ] = $gateway->getTransactionResponseDescription();

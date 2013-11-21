@@ -7,9 +7,7 @@ class Geko_Wp_Cart66_View extends Geko_Singleton_Abstract
 	protected $_sThisFile = '';
 	protected $_sInstanceClass = NULL;
 	
-	protected $data;
-	protected $notices;
-	protected $minify;
+	protected $_aParams = array();
 	
 	
 	
@@ -36,14 +34,23 @@ class Geko_Wp_Cart66_View extends Geko_Singleton_Abstract
 	
 	
 	//
-	public function init( $data = NULL, $notices = TRUE, $minify = FALSE ) {
-		
-		$this->data = $data;
-		$this->notices = $notices;
-		$this->minify = $minify;
-		
+	public function init( $aParams ) {
+		$this->_aParams = $aParams;
 		return $this;
 	}
+	
+	//
+	public function setParam( $sKey, $mValue ) {
+		$this->_aParams[ $sKey ] = $mValue;
+		return $this;
+	}
+	
+	//
+	public function getParam( $sKey ) {
+		return $this->_aParams[ $sKey ];
+	}
+	
+	
 	
 	
 	

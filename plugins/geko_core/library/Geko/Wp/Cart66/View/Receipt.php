@@ -6,13 +6,13 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 	
 	
 	//
-	public function render( $data = NULL, $notices = TRUE, $minify = FALSE ) {
+	public function render() {
 		
 		$this->_sThisFile = __FILE__;
 		
-		$data = $this->data;
-		$notices = $this->notices;
-		$minify = $this->minify;
+		$data = $this->getParam( 'data' );
+		$notices = $this->getParam( 'notices' );
+		$minify = $this->getParam( 'minify' );
 		
 		
 		
