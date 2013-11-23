@@ -3,7 +3,7 @@
 //
 class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 {
-
+	
 	
 	//
 	public function render() {
@@ -138,6 +138,7 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 				if ( 0 == count( $errors ) ) {
 					
 					$errors = $gateway->getErrors();     // Error info for server side error code
+					$errors = $this->validateCheckout( $errors );
 					$errors = apply_filters( $this->_sInstanceClass . '::validate_gateway_checkout', $errors, $gateway, $this );
 					
 					if ( count( $errors ) ) {
@@ -387,6 +388,15 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 								$notify->sendEmailReceipts();
 							}
 							
+							
+							//
+							$bEnableWordpressUserIntegration = $this->getVal( 'cart_wp_user_integration' ) ? TRUE : FALSE ;
+							if ( $bEnableWordpressUserIntegration && $_POST[ 'createacc-terms-agree' ] ) {
+								$_REQUEST[ 'subaction' ] = 'register';
+								Gloc_Service_Profile::getInstance()->process();
+							}
+							
+							
 							// Send buyer to receipt page
 							wp_redirect( $this->getLink( $newOrder, 'store/receipt', 'ouid' ) );
 							exit;
@@ -550,5 +560,74 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 		
 	}
 	
+	
+	
+	
+	//
+	public function validateCheckout( $errors ) {
+		
+		
+		$bEnableWordpressUserIntegration = $this->getVal( 'cart_wp_user_integration' ) ? TRUE : FALSE ;
+		
+		
+		if ( $bEnableWordpressUserIntegration ) {
+			
+			if ( $_POST[ 'createacc-active' ] && !$_POST[ 'createacc-dont-create' ] ) {
+				
+				// validate password
+				
+				$sPass = $_POST[ 'createacc-pass' ];
+				$sConfirmPass = $_POST[ 'createacc-confirm-pass' ];
+				
+				if ( !$sPass ) {
+					$errors[ 'Create Account Password' ] = $this->_t( 'Create Account Password Required' );
+				} else {
+					if ( strlen( $sPass ) < 8 ) {
+						$errors[ 'Create Account Password' ] = $this->_t( 'Create Account Password Must Be at Least 8 Characters Long' );
+					} else {
+						if ( $sPass != $sConfirmPass ) {
+							$errors[ 'Create Account Confirm Password' ] = $this->_t( 'Create Account Confirm Password Values Must Match' );
+						}
+					}
+				}
+				
+				// create account terms of use
+				
+				$bCaEnableTerms = $this->getVal( 'cart_wp_user_terms_checkbox' ) ? TRUE : FALSE ;
+				
+				if ( $bCaEnableTerms && !$_POST[ 'createacc-terms-agree' ] ) {
+					$errors[ 'Create Account Terms of Use' ] = $this->_t( 'Create Account Terms of Use Required' );
+				}
+				
+				
+				// validate email
+				
+				if (
+					!array_key_exists( 'Email', $errors ) && 
+					( $sEmail = $_POST[ 'payment' ][ 'email' ] )
+				) {
+					if ( email_exists( $sEmail ) ) {
+						$errors[ 'Email' ] = 'Email Already Exists in the System';
+					}
+				}
+								
+			}
+		}
+		
+		
+		// checkout terms of use
 
+		$bPayEnableTerms = $this->getVal( 'cart_terms_agree_checkbox' ) ? TRUE : FALSE ;
+		
+		if ( $bPayEnableTerms && !$_POST[ 'payment' ][ 'termsAgree' ] ) {
+			$errors[ 'Payment Terms of Use' ] = $this->_t( 'Payment Terms of Use Required' );
+		}
+		
+		
+		return $errors;
+	}
+	
+	
+	
+	
 }

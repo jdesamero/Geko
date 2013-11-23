@@ -10,6 +10,8 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	
 	protected $_oCalculation = NULL;
 	
+	protected $_bIframeMode = FALSE;
+	
 	
 	
 	//
@@ -37,9 +39,11 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 		if ( is_admin() ) {
 			
 			$oBsGw = Geko_Wp_Cart66_Gateway_Beanstream::getInstance( FALSE );
+
+			add_action( 'admin_cart66_settings_checkout_form_pq', array( $this, 'doCheckoutTab' ) );
 			
-			add_filter( 'admin_cart66_settings_gateways_form_pq', array( $oBsGw, 'settingsForm' ) );
-			add_filter( 'admin_cart66_settings_gateways_script_pq', array( $oBsGw, 'settingsForm' ) );
+			add_action( 'admin_cart66_settings_gateways_form_pq', array( $oBsGw, 'settingsForm' ) );
+			add_action( 'admin_cart66_settings_gateways_script_pq', array( $oBsGw, 'settingsForm' ) );
 			
 		}
 	}
@@ -85,6 +89,20 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	public function getCalculation() {
 		return $this->_oCalculation;
 	}
+	
+	
+	
+	//
+	public function setIframeMode( $bIframeMode ) {
+		$this->_bIframeMode = $bIframeMode;
+		return $this;
+	}
+	
+	//
+	public function getIframeMode() {
+		return $this->_bIframeMode;
+	}	
+	
 	
 	
 	
@@ -198,6 +216,105 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 		return $this;
 	}
 	
+	
+	//// settings
+	
+	public function doCheckoutTab( $oDoc ) {
+		
+		$oTable1 = $oDoc->find( '#cc-cart_checkout table.form-table' );
+		
+		$oTable1->find( 'tbody' )->append(
+			Geko_String::fromOb( array( $this, 'outputCheckoutFields' ), array( 'checkout' ) )
+		);
+		
+		// populate form values
+		$oTable1 = Geko_Html::populateForm( $oTable1, $this->getFormValues( array(
+			'cart_wp_user_integration',
+			'cart_wp_user_terms_checkbox',
+			'cart_wp_user_terms_verbiage'
+		) ), TRUE );
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		
+		$oTable2 = $oDoc->find( '#cc-terms_of_service table.form-table' );
+		
+		$oTable2->find( 'tbody' )->append(
+			Geko_String::fromOb( array( $this, 'outputCheckoutFields' ), array( 'terms' ) )
+		);
+		
+		// populate form values
+		$oTable2 = Geko_Html::populateForm( $oTable2, $this->getFormValues( array(
+			'cart_terms_agree_checkbox',
+			'cart_terms_verbiage'
+		) ), TRUE );
+		
+		return $oDoc;
+	}
+	
+	//
+	public function outputCheckoutFields( $sSection ) {
+		
+		if ( 'checkout' == $sSection ): ?>
+			<tr valign="top">
+				<th scope="row">Enable Wordpress User Account Integration</th>
+				<td>
+					<input type="radio" value="1" id="cart_wp_user_integration_yes" name="cart_wp_user_integration" />
+					<label for="cart_wp_user_integration_yes">Yes</label>
+					<input type="radio" value="" id="cart_wp_user_integration_no" name="cart_wp_user_integration" />
+					<label for="cart_wp_user_integration_no">No</label>
+					<p class="description">Use this option to tie in user accounts to Worpress users.</p>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row">Enable WP User Account "Agree to Terms" Checkbox</th>
+				<td>
+					<input type="radio" value="1" id="cart_wp_user_terms_checkbox_yes" name="cart_wp_user_terms_checkbox" />
+					<label for="cart_wp_user_terms_checkbox">Yes</label>
+					<input type="radio" value="" id="cart_wp_user_terms_checkbox_no" name="cart_wp_user_terms_checkbox" />
+					<label for="cart_wp_user_terms_checkbox_no">No</label>
+					<p class="description">Enable an agree to terms checkbox for account creation.</p>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row">WP User Account "Agree to Terms" Verbiage</th>
+				<td>
+					<input type="text" value="" id="cart_wp_user_terms_verbiage" name="cart_wp_user_terms_verbiage" class="regular-text" />
+					<p class="description">Text that will go beside the "Agree to Terms" checkbox.</p>
+				</td>
+			</tr>
+		<?php elseif ( 'terms' == $sSection ): ?>
+			<tr valign="top">
+				<th scope="row">Enable "Agree To Terms" Checkbox</th>
+				<td>
+					<input type="radio" value="1" id="cart_terms_agree_checkbox_yes" name="cart_terms_agree_checkbox" />
+					<label for="cart_terms_agree_checkbox_yes">Yes</label>
+					<input type="radio" value="" id="cart_terms_agree_checkbox_no" name="cart_terms_agree_checkbox" />
+					<label for="cart_terms_agree_checkbox_no">No</label>
+					<p class="description">Enable an "Agree to Terms" checkbox when completing a purchase.</p>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row">"Agree to Terms" Verbiage</th>
+				<td>
+					<input type="text" value="" id="cart_terms_verbiage" name="cart_terms_verbiage" class="regular-text" />
+					<p class="description">Text that will go beside the "Agree to Terms" checkbox.</p>
+				</td>
+			</tr>
+		<?php endif;
+	}
+	
+	
+	//
+	public function getFormValues( $aKeys ) {
+		
+		$aValues = array();
+		
+		foreach ( $aKeys as $sKey ) {
+			$aValues[ $sKey ] = Cart66Setting::getValue( $sKey );
+		}
+		
+		return $aValues;
+	}
 	
 	
 	

@@ -3,7 +3,7 @@
 //
 class Geko_Wp_Cart66_View_CheckoutForm extends Geko_Wp_Cart66_View
 {
-
+	
 	
 	//
 	public function render() {
@@ -94,17 +94,29 @@ class Geko_Wp_Cart66_View_CheckoutForm extends Geko_Wp_Cart66_View
 			$aFormClasses[] = 'subscription';
 		}
 		
+		$bEnableWordpressUserIntegration = $this->getVal( 'cart_wp_user_integration' ) ? TRUE : FALSE ;
+		
+		
+		
+		//// form classes
+		
 		$sFormClasses = implode( ' ', $aFormClasses );
 		
 		$sTaxableProds = ( $oCart->hasTaxableProducts() ) ? 'true' : 'false' ;
 		$sTaxBlockClass = ( $this->getSess( 'Tax' ) > 0 ) ? 'show-tax-block' : 'hide-tax-block' ;
 		
+		// checkout login form
+		if ( $bEnableWordpressUserIntegration ) {
+			$this->doCheckoutFormLogin( $errors );
+		}
 		
 		// action hook
 		do_action( $this->_sInstanceClass . '::pre_form', $this );
 		
 		?>
 		<form action="" method="post" id="<?php echo $gatewayName ?>_form" class="<?php echo $sFormClasses; ?>">
+			
+			<input type="hidden" name="geko_process_source_form" value="cart66" />
 			
 			<input type="hidden" class="ajax-tax-cart" name="ajax-tax-cart" value="<?php echo $sTaxableProds; ?>" />
 			<input type="hidden" name="cart66-gateway-name" value="<?php echo $gatewayName ?>" id="cart66-gateway-name" />
@@ -327,6 +339,10 @@ class Geko_Wp_Cart66_View_CheckoutForm extends Geko_Wp_Cart66_View
 					<input type="hidden" id="sameAsBilling" name="sameAsBilling" value="1" />
 				<?php endif; ?>
 				
+				<?php if ( $bEnableWordpressUserIntegration ):
+					$this->doCheckoutFormCreateAccount();
+				endif; ?>
+				
 				<?php do_action( $this->_sInstanceClass . '::form_mid', $this ); ?>
 				
 				<div id="paymentInfo">
@@ -401,6 +417,23 @@ class Geko_Wp_Cart66_View_CheckoutForm extends Geko_Wp_Cart66_View
 							<label for="payment-email"><?php $this->_e( 'Email' ); ?>:</label>
 							<input type="text" id="payment-email" name="payment[email]" value="<?php Cart66Common::showValue($p['email']); ?>" />
 						</li>
+						
+						<?php
+						
+						$bEnableTermsCbx = $this->getVal( 'cart_terms_agree_checkbox' ) ? TRUE : FALSE ;
+						
+						$sTermsCbxVerbiage = trim( $this->getVal( 'cart_terms_verbiage' ) );
+						
+						if ( !$sTermsCbxVerbiage ) {
+							$sTermsCbxVerbiage = sprintf( '%s <a href="#">%s</a>', $this->_t( 'Agree to Account Creation' ), $this->_t( 'Terms of Service' ) );
+						}
+						
+						if ( $bEnableTermsCbx ): ?>
+							<li>
+								<input type="checkbox" id="payment-termsAgree" name="payment[termsAgree]" value="1" />
+								<label for="payment-termsAgree" class="wide"><?php echo $sTermsCbxVerbiage; ?></label>
+							</li>
+						<?php endif; ?>
 						
 						<?php
 						
@@ -584,5 +617,310 @@ class Geko_Wp_Cart66_View_CheckoutForm extends Geko_Wp_Cart66_View
 		
 	}
 	
-
+	
+	
+	//// additional functionality
+	
+	//
+	public function doCheckoutFormLogin( $errors ) {
+		
+		if ( !is_user_logged_in() ):
+			
+			$bHasErrors = ( count( $errors ) > 0 ? TRUE : FALSE );
+			
+			$aStatus = array();
+			if ( class_exists( 'Gloc_Service_Profile' ) ) {
+				$aStatus = array(
+					'login' => Gloc_Service_Profile::STAT_LOGIN,
+					'not_activated' => Gloc_Service_Profile::STAT_NOT_ACTIVATED
+				);
+			}
+			
+			$aJsonParams = array(
+				'has_errors' => $bHasErrors,
+				'errors' => $errors,
+				'dont_create_account' => ( $_POST[ 'createacc-dont-create' ] ? TRUE : FALSE ),
+				'script' => Geko_Wp::getScriptUrls(),
+				'status' => $aStatus
+			);
+			
+			$aFormClasses = array( 'phorm2' );
+			
+			if ( $bHasErrors ) {
+				$aFormClasses[] = 'has_errors';
+			}
+			
+			$sFormClasses = implode( ' ', $aFormClasses );
+			
+			?>
+			
+			<style type="text/css">
+				
+				form.checkout_form,
+				#Cart66CheckoutButtonDiv {
+					display: none;
+				}
+				
+				form#checkoutLoginForm.has_errors {
+					display: none;
+				}
+				
+				form.checkout_form.has_errors,
+				#Cart66CheckoutButtonDiv.has_errors {
+					display: block;
+				}
+				
+			</style>
+			
+			<script type="text/javascript">
+				
+				jQuery( document ).ready( function( $ ) {
+					
+					var oParams = <?php echo Zend_Json::encode( $aJsonParams ); ?>;
+					
+					var checkoutForm = $( 'form.checkout_form' );
+					var checkoutButtonDiv = $( '#Cart66CheckoutButtonDiv' );
+					
+					var createAccDiv = $( '#checkoutCreateAccount' );
+					
+					var loginForm = $( '#checkoutLoginForm' );
+					
+					
+					/* toggle login form */
+					
+					var showCheckout = function() {
+						loginForm.hide();
+						checkoutForm.show();
+						checkoutButtonDiv.show();					
+					};
+					
+					var hideCheckout = function() {
+						checkoutForm.hide();
+						checkoutButtonDiv.hide();
+						loginForm.show();					
+					};					
+					
+					
+					loginForm.find( 'a.next_step' ).click( function() {
+						showCheckout();
+						return false;
+					} );
+					
+					createAccDiv.find( 'a.log_in' ).click( function() {
+						hideCheckout();
+						return false;
+					} );
+					
+					
+					/* login form functionality */
+					
+					
+					loginForm.gekoAjaxForm( {
+						status: oParams.status,
+						process_script: oParams.script.process,
+						action: '&action=Gloc_Service_Profile&subaction=login',
+						validate: function( form, errors ) {
+							
+							var email = form.getTrimVal( '#chklog-email' );
+							var password = form.getTrimVal( '#chklog-pass' );
+							
+							if ( !email ) {
+								errors.push( 'Please enter your email address' );
+								form.errorField( '#chklog-email' );
+							} else {
+								if ( !form.isEmail( email ) ) {
+									errors.push( 'Please enter a valid email address' );
+									form.errorField( '#chklog-email' );
+								}
+							}
+							
+							if ( !password ) {
+								errors.push( 'Please enter a password' );
+								form.errorField( '#chklog-pass' );
+							} else {
+								if ( password.length < 6 ) {
+									errors.push( 'Password must be at least 6 characters long' );
+									form.errorField( '#chklog-pass' );
+								}
+							}
+							
+							return errors;
+							
+						},
+						process: function( form, res, status ) {
+							if ( status.login == parseInt( res.status ) ) {
+								/* reload page */
+								window.location = oParams.script.curpage;
+							} else if ( status.not_activated == parseInt( res.status ) ) {
+								form.error( 'Please activate your account first.' );
+							} else {
+								form.error( 'Login failed. Please try again.' );
+							}
+						}
+					} );
+					
+					
+					/* toggle create account */
+					
+					var liPass = createAccDiv.find( '#createacc-pass' ).closest( 'li' );
+					var liConfPass = createAccDiv.find( '#createacc-confirm-pass' ).closest( 'li' );
+					var liTerms = createAccDiv.find( '#createacc-terms-agree' ).closest( 'li' );
+					
+					var cbxDontCreate = createAccDiv.find( '#createacc-dont-create' );
+					
+					cbxDontCreate.click( function() {
+						
+						var cbx = $( this );
+						
+						if ( cbx.is( ':checked' ) ) {
+							liPass.hide();
+							liConfPass.hide();
+							liTerms.hide();
+						} else {
+							liPass.show();
+							liConfPass.show();
+							liTerms.show();
+						}
+						
+					} );
+					
+					
+					/* init */
+					
+					var errorHash = {
+						'Create Account Password': 'createacc-pass',
+						'Create Account Confirm Password': 'createacc-confirm-pass',
+						'Create Account Terms of Use': 'createacc-terms-agree',
+						'Email': 'payment-email',
+						'Payment Card Number': 'payment-cardNumber',
+						'Payment phone': 'payment-phone',
+						'Payment Terms of Use': 'payment-termsAgree'
+					};
+					
+					if ( oParams.has_errors ) {
+						
+						/* showCheckout(); */
+						
+						$.each( errorHash, function( k, v ) {
+							
+							var match = oParams.errors[ k ];
+							if ( match ) {
+								checkoutForm.find( '#' + v ).addClass( 'errorField' );
+							}
+							
+						} );
+					};
+					
+					if ( oParams.dont_create_account ) {
+						cbxDontCreate.attr( 'checked', 'checked' );
+						liPass.hide();
+						liConfPass.hide();
+						liTerms.hide();
+					}
+					
+				} );
+				
+			</script>
+			
+			<form class="<?php echo $sFormClasses; ?>" id="checkoutLoginForm">
+				
+				<input type="hidden" name="geko_process_source_form" value="cart66" />
+				
+				<div class="loading"><img src="<?php bloginfo( 'template_directory' ); ?>/images/loader.gif" /></div>
+				<div class="error"></div>
+				<div class="success"></div>
+				
+				<ul id="checkoutLogin" class="shortLabels">
+					
+					<li>
+						<h2><?php $this->_e( 'Already Have an Account?' ); ?></h2>
+						<p><?php $this->_e( 'Please log in below:' ); ?></p>
+					</li>
+					
+					<li>
+						<label for="chklog-email"><?php $this->_e( 'Email:' ); ?></label>
+						<input type="text" id="chklog-email" name="chklog-email" value="" />
+					</li>
+					
+					<li>
+						<label for="chklog-pass"><?php $this->_e( 'Password:' ); ?></label>
+						<input type="password" id="chklog-pass" name="chklog-pass" value="" />
+					</li>
+					
+				</ul>
+				
+				<p>
+					<input type="submit" value="<?php $this->_e( 'Login' ); ?>" />
+					&nbsp;<small><a href="<?php bloginfo( 'url' ); ?>/login/forgot-password/"><?php $this->_e( 'Forgot Password?' ); ?></a></small>
+				</p>
+				
+				<p><?php $this->_e( "Don't Have an Account?" ); ?> <a href="#" class="next_step"><?php $this->_e( 'Proceed to Next Step' ); ?></a></p>
+				
+			</form>
+			
+			<?php
+		endif;
+		
+	}
+	
+	//
+	public function doCheckoutFormCreateAccount() {
+		
+		if ( !is_user_logged_in() ):
+			
+			$bEnableTerms = $this->getVal( 'cart_wp_user_terms_checkbox' ) ? TRUE : FALSE ;
+			
+			$sTermsVerbiage = trim( $this->getVal( 'cart_wp_user_terms_verbiage' ) );
+			
+			if ( !$sTermsVerbiage ) {
+				$sTermsVerbiage = sprintf( '%s <a href="#">%s</a>', $this->_t( 'Agree to Account Creation' ), $this->_t( 'Terms of Service' ) );
+			}
+			
+			wp_nonce_field( 'cart66-registration-form' );
+			
+			?>
+			
+			<div id="checkoutCreateAccount">
+				
+				<input type="hidden" id="createacc-active" name="createacc-active" value="1" />
+				
+				<ul class="shortLabels">
+					
+					<li><h2><?php $this->_e( 'Create Account' ); ?></h2></li>
+		
+					<li>
+						<label for="createacc-dont-create"><?php $this->_e( "Don't Create Account:" ); ?></label>
+						<input type="checkbox" id="createacc-dont-create" name="createacc-dont-create" value="1" />
+					</li>
+					
+					<li>
+						<label for="createacc-pass"><?php $this->_e( 'Password:' ); ?></label>
+						<input type="password" class="<?php echo $sPassError; ?>" id="createacc-pass" name="createacc-pass" value="<?php echo htmlspecialchars( $_POST[ 'createacc-pass' ] ); ?>" />
+					</li>
+					
+					<li>
+						<label for="createacc-confirm-pass"><?php $this->_e( 'Confirm Password:' ); ?></label>
+						<input type="password" class="<?php echo $sConfirmPassError; ?>" id="createacc-confirm-pass" name="createacc-confirm-pass" value="<?php echo htmlspecialchars( $_POST[ 'createacc-confirm-pass' ] ); ?>" />
+					</li>
+					
+					<?php if ( $bEnableTerms ): ?>
+						<li>
+							<input type="checkbox" id="createacc-terms-agree" name="createacc-terms-agree" value="1" />
+							<label for="createacc-terms-agree" class="wide"><?php echo $sTermsVerbiage; ?></label>
+						</li>
+					<?php endif; ?>
+					
+				</ul>
+				
+				<p><?php $this->_e( 'Already Have an Account?' ); ?> <a href="#" class="log_in"><?php $this->_e( 'Log In' ); ?></a></p>
+			
+			</div>
+			
+		<?php endif;
+		
+	}
+	
+	
+	
+	
 }

@@ -44,6 +44,14 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 		
 		
 		
+		$bIframeMode = $oGekoCart66->getIframeMode();
+		
+		$sTargetTag = '';
+		if ( $bIframeMode ) {
+			$sTargetTag = ' target="_top" ';
+		}
+		
+		
 		$items = $oCart->getItems();
 		$shippingMethods = $oCart->getShippingMethods();
 		
@@ -193,10 +201,10 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 					</colgroup>
 					<thead>
 						<tr>
-							<th><?php $this->_e( 'Product' ); ?></th>
-							<th class="cart66-align-center"><?php $this->_e( 'Quantity' ); ?></th>
-							<th class="cart66-align-right"><?php $this->_e( 'Item Price' ); ?></th>
-							<th class="cart66-align-right"><?php $this->_e( 'Item Total' ); ?></th>
+							<th class="cart66-product-col"><?php $this->_e( 'Product' ); ?></th>
+							<th class="cart66-align-center cart66-qty-col"><?php $this->_e( 'Quantity' ); ?></th>
+							<th class="cart66-align-right cart66-price-col"><?php $this->_e( 'Item Price' ); ?></th>
+							<th class="cart66-align-right cart66-total-col"><?php $this->_e( 'Item Total' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -229,7 +237,7 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 										( 1 == $this->getVal( 'product_links_in_cart' ) ) && 
 										( $fullMode )
 									): ?>
-										<a class="product_url" href="<?php echo $item->getProductUrl(); ?>"><?php echo $sProdTitle; ?></a>
+										<a class="product_url" href="<?php echo $item->getProductUrl(); ?>" <?php echo $sTargetTag; ?> ><?php echo $sProdTitle; ?></a>
 									<?php else: ?>
 										<?php echo $sProdTitle; ?>
 									<?php endif; ?>
@@ -505,8 +513,7 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 						
 						<?php if ( $oCart->requireShipping() ): ?>
 							<tr class="shipping">
-								<td colspan="2">&nbsp;</td>
-								<td class="alignRight strong"><?php $this->_e( 'Shipping' ); ?>:</td>
+								<td colspan="3" class="alignRight strong"><?php $this->_e( 'Shipping' ); ?>:</td>
 								<td class="strong cart66-align-right"><?php echo $oCalculation->getCurrShipping(); ?></td>
 							</tr>
 						<?php endif; ?>
@@ -518,8 +525,7 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 						$sTaxRowClass = ( $oCalculation->getTax() > 0 ) ? 'show-tax-row' : 'hide-tax-row' ;
 						
 						?><tr class="tax-row <?php echo $sTaxRowClass; ?>">
-							<td colspan="2">&nbsp;</td>
-							<td class="alignRight strong">
+							<td colspan="3" class="alignRight strong">
 								<span class="ajax-spin"><img src="<?php echo CART66_URL; ?>/images/ajax-spin.gif" /></span> 
 								<?php $this->_e( 'Tax' ); ?> (<span class="tax-rate"><?php echo $oCalculation->getTaxRatePercent(); ?>%</span>):
 							</td>
@@ -575,10 +581,10 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 				<div id="viewCartNav">
 					
 					<div id="continueShopping">
-						<?php if($cartImgPath): ?>
-							<a href="<?php $this->echoSess( 'LastPage' ); ?>" class="Cart66CartContinueShopping" ><img src="<?php echo $continueShoppingImg ?>" /></a>
+						<?php if ( $cartImgPath ): ?>
+							<a href="<?php $this->echoSess( 'LastPage' ); ?>" class="Cart66CartContinueShopping" <?php echo $sTargetTag; ?> ><img src="<?php echo $continueShoppingImg ?>" /></a>
 						<?php else: ?>
-							<a href="<?php $this->echoSess( 'LastPage' ); ?>" class="Cart66ButtonSecondary Cart66CartContinueShopping" title="Continue Shopping"><?php $this->_e( 'Continue Shopping' ); ?></a>
+							<a href="<?php $this->echoSess( 'LastPage' ); ?>" class="Cart66ButtonSecondary Cart66CartContinueShopping" title="Continue Shopping" <?php echo $sTargetTag; ?> ><?php $this->_e( 'Continue Shopping' ); ?></a>
 						<?php endif; ?>
 					</div>
 					
@@ -612,9 +618,9 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 								<?php $checkoutUrl = $this->getVal( 'auth_force_ssl' ) ? str_replace( 'http://', 'https://', get_permalink( $checkoutPage->ID ) ) : get_permalink( $checkoutPage->ID ); ?>
 								
 								<?php if($checkoutImg): ?>
-									<a id="Cart66CheckoutButton" href="<?php echo $checkoutUrl; ?>"><img src="<?php echo $checkoutImg ?>" /></a>
+									<a id="Cart66CheckoutButton" href="<?php echo $checkoutUrl; ?>" <?php echo $sTargetTag; ?> ><img src="<?php echo $checkoutImg ?>" /></a>
 								<?php else: ?>
-									<a id="Cart66CheckoutButton" href="<?php echo $checkoutUrl; ?>" class="Cart66ButtonPrimary" title="Continue to Checkout"><?php $this->_e( 'Checkout' ); ?></a>
+									<a id="Cart66CheckoutButton" href="<?php echo $checkoutUrl; ?>" class="Cart66ButtonPrimary" title="Continue to Checkout" <?php echo $sTargetTag; ?> ><?php $this->_e( 'Checkout' ); ?></a>
 								<?php endif; ?>
 							
 							</div><?php
