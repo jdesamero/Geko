@@ -3,6 +3,9 @@
 class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 {
 	
+	const MSG_PLUGIN_NOT_ACTIVATED = '<strong>Warning!</strong> Please activate the Cart66 Pro Plugin!';
+	
+	
 	protected $bCalledInit = FALSE;
 	
 	protected $_aBilling = array();
@@ -10,6 +13,7 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	
 	protected $_oCalculation = NULL;
 	
+	protected $_bCart66PluginActivated = FALSE;
 	protected $_bIframeMode = FALSE;
 	
 	
@@ -19,31 +23,40 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 		
 		if ( !$this->bCalledInit ) {
 			
-			Geko_Wp_Db::addPrefix( 'cart66_products' );
-			Geko_Wp_Db::addPrefix( 'cart66_orders' );
-			Geko_Wp_Db::addPrefix( 'cart66_order_items' );
-			
-			add_action( 'init', array( $this, 'wpInit' ) );
+			if ( class_exists( 'Cart66' ) ) {
+				
+				Geko_Wp_Db::addPrefix( 'cart66_products' );
+				Geko_Wp_Db::addPrefix( 'cart66_orders' );
+				Geko_Wp_Db::addPrefix( 'cart66_order_items' );
+				
+				add_action( 'init', array( $this, 'wpInit' ) );
+				
+				$this->_bCart66PluginActivated = TRUE;
+			}
 			
 			$this->bCalledInit = TRUE;
 		}
 	}
 	
 	
-	//
+	// TO DO: Make gateways configurable, add moneris
 	public function wpInit() {
 		
-		$oScm = new Geko_Wp_Cart66_ShortcodeManager();
-		add_shortcode( 'checkout_beanstream', array( $oScm, 'beanstreamCheckout' ) );
+		if ( $this->_bCart66PluginActivated ) {
 		
-		if ( is_admin() ) {
+			$oScm = new Geko_Wp_Cart66_ShortcodeManager();
+			add_shortcode( 'checkout_beanstream', array( $oScm, 'beanstreamCheckout' ) );
 			
-			$oBsGw = Geko_Wp_Cart66_Gateway_Beanstream::getInstance( FALSE );
-
-			add_action( 'admin_cart66_settings_checkout_form_pq', array( $this, 'doCheckoutTab' ) );
-			
-			add_action( 'admin_cart66_settings_gateways_form_pq', array( $oBsGw, 'settingsForm' ) );
-			add_action( 'admin_cart66_settings_gateways_script_pq', array( $oBsGw, 'settingsForm' ) );
+			if ( is_admin() ) {
+				
+				$oBsGw = Geko_Wp_Cart66_Gateway_Beanstream::getInstance( FALSE );
+	
+				add_action( 'admin_cart66_settings_checkout_form_pq', array( $this, 'doCheckoutTab' ) );
+				
+				add_action( 'admin_cart66_settings_gateways_form_pq', array( $oBsGw, 'settingsForm' ) );
+				add_action( 'admin_cart66_settings_gateways_script_pq', array( $oBsGw, 'settingsForm' ) );
+				
+			}
 			
 		}
 	}
@@ -174,11 +187,17 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 		
 		$iTotal = 0;
 		
-		if ( $oCart = Cart66Session::get( 'Cart66Cart' ) ) {
-			$aCartItems = $oCart->getItems();
-			foreach ( $aCartItems as $oItem ) {
-				$iTotal += intval( $oItem->getQuantity() );
+		if ( $this->_bCart66PluginActivated ) {
+			
+			if ( $oCart = Cart66Session::get( 'Cart66Cart' ) ) {
+				$aCartItems = $oCart->getItems();
+				foreach ( $aCartItems as $oItem ) {
+					$iTotal += intval( $oItem->getQuantity() );
+				}
 			}
+			
+		} else {
+			echo self::MSG_PLUGIN_NOT_ACTIVATED;
 		}
 		
 		return $iTotal;
@@ -188,13 +207,19 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	//
 	public function outputCart( $sMode = '' ) {
 		
-		$sModeAtt = '';
+		if ( $this->_bCart66PluginActivated ) {
 		
-		if ( $sMode ) {
-			$sModeAtt = sprintf( ' mode="%s"', $sMode );
+			$sModeAtt = '';
+			
+			if ( $sMode ) {
+				$sModeAtt = sprintf( ' mode="%s"', $sMode );
+			}
+			
+			echo do_shortcode( sprintf( '[cart%s]', $sModeAtt ) );
+			
+		} else {
+			echo self::MSG_PLUGIN_NOT_ACTIVATED;
 		}
-		
-		echo do_shortcode( sprintf( '[cart%s]', $sModeAtt ) );
 		
 		return $this;
 	}
@@ -202,7 +227,11 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	//
 	public function outputCheckout( $sGateway = 'mijireh' ) {
 		
-		echo do_shortcode( sprintf( '[checkout_%s]', $sGateway ) );
+		if ( $this->_bCart66PluginActivated ) {
+			echo do_shortcode( sprintf( '[checkout_%s]', $sGateway ) );
+		} else {
+			echo self::MSG_PLUGIN_NOT_ACTIVATED;
+		}
 		
 		return $this;
 	}
@@ -211,7 +240,11 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	//
 	public function outputReceipt() {
 		
-		echo do_shortcode( '[receipt]' );
+		if ( $this->_bCart66PluginActivated ) {
+			echo do_shortcode( '[receipt]' );
+		} else {
+			echo self::MSG_PLUGIN_NOT_ACTIVATED;
+		}
 		
 		return $this;
 	}
