@@ -204,6 +204,70 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	}
 	
 	
+	
+	//
+	public function outputAddToCart( $aProd, $aParams = array() ) {
+	
+		if ( $this->_bCart66PluginActivated ) {
+			
+			if ( $iItemNum = $aProd[ 'item_number' ] ) {
+				
+				//// TYPE 1 "Add to Cart" Widget, for single product
+				
+				// default attributes
+				$aAtts = array(
+					'showprice' => 'yes',
+					'quantity' => 'user:1',
+					'ajax' => 'yes',
+					'item' => $iItemNum
+				);
+				
+				// override atts
+				$aAtts = array_merge( $aAtts, $aParams );
+				
+				$sRes = do_shortcode( sprintf( '[add_to_cart %s]', $this->formatAtts( $aAtts ) ) );
+				echo preg_replace(
+					'/(<span class="Cart66Price Cart66PriceDescription">)(.+?)(<\/span>)/',
+					sprintf( '$1 %s - \$%s $3', $aProd[ 'price_description' ], $aProd[ 'price' ] ),
+					$sRes
+				);
+				
+			} elseif ( $sProdGroupKey = $aProd[ 'product_group_key' ] ) {
+			
+				//// TYPE 2 "Add to Cart" Widget, select from related product variations
+				
+				// product variations
+				$sProdVarSelect = $this->getProductVarietySelectHtml( $sProdGroupKey );
+				$iPostId = $aProd[ 'post_id' ];
+				
+				if ( $sProdVarSelect ): ?>
+					<a id="tl_<?php echo $iPostId; ?>" class="Cart66AddToCart toggle-link"><img src="<?php bloginfo( 'template_directory' ); ?>/images/spacer.gif" /></a>
+					<div id="tc_<?php echo $iPostId; ?>" class="toggle-content">
+						<div class="inner">
+							<h2>Buy this Product</h2>
+							<?php echo $sProdVarSelect; ?>
+							<span class="Cart66UserQuantity">
+								<label for="Cart66UserQuantityInput_1">Qty: </label>
+								<input id="Cart66UserQuantityInput_1" size="4" value="1" name="item_quantity" type="text" />
+							</span>
+							<div id="addToCart_1" class="Cart66ButtonPrimary prodlist" name="addToCart_1" value="Add to Cart">Add to Cart</div>
+							<div class="clear"></div>
+							<a class="toggle-close">Close</a><div class="clear"></div>
+						</div>
+					</div><?php
+				endif;
+				
+			}
+			
+		} else {
+			echo self::MSG_PLUGIN_NOT_ACTIVATED;
+		}
+		
+		return $this;	
+	}
+	
+	
+	
 	//
 	public function outputCart( $sMode = '' ) {
 		
@@ -247,6 +311,21 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 		}
 		
 		return $this;
+	}
+	
+	
+	// helper
+	
+	// format attributes for use in shortcode
+	public function formatAtts( $aAtts ) {
+		
+		$aAttsFmt = array();
+		
+		foreach ( $aAtts as $sKey => $sValue ) {
+			$aAttsFmt[] = sprintf( '%s="%s"', $sKey, $sValue );
+		}
+		
+		return implode( ' ', $aAttsFmt );
 	}
 	
 	
