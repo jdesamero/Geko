@@ -266,11 +266,16 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 										<?php endif; ?>
 										
 										<?php
-											$removeLink = get_permalink( $cartPage->ID );
-											$sDelim = ( strpos( $removeLink, '?' ) ) ? '&' : '?' ;
-											$sRemoveUrl = sprintf( '%s%stask=removeItem&itemIndex=%d', $removeLink, $sDelim, $itemIndex );
+										
+										$oRemoveUrl = new Geko_Uri( get_permalink( $cartPage->ID ) );
+										$oRemoveUrl
+											->setVar( 'task', 'removeItem' )
+											->setVar( 'itemIndex', $itemIndex )
+											->setVar( 'mode', $_GET[ 'mode' ] )
+										;
+										
 										?>
-										<a href="<?php echo $sRemoveUrl; ?>" title="<?php $this->_e( 'Remove item from cart' ); ?>"><img src="<?php echo $removeItemImg; ?>" alt="<?php $this->_e( 'Remove Item' ); ?>" /></a>
+										<a href="<?php echo strval( $oRemoveUrl ); ?>" title="<?php $this->_e( 'Remove item from cart' ); ?>"><img src="<?php echo $removeItemImg; ?>" alt="<?php $this->_e( 'Remove Item' ); ?>" /></a>
 										
 									</td>
 								<?php else: ?>
@@ -643,9 +648,9 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 			<div id="emptyCartMsg">
 				<h3><?php $this->_e( 'Your Cart Is Empty' ); ?></h3>
 				<?php if ( $cartImgPath ): ?>
-					<a href="<?php $this->echoSess( 'LastPage' ); ?>" title="Continue Shopping" class="Cart66CartContinueShopping"><img alt="Continue Shopping" class="continueShoppingImg" src="<?php echo $continueShoppingImg ?>" /></a>
+					<a href="<?php $this->echoSess( 'LastPage' ); ?>" title="Continue Shopping" class="Cart66CartContinueShopping" <?php echo $sTargetTag; ?> ><img alt="Continue Shopping" class="continueShoppingImg" src="<?php echo $continueShoppingImg ?>" /></a>
 				<?php else: ?>
-					<a href="<?php $this->echoSess( 'LastPage' ); ?>" class="Cart66ButtonSecondary" title="Continue Shopping"><?php $this->_e( 'Continue Shopping' ); ?></a>
+					<a href="<?php $this->echoSess( 'LastPage' ); ?>" class="Cart66ButtonSecondary" title="Continue Shopping" <?php echo $sTargetTag; ?> ><?php $this->_e( 'Continue Shopping' ); ?></a>
 				<?php endif; ?>
 			</div>
 			
