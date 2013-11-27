@@ -20,6 +20,9 @@ class Geko_Wp_Cart66_View_CheckoutForm extends Geko_Wp_Cart66_View
 		$b = $this->getParam( 'b' );
 		$s = $this->getParam( 's' );
 		$p = $this->getParam( 'p' );
+		$billingCountryCode = $this->getParam( 'billingCountryCode' );
+		$shippingCountryCode = $this->getParam( 'shippingCountryCode' );
+		
 		
 		
 		$oCart = $this->getSess( 'Cart' );
@@ -176,7 +179,7 @@ class Geko_Wp_Cart66_View_CheckoutForm extends Geko_Wp_Cart66_View
 						</li>
 						
 						<li><label for="billing-state_text" class="short billing-state_label"><?php $this->_e( 'State' ); ?>:</label>
-							<input type="text" name="billing[state_text]" value="<?php Cart66Common::showValue($b['state']); ?>" id="billing-state_text" class="ajax-tax state_text_field" />
+							<input type="text" name="billing[state_text]" value="<?php Cart66Common::showValue( $b[ 'state' ] ); ?>" id="billing-state_text" class="ajax-tax state_text_field" />
 							<select id="billing-state" class="ajax-tax required" title="State billing address" name="billing[state]">
 								<option value="">&nbsp;</option>
 								<?php
@@ -272,7 +275,7 @@ class Geko_Wp_Cart66_View_CheckoutForm extends Geko_Wp_Cart66_View
 							
 							<li>
 								<label for="shipping-state_text" class="short shipping-state_label"><?php $this->_e( 'State' ); ?>:</label>
-								<input type="text" name="shipping[state_text]" value="<?php Cart66Common::showValue($s['state']); ?>" id="shipping-state_text" class="ajax-tax state_text_field" />
+								<input type="text" name="shipping[state_text]" value="<?php Cart66Common::showValue( $s[ 'state' ] ); ?>" id="shipping-state_text" class="ajax-tax state_text_field" />
 								<select id="shipping-state" class="ajax-tax shipping_countries required" title="State shipping address" name="shipping[state]">
 									<option value="">&nbsp;</option>              
 									<?php

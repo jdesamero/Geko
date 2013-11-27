@@ -4,6 +4,10 @@
 class Geko_Wp_Cart66_Calculation
 {
 	
+	const DEFAULT_TAX_LOCATION = 'All Sales';
+	
+	
+	
 	protected $_aData = array();
 	protected $_aVars = array();
 	
@@ -18,6 +22,7 @@ class Geko_Wp_Cart66_Calculation
 	protected $_fPreTaxTotal = 0;
 	protected $_fTotal = 0;
 	
+	protected $_sLocation = '';			// province or state
 	
 	
 	
@@ -47,6 +52,19 @@ class Geko_Wp_Cart66_Calculation
 	//
 	public function getVar( $sKey ) {
 		return $this->_aVars[ $sKey ];
+	}
+	
+	
+	
+	//
+	public function setLocation( $sLocation ) {
+		$this->_sLocation = $sLocation;
+		return $this;
+	}
+	
+	//
+	public function getLocation() {
+		return Geko_String::coalesce( $this->_sLocation, self::DEFAULT_TAX_LOCATION );
 	}
 	
 	

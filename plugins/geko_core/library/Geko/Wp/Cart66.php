@@ -31,6 +31,8 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 				
 				add_action( 'init', array( $this, 'wpInit' ) );
 				
+				add_action( 'template_redirect', array( $this, 'ajaxTriggerCheck' ), 9 );
+				
 				$this->_bCart66PluginActivated = TRUE;
 			}
 			
@@ -426,6 +428,92 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 		}
 		
 		return $aValues;
+	}
+	
+	
+	
+	
+	//// ajax overrides
+	
+	//
+	public function ajaxTriggerCheck() {
+		
+		$aRes = NULL;
+		
+		if ( intval( get_query_var( 'cart66AjaxCartRequests' ) ) == 4 ) {
+			
+			$iId = 0;
+			$sState = '';
+			$sZip = '';
+			$fTax = 0;
+			$fRate = 0;
+			$fTotal = 0;
+			
+			if (
+				isset( $_POST[ 'state' ] ) && 
+				isset( $_POST[ 'state_text' ] ) && 
+				isset( $_POST[ 'zip' ] ) && 
+				isset( $_POST[ 'gateway' ] )
+			) {
+				
+				$iId = 1;
+				
+				$oCalculation = $this->getCalculation();
+				
+				$gateway = Cart66Ajax::loadAjaxGateway( $_POST[ 'gateway' ] );
+				
+				$gateway->setShipping( array(
+					'state_text' => $_POST[ 'state_text' ],
+					'state' => $_POST[ 'state' ],
+					'zip' => $_POST[ 'zip' ] )
+				);
+				
+				$s = $gateway->getShipping();
+				
+				$sState = $s[ 'state' ];
+				$sZip = $s[ 'zip' ];
+				
+				$oCalculation->setLocation( $sState );				
+				
+				if ( !Cart66Session::get( 'Cart66DontUsePoints' ) ) {
+					
+					global $user_ID;
+					
+					if ( $user_ID ) {
+						$oUser = new Gloc_User( $user_ID );
+						if ( $oUser->getIsActivated() ) {
+							$fAvailPntsDscnt = intval( $oUser->getPoints() ) * BODYPLUS_DOLLARS_PER_POINT;
+							if ( $fAvailPntsDscnt ) {
+								$oCalculation->setDiscountTwo( $fAvailPntsDscnt );
+							}
+						}
+					}
+				}
+				
+				$oCalculation->calculate();
+				
+				$fTax = $oCalculation->getTax();
+				$fRate = $oCalculation->getTaxRatePercent();
+				$fTotal = $oCalculation->getTotal();
+				
+				
+			}
+			
+			$aRes = array(
+				'id' => $iId,
+				'state' => $sState,
+				'zip' => $sZip,
+				'tax' => Cart66Common::currency( $fTax ),
+				'rate' => ( $fRate ) ? Cart66Common::tax( $fRate ) : '0.00%' ,
+				'total' => Cart66Common::currency( $fTotal )
+			);
+		
+		}
+		
+		if ( $aRes ) {
+			echo json_encode( $aRes );
+			die();
+		}
 	}
 	
 	
