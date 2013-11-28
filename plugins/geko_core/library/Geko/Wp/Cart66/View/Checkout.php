@@ -538,6 +538,7 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 		}
 
 		$checkout_data = array(
+			
 			'zones' => Cart66Common::getZones(),
 			'same_as_billing' => $same_as_billing,
 			'shipping_address_display' => $shipping_address_display,
@@ -548,15 +549,27 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 			'card_type' => isset( $p[ 'cardType' ] ) ? $p[ 'cardType' ] : '',
 			'form_name' => '#' . $gatewayName . '_form',
 			'error_field_names' => $error_field_names,
+			
 			'text_state' => $this->_t( 'State' ),
 			'text_zip_code' => $this->_t( 'Zip code' ),
 			'text_post_code' => $this->_t( 'Post code' ),
-			'text_province' => $this->_t( 'Province' )
+			'text_province' => $this->_t( 'Province' ),
+			
+			'text_enter_email' => $this->_t( 'Please enter your email address' ),
+			'text_enter_valid_email' => $this->_t( 'Please enter a valid email address' ),
+			'text_enter_password' => $this->_t( 'Please enter a password' ),
+			'text_enter_longer_password' => $this->_t( 'Password must be at least 6 characters long' ),
+			'text_activate_account' => $this->_t( 'Please activate your account first.' ),
+			'text_login_failed' => $this->_t( 'Login failed. Please try again.' )
+			
 		);
 		
-		$path = CART66_URL . '/js/checkout.js';
-		wp_enqueue_script( 'checkout_js', $path, array( 'jquery' ), FALSE, TRUE );
-		wp_localize_script( 'checkout_js', 'C66', $checkout_data );
+		// $path = CART66_URL . '/js/checkout.js';
+		// wp_enqueue_script( 'checkout_js', $path, array( 'jquery' ), FALSE, TRUE );
+		// wp_localize_script( 'checkout_js', 'C66', $checkout_data );
+		
+		wp_enqueue_script( 'geko_wp_cart66_view_checkout' );
+		wp_localize_script( 'geko_wp_cart66_view_checkout', 'C66', $checkout_data );
 		
 	}
 	

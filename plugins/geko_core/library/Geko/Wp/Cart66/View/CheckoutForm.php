@@ -539,7 +539,7 @@ class Geko_Wp_Cart66_View_CheckoutForm extends Geko_Wp_Cart66_View
 				</ul>
 			<?php endif; ?>
 			
-			<?php if(!Cart66Common::isLoggedIn()): ?>
+			<?php if ( !Cart66Common::isLoggedIn() ): ?>
 				<?php if ( $oCart->hasSubscriptionProducts() || $oCart->hasMembershipProducts() ): ?>
 					<?php echo Cart66Common::getView( 'pro/views/account-form.php', array( 'account' => $account, 'embed' => FALSE ) ); ?>
 				<?php endif; ?>
@@ -639,9 +639,20 @@ class Geko_Wp_Cart66_View_CheckoutForm extends Geko_Wp_Cart66_View
 				);
 			}
 			
+			$aErrorHash = array(
+				'Create Account Password' => 'createacc-pass',
+				'Create Account Confirm Password' => 'createacc-confirm-pass',
+				'Create Account Terms of Use' => 'createacc-terms-agree',
+				'Email' => 'payment-email',
+				'Payment Card Number' => 'payment-cardNumber',
+				'Payment phone' => 'payment-phone',
+				'Payment Terms of Use' => 'payment-termsAgree'
+			);
+			
 			$aJsonParams = array(
 				'has_errors' => $bHasErrors,
 				'errors' => $errors,
+				'error_hash' => $aErrorHash,
 				'dont_create_account' => ( $_POST[ 'createacc-dont-create' ] ? TRUE : FALSE ),
 				'script' => Geko_Wp::getScriptUrls(),
 				'status' => $aStatus
@@ -681,145 +692,7 @@ class Geko_Wp_Cart66_View_CheckoutForm extends Geko_Wp_Cart66_View
 					
 					var oParams = <?php echo Zend_Json::encode( $aJsonParams ); ?>;
 					
-					var checkoutForm = $( 'form.checkout_form' );
-					var checkoutButtonDiv = $( '#Cart66CheckoutButtonDiv' );
-					
-					var createAccDiv = $( '#checkoutCreateAccount' );
-					
-					var loginForm = $( '#checkoutLoginForm' );
-					
-					
-					/* toggle login form */
-					
-					var showCheckout = function() {
-						loginForm.hide();
-						checkoutForm.show();
-						checkoutButtonDiv.show();					
-					};
-					
-					var hideCheckout = function() {
-						checkoutForm.hide();
-						checkoutButtonDiv.hide();
-						loginForm.show();					
-					};					
-					
-					
-					loginForm.find( 'a.next_step' ).click( function() {
-						showCheckout();
-						return false;
-					} );
-					
-					createAccDiv.find( 'a.log_in' ).click( function() {
-						hideCheckout();
-						return false;
-					} );
-					
-					
-					/* login form functionality */
-					
-					
-					loginForm.gekoAjaxForm( {
-						status: oParams.status,
-						process_script: oParams.script.process,
-						action: '&action=Gloc_Service_Profile&subaction=login',
-						validate: function( form, errors ) {
-							
-							var email = form.getTrimVal( '#chklog-email' );
-							var password = form.getTrimVal( '#chklog-pass' );
-							
-							if ( !email ) {
-								errors.push( 'Please enter your email address' );
-								form.errorField( '#chklog-email' );
-							} else {
-								if ( !form.isEmail( email ) ) {
-									errors.push( 'Please enter a valid email address' );
-									form.errorField( '#chklog-email' );
-								}
-							}
-							
-							if ( !password ) {
-								errors.push( 'Please enter a password' );
-								form.errorField( '#chklog-pass' );
-							} else {
-								if ( password.length < 6 ) {
-									errors.push( 'Password must be at least 6 characters long' );
-									form.errorField( '#chklog-pass' );
-								}
-							}
-							
-							return errors;
-							
-						},
-						process: function( form, res, status ) {
-							if ( status.login == parseInt( res.status ) ) {
-								/* reload page */
-								window.location = oParams.script.curpage;
-							} else if ( status.not_activated == parseInt( res.status ) ) {
-								form.error( 'Please activate your account first.' );
-							} else {
-								form.error( 'Login failed. Please try again.' );
-							}
-						}
-					} );
-					
-					
-					/* toggle create account */
-					
-					var liPass = createAccDiv.find( '#createacc-pass' ).closest( 'li' );
-					var liConfPass = createAccDiv.find( '#createacc-confirm-pass' ).closest( 'li' );
-					var liTerms = createAccDiv.find( '#createacc-terms-agree' ).closest( 'li' );
-					
-					var cbxDontCreate = createAccDiv.find( '#createacc-dont-create' );
-					
-					cbxDontCreate.click( function() {
-						
-						var cbx = $( this );
-						
-						if ( cbx.is( ':checked' ) ) {
-							liPass.hide();
-							liConfPass.hide();
-							liTerms.hide();
-						} else {
-							liPass.show();
-							liConfPass.show();
-							liTerms.show();
-						}
-						
-					} );
-					
-					
-					/* init */
-					
-					var errorHash = {
-						'Create Account Password': 'createacc-pass',
-						'Create Account Confirm Password': 'createacc-confirm-pass',
-						'Create Account Terms of Use': 'createacc-terms-agree',
-						'Email': 'payment-email',
-						'Payment Card Number': 'payment-cardNumber',
-						'Payment phone': 'payment-phone',
-						'Payment Terms of Use': 'payment-termsAgree'
-					};
-					
-					if ( oParams.has_errors ) {
-						
-						/* showCheckout(); */
-						
-						$.each( errorHash, function( k, v ) {
-							
-							var match = oParams.errors[ k ];
-							if ( match ) {
-								checkoutForm.find( '#' + v ).addClass( 'errorField' );
-							}
-							
-						} );
-					};
-					
-					if ( oParams.dont_create_account ) {
-						cbxDontCreate.attr( 'checked', 'checked' );
-						liPass.hide();
-						liConfPass.hide();
-						liTerms.hide();
-					}
+					$.gekoWpCart66ViewCheckout( oParams );
 					
 				} );
 				
