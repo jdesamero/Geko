@@ -52,8 +52,10 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 			if ( is_admin() ) {
 				
 				$oBsGw = Geko_Wp_Cart66_Gateway_Beanstream::getInstance( FALSE );
-	
+				
 				add_action( 'admin_cart66_settings_checkout_form_pq', array( $this, 'doCheckoutTab' ) );
+				
+				add_action( 'admin_cart66_settings_notifications_form_pq', array( $this, 'doNotificationsTab' ) );
 				
 				add_action( 'admin_cart66_settings_gateways_form_pq', array( $oBsGw, 'settingsForm' ) );
 				add_action( 'admin_cart66_settings_gateways_script_pq', array( $oBsGw, 'settingsForm' ) );
@@ -338,7 +340,7 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 		$oTable1 = $oDoc->find( '#cc-cart_checkout table.form-table' );
 		
 		$oTable1->find( 'tbody' )->append(
-			Geko_String::fromOb( array( $this, 'outputCheckoutFields' ), array( 'checkout' ) )
+			Geko_String::fromOb( array( $this, 'outputSettingsFields' ), array( 'checkout_checkout' ) )
 		);
 		
 		// populate form values
@@ -353,7 +355,7 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 		$oTable2 = $oDoc->find( '#cc-terms_of_service table.form-table' );
 		
 		$oTable2->find( 'tbody' )->append(
-			Geko_String::fromOb( array( $this, 'outputCheckoutFields' ), array( 'terms' ) )
+			Geko_String::fromOb( array( $this, 'outputSettingsFields' ), array( 'checkout_terms' ) )
 		);
 		
 		// populate form values
@@ -362,13 +364,37 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 			'cart_terms_verbiage'
 		) ), TRUE );
 		
+		
+		
 		return $oDoc;
 	}
 	
+	
 	//
-	public function outputCheckoutFields( $sSection ) {
+	public function doNotificationsTab( $oDoc ) {
 		
-		if ( 'checkout' == $sSection ): ?>
+		$oTable1 = $oDoc->find( '#mainEmailReceiptForm table.form-table' );
+		
+		$oTable1->find( '#receipt_send_html_emails_yes' )->parents( 'tr' )->after(
+			Geko_String::fromOb( array( $this, 'outputSettingsFields' ), array( 'notifications_receipt' ) )
+		);
+		
+		// populate form values
+		$oTable1 = Geko_Html::populateForm( $oTable1, $this->getFormValues( array(
+			'receipt_html_logo'
+		) ), TRUE );
+		
+		
+		
+		return $oDoc;	
+	}
+	
+	
+	//
+	public function outputSettingsFields( $sSection ) {
+		
+		if ( 'checkout_checkout' == $sSection ): ?>
+		
 			<tr valign="top">
 				<th scope="row">Enable Wordpress User Account Integration</th>
 				<td>
@@ -396,7 +422,9 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 					<p class="description">Text that will go beside the "Agree to Terms" checkbox.</p>
 				</td>
 			</tr>
-		<?php elseif ( 'terms' == $sSection ): ?>
+		
+		<?php elseif ( 'checkout_terms' == $sSection ): ?>
+			
 			<tr valign="top">
 				<th scope="row">Enable "Agree To Terms" Checkbox</th>
 				<td>
@@ -414,6 +442,17 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 					<p class="description">Text that will go beside the "Agree to Terms" checkbox.</p>
 				</td>
 			</tr>
+
+		<?php elseif ( 'notifications_receipt' == $sSection ): ?>
+			
+			<tr valign="top">
+				<th scope="row">HTML Logo</th>
+				<td>
+					<input type="text" value="" id="receipt_html_logo" name="receipt_html_logo" class="regular-text" />
+					<p class="description">Include full &lt;img /&gt; tag included in the HTML receipt header.</p>
+				</td>
+			</tr>
+			
 		<?php endif;
 	}
 	
@@ -475,20 +514,7 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 				
 				$oCalculation->setLocation( $sState );				
 				
-				if ( !Cart66Session::get( 'Cart66DontUsePoints' ) ) {
-					
-					global $user_ID;
-					
-					if ( $user_ID ) {
-						$oUser = new Gloc_User( $user_ID );
-						if ( $oUser->getIsActivated() ) {
-							$fAvailPntsDscnt = intval( $oUser->getPoints() ) * BODYPLUS_DOLLARS_PER_POINT;
-							if ( $fAvailPntsDscnt ) {
-								$oCalculation->setDiscountTwo( $fAvailPntsDscnt );
-							}
-						}
-					}
-				}
+				$oCalculation = apply_filters( get_class( $this ) . '::ajaxTriggerCheck::calculate_tax', $oCalculation, $this );
 				
 				$oCalculation->calculate();
 				

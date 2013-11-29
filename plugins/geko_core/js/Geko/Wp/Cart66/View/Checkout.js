@@ -8,7 +8,7 @@
 ( function( $ ) {
 	
 	//
-	$.fn.listenForChange = function(options) {
+	$.fn.listenForChange = function( options ) {
 		
 		settings = $.extend( {
 			interval: 200 // in microseconds
@@ -105,8 +105,8 @@
 		
 		if ( typeof C66.zones[ country ] == 'undefined' ) {
 			frm.find( 'select[name="' + kind + '[state]"]' ).attr( 'disabled', 'disabled' );
-			frm.find( 'select[name="' + kind + '[state]"]' ).empty(); 
-			frm.find( 'select[name="' + kind + '[state]"]' ).hide(); 
+			frm.find( 'select[name="' + kind + '[state]"]' ).empty();
+			frm.find( 'select[name="' + kind + '[state]"]' ).hide();
 			frm.find( 'input[name="' + kind + '[state_text]"]' ).show();
 		}
 		
@@ -118,11 +118,25 @@
 	test = '';
 	
 	//
-	function updateAjaxTax() {
+	function updateAjaxTax( target ) {
 		
 		var sabCbx = $( '.sameAsBilling' );
-		
 		var taxed = $( '.ajax-tax-cart' ).val();
+    	
+    	//// do checks
+    	
+    	// shipping address is different, changing billing info should have no effect
+    	if (
+    		( !sabCbx.is( ':checked' ) ) && 
+    		(
+    			( 'billing-state' == target.attr( 'id' ) ) || 
+    			( 'billing-state_text' == target.attr( 'id' ) ) || 
+    			( 'billing-zip' == target.attr( 'id' ) )
+    		)
+    	) {
+    		return false;
+    	}
+    	
     	
 		// alert( taxed );
 		
@@ -179,7 +193,7 @@
 			}
 			/* */
 			
-			if ( state == '' && state_text == '' ) {
+			if ( !state && !state_text ) {
 				return false;
 			}
 			
@@ -258,20 +272,28 @@
 		//
 		$( '.shippingAddress' ).css( 'display', C66.shipping_address_display );
     	
+    	
+    	// listen for change
+		$( '#billing-state_text, #billing-state, #billing-zip' ).addClass( 'ajax-tax' );
+		$( '#shipping-state_text, #shipping-state, #shipping-zip' ).addClass( 'ajax-tax' );
+		
+    	
 		//
 		sabCbx.each( function() {
 			
-			var frm = $( this ).closest( 'form' );
-			var sabCbx2 = frm.find( '.sameAsBilling' );
+			var thisSabCbx = $( this );
+			var frm = thisSabCbx.closest( 'form' );
 			
-			if ( sabCbx2.is( ':checked' ) ) {
+			if ( thisSabCbx.is( ':checked' ) ) {
 				
 				frm.find( '.billing_countries' ).html( shipping_countries );
 				setState( frm, 'billing' );
 				
 				$( '.limited-countries-label-billing' ).show();
-				$( '#billing-state_text, #billing-state, #billing-zip' ).addClass( 'ajax-tax' );
-				$( '#shipping-state_text, #shipping-state, #shipping-zip' ).removeClass( 'ajax-tax' );
+				
+				// $( '#billing-state_text, #billing-state, #billing-zip' ).addClass( 'ajax-tax' );
+				// $( '#shipping-state_text, #shipping-state, #shipping-zip' ).removeClass( 'ajax-tax' );
+				
 				$( '#billing_tax_update' ).addClass( 'tax-update' ).show();
 				$( '#shipping_tax_update' ).removeClass( 'tax-update' ).hide();
 			
@@ -281,20 +303,23 @@
 				setState( frm, 'billing' );
 				
 				$( '.limited-countries-label-billing' ).hide();
-				$( '#billing-state_text, #billing-state, #billing-zip' ).removeClass( 'ajax-tax' );
-				$( '#shipping-state_text, #shipping-state, #shipping-zip' ).addClass( 'ajax-tax' );
+				
+				// $( '#billing-state_text, #billing-state, #billing-zip' ).removeClass( 'ajax-tax' );
+				// $( '#shipping-state_text, #shipping-state, #shipping-zip' ).addClass( 'ajax-tax' );
+				
 				$( '#billing_tax_update' ).removeClass( 'tax-update' ).hide();
 				$( '#shipping_tax_update' ).addClass( 'tax-update' ).show();
 			}
 			
 		} );
-    
+    	
 		//
 		sabCbx.click( function() {
 			
-			var frm = $( this ).closest( 'form' );
+			var thisSabCbx = $( this );
+			var frm = thisSabCbx.closest( 'form' );
 			
-			if ( frm.find( 'input[name="sameAsBilling"]' ).is( ':checked' ) ) {
+			if ( thisSabCbx.is( ':checked' ) ) {
 				
 				var billing_country = frm.find( '.billing_countries' ).val();
 				
@@ -314,8 +339,9 @@
 				$( '.limited-countries-label-billing' ).show();
 				frm.find( '.shippingAddress' ).css( 'display', 'none' );
 				
-				$( '#billing-state_text, #billing-state, #billing-zip' ).addClass( 'ajax-tax' );
-				$( '#shipping-state_text, #shipping-state, #shipping-zip' ).removeClass( 'ajax-tax' );
+				// $( '#billing-state_text, #billing-state, #billing-zip' ).addClass( 'ajax-tax' );
+				// $( '#shipping-state_text, #shipping-state, #shipping-zip' ).removeClass( 'ajax-tax' );
+				
 				$( '#billing_tax_update' ).addClass( 'tax-update' ).show();
 				$( '#shipping_tax_update' ).removeClass( 'tax-update' ).hide();
 			
@@ -328,20 +354,25 @@
 				
 				// setState( frm, 'billing' );
 				$( '.limited-countries-label-billing' ).hide();
-				$( '#billing-state_text, #billing-state, #billing-zip' ).removeClass( 'ajax-tax' );
-				$( '#shipping-state_text, #shipping-state, #shipping-zip' ).addClass( 'ajax-tax' );
+				
+				// $( '#billing-state_text, #billing-state, #billing-zip' ).removeClass( 'ajax-tax' );
+				// $( '#shipping-state_text, #shipping-state, #shipping-zip' ).addClass( 'ajax-tax' );
+				
 				$( '#billing_tax_update' ).removeClass( 'tax-update' ).hide();
 				$( '#shipping_tax_update' ).addClass( 'tax-update' ).show();
 				
 			}
 			
-			updateAjaxTax();
+			updateAjaxTax( thisSabCbx );
 		} );
 		
 		$( '#billing-state, #billing-zip, #billing-state_text, #shipping-state, #shipping-zip, #shipping-state_text' ).listenForChange();
+		
 		$( '.ajax-tax' ).on( 'change', function() {
-			updateAjaxTax();
+			var target = $( this );
+			updateAjaxTax( target );
 		} );
+		
 		
 		
 		/* /

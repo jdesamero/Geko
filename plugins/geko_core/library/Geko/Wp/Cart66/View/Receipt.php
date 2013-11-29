@@ -156,6 +156,14 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 		}
 		
 		
+		//// notification messages
+		
+		$this
+			->displayNotification( 'CreateAccountSuccess', $this->_t( 'Your account has been created! Please activate it first before logging in!' ) )
+			->displayNotification( 'CreateAccountFail', $this->_t( 'Sorry, your account could not be created. Please try again.' ), 'error' )
+		;
+		
+		
 		if ( !$ajaxRefresh ) :
 			
 			if ( ( 1 == $this->getVal( 'enable_google_analytics' ) ) && !$this->getVal( 'use_other_analytics_plugin' ) ):
@@ -181,7 +189,7 @@ class Geko_Wp_Cart66_View_Receipt extends Geko_Wp_Cart66_View
 			<?php if ( FALSE !== $order ): ?>
 				
 				<h2><?php $this->_e( 'Order Number' ); ?>: <?php echo $order->trans_id ?></h2>
-				
+								
 				<?php if(CART66_PRO && $order->hasAccount() == 1) {
 					
 					$logInLink = Cart66AccessManager::getLogInLink();

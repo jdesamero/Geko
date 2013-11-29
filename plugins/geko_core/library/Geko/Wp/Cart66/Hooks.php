@@ -4,6 +4,14 @@
 class Geko_Wp_Cart66_Hooks extends Geko_Wp_Admin_Hooks_PluginAbstract
 {	
 	
+	protected $_aTabs = array(
+		'checkout' => 'cart_checkout_settings',
+		'gateways' => 'gateways_settings',
+		'notifications' => 'notifications_settings'
+	);
+	
+	
+	
 	//
 	public function getStates() {
 		
@@ -19,10 +27,13 @@ class Geko_Wp_Cart66_Hooks extends Geko_Wp_Admin_Hooks_PluginAbstract
 			
 			$sTab = $oUrl->getVar( 'tab' );
 			
-			if ( 'gateways_settings' == $sTab ) {
-				$aRet[] = 'cart66_settings_gateways';
-			} elseif ( 'cart_checkout_settings' == $sTab ) {
-				$aRet[] = 'cart66_settings_checkout';			
+			$aTabs = $this->_aTabs;
+			
+			foreach ( $aTabs as $sKey => $sTabVal ) {
+				if ( $sTabVal == $sTab ) {
+					$aRet[] = sprintf( 'cart66_settings_%s', $sKey );
+					break;
+				}
 			}
 			
 			return $aRet;
@@ -35,7 +46,7 @@ class Geko_Wp_Cart66_Hooks extends Geko_Wp_Admin_Hooks_PluginAbstract
 	//
 	public function applyFilters( $sContent, $sState ) {
 		
-		$aTabs = array( 'checkout', 'gateways' );
+		$aTabs = array_keys( $this->_aTabs );
 		
 		foreach ( $aTabs as $sTab ) {
 		

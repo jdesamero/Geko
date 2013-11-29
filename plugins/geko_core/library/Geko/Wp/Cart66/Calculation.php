@@ -22,7 +22,8 @@ class Geko_Wp_Cart66_Calculation
 	protected $_fPreTaxTotal = 0;
 	protected $_fTotal = 0;
 	
-	protected $_sLocation = '';			// province or state
+	protected $_bApplyTaxToShipping = FALSE;		
+	protected $_sLocation = '';						// province or state
 	
 	
 	
@@ -52,6 +53,13 @@ class Geko_Wp_Cart66_Calculation
 	//
 	public function getVar( $sKey ) {
 		return $this->_aVars[ $sKey ];
+	}
+	
+	
+	//
+	public function setApplyTaxToShipping( $bApplyTaxToShipping ) {
+		$this->_bApplyTaxToShipping = $bApplyTaxToShipping;
+		return $this;
 	}
 	
 	
@@ -131,10 +139,14 @@ class Geko_Wp_Cart66_Calculation
 			return $this->_fTax;
 		}
 		
-		return (
-			$this->getPreTaxTotal() * 
-			$this->getTaxRate()
-		);
+		$fTax = 0;
+		if ( $this->_bApplyTaxToShipping ) {
+			$fTax = $this->getPreTaxTotal() * $this->getTaxRate();
+		} else {
+			$fTax = $this->getDiscountedSubTotal() * $this->getTaxRate();		
+		}
+		
+		return $fTax;
 	}
 	
 	//

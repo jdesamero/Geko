@@ -79,6 +79,11 @@ class Geko_Service extends Geko_Singleton_Abstract
 	}
 	
 	//
+	public function getStatus() {
+		return $this->aAjaxResponse[ 'status' ];
+	}
+	
+	//
 	public function setStatusMulti( $iStatus ) {
 		$this->setStatus( $iStatus, TRUE );
 		return $this;

@@ -147,7 +147,12 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 			<table width="100%" height="100%"  cellpadding="0" cellspacing="0" style="padding: 20px 0px 20px 0px" bgcolor="#ffffff"><tr align="center"><td>
 						
 				<!-- Start Header -->
-				<table width="562" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="color: #333; font-weight:bold;  padding: 16px 0px 16px 14px; font-family: Arial, Verdana, sans-serif; ">
+				<table width="562" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="color: #333; font-weight:bold;  padding: 16px 0px 16px 14px; font-family: Arial, Verdana, sans-serif;">
+					<?php if ( $sLogo = trim( $this->getVal( 'receipt_html_logo' ) ) ): ?>
+						<tr>
+							<td colspan="2"><?php echo $sLogo; ?><br />&nbsp;<br />&nbsp;<br /></td>
+						</tr>					
+					<?php endif; ?>
 					<tr>
 						<td>
 							<span style="font-size: 20px;"><?php $this->_e( 'Order Number' ); ?>: <?php echo $order->trans_id; ?></span>
@@ -181,17 +186,17 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 								
 								<?php echo $order->bill_first_name; ?> <?php echo $order->bill_last_name; ?><br />
 								<?php echo $order->bill_address; ?><br />
-	
-								<?php if(!empty($order->bill_address2)): ?>
+								
+								<?php if ( !empty( $order->bill_address2 ) ): ?>
 									<?php echo $order->bill_address2; ?><br />
 								<?php endif; ?>
 	
 								<?php echo $order->bill_city; ?> <?php echo $order->bill_state; ?><?php echo $order->bill_zip != null ? ',' : ''; ?> <?php echo $order->bill_zip; ?><br />
 								<?php echo $order->bill_country; ?><br />
 								
-								<?php if(is_array($additional_fields = maybe_unserialize($order->additional_fields)) && isset($additional_fields['billing'])): ?><br />
-									<?php foreach($additional_fields['billing'] as $af): ?>
-										<?php echo $af['label']; ?>: <?php echo $af['value']; ?><br />
+								<?php if ( is_array( $additional_fields = maybe_unserialize( $order->additional_fields ) ) && isset( $additional_fields[ 'billing' ] ) ): ?><br />
+									<?php foreach ( $additional_fields[ 'billing' ] as $af ): ?>
+										<?php echo $af[ 'label' ]; ?>: <?php echo $af[ 'value' ]; ?><br />
 									<?php endforeach; ?>
 								<?php endif; ?>
 								
@@ -219,11 +224,11 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 						</td>
 					</tr>
 
-					<?php if($order->shipping_method != 'None'): ?>
+					<?php if ( $order->shipping_method != 'None' ): ?>
 						<tr>
 							<td bgcolor="#f9f9f9" style="font-family: Arial, Verdana, sans-serif; padding: 10px 25px 0px 15px; font-size: 12px; color:#333;text-align:left;vertical-align:top;">
 								
-								<?php if($order->hasShippingInfo()): ?>
+								<?php if ( $order->hasShippingInfo() ): ?>
 									
 									<span style="text-transform: uppercase; font-size: 18px; font-weight: bold;"><?php $this->_e( 'Shipping Information' ); ?></span>
 									<br />
@@ -234,21 +239,21 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 										<?php echo $order->ship_first_name; ?> <?php echo $order->ship_last_name; ?><br />
 										<?php echo $order->ship_address; ?><br/>
 	
-										<?php if(!empty($order->ship_address2)): ?>
+										<?php if ( !empty( $order->ship_address2 ) ): ?>
 											<?php echo $order->ship_address2; ?><br />
 										<?php endif; ?>
 										
-										<?php if($order->ship_city != ''): ?>
+										<?php if ( $order->ship_city != '' ): ?>
 											<?php echo $order->ship_city ?> <?php echo $order->ship_state ?>, <?php echo $order->ship_zip ?><br />
 										<?php endif; ?>
 										
-										<?php if(!empty($order->ship_country)): ?>
+										<?php if ( !empty( $order->ship_country ) ): ?>
 											<?php echo $order->ship_country ?><br />
 										<?php endif; ?>
 										
-										<?php if(is_array($additional_fields = maybe_unserialize($order->additional_fields)) && isset($additional_fields['shipping'])): ?><br />
-											<?php foreach($additional_fields['shipping'] as $af): ?>
-												<?php echo $af['label']; ?>: <?php echo $af['value']; ?><br />
+										<?php if ( is_array( $additional_fields = maybe_unserialize( $order->additional_fields ) ) && isset( $additional_fields[ 'shipping' ] ) ): ?><br />
+											<?php foreach ( $additional_fields[ 'shipping' ] as $af ): ?>
+												<?php echo $af[ 'label' ]; ?>: <?php echo $af[ 'value' ]; ?><br />
 											<?php endforeach; ?>
 										<?php endif; ?>
 										

@@ -124,7 +124,14 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 					$rate = $gateway->getTaxRate();
 					
 					if ( $oCalculation ) {
+						
+						$oCalculation
+							->setLocation( $s[ 'state' ] )
+							->calculate()
+						;
+						
 						$tax = $oCalculation->getTax();
+					
 					} else {
 						$tax = $gateway->getTaxAmount();
 					}
@@ -391,9 +398,25 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 							
 							//
 							$bEnableWordpressUserIntegration = $this->getVal( 'cart_wp_user_integration' ) ? TRUE : FALSE ;
-							if ( $bEnableWordpressUserIntegration && $_POST[ 'createacc-terms-agree' ] ) {
+							if (
+								$bEnableWordpressUserIntegration && 
+								$_POST[ 'createacc-terms-agree' ] && 
+								class_exists( 'Gloc_Service_Profile' )
+							) {
+								
 								$_REQUEST[ 'subaction' ] = 'register';
-								Gloc_Service_Profile::getInstance()->process();
+								
+								$oProfile = Gloc_Service_Profile::getInstance();
+								$oProfile->process();
+								
+								$aStatus = Geko_Array::wrap( $oProfile->getStatus() );
+								
+								if ( in_array( Gloc_Service_Profile::STAT_REGISTER, $aStatus ) ) {
+									$this->setSess( 'CreateAccountSuccess', TRUE );
+								} else {
+									$this->setSess( 'CreateAccountFail', TRUE );								
+								}
+								
 							}
 							
 							

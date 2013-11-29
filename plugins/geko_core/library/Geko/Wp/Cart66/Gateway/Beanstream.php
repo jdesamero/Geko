@@ -53,6 +53,8 @@ class Geko_Wp_Cart66_Gateway_Beanstream extends Geko_Wp_Cart66_Gateway
 		$b = $this->getBilling();
 		$ship = $this->getShipping();
 		
+		$sComments = '';
+		
 		Cart66Common::log( 'Payment info for checkout: ' . print_r( $p, true ) );
 		
 		// $extData = $this->generateExtendedData();
@@ -63,25 +65,41 @@ class Geko_Wp_Cart66_Gateway_Beanstream extends Geko_Wp_Cart66_Gateway
 		// $this->addField( 'Username', $this->_apiData[ 'APIUSERNAME' ] );
 		// $this->addField( 'Password', $this->_apiData[ 'TRANSACTIONKEY' ] );
 		
+		$sBillName = sprintf( '%s %s', $b[ 'firstName' ], $b[ 'lastName' ] );
+		
 		$this->addField( 'requestType', 'BACKEND' );
 		$this->addField( 'merchant_id', $this->_apiData[ 'MERCHANTID' ] );
-		$this->addField( 'trnCardOwner', $b[ 'firstName' ] . ' ' . $b[ 'lastName' ] );
+		$this->addField( 'trnCardOwner', $sBillName );
 		$this->addField( 'trnCardNumber', $p[ 'cardNumber' ] );
 		$this->addField( 'trnExpMonth', $expMonth );
 		$this->addField( 'trnExpYear', $expYear );
-		$this->addField( 'trnOrderNumber', '' );
+		// $this->addField( 'trnOrderNumber', '' );
 		
 		$this->addField( 'trnAmount', $total );
 		$this->addField( 'Amount', $total );
 		
+		
+		// billing
 		$this->addField( 'ordEmailAddress', $p[ 'email' ] );
-		$this->addField( 'ordName', $b[ 'firstName' ] . ' ' . $b[ 'lastName' ] );
+		$this->addField( 'ordName', $sBillName );
 		$this->addField( 'ordPhoneNumber', preg_replace( '/\D/', '', $p[ 'phone' ] ) );
 		$this->addField( 'ordAddress1', $b[ 'address' ] );
 		$this->addField( 'ordCity', $b[ 'city' ] );
 		$this->addField( 'ordProvince', $b[ 'state' ] );
 		$this->addField( 'ordPostalCode', $b[ 'zip' ] );
 		$this->addField( 'ordCountry', $b[ 'country' ] );
+		
+		
+		
+		// shipping
+		$this->addField( 'shipName', sprintf( '%s %s', $ship[ 'firstName' ], $ship[ 'lastName' ] ) );
+		$this->addField( 'shipAddress1', $ship[ 'address' ] );
+		$this->addField( 'shipAddress2', $ship[ 'address2' ] );
+		$this->addField( 'shipCity', $ship[ 'city' ] );
+		$this->addField( 'shipProvince', $ship[ 'state' ] );
+		$this->addField( 'shipPostalCode', $ship[ 'zip' ] );
+		$this->addField( 'shipCountry', $ship[ 'country' ] );
+
 		
 		
 		// optional fields
@@ -99,15 +117,26 @@ class Geko_Wp_Cart66_Gateway_Beanstream extends Geko_Wp_Cart66_Gateway
 				$this->addField( 'prod_name_' . $idx, $sProdTitle );
 				$this->addField( 'prod_quantity_' . $idx, $item->getQuantity() );
 				$this->addField( 'prod_cost_' . $idx, $item->getProductPrice() );
-				
 			}
-			
 		}
 		
 		
-		// set b for redeemPoints
-		// $this->addField( 'ref1', $b[ 'redeemPoints' ] );
+		if ( $oCalculation = $this->_oCalculation ) {
+			
+			$this->addField( 'ordItemPrice', $oCalculation->getSubTotal() );							// sub-total
+			$this->addField( 'ordTax1Price', $oCalculation->getTax() );
+			$this->addField( 'ordShippingPrice', $oCalculation->getShipping() );
+			
+			$sComments = sprintf( "Discount: -%s\n", number_format( $oCalculation->getDiscount(), 2 ) );					// discount
+		}
 		
+		
+		// comments
+		if ( $sComments = trim( $sComments ) ) {
+			$this->addField( 'trnComments', $sComments );
+		}
+		
+		//
 		$this->addField( 'ExpDate', $expMonth . $expYear );
 		$this->addField( 'trnCardCvd', $p[ 'securityId' ] );
 		

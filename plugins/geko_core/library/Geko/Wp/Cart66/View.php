@@ -150,6 +150,33 @@ class Geko_Wp_Cart66_View extends Geko_Singleton_Abstract
 	
 	
 	
+	
+	//
+	public function displayNotification( $sKey, $sMessage, $sType = '' ) {
+		
+		$aClasses = array( 'alert-message', 'Cart66AjaxMessage' );
+		
+		if ( 'error' == $sType ) {
+			$aClasses[] = 'alert-error';
+		}
+		
+		$sClass = implode( ' ', $aClasses );
+		
+		if ( $this->getSess( $sKey ) ): ?>
+			<div class="<?php echo $sClass; ?>">
+				<p style="text-align: center;"><?php $this->_e( $sMessage ); ?></p>
+			</div>
+			<br clear="all" />
+			<?php
+			$this->dropSess( $sKey );
+		endif;
+		
+		return $this;
+	}
+	
+	
+	
+	
 }
 
 
