@@ -241,8 +241,8 @@ class Geko_Wp_Cart66_View_CheckoutForm extends Geko_Wp_Cart66_View
 						<ul id="shippingAddressCheckbox">
 							<li><h2><?php $this->_e( 'Shipping Address' ); ?></h2></li>							
 							<li>
-								<label for="sameAsBilling"><?php $this->_e( 'Same as billing address' ); ?>:</label>
-								<input type="checkbox" class="sameAsBilling" id="sameAsBilling" name="sameAsBilling" value="1" />
+								<input type="checkbox" class="sameAsBilling front_checkbox" id="sameAsBilling" name="sameAsBilling" value="1" />
+								<label for="sameAsBilling" class="wide"><?php $this->_e( 'Same as billing address' ); ?>:</label>
 							</li>
 						</ul>
 
@@ -433,7 +433,7 @@ class Geko_Wp_Cart66_View_CheckoutForm extends Geko_Wp_Cart66_View
 						
 						if ( $bEnableTermsCbx ): ?>
 							<li>
-								<input type="checkbox" id="payment-termsAgree" name="payment[termsAgree]" value="1" />
+								<input type="checkbox" id="payment-termsAgree" class="front_checkbox" name="payment[termsAgree]" value="1" />
 								<label for="payment-termsAgree" class="wide"><?php echo $sTermsCbxVerbiage; ?></label>
 							</li>
 						<?php endif; ?>
@@ -544,7 +544,7 @@ class Geko_Wp_Cart66_View_CheckoutForm extends Geko_Wp_Cart66_View
 					<?php echo Cart66Common::getView( 'pro/views/account-form.php', array( 'account' => $account, 'embed' => FALSE ) ); ?>
 				<?php endif; ?>
 			<?php endif; ?>
-	
+			
 			<div id="Cart66CheckoutButtonDiv" class="<?php echo $sCoBtnDivClass; ?>">
 				<label for="Cart66CheckoutButton" class="Cart66Hidden"><?php $this->_e( 'Checkout' ); ?></label>
 				<?php
@@ -612,7 +612,10 @@ class Geko_Wp_Cart66_View_CheckoutForm extends Geko_Wp_Cart66_View
 					<input id="Cart66CheckoutButton" class="confirm-order Cart66ButtonPrimary Cart66CompleteOrderButton" type="submit"  value="<?php $this->_e( 'Complete Order' ); ?>" name="Complete Order"/>
 				<?php endif; ?>
 				
-				<p class="description"><?php $this->_e( 'Your receipt will be on the next page and also immediately emailed to you.' ); ?><strong><?php $this->_e( 'We respect your privacy!' ); ?></strong></p>
+				<p class="description">
+					<?php $this->_e( 'Your receipt will be on the next page and also immediately emailed to you.' ); ?><br />
+					<strong><?php $this->_e( 'We respect your privacy.' ); ?></strong>
+				</p>
 				
 			</div>
 		</form>
@@ -765,8 +768,8 @@ class Geko_Wp_Cart66_View_CheckoutForm extends Geko_Wp_Cart66_View
 					<li><h2><?php $this->_e( 'Create Account' ); ?></h2></li>
 		
 					<li>
-						<label for="createacc-dont-create"><?php $this->_e( "Don't Create Account:" ); ?></label>
-						<input type="checkbox" id="createacc-dont-create" name="createacc-dont-create" value="1" />
+						<input type="checkbox" id="createacc-dont-create" class="front_checkbox" name="createacc-dont-create" value="1" />
+						<label for="createacc-dont-create" class="wide"><?php $this->_e( "Don't Create Account:" ); ?></label>
 					</li>
 					
 					<li>
@@ -781,7 +784,7 @@ class Geko_Wp_Cart66_View_CheckoutForm extends Geko_Wp_Cart66_View
 					
 					<?php if ( $bEnableTerms ): ?>
 						<li>
-							<input type="checkbox" id="createacc-terms-agree" name="createacc-terms-agree" value="1" />
+							<input type="checkbox" id="createacc-terms-agree" class="front_checkbox" name="createacc-terms-agree" value="1" />
 							<label for="createacc-terms-agree" class="wide"><?php echo $sTermsVerbiage; ?></label>
 						</li>
 					<?php endif; ?>
