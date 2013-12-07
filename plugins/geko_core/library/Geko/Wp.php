@@ -138,33 +138,35 @@ class Geko_Wp
 		foreach ( $aParams as $aSubParam ) {
 			
 			$sCond = $aSubParam[ 0 ];
+			$mParam2 = $aSubParam[ 1 ];
 			
 			if ( 'page_template' == $sCond ) {
 				
-				foreach ( $aSubParam[ 1 ] as $sTemplate ) {
+				foreach ( $mParam2 as $sTemplate ) {
 					if ( is_page_template( $sTemplate ) ) return TRUE;
 				}
 			
 			} elseif ( 'category_template' == $sCond ) {
 				
-				foreach ( $aSubParam[ 1 ] as $sTemplate ) {
+				foreach ( $mParam2 as $sTemplate ) {
 					if ( Geko_Wp_Category_Template::getInstance()->isTemplate( $sTemplate ) ) return TRUE;
 				}
 				
 			} elseif ( 'category_post_template' == $sCond ) {
 				
-				foreach ( $aSubParam[ 1 ] as $sTemplate ) {
+				foreach ( $mParam2 as $sTemplate ) {
 					if ( Geko_Wp_Category_PostTemplate::getInstance()->isTemplate( $sTemplate ) ) return TRUE;
 				}
 				
 			} elseif ( 'rewrite' == $sCond ) {
 				
-				$sCheck1 = $aSubParam[ 1 ];
-				$sCheck2 = 'Wp_' . $aSubParam[ 1 ] . '_Rewrite';
-				$sCheck3 = 'Geko_Wp_' . $aSubParam[ 1 ] . '_Rewrite';
+				$sCheck1 = sprintf( 'Gloc_%s_Rewrite', $mParam2 );
+				$sCheck2 = sprintf( 'Wp_%s_Rewrite', $mParam2 );
+				$sCheck3 = sprintf( 'Geko_Wp_%s_Rewrite', $mParam2 );
+				$sCheck4 = $mParam2;
 				
 				if (
-					( $sClass = Geko_Class::existsCoalesce( $sCheck1, $sCheck2, $sCheck3 ) ) && 
+					( $sClass = Geko_Class::existsCoalesce( $sCheck1, $sCheck2, $sCheck3, $sCheck4 ) ) && 
 					( is_subclass_of( $sClass, 'Geko_Wp_Rewrite_Interface' ) )
 				) {
 					$oRewrite = Geko_Singleton_Abstract::getInstance( $sClass );
@@ -178,7 +180,7 @@ class Geko_Wp
 				
 			} else {
 				
-				$fTest = 'is_' . $sCond;
+				$fTest = sprintf( 'is_%s', $sCond );
 				if (
 					( $aSubParam[ 1 ] ) ? $fTest( $aSubParam[ 1 ] ) : $fTest()
 				) return TRUE;
