@@ -116,13 +116,14 @@ class Geko_Wp_NavigationManagement_Page_Rewrite
     
     //
     public function resolveClass() {
-
-		$sCheck1 = $this->_rwSubj;
-		$sCheck2 = 'Wp_' . $this->_rwSubj . '_Rewrite';
-		$sCheck3 = 'Geko_Wp_' . $this->_rwSubj . '_Rewrite';
+		
+		$sCheck1 = sprintf( 'Gloc_%s_Rewrite', $this->_rwSubj );
+		$sCheck2 = sprintf( 'Wp_%s_Rewrite', $this->_rwSubj );
+		$sCheck3 = sprintf( 'Geko_Wp_%s_Rewrite', $this->_rwSubj );
+		$sCheck4 = $this->_rwSubj;
 		
 		if (
-			( $sClass = Geko_Class::existsCoalesce( $sCheck1, $sCheck2, $sCheck3 ) ) && 
+			( $sClass = Geko_Class::existsCoalesce( $sCheck1, $sCheck2, $sCheck3, $sCheck4 ) ) && 
 			( is_subclass_of( $sClass, 'Geko_Wp_Rewrite_Interface' ) )
 		) {
 			return $sClass;
