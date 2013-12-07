@@ -62,7 +62,7 @@
 									// assemble output string
 									var parsed = $.parseJSON( ret );
 									
-									if ( ret.vars ) ret = ret.vars;
+									if ( parsed.vars ) parsed = parsed.vars;
 									
 									var output = '';
 									
