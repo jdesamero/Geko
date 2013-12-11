@@ -24,8 +24,16 @@ class Geko_Service extends Geko_Singleton_Abstract
 			} catch ( Exception $e ) { }
 		}
 		
+		$this->start();
+		
 		return $this;
 	}
+	
+	
+	// hook method
+	public function start() { }
+	
+	
 	
 	//
 	public function process() {
