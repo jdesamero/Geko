@@ -10,7 +10,16 @@ class Geko_Browser
 	const DEVICE_MOBILE = 4;
 	
 	//
+	protected static $aDeviceHash = array(
+		1 => 'tv',
+		2 => 'tablet',
+		3 => 'desktop',
+		4 => 'mobile'
+	);
+	
 	protected $aBrowser = array();
+	
+	
 	
 	
 	//
@@ -395,6 +404,17 @@ class Geko_Browser
 		
 		return $aRet;
 		
+	}
+	
+	
+	
+	//
+	public static function bodyClass( $sUa = '' ) {
+		
+		$aRet = self::detect( $sUa );
+		$aRet[ 'device' ] = self::$aDeviceHash[ $aRet[ 'device' ] ];
+		
+		return implode( ' ', $aRet );
 	}
 	
 	

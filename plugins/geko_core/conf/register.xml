@@ -227,7 +227,7 @@
 		<file id="geko-jquery-tinysort" src="##geko_core_uri##/external/js/jquery.tinysort.min.js" dependencies="geko-jquery-tinysort_charorder" />
 		<file id="geko-jquery-tinysort_charorder" src="##geko_core_uri##/external/js/jquery.tinysort.charorder.min.js" dependencies="jquery" />
 		<file id="geko-jquery-tmpl" src="##geko_core_uri##/external/js/jquery.tmpl.js" dependencies="jquery" />
-		<file id="geko-jquery-touchswipe" src="##geko_core_uri##/external/js/jquery.touchSwipe-1.2.4.js" dependencies="jquery" />
+		<file id="geko-jquery-touchswipe" src="##geko_core_uri##/external/js/jquery.touchSwipe-1.6.5.js" dependencies="jquery" />
 		<file id="geko-jquery-uri" src="##geko_core_uri##/external/js/jquery.uri.js" dependencies="jquery" />
 		<file id="geko-jquery-url_encode" src="##geko_core_uri##/external/js/jquery.url_encode.js" dependencies="jquery" />
 		<file id="geko-jquery-validate" src="##geko_core_uri##/external/js/jquery.validate.js" dependencies="jquery" />
