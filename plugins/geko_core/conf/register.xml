@@ -37,6 +37,7 @@
 		<file id="geko-googlemaps" src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=##GOOGLEMAPS_API_KEY##" />
 		<file id="geko-string_format" src="##geko_core_uri##/external/js/string_format.js" />
 		<file id="geko-swf-object" src="##geko_core_uri##/external/js/swfobject.js" />
+		<file id="geko-swipe" src="##geko_core_uri##/external/js/swipe.js" />
 		<file id="geko-sylvester" src="##geko_core_uri##/external/js/sylvester.js" />
 		<file id="geko-underscore" src="##geko_core_uri##/external/js/underscore-min.js" dependencies="jquery" />
 		
@@ -316,6 +317,8 @@
 		
 		
 		<!-- version independent styles -->
+
+		<file id="geko-swipe" src="##geko_core_uri##/external/styles/swipe/style.css" />
 		
 		<file id="geko-jquery-jcarousel" src="##geko_core_uri##/external/styles/jquery.jcarousel.css" />
 		<file id="geko-jquery-jscrollbar" src="##geko_core_uri##/external/styles/jScrollbar/style.css" />
@@ -326,8 +329,8 @@
 		<file id="geko-jquery-smoothzoom" src="##geko_core_uri##/external/styles/smoothZoom/style.css" />
 		<file id="geko-jquery-weekcalendar" src="##geko_core_uri##/external/styles/weekcalendar/style.css" />
 		
-		<file id="geko-jquery-wpadmin" src="##geko_core_uri##/styles/wpadmin/style.css" />
 		<file id="geko-basic" src="##geko_core_uri##/styles/basic/style.css" />
+		<file id="geko-jquery-wpadmin" src="##geko_core_uri##/styles/wpadmin/style.css" />
 		
 		<!-- Geek Oracle PHP Extensions class-bound styles -->
 		<file id="geko_phpunit" src="##geko_core_uri##/styles/Geko/PhpUnit.css" dependencies="geko-basic" />
