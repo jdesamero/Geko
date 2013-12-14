@@ -203,6 +203,7 @@
 		<file id="geko-jquery-fixboxmodel" src="##geko_core_uri##/external/js/jquery.fixBoxModel.js" dependencies="jquery" />
 		<file id="geko-jquery-form" src="##geko_core_uri##/external/js/jquery.form.js" dependencies="jquery" />
 		<file id="geko-jquery-googlemaps" src="##geko_core_uri##/external/js/jquery.googlemaps-1.01.1.js" dependencies="geko-googlemaps jquery" />
+		<file id="geko-jquery-hammer" src="##geko_core_uri##/external/js/jquery.hammer.js" dependencies="jquery" />
 		<file id="geko-jquery-jcarousel" src="##geko_core_uri##/external/js/jquery.jcarousel.js" dependencies="jquery" />
 		<file id="geko-jquery-jcarousel-simple" src="##geko_core_uri##/external/js/jquery.jcarousel-simple.js" dependencies="jquery" />
 		<file id="geko-jquery-jcarousellite" src="##geko_core_uri##/external/js/jquery.jcarousellite_1.0.1.min.js" dependencies="geko-jquery-easing" />
