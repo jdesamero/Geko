@@ -247,6 +247,7 @@
 		<file id="geko-jquery-geko_get_multi" src="##geko_core_uri##/js/jquery.geko_get_multi.js" dependencies="jquery" />
 		<file id="geko-jquery-geko_horizontal_scroll" src="##geko_core_uri##/js/jquery.geko_horizontal_scroll.js" dependencies="jquery geko-jquery-ui-slider" />
 		<file id="geko-jquery-geko_image_picker" src="##geko_core_uri##/js/jquery.geko_image_picker.js" dependencies="geko-jquery-geko_util" />
+		<file id="geko-jquery-geko_pagination" src="##geko_core_uri##/js/jquery.geko_pagination.js" dependencies="jquery" />
 		<file id="geko-jquery-geko_portfolio" src="##geko_core_uri##/js/jquery.geko_portfolio.js" dependencies="jquery" />
 		<file id="geko-jquery-geko_read_only_form" src="##geko_core_uri##/js/jquery.geko_read_only_form.js" dependencies="jquery" />
 		<file id="geko-jquery-geko_reinit" src="##geko_core_uri##/js/jquery.geko_reinit.js" dependencies="jquery" />
