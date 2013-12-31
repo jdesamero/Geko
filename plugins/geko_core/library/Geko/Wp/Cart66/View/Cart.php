@@ -88,18 +88,15 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 		$fullMode = $this->getFullMode();
 		
 		
+		//// override images
 		
-		$cartImgPath = $this->getVal( 'cart_images_url' );
-		if ( 0 !== $cartImgPath && stripos( strrev( $cartImgPath ), '/' ) ) {
-			$cartImgPath .= '/';
-		}
-
-		if ( $cartImgPath ) {
+		if ( $cartImgPath = $this->getCartImgPath() ) {
 			$continueShoppingImg = $cartImgPath . 'continue-shopping.png';
 			$updateTotalImg = $cartImgPath . 'update-total.png';
 			$calculateShippingImg = $cartImgPath . 'calculate-shipping.png';
 			$applyCouponImg = $cartImgPath . 'apply-coupon.png';
 		}
+		
 		
 		if ( $this->getSess( 'InvalidOptions' ) ): ?>
 			<div id="Cart66InvalidOptions" class="alert-message alert-error Cart66Unavailable">
@@ -586,11 +583,7 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 				<div id="viewCartNav">
 					
 					<div id="continueShopping">
-						<?php if ( $cartImgPath ): ?>
-							<a href="<?php $this->echoSess( 'LastPage' ); ?>" class="Cart66CartContinueShopping" <?php echo $sTargetTag; ?> ><img src="<?php echo $continueShoppingImg ?>" /></a>
-						<?php else: ?>
-							<a href="<?php $this->echoSess( 'LastPage' ); ?>" class="Cart66ButtonSecondary Cart66CartContinueShopping" title="Continue Shopping" <?php echo $sTargetTag; ?> ><?php $this->_e( 'Continue Shopping' ); ?></a>
-						<?php endif; ?>
+						<?php $this->displayContinueShoppingBtn( $continueShoppingImg, $sTargetTag ); ?>
 					</div>
 					
 					<?php
@@ -647,11 +640,7 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 			
 			<div id="emptyCartMsg">
 				<h3><?php $this->_e( 'Your Cart Is Empty' ); ?></h3>
-				<?php if ( $cartImgPath ): ?>
-					<a href="<?php $this->echoSess( 'LastPage' ); ?>" title="Continue Shopping" class="Cart66CartContinueShopping" <?php echo $sTargetTag; ?> ><img alt="Continue Shopping" class="continueShoppingImg" src="<?php echo $continueShoppingImg ?>" /></a>
-				<?php else: ?>
-					<a href="<?php $this->echoSess( 'LastPage' ); ?>" class="Cart66ButtonSecondary" title="Continue Shopping" <?php echo $sTargetTag; ?> ><?php $this->_e( 'Continue Shopping' ); ?></a>
-				<?php endif; ?>
+				<?php $this->displayContinueShoppingBtn( $continueShoppingImg, $sTargetTag ); ?>
 			</div>
 			
 			<?php

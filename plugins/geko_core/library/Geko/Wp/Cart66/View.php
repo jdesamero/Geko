@@ -9,12 +9,27 @@ class Geko_Wp_Cart66_View extends Geko_Singleton_Abstract
 	
 	protected $_aParams = array();
 	
+	protected $_sCartImgPath = NULL;
+	
+	
 	
 	
 	//
 	protected function __construct() {
 		
 		$this->_sInstanceClass = get_class( $this );
+		
+		if (
+			( NULL === $this->_sCartImgPath ) && 
+			( $sCartImgPath = $this->getVal( 'cart_images_url' ) )
+		) {
+			
+			if ( 0 !== $sCartImgPath && stripos( strrev( $sCartImgPath ), '/' ) ) {
+				$sCartImgPath .= '/';
+			}
+			
+			$this->_sCartImgPath = $sCartImgPath;
+		}
 		
 	}
 	
@@ -50,6 +65,10 @@ class Geko_Wp_Cart66_View extends Geko_Singleton_Abstract
 		return $this->_aParams[ $sKey ];
 	}
 	
+	//
+	public function getCartImgPath() {
+		return $this->_sCartImgPath;
+	}
 	
 	
 	
@@ -151,6 +170,8 @@ class Geko_Wp_Cart66_View extends Geko_Singleton_Abstract
 	
 	
 	
+	//// shared widgety things
+	
 	//
 	public function displayNotification( $sKey, $sMessage, $sType = '' ) {
 		
@@ -175,6 +196,16 @@ class Geko_Wp_Cart66_View extends Geko_Singleton_Abstract
 	}
 	
 	
+	//
+	public function displayContinueShoppingBtn( $sContinueShoppingImg = '', $sTargetTag = '' ) {
+		
+		if ( $sContinueShoppingImg ): ?>
+			<a href="<?php $this->echoSess( 'LastPage' ); ?>" class="Cart66CartContinueShopping" <?php echo $sTargetTag; ?> ><img src="<?php echo $sContinueShoppingImg; ?>" /></a>
+		<?php else: ?>
+			<a href="<?php $this->echoSess( 'LastPage' ); ?>" class="Cart66ButtonSecondary Cart66CartContinueShopping" title="<?php $this->_e( 'Continue Shopping' ); ?>" <?php echo $sTargetTag; ?> ><?php $this->_e( 'Continue Shopping' ); ?></a>
+		<?php endif;
+		
+	}
 	
 	
 }

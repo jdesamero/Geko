@@ -1,5 +1,6 @@
 <?php
 
+//
 class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 {
 	
@@ -15,6 +16,9 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	
 	protected $_bCart66PluginActivated = FALSE;
 	protected $_bIframeMode = FALSE;
+	
+	protected $_aLabelOverrides = array();
+	
 	
 	
 	
@@ -119,6 +123,32 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	public function getIframeMode() {
 		return $this->_bIframeMode;
 	}	
+	
+	
+	//
+	public function setLabelOverride() {
+		
+		$aArgs = func_get_args();
+		
+		if ( is_array( $aValues = $aArgs[ 0 ] ) ) {
+			$this->_aLabelOverrides = array_merge( $this->_aLabelOverrides, $aValues );
+		} else {
+			list( $sKey, $sValue ) = $aArgs;
+			$this->_aLabelOverrides[ $sKey ] = $sValue;
+		}
+		
+		return $this;
+	}
+	
+	//
+	public function getLabelOverride( $sKey, $sDefaultVal ) {
+		
+		if ( $sValue = $this->_aLabelOverrides[ $sKey ] ) {
+			return __( $sValue, 'cart66' );
+		}
+		
+		return $sDefaultVal;
+	}
 	
 	
 	
@@ -345,6 +375,7 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 		
 		// populate form values
 		$oTable1 = Geko_Html::populateForm( $oTable1, $this->getFormValues( array(
+			'cart_cont_shop_on_checkout',
 			'cart_wp_user_integration',
 			'cart_wp_user_terms_checkbox',
 			'cart_wp_user_terms_verbiage'
@@ -394,7 +425,16 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	public function outputSettingsFields( $sSection ) {
 		
 		if ( 'checkout_checkout' == $sSection ): ?>
-		
+			
+			<tr valign="top">
+				<th scope="row">Show Continue Shopping Button on Checkout Page</th>
+				<td>
+					<input type="radio" value="1" id="cart_cont_shop_on_checkout_yes" name="cart_cont_shop_on_checkout" />
+					<label for="cart_cont_shop_on_checkout_yes">Yes</label>
+					<input type="radio" value="" id="cart_cont_shop_on_checkout_no" name="cart_cont_shop_on_checkout" />
+					<label for="cart_cont_shop_on_checkout_no">No</label>
+				</td>
+			</tr>
 			<tr valign="top">
 				<th scope="row">Enable Wordpress User Account Integration</th>
 				<td>

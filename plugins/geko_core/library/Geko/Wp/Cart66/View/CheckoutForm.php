@@ -100,6 +100,13 @@ class Geko_Wp_Cart66_View_CheckoutForm extends Geko_Wp_Cart66_View
 		$bEnableWordpressUserIntegration = $this->getVal( 'cart_wp_user_integration' ) ? TRUE : FALSE ;
 		
 		
+		//// override images
+
+		if ( $cartImgPath = $this->getCartImgPath() ) {
+			$completeImgPath = $cartImgPath . 'complete-order.png';
+			$continueShoppingImg = $cartImgPath . 'continue-shopping.png';
+		}
+		
 		
 		//// form classes
 		
@@ -107,6 +114,18 @@ class Geko_Wp_Cart66_View_CheckoutForm extends Geko_Wp_Cart66_View
 		
 		$sTaxableProds = ( $oCart->hasTaxableProducts() ) ? 'true' : 'false' ;
 		$sTaxBlockClass = ( $this->getSess( 'Tax' ) > 0 ) ? 'show-tax-block' : 'hide-tax-block' ;
+		
+		?>
+		
+		<!-- optional continue shopping button -->
+		<?php if ( $this->getVal( 'cart_cont_shop_on_checkout' ) ): ?>
+			<div id="continueShopping">
+				<?php $this->displayContinueShoppingBtn( $continueShoppingImg ); ?>
+			</div>
+		<?php endif; ?>
+		
+		
+		<?php
 		
 		// checkout login form
 		if ( $bEnableWordpressUserIntegration ) {
@@ -548,16 +567,7 @@ class Geko_Wp_Cart66_View_CheckoutForm extends Geko_Wp_Cart66_View
 			<div id="Cart66CheckoutButtonDiv" class="<?php echo $sCoBtnDivClass; ?>">
 				<label for="Cart66CheckoutButton" class="Cart66Hidden"><?php $this->_e( 'Checkout' ); ?></label>
 				<?php
-					
-				// 
-				$cartImgPath = $this->getVal( 'cart_images_url' );
-				if ( $cartImgPath ) {
-					if ( strpos( strrev( $cartImgPath ), '/' ) !== 0 ) {
-						$cartImgPath .= '/';
-					}
-					$completeImgPath = $cartImgPath . 'complete-order.png';
-				}
-				
+								
 				//
 				$url = Cart66Common::appendWurlQueryString( 'cart66AjaxCartRequests' );
 				if ( Cart66Common::isHttps() ) {

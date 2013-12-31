@@ -430,6 +430,11 @@
 			$( field ).addClass( 'errorField' );
 		} );
     	
+    	
+    	var frm2 = $( this ).closest( 'form' );
+    	setState( frm2, 'shipping' );
+    	
+    	
 	} );
 	
 	

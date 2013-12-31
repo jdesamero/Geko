@@ -27,6 +27,8 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 		$gateway = $data[ 'gateway' ];
 		$gatewayName = ( is_object( $gateway ) ) ? get_class( $gateway ) : NULL ;
 		
+		$oGekoCart66 = Geko_Wp_Cart66::getInstance();
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		
 		
@@ -573,10 +575,10 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 			'form_name' => '#' . $gatewayName . '_form',
 			'error_field_names' => $error_field_names,
 			
-			'text_state' => $this->_t( 'State' ),
-			'text_zip_code' => $this->_t( 'Zip code' ),
-			'text_post_code' => $this->_t( 'Post code' ),
-			'text_province' => $this->_t( 'Province' ),
+			'text_state' => $oGekoCart66->getLabelOverride( 'text_state', $this->_t( 'State' ) ),
+			'text_zip_code' => $oGekoCart66->getLabelOverride( 'text_zip_code', $this->_t( 'Zip code' ) ),
+			'text_post_code' => $oGekoCart66->getLabelOverride( 'text_post_code', $this->_t( 'Post code' ) ),
+			'text_province' => $oGekoCart66->getLabelOverride( 'text_province', $this->_t( 'Province' ) ),
 			
 			'text_enter_email' => $this->_t( 'Please enter your email address' ),
 			'text_enter_valid_email' => $this->_t( 'Please enter a valid email address' ),
