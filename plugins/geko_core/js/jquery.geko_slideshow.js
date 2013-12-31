@@ -50,7 +50,10 @@
 			}
 			
 			fSlideEffect();
-			fAutoPlay();
+			
+			if ( max_idx > 0 ) {
+				fAutoPlay();
+			}
 		};
 		
 		var fAutoPlay = function() {
