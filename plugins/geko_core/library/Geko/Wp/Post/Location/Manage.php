@@ -27,8 +27,8 @@ class Geko_Wp_Post_Location_Manage extends Geko_Wp_Location_Manage
 		
 		$this->_sCurrentDisplayMode = Geko_Wp_Admin_Hooks::getDisplayMode();
 		
-		add_action( 'save_' . $this->_sSubAction, array( $this, 'savePostdata' ) );	
-		add_action( 'delete_' . $this->_sSubAction, array( $this, 'deletePostdata' ) );
+		add_action( 'save_post', array( $this, 'savePostdata' ) );	
+		add_action( 'delete_post', array( $this, 'deletePostdata' ) );
 		
 		return $this;
 	}
@@ -121,18 +121,11 @@ class Geko_Wp_Post_Location_Manage extends Geko_Wp_Location_Manage
 		// verify this came from the our screen and with proper authorization,
 		// because save_post can be triggered at other times
 		
-		if ( FALSE == wp_verify_nonce( $_POST[ 'geko-post-location_noncename' ], plugin_basename( __FILE__ ) ) ) {
+		if (
+			( FALSE == wp_verify_nonce( $_POST[ 'geko-post-location_noncename' ], plugin_basename( __FILE__ ) ) ) || 
+			( FALSE == current_user_can( 'edit_post', $iPostId ) )
+		) {
 			return $iPostId;
-		}
-		
-		if ( 'page' == $_POST[ 'post_type' ] ) {
-			if ( FALSE == current_user_can( 'edit_page', $iPostId ) ) {
-				return $iPostId;
-			}
-		} else {
-			if ( FALSE == current_user_can( 'edit_post', $iPostId ) ) {
-				return $iPostId;
-			}
 		}
 		
 		//// DB stuff
