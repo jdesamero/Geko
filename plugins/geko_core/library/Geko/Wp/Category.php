@@ -8,59 +8,61 @@ class Geko_Wp_Category extends Geko_Wp_Entity
 	
 	// get the current category object
 	// $sKey is either a category name or slug
-	public static function get_cat($sKey)
-	{
+	public static function get_cat( $sKey, $bReturnId = FALSE ) {
+		
 		// try using slug first
-		$cat = get_term_by('slug', $sKey, 'category');
-		if ($cat) {
-			return $cat;
-		}
+		$oCat = get_term_by( 'slug', $sKey, 'category' );
 		
 		// try using category name
-		$cat = get_term_by('name', $sKey, 'category');
-		if ($cat) {
-			return $cat;
+		if ( !$oCat ) {
+			$oCat = get_term_by( 'name', $sKey, 'category' );
 		}
 		
-		return NULL;
+		return ( $bReturnId ) ?
+			( ( $oCat ) ? $oCat->term_id : 0 ) : 
+			( ( $oCat ) ? $oCat : NULL )
+		;
 	}
 	
 	// $sKey is either a category name or slug
 	// the standard get_category_ID() function works with the category name only
-	public static function get_ID($sKey)
-	{
-		$cat = self::get_cat($sKey);
-		if ($cat) {
-			return $cat->term_id;
-		} else {
-			return 0;
+	public static function get_ID( $mKey ) {
+		
+		if ( is_array( $mKey ) ) {
+			$aRet = array();
+			foreach ( $mKey as $sKey ) {
+				$aRet[] = self::get_ID( $sKey );
+			}
+			return $aRet;
 		}
+		
+		return self::get_cat( $mKey, TRUE );		
 	}
 	
 	// $sKey is either a category name or slug
 	// the standard in_category() function works with the category name only
-	private static function _in( $sKey, $iPostId = NULL )
-	{
+	private static function _in( $sKey, $iPostId = NULL ) {
+		
 		global $post;
 		
 		if ( NULL === $iPostId ) $iPostId = $post->ID;
 		
-		if (empty($sKey)) return FALSE;
+		if ( empty( $sKey ) ) return FALSE;
 		
-		$cat_ID = self::get_ID($sKey);
+		$iCatId = self::get_ID( $sKey );
 		
-		$categories = get_object_term_cache( $iPostId, 'category' );
+		$aCats = get_object_term_cache( $iPostId, 'category' );
 		
-		if (FALSE === $categories) {
-			$categories = wp_get_object_terms( $iPostId, 'category' );
+		if ( FALSE === $aCats ) {
+			$aCats = wp_get_object_terms( $iPostId, 'category' );
 		}
 		
 		$aCatKeys = array();
-		foreach ($categories as $cat) {
-			$aCatKeys[] = $cat->term_id;
+		foreach ( $aCats as $oCat ) {
+			$aCatKeys[] = $oCat->term_id;
 		}
 		
-		if ( in_array($cat_ID, $aCatKeys) ) {
+		if ( in_array( $iCatId, $aCatKeys ) ) {
 			return TRUE;
 		} else {
 			return FALSE;
@@ -68,8 +70,8 @@ class Geko_Wp_Category extends Geko_Wp_Entity
 	}
 	
 	// allows to take a list of categories, either as comma delimited or as an array
-	public static function in( $mArg, $iPostId = NULL )
-	{
+	public static function in( $mArg, $iPostId = NULL ) {
+		
 		if ( FALSE == is_array( $mArg ) ) {
 			$mArg = explode( ',', $mArg );
 		}
@@ -85,29 +87,29 @@ class Geko_Wp_Category extends Geko_Wp_Entity
 	
 	// get order query args from string with format eg:
 	// company|title|asc;event|start_date|desc
-	public static function getOrderQueryArgs($sRules, $sSlug = '')
-	{
+	public static function getOrderQueryArgs( $sRules, $sSlug = '' ) {
+		
 		$sQueryOrderArgs = '';
 		
-		$aRules = explode(';', $sRules);
+		$aRules = explode( ';', $sRules );
 		
-		foreach ($aRules as $sRule) {
+		foreach ( $aRules as $sRule ) {
 			
-			$aRule = explode(',', $sRule);
-			$sCatSlug = strtolower(trim($aRule[0]));
+			$aRule = explode( ',', $sRule );
+			$sCatSlug = strtolower( trim( $aRule[ 0 ] ) );
 			
-			if ('' != $sSlug) {
-				$bArg = ($sSlug == $sCatSlug);
+			if ( '' != $sSlug ) {
+				$bArg = ( $sSlug == $sCatSlug );
 			} else {
-				$bArg = Geko_Wp_Category::in($sCatSlug);
+				$bArg = self::in( $sCatSlug );
 			}
 			
 			// ordering
-			if ($bArg) {
+			if ( $bArg ) {
 
-				$sSortField = strtolower(trim($aRule[1]));
-				$sSortDir = strtoupper(trim($aRule[2]));
-				if ('' == $sSortDir) $sSortDir = 'ASC';
+				$sSortField = strtolower( trim( $aRule[ 1 ] ) );
+				$sSortDir = strtoupper( trim( $aRule[ 2 ] ) );
+				if ( '' == $sSortDir ) $sSortDir = 'ASC';
 				
 				$sQueryOrderArgs = '&orderby=' . $sSortField . '&order=' . $sSortDir;
 			}
@@ -119,15 +121,17 @@ class Geko_Wp_Category extends Geko_Wp_Entity
 	
 	
 	// get an imploded list of id's of all of the descendants of given category list
-	public static function getDescendantCategoryIds($sCatList)
-	{
+	public static function getDescendantCategoryIds( $sCatList ) {
+		
 		$sDescendantIds = '';
-		$aParentIds = explode(',', $sCatList);
-		foreach ($aParentIds as $iParentCatId) {
-			$aDescendantIds = get_term_children(trim($iParentCatId), 'category');
-			if ('' != $sDescendantIds) $sDescendantIds .= ',';
-			$sDescendantIds .= implode(',', $aDescendantIds);
+		$aParentIds = explode( ',', $sCatList );
+		
+		foreach ( $aParentIds as $iParentCatId ) {
+			$aDescendantIds = get_term_children( trim( $iParentCatId ), 'category' );
+			if ( '' != $sDescendantIds ) $sDescendantIds .= ',';
+			$sDescendantIds .= implode( ',', $aDescendantIds );
 		}
+		
 		return $sDescendantIds;
 	}
 	
@@ -138,14 +142,12 @@ class Geko_Wp_Category extends Geko_Wp_Entity
 	//// implement concrete methods for category
 	
 	//
-	public function getEntityFromId( $iEntityId )
-	{
+	public function getEntityFromId( $iEntityId ) {
 		return get_category( $iEntityId );
 	}
-
+	
 	//
-	public function getEntityFromSlug( $sEntitySlug )
-	{
+	public function getEntityFromSlug( $sEntitySlug ) {
 		if ( FALSE !== strpos( $sEntitySlug, '/' ) ) {
 			return get_category_by_path( $sEntitySlug );
 		} else {
@@ -154,8 +156,8 @@ class Geko_Wp_Category extends Geko_Wp_Entity
 	}
 
 	//
-	public function init()
-	{
+	public function init() {
+		
 		parent::init();
 		
 		$this
@@ -170,15 +172,14 @@ class Geko_Wp_Category extends Geko_Wp_Entity
 	}
 	
 	//
-	public function getPermalink()
-	{
+	public function getPermalink() {
 		return get_category_link( $this->getId() );
 	}
 	
 	
 	//
-	public function getDefaultEntityValue()
-	{
+	public function getDefaultEntityValue() {
+		
 		global $wp_query;
 		
 		if ( is_category() ) {
@@ -189,7 +190,7 @@ class Geko_Wp_Category extends Geko_Wp_Entity
 				return $oCatAlias->getApparentCat()->getRawEntity();
 			}
 			
-			return Geko_Wp_Category::get_ID( $wp_query->query_vars['category_name'] );
+			return self::get_ID( $wp_query->query_vars[ 'category_name' ] );
 		}
 		
 		return NULL;
@@ -197,14 +198,15 @@ class Geko_Wp_Category extends Geko_Wp_Entity
 	
 	
 	//
-	public function getRawMeta( $sMetaKey )
-	{
+	public function getRawMeta( $sMetaKey ) {
+		
 		$oMeta = Geko_Singleton_Abstract::getInstance( $this->_sMetaClass );
 		
 		return $oMeta->getInheritedValue(
 			$this->getId(), $oMeta->getPrefixWithSep() . $sMetaKey
 		);
 	}
+	
 	
 }
 

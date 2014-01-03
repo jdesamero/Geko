@@ -238,6 +238,32 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	}
 	
 	
+	//
+	public function getNumOrders( $iUserId ) {
+		
+		if ( $this->_bCart66PluginActivated ) {
+			
+			if ( $iUserId ) {
+				
+				global $wpdb;
+				
+				$sQuery = sprintf(
+					'SELECT COUNT(*) AS num FROM %s o WHERE o.wp_user_id = %d',
+					$wpdb->cart66_orders,
+					$iUserId
+				);
+				
+				return $wpdb->get_var( $sQuery );
+			}
+			
+		} else {
+			echo self::MSG_PLUGIN_NOT_ACTIVATED;
+		}
+		
+		return NULL;		
+	}
+	
+	
 	
 	//
 	public function outputAddToCart( $aProd, $aParams = array() ) {
@@ -343,6 +369,56 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 		} else {
 			echo self::MSG_PLUGIN_NOT_ACTIVATED;
 		}
+		
+		return $this;
+	}
+
+
+	//
+	public function outputHistory( $iUserId ) {
+		
+		if ( $this->_bCart66PluginActivated ):
+			
+			global $wpdb;
+			
+			$results = $wpdb->get_results( sprintf(
+				'SELECT o.ouid, o.ordered_on, o.trans_id, o.total, o.status FROM %s o WHERE wp_user_id = %d ORDER BY o.ordered_on DESC',
+				$wpdb->cart66_orders,
+				$iUserId 
+			) );
+			
+			?>
+			<table id="viewCartTable">
+				<thead>
+					<tr>
+						<th>Order Number</th>
+						<th>Date</th>
+						<th>Total</th>
+						<th>Order Status</th>
+						<th>Receipt</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ( $results as $order ):
+						
+						$sReceiptUrl = sprintf( '%s/store/receipt/?ouid=%s', get_bloginfo( 'url' ), $order->ouid );
+						
+						?>
+						<tr>
+							<td><a href="<?php echo $sReceiptUrl; ?>" title="Click to view receipt" target="_blank"><?php echo $order->trans_id; ?></a></td>
+							<td><?php echo date( 'D, j M Y - h:i A', strtotime( $order->ordered_on ) ); ?></td>
+							<td><?php echo Cart66Common::currency( $order->total ); ?></td>
+							<td><?php echo ucwords( $order->status ); ?></td>
+							<td><a href="<?php echo $sReceiptUrl; ?>" title="Click to view receipt" target="_blank">View Receipt</a></td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+			<?php
+			
+		else:
+			echo self::MSG_PLUGIN_NOT_ACTIVATED;
+		endif;
 		
 		return $this;
 	}
