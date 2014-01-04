@@ -95,15 +95,25 @@ class Geko_Wp_Cart66_Gateway extends Cart66GatewayAbstract
 	
 	
 	//
-	public function saveDiscountedOrder( $fDiscount, $total, $tax, $transactionId, $status, $accountId ) {
+	public function saveOrderExtra( $fDiscount, $total, $tax, $transactionId, $status, $accountId ) {
 		
 		global $wpdb;
 		
 		$iOrderId = $this->saveOrder( $total, $tax, $transactionId, $status, $accountId );
 		
-		$wpdb->update( $wpdb->cart66_orders, array(
-			'discount_amount' => $fDiscount
-		), array(
+		$aData = array( 'discount_amount' => $fDiscount );
+		
+		// track user id
+		if ( Cart66Setting::getValue( 'cart_wp_user_integration' ) ) {
+			
+			global $user_ID;
+			
+			if ( $user_ID ) {
+				$aData[ 'wp_user_id' ] = $user_ID;
+			}
+		}
+		
+		$wpdb->update( $wpdb->cart66_orders, $aData, array(
 			'id' => $iOrderId
 		) );
 		

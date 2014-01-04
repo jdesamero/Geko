@@ -9,6 +9,8 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	
 	protected $bCalledInit = FALSE;
 	
+	protected $_iNumPieces = NULL;
+	protected $_iNumOrders = NULL;
 	protected $_aBilling = array();
 	protected $_aPayment = array();
 	
@@ -16,6 +18,10 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	
 	protected $_bCart66PluginActivated = FALSE;
 	protected $_bIframeMode = FALSE;
+	
+	protected $_iUserId = NULL;
+	protected $_bHistoryPaginate = FALSE;
+	protected $_iHistoryItemsPerPage = NULL;
 	
 	protected $_aLabelOverrides = array();
 	
@@ -72,6 +78,12 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	
 	
 	//// accessors
+	
+	//
+	public function setUserId( $iUserId ) {
+		$this->_iUserId = $iUserId;
+		return $this;
+	}
 	
 	//
 	public function setBilling( $aBilling ) {
@@ -151,6 +163,26 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	}
 	
 	
+	//
+	public function setOrderHistoryPagination( $bPaginate = TRUE, $iItemsPerPage = 15 ) {
+		
+		$this->_bHistoryPaginate = $bPaginate;
+		$this->_iHistoryItemsPerPage = $iItemsPerPage;
+		
+		if ( $bPaginate && ( $iItemsPerPage > 0 ) ) {
+			
+			global $wp_query;
+			
+			$iNumOrders = $this->getNumOrders();
+			
+			$wp_query->found_posts = $iNumOrders;
+			$wp_query->max_num_pages = ceil( $iNumOrders / $iItemsPerPage );		
+		}
+		
+		return $this;
+	}
+	
+	
 	
 	
 	//// db
@@ -160,13 +192,17 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 		
 		global $wpdb;
 		
-		$sQuery = sprintf(
-			'SELECT DISTINCT p.name, MD5( p.name ) AS name_key FROM %s p ORDER BY p.name ASC',
-			$wpdb->cart66_products
-		);
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			->distinct( TRUE )
+			->field( 'p.name' )
+			->field( 'MD5( p.name )', 'name_key' )
+			->from( $wpdb->cart66_products, 'p' )
+			->order( 'p.name', 'ASC' )
+		;
 		
 		$aResFmt = array();
-		$aRes = $wpdb->get_results( $sQuery, ARRAY_A );
+		$aRes = $wpdb->get_results( strval( $oQuery ), ARRAY_A );
 		
 		foreach ( $aRes as $aRow ) {
 			$aResFmt[ $aRow[ 'name_key' ] ] = $aRow[ 'name' ];
@@ -181,13 +217,18 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 		
 		global $wpdb;
 		
-		$sQuery = sprintf(
-			"SELECT p.id, p.name, p.item_number, p.price_description, p.price FROM %s p WHERE MD5( p.name ) = '%s'",
-			$wpdb->cart66_products,
-			addslashes( $sProdGroupKey )
-		);
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			->field( 'p.id' )
+			->field( 'p.name' )
+			->field( 'p.item_number' )
+			->field( 'p.price_description' )
+			->field( 'p.price' )
+			->from( $wpdb->cart66_products, 'p' )
+			->where( 'MD5( p.name ) = ?', $sProdGroupKey )
+		;
 		
-		return $wpdb->get_results( $sQuery, ARRAY_A );
+		return $wpdb->get_results( strval( $oQuery ), ARRAY_A );
 	}
 	
 	//
@@ -217,50 +258,66 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 	
 	
 	//
-	public function getCartNumPieces() {
-		
-		$iTotal = 0;
+	public function getCartNumPieces( $bUseCache = TRUE ) {
 		
 		if ( $this->_bCart66PluginActivated ) {
 			
-			if ( $oCart = Cart66Session::get( 'Cart66Cart' ) ) {
+			if (
+				( $oCart = Cart66Session::get( 'Cart66Cart' ) ) && 
+				(
+					( NULL === $this->_iNumPieces ) || 
+					( ( NULL !== $this->_iNumPieces ) && ( !$bUseCache ) )
+				)
+			) {
+				
 				$aCartItems = $oCart->getItems();
+				
+				$iTotal = 0;
 				foreach ( $aCartItems as $oItem ) {
 					$iTotal += intval( $oItem->getQuantity() );
 				}
+				
+				$this->_iNumPieces = $iTotal;
 			}
 			
 		} else {
 			echo self::MSG_PLUGIN_NOT_ACTIVATED;
 		}
 		
-		return $iTotal;
+		return $this->_iNumPieces;
 	}
 	
 	
 	//
-	public function getNumOrders( $iUserId ) {
+	public function getNumOrders( $bUseCache = TRUE ) {
 		
 		if ( $this->_bCart66PluginActivated ) {
 			
-			if ( $iUserId ) {
+			if (
+				( $iUserId = $this->_iUserId ) && 
+				(
+					( NULL === $this->_iNumOrders ) || 
+					( ( NULL !== $this->_iNumOrders ) && ( !$bUseCache ) )
+				)
+			) {
 				
 				global $wpdb;
 				
-				$sQuery = sprintf(
-					'SELECT COUNT(*) AS num FROM %s o WHERE o.wp_user_id = %d',
-					$wpdb->cart66_orders,
-					$iUserId
-				);
+				$oQuery = new Geko_Sql_Select();
+				$oQuery
+					->field( 'COUNT(*)', 'num' )
+					->from( $wpdb->cart66_orders, 'o' )
+					->where( 'o.wp_user_id = ?', $iUserId )
+				;
 				
-				return $wpdb->get_var( $sQuery );
+				$this->_iNumOrders = intval( $wpdb->get_var( strval( $oQuery ) ) );
 			}
 			
 		} else {
 			echo self::MSG_PLUGIN_NOT_ACTIVATED;
 		}
 		
-		return NULL;		
+		return $this->_iNumOrders;		
 	}
 	
 	
@@ -375,27 +432,46 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 
 
 	//
-	public function outputHistory( $iUserId ) {
+	public function outputHistory( $iPage = NULL ) {
 		
-		if ( $this->_bCart66PluginActivated ):
+		if ( $this->_bCart66PluginActivated && $this->_iUserId ):
 			
 			global $wpdb;
 			
-			$results = $wpdb->get_results( sprintf(
-				'SELECT o.ouid, o.ordered_on, o.trans_id, o.total, o.status FROM %s o WHERE wp_user_id = %d ORDER BY o.ordered_on DESC',
-				$wpdb->cart66_orders,
-				$iUserId 
-			) );
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				->field( 'o.ouid' )
+				->field( 'o.ordered_on' )
+				->field( 'o.trans_id' )
+				->field( 'o.total' )
+				->field( 'o.status' )
+				->from( $wpdb->cart66_orders, 'o' )
+				->where( 'o.wp_user_id = ?', $this->_iUserId )
+				->order( 'o.ordered_on', 'DESC' )
+			;
+			
+			if ( $this->_bHistoryPaginate ) {
+				
+				$iItemsPerPage = $this->_iHistoryItemsPerPage;
+				$iOffset = (
+					( ( $iPage ) ? ( intval( $iPage ) - 1 ) : 0 ) *
+					$iItemsPerPage
+				);
+				$oQuery->limitOffset( $iItemsPerPage, $iOffset );
+
+			}
+			
+			$results = $wpdb->get_results( strval( $oQuery ) );
 			
 			?>
-			<table id="viewCartTable">
+			<table id="viewCartTable" class="order-history">
 				<thead>
 					<tr>
-						<th>Order Number</th>
-						<th>Date</th>
-						<th>Total</th>
-						<th>Order Status</th>
-						<th>Receipt</th>
+						<th class="ordernum">Order Number</th>
+						<th class="date">Date</th>
+						<th class="total">Total</th>
+						<th class="orderstat">Order Status</th>
+						<th class="receipt">Receipt</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -405,11 +481,11 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 						
 						?>
 						<tr>
-							<td><a href="<?php echo $sReceiptUrl; ?>" title="Click to view receipt" target="_blank"><?php echo $order->trans_id; ?></a></td>
-							<td><?php echo date( 'D, j M Y - h:i A', strtotime( $order->ordered_on ) ); ?></td>
-							<td><?php echo Cart66Common::currency( $order->total ); ?></td>
-							<td><?php echo ucwords( $order->status ); ?></td>
-							<td><a href="<?php echo $sReceiptUrl; ?>" title="Click to view receipt" target="_blank">View Receipt</a></td>
+							<td class="ordernum"><a href="<?php echo $sReceiptUrl; ?>" title="Click to view receipt" target="_blank"><?php echo $order->trans_id; ?></a></td>
+							<td class="date"><?php echo date( 'D, j M Y - h:i A', strtotime( $order->ordered_on ) ); ?></td>
+							<td class="total"><?php echo Cart66Common::currency( $order->total ); ?></td>
+							<td class="orderstat"><?php echo ucwords( $order->status ); ?></td>
+							<td class="receipt"><a href="<?php echo $sReceiptUrl; ?>" title="Click to view receipt" target="_blank">View Receipt</a></td>
 						</tr>
 					<?php endforeach; ?>
 				</tbody>

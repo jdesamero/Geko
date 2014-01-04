@@ -355,8 +355,8 @@ class Geko_Wp_Cart66_View_Checkout extends Geko_Wp_Cart66_View
 							}
 							
 							// Save the order locally
-							if ( $fDiscount && method_exists( $gateway, 'saveDiscountedOrder' ) ) {
-								$orderId = $gateway->saveDiscountedOrder( $fDiscount, $total, $tax, $transactionId, $status, $accountId );							
+							if ( $fDiscount && method_exists( $gateway, 'saveOrderExtra' ) ) {
+								$orderId = $gateway->saveOrderExtra( $fDiscount, $total, $tax, $transactionId, $status, $accountId );							
 							} else {
 								$orderId = $gateway->saveOrder( $total, $tax, $transactionId, $status, $accountId );
 							}
