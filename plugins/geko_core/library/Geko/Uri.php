@@ -232,6 +232,22 @@ class Geko_Uri
 	//// output methods
 	
 	//
+	public function getServer() {
+		
+		$a = $this->_aParsed;
+		
+		$sOut =  
+			( ( $a[ 'scheme' ] ) ? $a[ 'scheme' ] . '://' : '' ) .
+			( ( $a[ 'user' ] ) ? $a[ 'user' ] . ':' . $a[ 'pass' ] . '@' : '' ) .
+			$a[ 'host' ] .
+			( ( $a[ 'port' ] ) ? ':' . $a[ 'port' ] : '' )
+		;
+		
+		return $sOut;	
+	}
+	
+	
+	//
 	public function __toString() {
 		
 		$a = $this->_aParsed;
@@ -406,6 +422,33 @@ class Geko_Uri
 	public static function getUrls() {
 		return self::$_aUrls;
 	}
+	
+	
+	
+	//// utility methods
+	
+	// http://stackoverflow.com/questions/1175096/how-to-find-out-if-you-are-using-https-without-serverhttps
+	// check if the current url is https
+	public static function isHttps() {
+		return (
+			!empty( $_SERVER[ 'HTTPS' ] ) && 
+			( 'off' !== $_SERVER[ 'HTTPS' ] ) || 
+			( 443 == $_SERVER[ 'SERVER_PORT' ] )
+		) ? TRUE : FALSE ;
+	}
+	
+	
+	//
+	public static function forceHttps() {
+		
+		if ( !self::isHttps() ) {
+			$oUrl = self::getGlobal();
+			$sUrl = str_replace( 'http://', 'https://', strval( $oUrl ) );
+			header( sprintf( 'Location: %s', $sUrl ) );
+		}
+		
+	}
+	
 	
 	
 	//// magic methods

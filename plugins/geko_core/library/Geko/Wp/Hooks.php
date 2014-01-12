@@ -6,43 +6,81 @@ class Geko_Wp_Hooks
 	protected static $bCalledInit = FALSE;
 	protected static $bIsBuffering = FALSE;
 	
+	protected static $bFixHttpsTheme = FALSE;
+	protected static $bFixHttpsAdmin = FALSE;
+	
+	
 	
 	//
 	public static function init() {
 		
 		if ( !self::$bCalledInit ) {
-			add_action( 'admin_init', array( __CLASS__, 'bufferStart' ) );
-			add_action( 'shutdown', array( __CLASS__, 'bufferEndAdminInit' ), 0 );
+			
+			add_action( 'template_redirect', array( __CLASS__, 'bufferStartTheme' ) );
+			add_action( 'get_footer', array( __CLASS__, 'bufferEndTheme' ), 0 );
+			
+			add_action( 'admin_init', array( __CLASS__, 'bufferStartAdmin' ) );
+			add_action( 'shutdown', array( __CLASS__, 'bufferEndAdmin' ), 0 );
+			
+			// only apply if already in https
+			if ( Geko_Uri::isHttps() ) {
+				
+				if ( self::$bFixHttpsTheme ) {
+					add_filter( 'theme_page_source', array( __CLASS__, 'fixHttpsFilter' ) );		
+				}
+				
+				if ( self::$bFixHttpsAdmin ) {
+					add_filter( 'admin_page_source', array( __CLASS__, 'fixHttpsFilter' ) );				
+				}
+				
+			}
 			
 			self::$bCalledInit = TRUE;
 		}
 	}
 	
+	
+	
 	//
-	public static function bufferStart() {
+	public static function bufferStartTheme() {
+		
+		self::$bIsBuffering = ( has_action( 'theme_page_source' ) ) ? TRUE : FALSE ;
+		
+		if ( self::$bIsBuffering ) ob_start();
+	}
+	
+
+	//
+	public static function bufferEndTheme() {
+		
+		if ( self::$bIsBuffering && did_action( 'template_redirect' ) ) {
+			
+			$sSource = ob_get_contents();
+			ob_end_clean();
+
+			if ( has_filter( 'theme_page_source' ) ) {
+				$sSource = apply_filters( 'theme_page_source', $sSource );
+			}
+			
+			echo $sSource;
+		}
+	}
+	
+	
+	//
+	public static function bufferStartAdmin() {
 		
 		self::$bIsBuffering = (
 			has_action( 'admin_body_header' ) ||
 			has_action( 'admin_body_footer' ) ||
 			has_filter( 'admin_page_source' )
-		);
+		) ? TRUE : FALSE ;
 		
 		if ( self::$bIsBuffering ) ob_start();
 	}
 	
 	//
-	public static function inject( $sAction, $sSource, $sPatternMatch, $sPatternReplace = '{INJECT}' ) {
-		
-		ob_start();
-		do_action( $sAction );
-		$sInject = ob_get_contents();
-		ob_end_clean();
-		
-		return preg_replace( $sPatternMatch, str_replace( '{INJECT}', $sInject, $sPatternReplace ), $sSource );
-	}
-	
-	//
-	public static function bufferEndAdminInit() {
+	public static function bufferEndAdmin() {
 		
 		if ( self::$bIsBuffering && did_action( 'admin_init' ) ) {
 			
@@ -65,6 +103,22 @@ class Geko_Wp_Hooks
 			
 		}
 	}
+	
+	
+	
+	
+	
+	//
+	public static function inject( $sAction, $sSource, $sPatternMatch, $sPatternReplace = '{INJECT}' ) {
+		
+		ob_start();
+		do_action( $sAction );
+		$sInject = ob_get_contents();
+		ob_end_clean();
+		
+		return preg_replace( $sPatternMatch, str_replace( '{INJECT}', $sInject, $sPatternReplace ), $sSource );
+	}
+
 	
 	
 	// create equivalent Wordpress hooks to Geko_Hooks
@@ -154,5 +208,27 @@ class Geko_Wp_Hooks
 	}
 	
 	
+	//// helpers
+	
+	//
+	public static function setFixHttps( $bFixHttpsTheme = TRUE, $bFixHttpsAdmin = TRUE ) {
+		self::$bFixHttpsTheme = $bFixHttpsTheme;
+		self::$bFixHttpsAdmin = $bFixHttpsAdmin;
+	}
+	
+	// filter that replaces http references in document from http to https if url is https
+	public static function fixHttpsFilter( $sSource ) {
+		
+		$oUrl = Geko_Uri::getGlobal();
+		$sHttpsServer = $oUrl->getServer();		// assume we are in https mode
+		$sHttpServer = str_replace( 'https://', 'http://', $oUrl->getServer() );
+		
+		$sSource = preg_replace( '/((src|href)=[\'"])http\:\/\//', '$1https://', $sSource );
+		
+		return str_replace( $sHttpServer, $sHttpsServer, $sSource );
+
+	}
+	
 }
+
 
