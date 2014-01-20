@@ -91,10 +91,24 @@ Geko_Uri::setUrl( array(
 
 //// logger
 
-if ( is_file( GEKO_LOG ) ) {
-	$oWriter = new Zend_Log_Writer_Stream( GEKO_LOG );
-	$oLogger = new Zend_Log( $oWriter );
-	Zend_Registry::set( 'logger', $oLogger );
+$aLoggerParams = array();
+
+if ( defined( 'GEKO_LOG_DISABLED' ) && GEKO_LOG_DISABLED ) {
+	$iLoggerType = Geko_Log::WRITER_DISABLED;
+} elseif ( defined( 'GEKO_LOG_FIREBUG' ) && GEKO_LOG_FIREBUG ) {
+	$iLoggerType = Geko_Log::WRITER_FIREBUG;
+} elseif ( defined( 'GEKO_LOG_STREAM' ) && GEKO_LOG_STREAM ) {
+	$iLoggerType = Geko_Log::WRITER_STREAM;
+} else {
+	if ( is_file( GEKO_LOG ) ) {
+		$iLoggerType = Geko_Log::WRITER_FILE;
+		$aLoggerParams[ 'file' ] = GEKO_LOG;
+	} else {
+		$iLoggerType = Geko_Log::WRITER_STREAM;
+	}
 }
+
+$oLogger = new Geko_Log( $iLoggerType, $aLoggerParams );
+Zend_Registry::set( 'logger', $oLogger );
 
 
