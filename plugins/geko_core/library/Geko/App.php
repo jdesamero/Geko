@@ -10,6 +10,7 @@ class Geko_App extends Geko_Singleton_Abstract
 	protected $_bCalledInit = FALSE;
 	
 	protected $_aDeps = array(						// dependency tree for the various app components
+		'logger' => NULL,
 		'db' => NULL,
 		'match' => NULL,
 		'router' => NULL,
@@ -17,12 +18,15 @@ class Geko_App extends Geko_Singleton_Abstract
 		'router.layout' => array( 'router' ),
 		'sess' => array( 'db' ),
 		'auth' => array( 'sess' ),
+		'auth.adapter' => array( 'auth' ),
+		'auth.storage' => array( 'auth' ),
 		'router.auth' => array( 'router', 'auth' ),
 	);
 	
 	protected $_aExtComponents = array();
 	
 	protected $_aConfig = array(					// config flags for desired modules
+		'logger' => TRUE,
 		'match' => TRUE,
 		'router' => TRUE,
 		'router.layout' => TRUE,
@@ -83,11 +87,17 @@ class Geko_App extends Geko_Singleton_Abstract
 					array_walk( $aComp, array( 'Geko_Inflector', 'camelize' ) );
 					$sComp = implode( '_', $aComp );
 					
-					$sMethod = 'comp' . $sComp;
+					$sMethod = sprintf( 'comp%s', $sComp );
 					
-					if ( method_exists( $this, $sMethod ) ) {
+					if ( $bMethodExists = method_exists( $this, $sMethod ) ) {
 						$this->$sMethod( $mArgs );
 					}
+					
+					if ( $oLogger = self::get( 'logger' ) ) {
+						$sMsg = ( $bMethodExists ) ? 'found' : 'NOT found' ;
+						$oLogger->info( sprintf( '%s: Method %s() %s', get_class( $this ), $sMethod, $sMsg ) );
+					}
+					
 				}
 				
 			}
@@ -146,7 +156,7 @@ class Geko_App extends Geko_Singleton_Abstract
 	}
 	
 	//
-	public function registerComponent( $sKey, $fComponent, $aDeps = NULL ) {
+	public function registerComponent( $sKey, $fComponent = FALSE, $aDeps = NULL ) {
 		
 		$this->_aExtComponents[ $sKey ] = $fComponent;
 		
@@ -169,17 +179,37 @@ class Geko_App extends Geko_Singleton_Abstract
 	//// default components
 	
 	
+	// logger/debugger
+	// independent
+	public function compLogger( $mArgs ) {
+		
+		$oLogger = Zend_Registry::get( 'logger' );
+		
+		if ( !$oLogger && is_array( $mArgs ) ) {
+			$oLogger = new Geko_Log( $mArgs[ 0 ], $mArgs[ 1 ] );
+		}
+		
+		if ( $oLogger ) {
+			self::set( 'logger', $oLogger );
+		}
+	}
+	
+	
 	// database connection
 	// independent
 	public function compDb( $mArgs ) {
-
-		$oDb = Geko_Db::factory( 'Pdo_Mysql', array(
-			'host' => GEKO_DB_HOST,
-			'username' => GEKO_DB_USER,
-			'password' => GEKO_DB_PWD,
-			'dbname' => GEKO_DB_NAME,
-			'table_prefix' => GEKO_DB_TABLE_PREFIX
-		) );
+		
+		if ( is_array( $mArgs ) ) {
+			$oDb = Geko_Db::factory( $mArgs[ 0 ], $mArgs[ 1 ] );
+		} else {
+			$oDb = Geko_Db::factory( 'Pdo_Mysql', array(
+				'host' => GEKO_DB_HOST,
+				'username' => GEKO_DB_USER,
+				'password' => GEKO_DB_PWD,
+				'dbname' => GEKO_DB_NAME,
+				'table_prefix' => GEKO_DB_TABLE_PREFIX
+			) );
+		}
 		
 		self::set( 'db', $oDb );
 	}
@@ -197,7 +227,7 @@ class Geko_App extends Geko_Singleton_Abstract
 			$oSess->regenerateSessionKey();
 		}
 		
-		self::set( 'sess', $oSess );	
+		self::set( 'sess', $oSess );
 	}
 	
 	//
@@ -294,12 +324,13 @@ class Geko_App extends Geko_Singleton_Abstract
 			$oSess->destroySession();
 			$oAuth->clearIdentity();
 			
-			header( 'Location: ' . GEKO_STANDALONE_URL );
+			header( sprintf( 'Location: %s', GEKO_STANDALONE_URL ) );
 			die();
 		}
 		
 		self::set( 'auth', $oAuth );
-		self::set( 'auth_adapter', $oAuthAdapter );	
+		self::set( 'auth.adapter', $oAuthAdapter );	
+		self::set( 'auth.storage', $oAuthStorage );	
 	}
 	
 	//

@@ -346,7 +346,7 @@ class Geko_App_Session extends Geko_Singleton_Abstract
 			}
 			
 		} else {
-			throw new InvalidArgumentException( 'Provided values must be an array. Type given: ' . gettype( $aValues ) );
+			throw new InvalidArgumentException( sprintf( 'Provided values must be an array. Type given: %s', gettype( $aValues ) ) );
 		}
 		
 		return $this;
@@ -421,7 +421,7 @@ class Geko_App_Session extends Geko_Singleton_Abstract
 		
 		$aStale = $oDb->fetchCol( strval( $oSql ) );
 		if ( count( $aStale ) > 0 ) {
-			$sArg = 'sess_id IN ( ' . implode( ', ', $aStale ) . ' )';
+			$sArg = sprintf( 'sess_id IN ( %s )', implode( ', ', $aStale ) );
 			$oDb->delete( '##pfx##session_data', array( $sArg ) );
 			$oDb->delete( '##pfx##session', array( $sArg ) );		
 		}
