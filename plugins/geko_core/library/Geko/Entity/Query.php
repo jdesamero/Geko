@@ -395,13 +395,73 @@ abstract class Geko_Entity_Query
 	// to be implemented by sub-classes that have to
 	// query the database directly
 	public function constructQuery( $aParams ) {
-		return '';
+		
+		$oQuery = NULL;
+		
+		if ( $this->_bUseManageQuery && $this->_sManageClass ) {
+			$oMng = Geko_Singleton_Abstract::getInstance( $this->_sManageClass );
+			$oQuery = $oMng->getPrimaryTable()->getSelect();
+		}
+		
+		if ( !$oQuery ) $oQuery = new Geko_Sql_Select();
+		
+		// further manipulate by sub-class
+		$oQuery = $this->modifyQuery( $oQuery, $aParams );
+		
+		return strval( $oQuery );
 	}
+	
 	
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
+		
+		// $oQuery is an instance of Geko_Sql_Select
+		
+		$oQuery->option( 'SQL_CALC_FOUND_ROWS' );
+		
+		
+		//// distinct option
+		
+		if ( $aParams[ 'distinct' ] ) {
+			$oQuery->distinct( TRUE );
+		}
+		
+		
+		//// sorting
+		
+		if ( is_array( $aOrder = $aParams[ 'orderby' ] ) ) {
+			
+			foreach ( $aOrder as $sKey => $sOrder ) {
+				$oQuery->order( $sKey, $sOrder, $sKey );			
+			}
+			
+		} else {
+			
+			// sorting direction
+			if ( $aParams[ 'order' ] ) {
+				$aParams[ 'order' ] = strtoupper( $aParams[ 'order' ] );
+				if ( !in_array( $aParams[ 'order' ], array( 'ASC', 'DESC', 'NONE' ) ) ) {
+					$aParams[ 'order' ] = 'ASC';
+				} elseif ( 'NONE' == $aParams[ 'order' ] ) {
+					$aParams[ 'order' ] = '';
+				}
+			} else {
+				$aParams[ 'order' ] = 'ASC';		// default
+			}
+			
+			//
+			if ( 'random' == $aParams[ 'orderby' ] ) {
+				// random
+				$oQuery->order( 'RAND()', '', $aParams[ 'orderby' ] );
+			} elseif ( $aParams[ 'orderby' ] ) {
+				// arbitrary
+				$oQuery->order( $aParams[ 'orderby' ], $aParams[ 'order' ], $aParams[ 'orderby' ] );
+			}
+		}
+		
 		return $oQuery;
 	}
+	
 	
 	//
 	public function getEntityQuery( $mParam ) {

@@ -142,7 +142,7 @@ class Geko_Layout extends Geko_Singleton_Abstract
 	
 	//
 	public function resolveClass( $sClass ) {
-		return Geko_Class::existsCoalesce( $sClass, 'Geko_' . $sClass );
+		return Geko_Class::existsCoalesce( $sClass, sprintf( 'Geko_%s', $sClass ) );
 	}
 	
 	//

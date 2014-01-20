@@ -21,8 +21,8 @@ class Geko_Router
 		
 		$oUrl = Geko_Uri::getGlobal();
 		
-		// echo $oUrl->getHost() . '<br />';
-		// echo $oUrl->getPath() . '<br />';
+		// echo sprintf( '%s<br />', $oUrl->getHost() );
+		// echo sprintf( '%s<br />', $oUrl->getPath() );
 		
 		$sPath = $oUrl->getPath();
 		
@@ -116,7 +116,7 @@ class Geko_Router
 			
 			$oRoute = $aRoute[ 'route' ];
 			
-			// echo 'Running... ' . get_class( $oRoute ) . '<br />';
+			// echo sprintf( 'Running... %s<br />', get_class( $oRoute ) );
 			
 			if ( $oRoute->isMatch() ) {
 				

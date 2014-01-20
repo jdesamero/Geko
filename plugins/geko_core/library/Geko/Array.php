@@ -317,6 +317,44 @@ class Geko_Array
 		return $aSubject;
 	}
 	
+	
+	//
+	public function levelize( $aRows, $iParentId = NULL, $iLevel = 0, $aParams = array() ) {
+		
+		$aParams = array_merge( array(
+			'id_key' => 'id',
+			'parent_key' => 'parent_id',
+			'level_key' => 'level'
+		), $aParams );
+		
+		$sIdKey = $aParams[ 'id_key' ];
+		$sParentKey = $aParams[ 'parent_key' ];
+		$sLevelKey = $aParams[ 'level_key' ];
+		
+		$aResFmt = array();
+		
+		foreach ( $aRows as $aRow ) {
+			if ( $aRow[ $sParentKey ] == $iParentId ) {
+				
+				$aRow[ $sLevelKey ] = $iLevel;
+				$aResFmt[] = $aRow;
+				
+				$aChildren = self::levelize( $aRows, $aRow[ $sIdKey ], $iLevel + 1, $aParams );
+				
+				if ( is_array( $aChildren ) ) {
+					$aResFmt = array_merge( $aResFmt, $aChildren );
+				}
+			}
+		}
+		
+		if ( count( $aResFmt ) > 0 ) {
+			return $aResFmt;
+		}
+		
+		return NULL;
+	}
+	
+	
 }
 
 

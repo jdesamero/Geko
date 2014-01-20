@@ -75,23 +75,10 @@ abstract class Geko_Wp_Entity_Query extends Geko_Entity_Query
 	//// query methods
 	
 	//
-	public function constructQuery( $aParams ) {
+	public function modifyQuery( $oQuery, $aParams ) {
 		
-		$oQuery = NULL;
-		
-		if ( $this->_bUseManageQuery && $this->_sManageClass ) {
-			$oMng = Geko_Singleton_Abstract::getInstance( $this->_sManageClass );
-			$oQuery = $oMng->getPrimaryTable()->getSelect();
-		}
-		
-		if ( !$oQuery ) $oQuery = new Geko_Sql_Select();
-		
-		$oQuery->option( 'SQL_CALC_FOUND_ROWS' );
-		
-		// distinct option
-		if ( $aQuery[ 'params' ][ 'distinct' ] ) {
-			$oQuery->distinct( TRUE );
-		}
+		// apply super-class manipulations
+		$oQuery = parent::modifyQuery( $oQuery, $aParams );
 		
 		// wordpress paging
 		$iItemsPerPage = intval( $aParams[ 'posts_per_page' ] );
@@ -107,28 +94,6 @@ abstract class Geko_Wp_Entity_Query extends Geko_Entity_Query
 			$oQuery->limitOffset( $iItemsPerPage, $iOffset );
 		}
 		
-		//// sorting
-		
-		// sorting direction
-		if ( $aParams[ 'order' ] ) {
-			$aParams[ 'order' ] = strtoupper( $aParams[ 'order' ] );
-			if ( !in_array( $aParams[ 'order' ], array( 'ASC', 'DESC', 'NONE' ) ) ) {
-				$aParams[ 'order' ] = 'ASC';
-			} elseif ( 'NONE' == $aParams[ 'order' ] ) {
-				$aParams[ 'order' ] = '';
-			}
-		} else {
-			$aParams[ 'order' ] = 'ASC';		// default
-		}
-		
-		//
-		if ( 'random' == $aParams[ 'orderby' ] ) {
-			// random
-			$oQuery->order( 'RAND()', '', $aParams[ 'orderby' ] );
-		} elseif ( $aParams[ 'orderby' ] ) {
-			// arbitrary
-			$oQuery->order( $aParams[ 'orderby' ], $aParams[ 'order' ], $aParams[ 'orderby' ] );
-		}
 		
 		//// keyword search
 		if ( $aParams[ 'kwsearch' ] ) {
@@ -136,12 +101,10 @@ abstract class Geko_Wp_Entity_Query extends Geko_Entity_Query
 				$aParams[ 'kwsearch' ], $aParams[ 'kwsearch_fields' ]
 			) );
 		}
-		
-		// further manipulate by sub-class
-		$oQuery = $this->modifyQuery( $oQuery, $aParams );
-		
-		return strval( $oQuery );
+				
+		return $oQuery;
 	}
+	
 	
 	//
 	public function getFoundRows() {

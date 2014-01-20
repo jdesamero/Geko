@@ -854,19 +854,19 @@ abstract class Geko_Entity
 			
 			$aRegs = array();
 			if ( preg_match( '/get([a-zA-Z0-9]+)Url/', $sMethod, $aRegs ) ) {
-				$sCall = 'fileurl' . $aRegs[ 1 ];
+				$sCall = sprintf( 'fileurl%s', $aRegs[ 1 ] );
 				return $this->__call( $sCall, $aArgs );
 			}
 			
 			$aRegs = array();
 			if ( preg_match( '/get([a-zA-Z0-9]+)Path/', $sMethod, $aRegs ) ) {
-				$sCall = 'filepath' . $aRegs[ 1 ];
+				$sCall = sprintf( 'filepath%s', $aRegs[ 1 ] );
 				return $this->__call( $sCall, $aArgs );
 			}
 			
 			$aRegs = array();
 			if ( preg_match( '/get([a-zA-Z0-9]+)Size/', $sMethod, $aRegs ) ) {
-				$sCall = 'filesize' . $aRegs[ 1 ];
+				$sCall = sprintf( 'filesize%s', $aRegs[ 1 ] );
 				return $this->__call( $sCall, $aArgs );
 			}
 			
@@ -897,33 +897,33 @@ abstract class Geko_Entity
 			
 			// return the full URL, assuming entity property corresponds to a file
 			$sProp = substr_replace( $sMethod, '', 0, 7 );
-			$sCall = 'thisget' . $sProp;
+			$sCall = sprintf( 'thisget%s', $sProp );
 			return $this->_getFileUrl( $this->__call( $sCall, $aArgs ), $sProp, $aArgs );
 			
 		} elseif ( 0 === strpos( strtolower( $sMethod ), 'filepath' ) ) {
 			
 			// return the full URL, assuming entity property corresponds to a file
 			$sProp = substr_replace( $sMethod, '', 0, 8 );
-			$sCall = 'thisget' . $sProp;
+			$sCall = sprintf( 'thisget%s', $sProp );
 			return $this->_getFilePath( $this->__call( $sCall, $aArgs ), $sProp, $aArgs );
 			
 		} elseif ( 0 === strpos( strtolower( $sMethod ), 'filesize' ) ) {
 			
 			// return the full URL, assuming entity property corresponds to a file
 			$sProp = substr_replace( $sMethod, '', 0, 8 );
-			$sCall = 'thisget' . $sProp;
+			$sCall = sprintf( 'thisget%s', $sProp );
 			return $this->_getFileSize( $this->__call( $sCall, $aArgs ), $sProp, $aArgs );
 			
 		} elseif ( 0 === strpos( strtolower( $sMethod ), 'fileis' ) ) {
 			
 			// return the full URL, assuming entity property corresponds to a file
 			$sProp = substr_replace( $sMethod, '', 0, 6 );
-			$sCall = 'thisget' . $sProp;
+			$sCall = sprintf( 'thisget%s', $sProp );
 			return $this->_getFileIs( $this->__call( $sCall, $aArgs ), $sProp, $aArgs );
 			
 		}
 		
-		throw new Exception( 'Invalid method ' . $this->_sEntityClass . '::' . $sMethod . '() called.' );
+		throw new Exception( sprintf( 'Invalid method %s::%s() called.', $this->_sEntityClass, $sMethod ) );
 	}
 	
 	//

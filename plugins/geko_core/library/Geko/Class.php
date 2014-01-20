@@ -56,7 +56,7 @@ class Geko_Class
 		
 		$sBaseClass = ( is_object( $mBaseClass ) ) ? get_class( $mBaseClass ) : $mBaseClass;
 		
-		$sResolveKey = $sBaseClass . '|' . $sBaseSuffix . '|' . $sRelatedSuffix;
+		$sResolveKey = sprintf( '%s|%s|%s', $sBaseClass, $sBaseSuffix, $sRelatedSuffix );
 		
 		if ( !isset( self::$_aResolveCache[ $sResolveKey ] ) ) {
 			
@@ -81,7 +81,7 @@ class Geko_Class
 				}
 			}
 			
-			$sRelatedClass = $sBaseClass . $sRelatedSuffix;
+			$sRelatedClass = sprintf( '%s%s', $sBaseClass, $sRelatedSuffix );
 			
 			self::$_aResolveCache[ $sResolveKey ] = ( @class_exists( $sRelatedClass ) ) ?
 				$sRelatedClass : FALSE
@@ -99,7 +99,7 @@ class Geko_Class
 		
 		foreach ( $aSuffixes as $sSuffix ) {
 			foreach ( $aPrefixes as $sPrefix ) {
-				$aClasses[] = $sPrefix . $sSuffix;
+				$aClasses[] = sprintf( '%s%s', $sPrefix, $sSuffix );
 			}
 		}
 		

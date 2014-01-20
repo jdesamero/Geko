@@ -231,7 +231,7 @@ class Geko_Sql_Select
 	//
 	public function order( $sField, $sDirection = 'ASC', $sKey = NULL ) {
 		
-		if (NULL !== $sKey) {
+		if ( NULL !== $sKey ) {
 			// supply an associative index
 			$this->_aOrder[ $sKey ] = trim( sprintf( '%s %s', $sField, $sDirection ) );
 		} else {

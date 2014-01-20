@@ -17,39 +17,40 @@ class Geko_Wp_Layout extends Geko_Layout
 	
 	protected $_sRenderer = 'Geko_Wp_Layout_Renderer';
 	
-	protected $_aMapMethods = array(
-		
-		'sw' => array( 'Geko_String', 'sprintfWrap' ),
-		'pw' => array( 'Geko_String', 'printfWrap' ),
-		'st' => array( 'Geko_String', 'truncate' ),
-		'pt' => array( 'Geko_String', 'ptruncate' ),
-		'sn' => 'number_format',
-		'pn' => array( 'Geko_String', 'printNumberFormat' ),
-		'tm' => array( 'Geko_String', 'mbTrim' ),
-		
-		'pf' => array( 'Geko_Html', 'populateForm' ),
-		
-		'is' => array( 'Geko_Wp', 'is' ),
-		
-		'listCats' => 'wp_list_cats',
-		'listArchives' => 'wp_get_archives',
-		'listAuthors' => 'wp_list_authors',
-		'listBookmarks' => 'wp_list_bookmarks',
-		'tagCloud' => 'wp_tag_cloud'
-		
-	);
-	
 	protected $_aTranslatedValues = array();
 	
 	protected $_aLinks = array();
 	
 	
 	
+	
+	
+	//
+	public function init( $bUnshift = FALSE ) {
+		
+		parent::init( $bUnshift );
+		
+		$this->_aMapMethods = array_merge( $this->_aMapMethods, array(
+			
+			'is' => array( 'Geko_Wp', 'is' ),
+			
+			'listCats' => 'wp_list_cats',
+			'listArchives' => 'wp_get_archives',
+			'listAuthors' => 'wp_list_authors',
+			'listBookmarks' => 'wp_list_bookmarks',
+			'tagCloud' => 'wp_tag_cloud'
+			
+		) );
+		
+		return $this;
+	}
+	
+	
 	//// helpers
 	
 	//
 	public function resolveClass( $sClass ) {
-		return Geko_Class::existsCoalesce( $sClass, 'Gloc_' . $sClass, 'Geko_Wp_' . $sClass );
+		return Geko_Class::existsCoalesce( $sClass, sprintf( 'Gloc_%s', $sClass ), sprintf( 'Geko_Wp_%s', $sClass ) );
 	}
 	
 	//

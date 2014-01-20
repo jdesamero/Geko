@@ -8,14 +8,14 @@ abstract class Geko_Composite_Abstract implements Geko_Composite_Interface
 	
 	//// setters
 
-	public function setParent($oParent) {
+	public function setParent( $oParent ) {
 		$this->_oParent = $oParent;
 		return $this;
 	}
 	
-	public function setChild($aChild) {
+	public function setChild( $aChild ) {
 		
-		if ( FALSE == is_array($this->_aChildren) ) $this->_aChildren = array();
+		if ( FALSE == is_array( $this->_aChildren ) ) $this->_aChildren = array();
 		
 		$this->_aChildren[] = $aChild;
 		return $this;
@@ -25,8 +25,8 @@ abstract class Geko_Composite_Abstract implements Geko_Composite_Interface
 	//// getters
 
 	public function hasChildren() {
-		if ( is_array($this->_aChildren) ) {
-			return (count($this->_aChildren) > 0);
+		if ( is_array( $this->_aChildren ) ) {
+			return ( count( $this->_aChildren ) > 0 );
 		} else {
 			return FALSE;
 		}
@@ -43,8 +43,9 @@ abstract class Geko_Composite_Abstract implements Geko_Composite_Interface
 	
 	//// hooks
 	
-	public function setParams($oParams) { }
+	public function setParams( $oParams ) { }
 	public function setUp() { }
 	
 }
+
 
