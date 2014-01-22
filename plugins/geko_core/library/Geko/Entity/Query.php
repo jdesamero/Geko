@@ -403,12 +403,18 @@ abstract class Geko_Entity_Query
 			$oQuery = $oMng->getPrimaryTable()->getSelect();
 		}
 		
-		if ( !$oQuery ) $oQuery = new Geko_Sql_Select();
+		if ( !$oQuery ) $oQuery = $this->createSqlSelect();
 		
 		// further manipulate by sub-class
 		$oQuery = $this->modifyQuery( $oQuery, $aParams );
 		
 		return strval( $oQuery );
+	}
+	
+	
+	// can be overridden by superclass
+	public function createSqlSelect() {
+		return new Geko_Sql_Select();
 	}
 	
 	

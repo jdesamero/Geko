@@ -138,9 +138,10 @@ class Geko_Wp_Initialize extends Geko_Singleton_Abstract
 			$aHier[] = $sClassName;
 			
 			while ( $sClassName = get_parent_class( $sClassName ) ) {
+				$sMethodSig = sprintf( '%s::%s', $sClassName, $sRealMethod );
 				if (
 					( method_exists( $sClassName, $sRealMethod ) ) && 
-					( !isset( self::$aCalledCoft[ $sClassName . '::' . $sRealMethod ] ) )
+					( !isset( self::$aCalledCoft[ $sMethodSig ] ) )
 				) {
 					array_unshift( $aHier, $sClassName );
 				} else {
@@ -150,7 +151,7 @@ class Geko_Wp_Initialize extends Geko_Singleton_Abstract
 			
 			// make calls
 			foreach ( $aHier as $sClassName ) {
-				$sMethodSig = $sClassName . '::' . $sRealMethod;
+				$sMethodSig = sprintf( '%s::%s', $sClassName, $sRealMethod );
 				if ( !isset( self::$aCalledCoft[ $sMethodSig ] ) ) {
 					
 					// check if the class declares the method, if not don't call
@@ -182,7 +183,7 @@ class Geko_Wp_Initialize extends Geko_Singleton_Abstract
 			
 			// CO: call once
 			
-			$sMethodSig = $sClassName . '::' . $sRealMethod;				
+			$sMethodSig = sprintf( '%s::%s', $sClassName, $sRealMethod );
 			
 			if ( !isset( self::$aCalledCoft[ $sMethodSig ] ) ) {
 				
@@ -200,7 +201,7 @@ class Geko_Wp_Initialize extends Geko_Singleton_Abstract
 		) {
 			
 			// test if COFT or CO was called for the method
-			$sMethodSig = $sClassName . '::' . $sRealMethod;
+			$sMethodSig = sprintf( '%s::%s', $sClassName, $sRealMethod );
 			return ( self::$aCalledCoft[ $sMethodSig ] || self::$aCalledCo[ $sMethodSig ] );
 		
 		} elseif ( 0 === strpos( $sMethod, 'get' ) ) {
@@ -217,7 +218,7 @@ class Geko_Wp_Initialize extends Geko_Singleton_Abstract
 			}
 		}
 		
-		throw new Exception('Invalid method ' . get_class( $this ) . '::' . $sMethod . '() called.');
+		throw new Exception( sprintf( 'Invalid method %s::%s() called.', get_class( $this ), $sMethod ) );
 	}
 	
 	

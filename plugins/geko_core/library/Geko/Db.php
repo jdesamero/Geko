@@ -134,7 +134,7 @@ class Geko_Db
 			return call_user_func_array( array( $oDb, $sMethod ), $aArgs );
 		}
 		
-		throw new Exception( 'Invalid method ' . get_class( $this ) . '::' . $sMethod . '() called.' );
+		throw new Exception( sprintf( 'Invalid method %s::%s() called.', get_class( $this ), $sMethod ) );
 	}
 	
 	

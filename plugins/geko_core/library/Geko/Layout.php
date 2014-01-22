@@ -29,9 +29,20 @@ class Geko_Layout extends Geko_Singleton_Abstract
 	
 	
 	
-	
+	/*
 	//
 	public function init( $bUnshift = FALSE ) {
+		
+		$this->start();
+		
+		return $this;
+	}
+	*/
+	
+	// call hooks
+	
+	//
+	public function preStart( $bUnshift = FALSE ) {
 		
 		$oRenderer = Geko_Singleton_Abstract::getInstance( $this->_sRenderer );
 		
@@ -39,22 +50,14 @@ class Geko_Layout extends Geko_Singleton_Abstract
 			$oRenderer->addLayoutUnshift( $this );
 		} else {
 			$oRenderer->addLayout( $this );
-		}
-		
-		$this->start();
-		
-		return $this;
+		}	
 	}
 	
-	// call right after init()
-	public function start() {
-		return $this;
-	}
 	
-	// call after rendering the layout stack
-	public function end() {
-		return $this;	
-	}
+	
+	// my hooks
+	
+	public function end() { }					// call after rendering the layout stack
 	
 	
 	
@@ -508,7 +511,7 @@ class Geko_Layout extends Geko_Singleton_Abstract
 
 		// TO DO: add mechanism for "layout helpers"
 		
-		throw new Exception( 'Invalid method ' . __CLASS__ . '::' . $sMethod . '() called.' );
+		throw new Exception( sprintf( 'Invalid method %s::%s() called.', __CLASS__, $sMethod ) );
 	}
 	
 }

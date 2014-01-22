@@ -31,7 +31,7 @@ abstract class Geko_App_Entity_Query extends Geko_Entity_Query
 		}
 	}
 	
-	
+	//
 	public function getSingleEntity( $mParam ) {
 		
 		$oDb = Geko_App::get( 'db' );
@@ -39,6 +39,15 @@ abstract class Geko_App_Entity_Query extends Geko_Entity_Query
 		return $oDb->fetchRow(
 			$this->getEntityQuery( $mParam )
 		);
+	}
+	
+	
+	//
+	public function createSqlSelect() {
+		
+		$oDb = Geko_App::get( 'db' );
+		
+		return new Geko_Sql_Select( $oDb );
 	}
 
 	

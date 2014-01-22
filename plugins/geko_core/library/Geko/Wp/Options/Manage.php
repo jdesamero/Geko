@@ -100,7 +100,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		
 		//
 		if ( !$this->_sActionPrefix ) {
-			$this->_sActionPrefix = 'admin_' . $this->_sNamespace . '_' . $this->_sType;
+			$this->_sActionPrefix = sprintf( 'admin_%s_%s', $this->_sNamespace, $this->_sType );
 		}
 		
 		// normalize any custom actions

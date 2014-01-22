@@ -336,6 +336,9 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	
 	
 	
+	//// TO DO: consolidate with Geko_App_Entity_Manage
+	
+	
 	//// table functions
 	
 	// ensure that an <sql table object> is returned
@@ -411,7 +414,7 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 		global $wpdb;
 				
 		if ( $sTableName = $this->resolveTableName( $mSqlTable ) ) {
-			$wpdb->query( 'DROP TABLE ' . $sTableName );
+			$wpdb->query( sprintf( 'DROP TABLE %s', $sTableName ) );
 		}
 		
 		return $this;
@@ -507,23 +510,30 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	
 	//
 	protected function triggerNotifyMsg() {
-		$_SESSION[ $this->_sInstanceClass . 'notify_msg_id' ] = func_get_args();
+		$sNotifyKey = sprintf( '%snotify_msg_id', $this->_sInstanceClass );
+		$_SESSION[ $sNotifyKey ] = func_get_args();
 	}
 	
 	//
 	protected function triggerErrorMsg() {
-		$_SESSION[ $this->_sInstanceClass . 'error_msg_id' ] = func_get_args();
+		$sErrorKey = sprintf( '%serror_msg_id', $this->_sInstanceClass );
+		$_SESSION[ $sErrorKey ] = func_get_args();
 	}
 
 	//
 	protected function triggerDebugMsg( $sDebugData ) {
-		$_SESSION[ $this->_sInstanceClass . 'debug' ] = $sDebugData;
+		$sDebugKey = sprintf( '%sdebug', $this->_sInstanceClass );
+		$_SESSION[ $sDebugKey ] = $sDebugData;
 	}
-		
+	
 	//
 	public function notificationMessages() {
 		
-		if ( $aArgs = $_SESSION[ $this->_sInstanceClass . 'notify_msg_id' ] ):
+		$sNotifyKey = sprintf( '%snotify_msg_id', $this->_sInstanceClass );
+		$sErrorKey = sprintf( '%serror_msg_id', $this->_sInstanceClass );
+		$sDebugKey = sprintf( '%sdebug', $this->_sInstanceClass );
+		
+		if ( $aArgs = $_SESSION[ $sNotifyKey ] ):
 			
 			$iMsgId = $aArgs[ 0 ];
 			
@@ -534,10 +544,10 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 			$sMsg = call_user_func_array( 'sprintf', $aArgs );
 			
 			?><div class="updated fade below-h2" id="message"><p><?php echo $sMsg; ?></p></div><?php
-			unset( $_SESSION[ $this->_sInstanceClass . 'notify_msg_id' ] );
+			unset( $_SESSION[ $sNotifyKey ] );
 		endif; ?>
 		
-		<?php if ( $aArgs = $_SESSION[ $this->_sInstanceClass . 'error_msg_id' ] ):
+		<?php if ( $aArgs = $_SESSION[ $sErrorKey ] ):
 			
 			$iMsgId = $aArgs[ 0 ];
 			
@@ -548,12 +558,12 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 			$sMsg = call_user_func_array( 'sprintf', $aArgs );
 			
 			?><div class="error below-h2" id="notice"><p><?php echo $sMsg; ?></p></div><?php
-			unset( $_SESSION[ $this->_sInstanceClass . 'error_msg_id' ] );
+			unset( $_SESSION[ $sErrorKey ] );
 		endif;
 		
-		if ( $sDebugMsg = $_SESSION[ $this->_sInstanceClass . 'debug' ] ):
+		if ( $sDebugMsg = $_SESSION[ $sDebugKey ] ):
 			?><div class="error below-h2" id="notice"><p><?php echo $sDebugMsg; ?></p></div><?php
-			unset( $_SESSION[ $this->_sInstanceClass . 'debug' ] );
+			unset( $_SESSION[ $sDebugKey ] );
 		endif;
 		
 	}

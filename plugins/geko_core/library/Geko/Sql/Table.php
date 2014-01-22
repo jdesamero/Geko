@@ -201,7 +201,7 @@ class Geko_Sql_Table
 	//
 	public function getSelect() {
 		
-		$oSqlSelect = new Geko_Sql_Select();
+		$oSqlSelect = new Geko_Sql_Select( $this->_oDb );
 		
 		list( $sTableName, $sTablePrefix ) = $this->_aTable;
 		
