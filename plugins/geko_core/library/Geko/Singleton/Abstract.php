@@ -38,6 +38,50 @@ abstract class Geko_Singleton_Abstract
 		);
 	}
 	
+	
+	////
+	
+	protected $_bCalledInit = FALSE;
+	
+	// ensure init is called once
+	public function init() {
+		
+		$aArgs = func_get_args();
+		
+		if ( !$this->_bCalledInit ) {
+			
+			call_user_func_array( array( $this, 'preStart' ), $aArgs );
+			call_user_func_array( array( $this, 'start' ), $aArgs );
+			call_user_func_array( array( $this, 'postStart' ), $aArgs );
+			
+			$this->_bCalledInit = TRUE;
+		}
+		
+		return $this;
+	}
+	
+	
+	
+	// hooks
+	
+	public function preStart() { }						// ???
+	public function start() { }							// ???
+	public function postStart() { }						// ???
+	
+	
+	// public function end() { }						// ???
+	
+	//
+	public function reInit() {
+		
+		$aArgs = func_get_args();
+		
+		$this->_bCalledInit = FALSE;
+		
+		return call_user_func_array( array( $this, 'init' ), $aArgs );
+	}
+	
+	
 }
 
 
