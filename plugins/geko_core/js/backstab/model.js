@@ -155,6 +155,19 @@
 					
 				} );
 			}		
+		},
+		
+		getDataValues: function() {
+			
+			var model = this;
+			
+			var ret = {};
+			for ( var i = 0; i < arguments.length; i++ ) {
+				var key = arguments[ i ];
+				ret[ key ] = model.get( key );
+			}
+			
+			return ret;
 		}
 		
 	} );
