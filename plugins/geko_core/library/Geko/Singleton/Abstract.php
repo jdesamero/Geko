@@ -46,13 +46,11 @@ abstract class Geko_Singleton_Abstract
 	// ensure init is called once
 	public function init() {
 		
-		$aArgs = func_get_args();
-		
 		if ( !$this->_bCalledInit ) {
 			
-			call_user_func_array( array( $this, 'preStart' ), $aArgs );
-			call_user_func_array( array( $this, 'start' ), $aArgs );
-			call_user_func_array( array( $this, 'postStart' ), $aArgs );
+			$this->preStart();
+			$this->start();
+			$this->postStart();
 			
 			$this->_bCalledInit = TRUE;
 		}
@@ -63,7 +61,6 @@ abstract class Geko_Singleton_Abstract
 	
 	
 	// hooks
-	
 	public function preStart() { }						// ???
 	public function start() { }							// ???
 	public function postStart() { }						// ???
@@ -78,8 +75,14 @@ abstract class Geko_Singleton_Abstract
 		
 		$this->_bCalledInit = FALSE;
 		
+		$this->reStart();
+		
 		return call_user_func_array( array( $this, 'init' ), $aArgs );
 	}
+	
+	// hooks
+	public function reStart() { }						// ???
+	
 	
 	
 }

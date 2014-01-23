@@ -6,6 +6,8 @@ class Geko_Layout extends Geko_Singleton_Abstract
 	protected $_sRenderer = 'Geko_Layout_Renderer';
 	protected $_aParams = array();
 	
+	protected $_bUnshift = FALSE;
+	
 	protected $_aMapMethods = array(
 		
 		'sw' => array( 'Geko_String', 'sprintfWrap' ),
@@ -29,24 +31,27 @@ class Geko_Layout extends Geko_Singleton_Abstract
 	
 	
 	
-	/*
 	//
 	public function init( $bUnshift = FALSE ) {
-		
-		$this->start();
-		
-		return $this;
+		$this->_bUnshift = $bUnshift;
+		return parent::init();
 	}
-	*/
 	
-	// call hooks
+	//
+	public function reInit( $bUnshift = FALSE ) {
+		return parent::reInit( $bUnshift );
+	}
+	
+	
+	
+	//// call hooks
 	
 	//
 	public function preStart( $bUnshift = FALSE ) {
 		
 		$oRenderer = Geko_Singleton_Abstract::getInstance( $this->_sRenderer );
 		
-		if ( $bUnshift ) {
+		if ( $this->_bUnshift ) {
 			$oRenderer->addLayoutUnshift( $this );
 		} else {
 			$oRenderer->addLayout( $this );
@@ -55,7 +60,7 @@ class Geko_Layout extends Geko_Singleton_Abstract
 	
 	
 	
-	// my hooks
+	//// my hooks
 	
 	public function end() { }					// call after rendering the layout stack
 	

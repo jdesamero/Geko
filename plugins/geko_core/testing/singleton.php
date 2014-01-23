@@ -111,7 +111,23 @@ class Pear extends Fruit {
 		Geko_Once::run( sprintf( '%s::announce', __CLASS__ ), array( $this, 'announceMe' ), array( 'Pear', 1 ) );
 		
 	}
-
+	
+	//
+	public function init( $sKind = 'Kronk', $iNumSeeds = 10 ) {
+		
+		echo sprintf( 'Kind of pear: %s, num seeds: %d<br />', $sKind, $iNumSeeds );
+		
+		return parent::init();
+	}
+	
+	//
+	public function reStart() {
+		
+		parent::reStart();
+		
+		Geko_Once::unregister( sprintf( '%s::announce', __CLASS__ ) );
+	}
+	
 }
 
 /* */
@@ -233,6 +249,7 @@ echo '<br /><br />';
 $oPear = Pear::getInstance();
 $oPear->init();
 $oPear->init();
+$oPear->reInit( 'Bosc', 2 );
 
 echo '<br /><br />';
 

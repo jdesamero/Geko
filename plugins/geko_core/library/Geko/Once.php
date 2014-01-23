@@ -39,6 +39,14 @@ class Geko_Once
 	}
 	
 	//
+	public static function unregister( $sKey ) {
+		
+		$aReg =& self::$aRegistry;
+		
+		unset( $aReg[ $sKey ] );
+	}
+	
+	//
 	public static function debug() {
 		// print_r( self::$aRegistry );
 		print_r( array_keys( self::$aRegistry ) );
