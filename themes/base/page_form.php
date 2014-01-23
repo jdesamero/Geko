@@ -15,6 +15,8 @@ class Gloc_Layout_Template extends Gloc_Layout
 	//
 	public function start() {
 		
+		parent::start();
+		
 		$oPage = $this->newPage();
 		
 		$iFormId = intval( $oPage->getMeta( 'form' ) );

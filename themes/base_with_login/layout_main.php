@@ -36,6 +36,8 @@ class Gloc_Layout_Main extends Gloc_Layout
 	//
 	public function start() {
 		
+		parent::start();
+		
 		global $user_ID;
 		
 		if ( $user_ID ) {
@@ -44,7 +46,6 @@ class Gloc_Layout_Main extends Gloc_Layout
 			$this->bIsLoggedIn = ( $oUser->getIsActivated() ) ? TRUE : FALSE;
 			
 			if ( $this->bIsLoggedIn ) $this->oUser = $oUser;
-			
 		}
 		
 	}

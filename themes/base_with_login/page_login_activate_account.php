@@ -24,9 +24,11 @@ class Gloc_Layout_Template extends Gloc_Layout
 	//
 	public function start() {
 		
+		parent::start();
+		
 		global $user_ID;
 		if ( $user_ID ) {
-			header( 'Location: ' . Geko_Wp::getUrl() );
+			header( sprintf( 'Location: %s', Geko_Wp::getUrl() ) );
 			die();
 		}
 		

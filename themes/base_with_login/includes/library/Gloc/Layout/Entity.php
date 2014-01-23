@@ -25,6 +25,7 @@ class Gloc_Layout_Entity extends Gloc_Layout
 	//
 	public function start() {
 		
+		parent::start();
 		
 		
 		//// resolve related classes
