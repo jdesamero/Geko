@@ -192,7 +192,58 @@ class Geko_App_Entity_Manage extends Geko_Singleton_Abstract
 	
 	
 	
-
+	//// crud methods
+	
+	
+	//
+	public function formatWhere( $aWhere ) {
+		
+		$oDb = Geko_App::get( 'db' );
+		
+		$aWhereFmt = array();
+		
+		foreach ( $aWhere as $sKey => $sValue ) {
+			$aWhereFmt[] = sprintf( "%s = '%s'", $sKey, $oDb->quote( $sValue ) );
+		}
+		
+		return $aWhereFmt;
+	}
+	
+	
+	//
+	public function insert( $aInsertData ) {
+		
+		$oDb = Geko_App::get( 'db' );
+		
+		// returns affected rows
+		$iRes = $oDb->insert( $this->_sPrimaryTable, $aInsertData );
+		
+		if ( !$iLastInsertId = $oDb->lastInsertId() ) {
+			$iLastInsertId = $trySomeOtherMethod;
+		}
+		
+		return $iRes;
+	}
+	
+	
+	//
+	public function update( $aUpdateData, $aWhere ) {
+		
+		$oDb = Geko_App::get( 'db' );
+		
+		// returns affected rows
+		return $oDb->update( $this->_sPrimaryTable, $aUpdateData, $this->formatWhere( $aWhere ) );
+	}
+	
+	
+	//
+	public function delete( $aWhere ) {
+		
+		$oDb = Geko_App::get( 'db' );
+		
+		// returns affected rows
+		return $oDb->delete( $this->_sPrimaryTable, $this->formatWhere( $aWhere ) );
+	}
 
 
 }

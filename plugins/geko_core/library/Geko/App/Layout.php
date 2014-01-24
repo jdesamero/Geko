@@ -12,12 +12,12 @@ class Geko_App_Layout extends Geko_Layout
 	
 	//
 	public function init( $bUnshift = FALSE ) {
-		
-		parent::init( $bUnshift );
-		
+
 		$this->_aMapMethods = array_merge( $this->_aMapMethods, array(
 			'appGet' => array( Geko_Class::existsCoalesce( 'Gloc_App', 'Geko_App' ), 'get' )
 		) );
+		
+		parent::init( $bUnshift );
 		
 		return $this;
 	}

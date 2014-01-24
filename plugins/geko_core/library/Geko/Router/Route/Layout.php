@@ -150,8 +150,8 @@ class Geko_Router_Route_Layout extends Geko_Router_Route
 		
 		if ( $sBestMatch = $this->_sBestMatch ) {
 			Geko_Singleton_Abstract::getInstance( $sBestMatch )
-				->init()
 				->setLeftovers( $this->_aLeftovers )
+				->init()
 			;
 		} else {
 			throw new Exception( 'A valid layout class was not found!' );
