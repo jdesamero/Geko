@@ -198,6 +198,8 @@
 		<!-- third-party jquery plugins -->
 		<file id="geko-jquery-anythingslider" src="##geko_core_uri##/external/js/jquery.anythingslider.js" dependencies="jquery geko-jquery-easing" />
 		<file id="geko-jquery-bgiframe" src="##geko_core_uri##/external/js/jquery.bgiframe.js" dependencies="jquery" />
+		<file id="geko-jquery-color" src="##geko_core_uri##/external/js/jquery.color.js" dependencies="jquery" />
+		<file id="geko-jquery-color_svg_names" src="##geko_core_uri##/external/js/jquery.color.svg-names.js" dependencies="geko-jquery-color" />
 		<file id="geko-jquery-cookie" src="##geko_core_uri##/external/js/jquery.cookie.js" dependencies="jquery" />
 		<file id="geko-jquery-easing" src="##geko_core_uri##/external/js/jquery.easing.1.3.js" dependencies="jquery" />
 		<file id="geko-jquery-facebook" src="##geko_core_uri##/external/js/jquery.geko_facebook.js" dependencies="jquery geko-facebook-connect" />
@@ -226,8 +228,8 @@
 		<file id="geko-jquery-swfobject" src="##geko_core_uri##/external/js/jquery.swfobject.1-1-1.min.js" dependencies="jquery" />
 		<file id="geko-jquery-syger" src="##geko_core_uri##/external/js/jquery-syger.js" dependencies="jquery" />
 		<file id="geko-jquery-tabslideout" src="##geko_core_uri##/external/js/jquery.tabSlideOut.v1.3.1.js" dependencies="jquery" />
-		<file id="geko-jquery-tinysort" src="##geko_core_uri##/external/js/jquery.tinysort.min.js" dependencies="geko-jquery-tinysort_charorder" />
-		<file id="geko-jquery-tinysort_charorder" src="##geko_core_uri##/external/js/jquery.tinysort.charorder.min.js" dependencies="jquery" />
+		<file id="geko-jquery-tinysort" src="##geko_core_uri##/external/js/jquery.tinysort.min.js" dependencies="jquery" />
+		<file id="geko-jquery-tinysort_charorder" src="##geko_core_uri##/external/js/jquery.tinysort.charorder.min.js" dependencies="geko-jquery-tinysort" />
 		<file id="geko-jquery-tmpl" src="##geko_core_uri##/external/js/jquery.tmpl.js" dependencies="jquery" />
 		<file id="geko-jquery-touchswipe" src="##geko_core_uri##/external/js/jquery.touchSwipe-1.6.5.js" dependencies="jquery" />
 		<file id="geko-jquery-uri" src="##geko_core_uri##/external/js/jquery.uri.js" dependencies="jquery" />
@@ -254,6 +256,8 @@
 		<file id="geko-jquery-geko_scroll_panel" src="##geko_core_uri##/js/jquery.geko_scroll_panel.js" dependencies="geko-css_sandpaper geko-jquery-geko_util geko-jquery-scrollpath geko-jquery-geko_animate_frames" />
 		<file id="geko-jquery-geko_slider" src="##geko_core_uri##/js/jquery.geko_slider.js" dependencies="geko-jquery-easing" />
 		<file id="geko-jquery-geko_slideshow" src="##geko_core_uri##/js/jquery.geko_slideshow.js" dependencies="jquery" />
+		<file id="geko-jquery-geko_sysomos_feed" src="##geko_core_uri##/js/jquery.geko_sysomos_feed.js" dependencies="geko-jquery-geko_util" />
+		<file id="geko-jquery-geko_sysomos_top_ten" src="##geko_core_uri##/js/jquery.geko_sysomos_top_ten.js" dependencies="geko-jquery-geko_util geko-jquery-tinysort_charorder" />
 		<file id="geko-jquery-geko_update" src="##geko_core_uri##/js/jquery.geko_update.js" dependencies="jquery" />
 		<file id="geko-jquery-geko_util" src="##geko_core_uri##/js/jquery.geko_util.min.js" dependencies="geko-compatibility jquery" />
 		<file id="geko-jquery-geko_vertical_scroller" src="##geko_core_uri##/js/jquery.geko_vertical_scroller.js" dependencies="jquery" />
