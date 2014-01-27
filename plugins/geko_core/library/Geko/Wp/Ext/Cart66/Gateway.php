@@ -1,7 +1,7 @@
 <?php
 
 //
-class Geko_Wp_Cart66_Gateway extends Cart66GatewayAbstract
+class Geko_Wp_Ext_Cart66_Gateway extends Cart66GatewayAbstract
 {
 	
 	protected $_apiData;

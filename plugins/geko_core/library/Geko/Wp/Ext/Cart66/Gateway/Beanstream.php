@@ -1,7 +1,7 @@
 <?php
 
 //
-class Geko_Wp_Cart66_Gateway_Beanstream extends Geko_Wp_Cart66_Gateway
+class Geko_Wp_Ext_Cart66_Gateway_Beanstream extends Geko_Wp_Ext_Cart66_Gateway
 {
 	
 	protected $_sTitle = 'Beanstream';

@@ -1,7 +1,7 @@
 <?php
 
 //
-class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_View
+class Geko_Wp_Ext_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Ext_Cart66_View
 {
 	
 	
@@ -28,7 +28,7 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 		if ( $test ) {
 			
 			$subject = $this->_t( 'TEST - Email Receipt' );
-			$order = new Geko_Wp_Cart66_Mock_Order();
+			$order = new Geko_Wp_Ext_Cart66_Mock_Order();
 			
 		} else {
 			
@@ -451,8 +451,8 @@ class Geko_Wp_Cart66_View_Pro_Emails_DefaultEmailReceipt extends Geko_Wp_Cart66_
 		
 		$hasDigital = FALSE;
 		
-		if ( $order && ( $order instanceof Geko_Wp_Cart66_Mock_Order ) ) {
-			$product = new Geko_Wp_Cart66_Mock_Product();
+		if ( $order && ( $order instanceof Geko_Wp_Ext_Cart66_Mock_Order ) ) {
+			$product = new Geko_Wp_Ext_Cart66_Mock_Product();
 		} else {
 			$product = new Cart66Product();
 		}

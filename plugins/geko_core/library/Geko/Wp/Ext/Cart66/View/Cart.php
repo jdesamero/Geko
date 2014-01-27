@@ -1,7 +1,7 @@
 <?php
 
 //
-class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
+class Geko_Wp_Ext_Cart66_View_Cart extends Geko_Wp_Ext_Cart66_View
 {
 	
 	
@@ -27,7 +27,7 @@ class Geko_Wp_Cart66_View_Cart extends Geko_Wp_Cart66_View
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		
-		$oGekoCart66 = Geko_Wp_Cart66::getInstance();
+		$oGekoCart66 = Geko_Wp_Ext_Cart66::getInstance();
 		
 		$oCalculation = $oGekoCart66->getCalculation();
 		

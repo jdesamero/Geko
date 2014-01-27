@@ -1,7 +1,7 @@
 <?php
 
 //
-class Geko_Wp_Cart66_ShortcodeManager extends Cart66ShortcodeManager
+class Geko_Wp_Ext_Cart66_ShortcodeManager extends Cart66ShortcodeManager
 {
 	
 	//
@@ -11,7 +11,7 @@ class Geko_Wp_Cart66_ShortcodeManager extends Cart66ShortcodeManager
 			
 			$gatewayName = Cart66Common::postVal( 'cart66-gateway-name' );  
 			
-			if ( $_SERVER[ 'REQUEST_METHOD' ] == 'POST' && $gatewayName != 'Geko_Wp_Cart66_Gateway_Beanstream' ) {
+			if ( $_SERVER[ 'REQUEST_METHOD' ] == 'POST' && $gatewayName != 'Geko_Wp_Ext_Cart66_Gateway_Beanstream' ) {
 				return ( $gatewayName == 'Cart66ManualGateway' ) ? $this->manualCheckout() : '';
 			}
 			
@@ -26,9 +26,9 @@ class Geko_Wp_Cart66_ShortcodeManager extends Cart66ShortcodeManager
 				
 				try {
 					
-					$oBsGw = Geko_Wp_Cart66_Gateway_Beanstream::getInstance();
+					$oBsGw = Geko_Wp_Ext_Cart66_Gateway_Beanstream::getInstance();
 					
-					$oGekoCart66 = Geko_Wp_Cart66::getInstance();
+					$oGekoCart66 = Geko_Wp_Ext_Cart66::getInstance();
 					
 					$oBsGw
 						->setCalculation( $oGekoCart66->getCalculation() )

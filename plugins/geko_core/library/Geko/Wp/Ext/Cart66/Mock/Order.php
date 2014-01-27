@@ -1,7 +1,7 @@
 <?php
 
 //
-class Geko_Wp_Cart66_Mock_Order
+class Geko_Wp_Ext_Cart66_Mock_Order
 {
 	
 	public $trans_id = 'ABC123DEF456GHI789J0';
@@ -69,9 +69,9 @@ class Geko_Wp_Cart66_Mock_Order
 	//
 	public function getItems() {
 		return array(
-			new Geko_Wp_Cart66_Mock_Item(),
-			new Geko_Wp_Cart66_Mock_Item( '456', 39, 2, 'Another Product' ),
-			new Geko_Wp_Cart66_Mock_Item( '8910', 5, 12, 'Cheap Stuff' )
+			new Geko_Wp_Ext_Cart66_Mock_Item(),
+			new Geko_Wp_Ext_Cart66_Mock_Item( '456', 39, 2, 'Another Product' ),
+			new Geko_Wp_Ext_Cart66_Mock_Item( '8910', 5, 12, 'Cheap Stuff' )
 		);
 	}
 	

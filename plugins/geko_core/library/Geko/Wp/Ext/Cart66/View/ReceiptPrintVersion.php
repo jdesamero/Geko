@@ -1,7 +1,7 @@
 <?php
 
 //
-class Geko_Wp_Cart66_View_ReceiptPrintVersion extends Geko_Wp_Cart66_View
+class Geko_Wp_Ext_Cart66_View_ReceiptPrintVersion extends Geko_Wp_Ext_Cart66_View
 {
 	
 	

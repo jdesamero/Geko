@@ -1,7 +1,7 @@
 <?php
 
 //
-class Geko_Wp_Cart66_Hooks extends Geko_Wp_Admin_Hooks_PluginAbstract
+class Geko_Wp_Ext_Cart66_Hooks extends Geko_Wp_Admin_Hooks_PluginAbstract
 {	
 	
 	protected $_aTabs = array(

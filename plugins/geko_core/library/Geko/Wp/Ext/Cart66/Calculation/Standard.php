@@ -1,7 +1,7 @@
 <?php
 
 //
-class Geko_Wp_Cart66_Calculation_Standard extends Geko_Wp_Cart66_Calculation
+class Geko_Wp_Ext_Cart66_Calculation_Standard extends Geko_Wp_Ext_Cart66_Calculation
 {
 
 	

@@ -1,7 +1,7 @@
 <?php
 
 //
-class Geko_Wp_Cart66_View extends Geko_Singleton_Abstract
+class Geko_Wp_Ext_Cart66_View extends Geko_Singleton_Abstract
 {
 	
 	protected $_sThisFile = '';

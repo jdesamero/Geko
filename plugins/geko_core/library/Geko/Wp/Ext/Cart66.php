@@ -1,7 +1,7 @@
 <?php
 
 //
-class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
+class Geko_Wp_Ext_Cart66 extends Geko_Singleton_Abstract
 {
 	
 	const MSG_PLUGIN_NOT_ACTIVATED = '<strong>Warning!</strong> Please activate the Cart66 Pro Plugin!';
@@ -43,10 +43,44 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 				
 				add_action( 'template_redirect', array( $this, 'ajaxTriggerCheck' ), 9 );
 				
+				$this->adminRedirect();
+				
 				$this->_bCart66PluginActivated = TRUE;
 			}
 			
 			$this->bCalledInit = TRUE;
+		}
+	}
+	
+	
+	//
+	public function adminRedirect() {
+		if (
+			( is_admin() ) && 
+			( 'cart66_admin' == $_GET[ 'page' ] ) && 
+			( 'view' == $_GET[ 'task' ] ) && 
+			( $sOuid = trim( $_GET[ 'ouid' ] ) )
+		) {
+			
+			global $wpdb;
+			
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				->field( 'o.id' )
+				->from( $wpdb->cart66_orders, 'o' )
+				->where( 'o.ouid = ?', $sOuid )
+			;
+			
+			$iId = intval( $wpdb->get_var( strval( $oQuery ) ) );
+			
+			$sHeader = sprintf(
+				'Location: %s/wp-admin/admin.php?page=cart66_admin&task=view&id=%d',
+				get_bloginfo( 'url' ),
+				$iId
+			);
+			
+			header( $sHeader );
+			die();
 		}
 	}
 	
@@ -56,12 +90,12 @@ class Geko_Wp_Cart66 extends Geko_Singleton_Abstract
 		
 		if ( $this->_bCart66PluginActivated ) {
 		
-			$oScm = new Geko_Wp_Cart66_ShortcodeManager();
+			$oScm = new Geko_Wp_Ext_Cart66_ShortcodeManager();
 			add_shortcode( 'checkout_beanstream', array( $oScm, 'beanstreamCheckout' ) );
 			
 			if ( is_admin() ) {
 				
-				$oBsGw = Geko_Wp_Cart66_Gateway_Beanstream::getInstance( FALSE );
+				$oBsGw = Geko_Wp_Ext_Cart66_Gateway_Beanstream::getInstance( FALSE );
 				
 				add_action( 'admin_cart66_settings_checkout_form_pq', array( $this, 'doCheckoutTab' ) );
 				

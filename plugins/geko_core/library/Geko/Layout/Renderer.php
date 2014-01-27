@@ -12,7 +12,7 @@ class Geko_Layout_Renderer extends Geko_Singleton_Abstract
 	
 	//
 	public function isAjaxContent() {
-		return ( intval( $_REQUEST[ 'ajax_content' ] ) ) ? TRUE : FALSE ;
+		return ( $_REQUEST[ 'ajax_content' ] ) ? TRUE : FALSE ;
 	}
 	
 	//

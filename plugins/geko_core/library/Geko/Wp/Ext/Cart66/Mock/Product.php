@@ -1,7 +1,7 @@
 <?php
 
 //
-class Geko_Wp_Cart66_Mock_Product
+class Geko_Wp_Ext_Cart66_Mock_Product
 {
 
 	
