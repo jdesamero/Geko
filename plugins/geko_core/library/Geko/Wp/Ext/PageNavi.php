@@ -19,6 +19,11 @@ class Geko_Wp_Ext_PageNavi
 				$aParamKeys = array( 'before', 'after', 'options', 'query', 'type' );
 				foreach ( $aParamKeys as $sKey ) {
 					if ( $mValue = $aParams[ $sKey ] ) {
+						
+						if ( ( 'query' == $sKey ) && ( $mValue instanceof Geko_Wp_Post_Query ) ) {
+							$mValue = $mValue->getWpQuery();
+						}
+						
 						$aPgnvParams[ $sKey ] = $mValue;
 					}
 				}
