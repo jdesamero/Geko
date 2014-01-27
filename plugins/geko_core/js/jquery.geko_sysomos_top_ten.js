@@ -56,7 +56,7 @@
 					calcRebuildDelay = rebuildDelay;
 				}
 				
-				console.log( calcRebuildDelay );
+				// console.log( calcRebuildDelay );
 				
 				return calcRebuildDelay;
 			};
