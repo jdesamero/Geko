@@ -65,6 +65,11 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 		return ( $this->oWpQuery ) ? $this->oWpQuery->request : '';
 	}
 	
+	//
+	public function getWpQuery() {
+		return $this->oWpQuery;
+	}
+	
 	
 	//
 	public function getSingleEntity( $mParam ) {

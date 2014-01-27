@@ -39,25 +39,31 @@ class Gloc_Layout_Widgets extends Gloc_Layout
 	
 	//
 	public function echoPagination() {
+		
+		$aArgs = func_get_args();
+		
 		?><div class="navigation"><?php
-
-			if ( function_exists( 'wp_pagenavi' ) ) {
-				wp_pagenavi();
+		
+			if ( $sNavHtml = Geko_Wp_Ext_PageNavi::get( $aArgs[ 0 ] ) ) {
+				echo $sNavHtml;
 			} else {
 				posts_nav_link();
 			}
 			
-		?></div><?php
-		
+		?></div><?php		
 	}
 	
 	
 	
 	//
 	public function echoNavMenu() {
-		$aParams = func_get_args();
+		
+		$aArgs = func_get_args();
+		
 		if ( class_exists( 'Geko_Wp_NavigationManagement' ) ) {
-			call_user_func_array( array( Geko_Wp_NavigationManagement::getInstance(), 'renderMenu' ), $aParams );
+			
+			call_user_func_array( array( Geko_Wp_NavigationManagement::getInstance(), 'renderMenu' ), $aArgs );
+		
 		} elseif ( function_exists( 'wp_nav_menu' ) ) {
 			
 			// print_r( $aParams );
@@ -78,7 +84,9 @@ class Gloc_Layout_Widgets extends Gloc_Layout
 	
 	//
 	public function echoNavBreadcrumb() {
+		
 		$aParams = func_get_args();
+		
 		if ( class_exists( 'Geko_Wp_NavigationManagement' ) ) {
 			call_user_func_array( array( Geko_Wp_NavigationManagement::getInstance(), 'renderBreadcrumb' ), $aParams );
 		} else {
@@ -88,7 +96,9 @@ class Gloc_Layout_Widgets extends Gloc_Layout
 	
 	//
 	public function echoNavClassChain() {
+		
 		$aParams = func_get_args();
+		
 		if ( class_exists( 'Geko_Wp_NavigationManagement' ) ) {
 			call_user_func_array( array( Geko_Wp_NavigationManagement::getInstance(), 'renderClassChain' ), $aParams );
 		} else {
@@ -114,7 +124,7 @@ class Gloc_Layout_Widgets extends Gloc_Layout
 	//
 	public function echoLinkPages() {
 		wp_link_pages( array(
-			'before' => '<div class="page-link">' . $this->l_101(),
+			'before' => sprintf( '<div class="page-link">%s', $this->l_101() ),
 			'after' => '</div>',
 			'next_or_number' => 'number'
 		) );
