@@ -53,124 +53,116 @@ class Gloc_Layout_Main extends Gloc_Layout
 	
 	//
 	public function echoEnqueue() {
-		wp_enqueue_script( 'geko-jquery-geko_ajax_form' );
+		$this->enqueueScript( 'geko-jquery-geko_ajax_form' );
 	}
 	
 	//
 	public function echoMain() {
-				
-		if ( $_GET[ 'ajax_content' ] || $this->is( 'page_template:page_ajax.php' ) ) {
+		
+		// register templates
+		$this
+			->addTemplate( 'page_template:homepage.php', 'custom', 'public' )
+			->addTemplate( 'page_template:nosidebar.php', 'no_sidebar', 'public' )
+			->addTemplate( 'page_template:page_login_update_profile.php', 'no_sidebar', 'protected' )
+			->addTemplate( 'page_template:page_login.php', 'no_sidebar', 'unprotected' )
+			->addTemplate( 'page_template:page_login_register.php', 'no_sidebar', 'unprotected' )
 			
-			$this->doAjaxContent();
+			// below uses the default template with sidebar and breadcrumbs
+			// ->addTemplate( 'page_template:some_template.php', 'default', ... )
+		;
+		
+		$this->doEnqueue();
+		$this->doGetHeader();
+		
+		?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+		<html xmlns="http://www.w3.org/1999/xhtml" <?php language_attributes(); ?>>
+		
+		<head profile="http://gmpg.org/xfn/11">
 			
-		} else {
+			<title><?php echo $this->applyTitle( '' ); ?></title>
 			
-			// register templates
-			$this
-				->addTemplate( 'page_template:homepage.php', 'custom', 'public' )
-				->addTemplate( 'page_template:nosidebar.php', 'no_sidebar', 'public' )
-				->addTemplate( 'page_template:page_login_update_profile.php', 'no_sidebar', 'protected' )
-				->addTemplate( 'page_template:page_login.php', 'no_sidebar', 'unprotected' )
-				->addTemplate( 'page_template:page_login_register.php', 'no_sidebar', 'unprotected' )
-				
-				// below uses the default template with sidebar and breadcrumbs
-				// ->addTemplate( 'page_template:some_template.php', 'default', ... )
-			;
+			<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+			<meta name="Description" content="<?php bloginfo( 'description' ); ?>" />
+			<meta name="generator" content="WordPress <?php bloginfo( 'version' ); ?>" /><!-- Please leave for stats -->
 			
-			$this->doEnqueue();
-			$this->doGetHeader();
+			<?php $this->doMeta(); ?>
 			
-			?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-			<html xmlns="http://www.w3.org/1999/xhtml" <?php language_attributes(); ?>>
+			<link rel="stylesheet" type="text/css" href="<?php bloginfo( 'stylesheet_url' ); ?>" />
+			<link rel="alternate" type="application/rss+xml" href="<?php bloginfo( 'rss2_url' ); ?>" title="<?php echo wp_specialchars( get_bloginfo( 'name' ), 1 ); ?> <?php $this->e_102(); ?>" />
+			<link rel="alternate" type="application/rss+xml" href="<?php bloginfo( 'comments_rss2_url' ); ?>" title="<?php echo wp_specialchars( get_bloginfo( 'name' ), 1 ); ?> <?php $this->e_103(); ?>" />
+			<link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>" />
 			
-			<head profile="http://gmpg.org/xfn/11">
-				
-				<title><?php echo $this->applyTitle( '' ); ?></title>
-				
-				<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-				<meta name="Description" content="<?php bloginfo( 'description' ); ?>" />
-				<meta name="generator" content="WordPress <?php bloginfo( 'version' ); ?>" /><!-- Please leave for stats -->
-				
-				<?php $this->doMeta(); ?>
-				
-				<link rel="stylesheet" type="text/css" href="<?php bloginfo( 'stylesheet_url' ); ?>" />
-				<link rel="alternate" type="application/rss+xml" href="<?php bloginfo( 'rss2_url' ); ?>" title="<?php echo wp_specialchars( get_bloginfo( 'name' ), 1 ); ?> <?php $this->e_102(); ?>" />
-				<link rel="alternate" type="application/rss+xml" href="<?php bloginfo( 'comments_rss2_url' ); ?>" title="<?php echo wp_specialchars( get_bloginfo( 'name' ), 1 ); ?> <?php $this->e_103(); ?>" />
-				<link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>" />
-				
-				<?php
-				
-				$this->doHeadEarly();
-				$this->doWpHead();
-				
-				if ( $this->isTemplateList( 'protected' ) ):
-					if ( $this->isLoggedIn() ):
-						$this->doHeadLate();
-					endif;
-				else:
+			<?php
+			
+			$this->doHeadEarly();
+			$this->doWpHead();
+			
+			if ( $this->isTemplateList( 'protected' ) ):
+				if ( $this->isLoggedIn() ):
 					$this->doHeadLate();
 				endif;
-				
-				?>
-				
-			</head>
+			else:
+				$this->doHeadLate();
+			endif;
 			
-			<body class="<?php echo $this->applyBodyClass( '' ); ?>">
-				
-				<table id="outer"><tr><td class="top">
-	
-					<div id="wrapper">
-						
-						<?php $this->doBodyHeader(); ?>
-						
-						<?php if ( $this->isTemplateList( 'custom' ) ): ?>
-							
-							<!-- custom page layout -->
-							<?php $this->_echoContent( 'custom' ); ?>
-							
-						<?php elseif ( $this->isTemplateList( 'no_sidebar' ) ): ?>
-							
-							<!-- no sidebar page layout -->
-							<div id="container">
-								<?php $this->_echoContent( 'no_sidebar' ); ?>
-								<div class="clear"></div>
-							</div>
+			?>
+			
+		</head>
 		
-						<?php else: ?>
-							
-							<!-- default page layout -->
-							<div id="container">
-								<div id="leftnavbox"><?php $this->doSidebar(); $this->doGetSidebar(); ?></div>
-								<div id="content">
-									
-									<div class="breadcrumbs"><?php $this->doNavBreadcrumb( 'main' ); ?></div>
-									
-									<?php $this->_echoContent( 'default' ); ?>
-									
-									<div class="breadcrumbs"><?php $this->doNavBreadcrumb( 'main' ); ?></div>
-								
-								</div>
-								<div class="clear"></div>
-							</div>
-							
-						<?php endif; ?>
-											
-					</div>
-					<?php $this->doBodyFooter(); ?>
+		<body class="<?php echo $this->applyBodyClass( '' ); ?>">
+			
+			<table id="outer"><tr><td class="top">
+
+				<div id="wrapper">
 					
-				</td></tr></table>
+					<?php $this->doBodyHeader(); ?>
+					
+					<?php if ( $this->isTemplateList( 'custom' ) ): ?>
 						
-				<?php $this->doWpFooter(); ?>
+						<!-- custom page layout -->
+						<?php $this->_echoContent( 'custom' ); ?>
+						
+					<?php elseif ( $this->isTemplateList( 'no_sidebar' ) ): ?>
+						
+						<!-- no sidebar page layout -->
+						<div id="container">
+							<?php $this->_echoContent( 'no_sidebar' ); ?>
+							<div class="clear"></div>
+						</div>
+	
+					<?php else: ?>
+						
+						<!-- default page layout -->
+						<div id="container">
+							<div id="leftnavbox"><?php $this->doSidebar(); $this->doGetSidebar(); ?></div>
+							<div id="content">
+								
+								<div class="breadcrumbs"><?php $this->doNavBreadcrumb( 'main' ); ?></div>
+								
+								<?php $this->_echoContent( 'default' ); ?>
+								
+								<div class="breadcrumbs"><?php $this->doNavBreadcrumb( 'main' ); ?></div>
+							
+							</div>
+							<div class="clear"></div>
+						</div>
+						
+					<?php endif; ?>
+										
+				</div>
+				<?php $this->doBodyFooter(); ?>
 				
-			</body>
+			</td></tr></table>
+					
+			<?php $this->doWpFooter(); ?>
 			
-			</html><?php
-			
-			$this->doGetFooter();
-			$this->doFooterLate();
+		</body>
 		
-		}
-			
+		</html><?php
+		
+		$this->doGetFooter();
+		$this->doFooterLate();
+	
 	}
 	
 	//

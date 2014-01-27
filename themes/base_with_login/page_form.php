@@ -34,7 +34,7 @@ class Gloc_Layout_Template extends Gloc_Layout
 	
 	//
 	public function echoEnqueue() {
-		wp_enqueue_script( 'geko_wp_form_render' );
+		$this->enqueueScript( 'geko_wp_form_render' );
 	}
 	
 	//
