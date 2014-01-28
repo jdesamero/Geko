@@ -1,0 +1,17 @@
+/**
+ ** file: blank_mapfix.css
+ ** label: Blank Theme with Map Fix
+ ** description: Only CSS rule is the map image fix, default layout mostly dictacted by active WordPress theme.
+ **
+ **/
+
+/*---------------------
+ * Map
+ *---------------------*/
+
+/* Don't let WordPress Mangle Map Images */
+div#map img {
+    box-shadow: none;
+    max-width: none;
+}
+

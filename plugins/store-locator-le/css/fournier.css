@@ -1,0 +1,380 @@
+/**
+ ** file: fournier.css
+ ** label: Fournier
+ ** columns: 1
+ ** description: Side-by-Side boxes with simple colors on white.  Requires Google Fonts.  A modified version of Bellard-RT using custom Results Format.
+ ** settings:
+ **    csl-slplus-enhanced_results_string
+ **       <table width="96%" cellpadding="4px" cellspacing="0" class="searchResultsTable" id="slp_results_table_{15}">
+ **       <tr class="slp_results_row" id="slp_location_{15}">
+ **       <td class="results_row_left_column" id="slp_left_cell_{15}">
+ **       <div class="slp_result_block">
+ **       <span class="location_name">{0}</span>
+ **       <span class="location_distance">{1} {2}</span>
+ **       <span class="slp_result_header_coordinates result_subheader">Coordinates</span>
+ **       <span class="slp_result_address slp_result_street">{3}</span>
+ **       <span class="slp_result_address slp_result_street2">{4}</span>
+ **       <span class="slp_result_address slp_result_citystatezip">{5}</span>
+ **       <span class="slp_result_address slp_result_country">{16}</span>
+ **       <span class="slp_result_header_hours result_subheader">Business Hours</span>
+ **       <span class="slp_hours">{17}</span>
+ **       <span class="slp_result_contact slp_result_email"><a href="mailto:{18.email}" target="csa">Contact Us</a>  . </span>
+ **       <span class="slp_result_contact slp_result_directions"><a href="http://{10}/maps?saddr={11}&daddr={12}" target="_blank" class="storelocatorlink">{13}</a></span>
+ **       <span class="slp_result_buffer">&nbsp;</span>
+ **       </div>
+ **       </td>
+ **       </tr>
+ **       </table>
+ **
+ **/
+
+/* Slider from proto.io/freebies/onoff/
+*/
+.onoffswitch-block {
+    display: inline-block;
+    float: right;
+    margin-right: 8px;
+}
+.onoffswitch-pretext {
+    display: linline-block;
+    padding-right: 12px;
+    vertical-align: super;
+}
+    .onoffswitch {
+    display: inline-block;
+    position: relative; width: 56px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+    }
+    .onoffswitch-checkbox {
+    display: none;
+    }
+    .onoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    border: 2px solid #999999; border-radius: 20px;
+    }
+    .onoffswitch-inner {
+    width: 200%; margin-left: -100%;
+    -moz-transition: margin 0.3s ease-in 0s; -webkit-transition: margin 0.3s ease-in 0s;
+    -o-transition: margin 0.3s ease-in 0s; transition: margin 0.3s ease-in 0s;
+    }
+    .onoffswitch-inner:before, .onoffswitch-inner:after {
+    float: left; width: 50%; height: 17px; padding: 0; line-height: 17px;
+    font-size: 10px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+    }
+    .onoffswitch-inner:before {
+    content: "ON";
+    padding-left: 8px;
+    background-color: #2FCCFF; color: #FFFFFF;
+    }
+    .onoffswitch-inner:after {
+    content: "OFF";
+    padding-right: 8px;
+    background-color: #EEEEEE; color: #999999;
+    text-align: right;
+    }
+    .onoffswitch-switch {
+    width: 8px; margin: 4.5px;
+    background: #FFFFFF;
+    border: 2px solid #999999; border-radius: 20px;
+    position: absolute; top: 0; bottom: 0; right: 35px;
+    -moz-transition: all 0.3s ease-in 0s; -webkit-transition: all 0.3s ease-in 0s;
+    -o-transition: all 0.3s ease-in 0s; transition: all 0.3s ease-in 0s;
+    }
+    .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+    }
+    .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 0px;
+    }
+
+
+/***********************
+ * Search Form
+ ***********************/
+#search_table {
+    border: none;
+    margin: 0px;
+    padding: 0px;
+}
+#search_table_body {
+}
+#search_form_table_row {
+    display: inline;     /* Keep the map right up to the bottom of the search form. */
+}
+#search_form_table_cell {
+}
+#search_table td {
+    border: none;
+}
+
+div#address_search {
+    height: 40px;
+    display: inline-block;
+    position: relative;
+}
+div#addy_in_state {
+    display: inline-block;
+    margin-right: 8px;
+    position: relative;
+    width: 315px;
+}
+/* Targetting Webkit browsers only. FF will show the dropdown arrow with so much padding. */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    div#add_in_state SELECT {padding-right:18px}
+}
+div#addy_in_state LABEL {
+    /* display: none; */
+    position:relative;
+    z-index: 99;
+}
+div#addy_in_state LABEL:after {
+    position:absolute;
+    height: 24px;
+    width: 26px;
+    right:0px;
+    top:7px;
+    padding: 0px;
+    margin: 1px;
+
+    content:'>';
+    font:24px "Consolas", monospace;
+    color: #8F8F8F;
+    -webkit-transform:rotate(90deg);
+    -moz-transform:rotate(90deg);
+    -ms-transform:rotate(90deg);
+    transform:rotate(90deg);
+    text-align: center;
+    line-height: 20px;
+
+    background:#FFFFFF;
+    border-left: solid 1px #F0F0F0;
+
+    pointer-events:none;
+}
+div#addy_in_state LABEL:before {
+    content:'';
+    right:6px; top:0px;
+    width:20px; height:20px;
+    background:#FFFFFF;
+    position:absolute;
+    pointer-events:none;
+    display:block;
+}
+
+#addressInputState {
+    border: solid 1px #F0F0F0;
+    background-color: #FFFFFF;
+    background-image: -webkit-linear-gradient(#FFFF,#FFFF, #FFFF);
+    color: #8F8F8F;
+    display: inline-block;
+    font-family: "Arial", sans-serif;
+    font-size: 12px;
+    height: 34px;
+    width: 315px;
+    white-space: nowrap;
+    -moz-appearance: button;
+    -webkit-appearance: button;
+}
+#address_search div#addy_in_address {
+    color: #8F8F8F;
+    display: inline-block;
+    font-family: "Arial", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    height: 40px;
+    margin-right: 15px;
+    width: 429px;
+}
+#address_search .search_item INPUT#addressInput {
+    width: 421px;
+}
+div#radius_in_submit {
+    display: inline-block;
+}
+#addressSubmit,
+#addressSubmit:hover
+{
+    background-color: #00D6F2;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00D6F2', endColorstr='#00D6F2'); /* for IE */
+    background: -webkit-gradient(linear, left top, left bottom, from(#00D6F2), to(#00D6F2)); /* for webkit browsers */
+    background: -moz-linear-gradient(top,  #00D6F2,  #00D6F2); /* for firefox 3.6+ */
+    border: medium none;
+    color: #FFFFFF;
+    cursor: pointer;
+    font: "Arial", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    height: 40px;
+    margin: 0;
+    padding: 0;
+    width: 145px;
+}
+
+
+ 
+/***********************
+ * Map
+ ***********************/
+#map_table {
+   border: none;
+   margin: 0px;
+   padding: 0px;
+   width: 100%;
+}
+#map_table td {
+    border: none;
+}
+div#slp_tagline {
+    text-align: right;
+    padding-right: 3px;
+}
+#map_table_row {
+    width: 100%;
+}
+#map_table_cell {
+    width: 100%;
+}
+/* Hide the default Google bubble shadow */
+div#map img[src='http://maps.gstatic.com/mapfiles/iws3.png'] {
+    display:none;
+}
+
+div.entry-content div#sl_div #map_table IMG {
+	max-width:none;
+    box-shadow: none;
+    border-radius: 0px;
+    border: none;
+    padding: 0px;
+    margin: 0px;
+}
+
+/***********************
+ * Results Table
+ ***********************/
+#results_table td {
+    border: none;
+}
+#results_table tr {
+     height: 332px;
+}
+#map_sidebar_td {
+    margin: 0px;
+    padding: 0px;
+}
+div#map_sidebar {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    width: 300px;
+}
+div.results_entry {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    width: 300px;
+}
+
+#results_table .results_row_left_column {
+	width: 300px;
+	height: 332px;
+	margin: 0px;
+	padding: 0px 3px;
+
+	position: absolute;
+	left: 0px;
+	top: 0px;
+
+	border:none;
+	text-align:left;
+	color: #888;
+}
+
+/*--- The Result Block, where all the output renders. */
+
+div.slp_result_block {
+    height: 332px;
+    width:  280px;
+    margin: 0px 10px;
+    padding: 0px 0px;
+
+    position: relative;
+    display: inline-block;
+
+    border-bottom: solid 1px #008FAD;
+}
+div.slp_result_block span {
+    max-width: 280px;
+    width: 100%;
+    margin: 0px;
+    padding: 0px;
+
+    display: block;
+    position: absolute;
+
+    color: #636363;
+    font-family: "News Cycle", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/*-- Data Specific Formatting */
+div.slp_result_block span.result_subheader {
+    font-family: 'Oswald', sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+}
+div.slp_result_block span.location_name {
+    bottom: 293px;
+    color: #00D6F4;
+    font-family: 'Oswald', sans-serif;
+    font-size: 25px;
+    line-height: 39px;
+}
+div.slp_result_block span.location_distance {
+    bottom: 271px;
+}
+div.slp_result_block span.slp_result_header_coordinates.result_subheader {
+    bottom: 239px;
+}
+div.slp_result_block span.slp_result_street {
+    bottom: 217px;
+}
+div.slp_result_block span.slp_result_street2 {
+    bottom: 195px;
+}
+div.slp_result_block span.slp_result_citystatezip {
+    bottom: 179px;
+}
+div.slp_result_block span.slp_result_country {
+    bottom: 163px;
+}
+div.slp_result_block span.slp_result_header_hours.result_subheader {
+    bottom: 115px;
+}
+div.slp_result_block span.slp_hours {
+    top: 217px;
+}
+div.slp_result_block span.slp_result_contact {
+    color: #008FAD;
+    font-family: 'Oswald', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+}
+div.slp_result_block span.slp_result_contact a {
+    text-decoration: none;
+}
+div.slp_result_block span.slp_result_email {
+    bottom: 25px;
+    left: 0px;
+}
+div.slp_result_block span.slp_result_directions {
+    bottom: 25px;
+    left: 150px;
+}
+div.slp_result_block span.slp_result_buffer {
+    height: 25px;
+}

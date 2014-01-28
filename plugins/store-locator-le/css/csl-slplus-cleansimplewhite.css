@@ -1,0 +1,181 @@
+/**
+ ** file: csl-slplus-cleansimplewhite.css
+ ** label: Clean Simple White
+ ** description: Designed to work with the Mazznoer Clean Simple White WP Theme.
+ **
+ **/
+
+/* Slider from proto.io/freebies/onoff/
+*/
+.onoffswitch-block {
+    display: inline-block;
+    float: right;
+    margin-right: 8px;
+}
+.onoffswitch-pretext {
+    display: linline-block;
+    padding-right: 12px;
+    vertical-align: super;
+}
+.onoffswitch {
+display: inline-block;
+position: relative; width: 56px;
+-webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.onoffswitch-checkbox {
+display: none;
+}
+.onoffswitch-label {
+display: block; overflow: hidden; cursor: pointer;
+border: 2px solid #999999; border-radius: 20px;
+}
+.onoffswitch-inner {
+width: 200%; margin-left: -100%;
+-moz-transition: margin 0.3s ease-in 0s; -webkit-transition: margin 0.3s ease-in 0s;
+-o-transition: margin 0.3s ease-in 0s; transition: margin 0.3s ease-in 0s;
+}
+.onoffswitch-inner:before, .onoffswitch-inner:after {
+float: left; width: 50%; height: 17px; padding: 0; line-height: 17px;
+font-size: 10px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+}
+.onoffswitch-inner:before {
+content: "ON";
+padding-left: 8px;
+background-color: #2FCCFF; color: #FFFFFF;
+}
+.onoffswitch-inner:after {
+content: "OFF";
+padding-right: 8px;
+background-color: #EEEEEE; color: #999999;
+text-align: right;
+}
+.onoffswitch-switch {
+width: 8px; margin: 4.5px;
+background: #FFFFFF;
+border: 2px solid #999999; border-radius: 20px;
+position: absolute; top: 0; bottom: 0; right: 35px;
+-moz-transition: all 0.3s ease-in 0s; -webkit-transition: all 0.3s ease-in 0s;
+-o-transition: all 0.3s ease-in 0s; transition: all 0.3s ease-in 0s;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+margin-left: 0;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+right: 0px;
+}
+
+/**
+ * Search Area
+ **/
+div#sl_div div#address_search {
+    text-align: left;
+}
+div#sl_div div#address_search LABEL {
+    display: inline-block;
+    padding-right: 9px;
+    text-align: right;
+    width: 128px;
+}
+div#sl_div div#address_search div.search_item {
+    margin-bottom: 3px;
+}
+div#sl_div div#address_search div#radius_in_submit {
+    padding-left: 134px;
+}
+div#sl_div div#address_search input[type="submit"] {
+  margin: 3px;
+  padding: 3px;
+}
+
+/**
+ * Map Area
+ **/
+div#map {
+    border-top: solid 1px #CCCCCC;
+    border-left: solid 1px #CCCCCC;
+    border-right: solid 1px #CCCCCC;
+    width: auto !important;
+}
+div#map img[src='http://maps.gstatic.com/mapfiles/iws3.png'] {
+    display:none;
+}
+div.entry-content div#sl_div #map_table IMG {
+	max-width:none;
+    box-shadow: none;
+    border-radius: 0px;
+    border: none;
+    padding: 0px;
+    margin: 0px;
+}
+
+/**
+ * Tagline Area (immediately below map)
+ **/
+div#slp_tagline {
+    text-align: right;
+    padding-right: 3px;
+}
+table.sl_footer {
+    margin-bottom: 12px;
+    border-bottom: solid 1px #CCCCCC;
+    border-left: solid 1px #CCCCCC;
+    border-right: solid 1px #CCCCCC;
+}
+tr.slp_map_tagline td {
+    color: #444444;
+    background-color: #F4F4F4;
+    font-size: 0.9em;
+    font-style: italic;
+    padding: 3px;
+    text-align: right;    
+}
+
+/**
+ * Results
+ **/
+tr.slp_results_row:hover {
+    background-color: #F2F2F2;
+}
+tr.slp_map_search_results td {
+    border: none;
+    padding-bottom: 18px;
+    vertical-align: text-top;
+}
+tr.slp_map_search_results td.results_row_left_column {
+    width: 240px;
+}
+tr.slp_map_search_results td.results_row_right_column {
+    text-align: right;
+}
+tr.slp_map_search_results span.location_name {
+    color: #CC0000;
+    font-weight: bold;
+}
+tr.slp_map_search_results a {
+    color: #444444;
+    display: inline-block;
+    text-decoration: none;
+    width: 100%;
+}
+tr.slp_map_search_results a:hover {
+    color: #4444FF;
+    background-color: #F2F2F2;
+}
+span.slp_checkbox_entry {
+    padding-right: 12px;
+}
+span.slp_checkbox_entry input[type="checkbox"] {
+    vertical-align: text-bottom;
+}
+span.slp_result_address {
+    width: 100%;
+    display: inline-block;
+}
+span.slp_result_phone {
+    padding-top: 6px;
+}
+span.slp_result_contact {
+    width: 100%;
+    white-space: nowrap;
+}

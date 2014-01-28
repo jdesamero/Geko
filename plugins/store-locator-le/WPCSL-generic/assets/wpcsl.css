@@ -1,0 +1,224 @@
+/* 
+    Document   : wpcsl.css
+    Created on : Jun 13, 2013, 11:49:24 AM
+    Author     : lcleveland
+    Description:
+        Styles for wpCSL interface
+*/
+
+
+/* Base WP Override */
+#slplus_navbar .about-wrap {
+    margin-left: 3px;
+}
+.about-wrap h2 .nav-tab {
+    font-size: 16px;
+    margin: 0 3px -1px 0;
+    padding: 4px 10px 6px;
+    vertical-align: top;
+}
+.about-wrap h2 .nav-tab-active {
+    background-color: #E0E0E0;
+}
+#wpfooter {
+    position: relative;
+}
+
+/* Woo-ish */
+
+#wpcsl_container {
+    position: relative;
+    z-index: 0;
+}
+
+#wpcsl_container #main {
+    background: none repeat scroll 0 0 #F1F1F1;
+    border-bottom: 1px solid #CCCCCC;
+    height: 100%;
+    margin: 0 0 0 3px;
+    min-width: 10%;
+    padding-bottom: 0;
+    position: relative;
+    width: 820px;
+}
+
+/* Navigation */
+#wpcsl_container .navsave {
+    background-color: #E0E0E0;
+    border-bottom: 1px solid #CCCCCC;
+    border-top: 1px solid white;
+    margin: 0 auto;
+    padding: 6px 0;
+    text-align: center;
+    width: 100%;
+}
+#wpcsl_container #wpcsl-nav {
+    border-left: solid 1px  #CCCCCC;
+    position: absolute;
+    width: 190px;
+    z-index: 9999;
+    min-height: 650px;
+    background-color: #F1F1F1;
+    margin-top: -3px;
+}
+
+#wpcsl_container #wpcsl-nav ul {
+    margin: 0;
+}
+
+#wpcsl_container #wpcsl-nav li {
+    margin-bottom: 0;
+    position: relative;
+}
+
+#wpcsl-nav li .arrow {
+    cursor: auto;
+    display: none;
+    height: 32px;
+    left: -1000px;
+    margin: 0;
+    position: absolute;
+    top: 1px;
+    transform: translate(146px);
+    width: 6px;
+}
+
+#wpcsl-nav li .arrow div {
+    background: none repeat scroll 0 0 #E4E4E4;
+    border-color: #CCCCCC;
+    border-style: solid;
+    border-width: 0 0 1px 1px;
+    height: 17px;
+    left: -2px;
+    position: absolute;
+    top: 7px;
+    transform: matrix(-0.6, 1, 0.6, 1, 0, 0);
+    width: 17px;
+}
+
+#wpcsl_container #wpcsl-nav ul li span.icon {
+    background-position: 0 center;
+    background-repeat: no-repeat;
+    display: block;
+    float: left;
+    height: 16px;
+    margin-left: 10px;
+    padding: 16px 0 0 9px;
+    width: 16px;
+}
+
+#wpcsl_container #wpcsl-nav ul li a:link,
+#wpcsl-nav ul li a:visited {
+    border-bottom: 1px solid #D8D8D8;
+    border-top: 1px solid #FFFFFF;
+    color: #797979;
+    display: block;
+    font: bold 12px/18px sans-serif;
+    padding: 7px 10px;
+    text-decoration: none;
+    text-shadow: 0 1px 0 #FFFFFF;
+}
+#wpcsl_container #wpcsl-nav ul li.first a:link,
+#wpcsl-nav ul li.first a:visited {
+    border-top: none;
+}
+
+
+/* Navigation Current Selection */
+#wpcsl-nav li.current .arrow, #wpcsl-nav li.has-children.current .arrow {
+    background-color: #777777;
+    background-image: -moz-linear-gradient(center bottom , #6D6D6D, #808080);
+    display: block;
+    transform: translate(1184px);
+    z-index: 9997;
+}
+
+#wpcsl_container #wpcsl-nav ul li.current .arrow div {
+    background-color: #777777;
+    background-image: -moz-linear-gradient(right bottom , #6D6D6D, #808080);
+    border: medium none;
+}
+
+#wpcsl_container #wpcsl-nav ul li.current a:link, #wpcsl_container #wpcsl-nav ul li.current a:visited {
+    background-color: #777777;
+    background-image: -moz-linear-gradient(center bottom , #6D6D6D, #808080);
+    border-bottom-color: #6D6D6D;
+    border-top-color: gray;
+    color: white;
+    margin-left: -1px;
+    text-shadow: 0 -1px 0 #333333;
+}
+
+/* Content */
+#wpcsl_container #content {
+    background-color: transparent;
+    font-family: sans-serif;
+    min-height: 650px;
+    padding: 0 20px;
+    position: absolute;
+    top: 6;
+    left: 188;
+    width: 595px;
+}
+
+#wpcsl_container #main #content {
+    margin-left: 189px;
+    position: relative;
+    background-color: #FFFFFF;
+}
+
+/* Content Groups */
+#wpcsl_container #content .group {
+    margin-top: 3px;
+}
+#wpcsl_container #content .group h1 {
+    border-bottom: 1px solid #E0E0E0;
+    color: #464646;
+    display: none;
+    font-size: 23px;
+    font-weight: normal;
+    margin: 0 0 20px;
+    padding: 20px 0;
+}
+
+/* Content Group Sections */
+
+#wpcsl_container #content .section {
+    margin-bottom: 10px;
+    padding-bottom: 15px;
+}
+#wpcsl_container #content .section:last-child {
+    margin-bottom: 0;
+}
+
+div.section_column {
+    width: 520px;
+    margin: 3px 6px 6px 0px;
+    border: solid 1px #D0D0D0;
+    overflow: auto;
+    background-color: #F0F0E0;
+}
+
+
+div.section_column h2, #rb_details h2 {
+    background: none repeat scroll 0 0 #E0E0D0;
+    border-bottom: 1px solid #D0D0D0;
+    font-size: 16px;
+    margin-bottom: 12px;
+    margin-top: 0;
+    padding: 0 6px;
+}
+
+/* Env Info */
+p.envinfo {
+    margin:0px;
+    padding: 0px;
+}
+span.label {
+    background-color: #DDFFDD;
+    display: inline-block;
+    padding: 4px;
+    text-align: right;
+    width: 180px;
+    margin-right: 6px;
+}

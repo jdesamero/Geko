@@ -1,0 +1,107 @@
+.gallery,
+.gallery .gly_item,
+.gallery .gly_item img.gly_bg,
+.gallery .gly_controls {
+	width: 999px;
+	height: 425px;
+}
+
+.gallery {
+	position: relative;
+	margin: 0 auto;
+	box-shadow: 0 0 8px #000;
+}
+
+.gly_item {
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+.gly_item table.ovly {
+	width: 550px;
+	padding: 0;
+	margin: 0;
+	border: 0;
+	border-collapse: collapse;
+	position: absolute;
+	left: 33px;
+	top: 191px;
+}
+
+.gly_item table.ovly td {
+	margin: 0;
+	border: 0;
+}
+
+.gly_item table.ovly td.top {
+	padding: 0;
+}
+
+.gly_item table.ovly td {
+	background: url('../images/ovly.png');
+	color: #FFF;
+	font-size: 12px;
+	padding: 12px;
+	vertical-align: top;
+}
+
+.gly_item table.ovly td h2 {
+	text-transform: uppercase;
+}
+
+.gallery .gly_ctls {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+}
+
+.gallery .gly_ctls .gly_btn {
+	width: 66px;
+	height: 6px;
+	background-color: #191919;
+	cursor: pointer;
+	margin-right: 10px;
+	float: left;
+}
+
+.gallery .gly_ctls .gly_btn:hover,
+.gallery .gly_ctls .gly_btn.gly_cur {
+	background-color: #fcb913;
+}
+
+/* Interior Gallery */
+
+.interior-gallery,
+.interior-gallery .gly_item,
+.interior-gallery .gly_item img.gly_bg,
+.interior-gallery .gly_controls {
+	width: 735px;
+	height: 370px;
+}
+
+.interior-gallery {
+	position: relative;
+	margin: 0 auto;
+	box-shadow: 0 0 8px #000;
+}
+
+.interior-gallery .gly_ctls {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+}
+
+.interior-gallery .gly_ctls .gly_btn {
+	width: 66px;
+	height: 6px;
+	background-color: #191919;
+	cursor: pointer;
+	margin-right: 10px;
+	float: left;
+}
+
+.interior-gallery .gly_ctls .gly_btn:hover,
+.interior-gallery .gly_ctls .gly_btn.gly_cur {
+	background-color: #fcb913;
+}

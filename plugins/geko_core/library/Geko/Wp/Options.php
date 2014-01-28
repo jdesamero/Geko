@@ -95,20 +95,20 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 			
 			// init
 			
-			$sInitHook = 'admin_init_' . $this->_sSubAction . '::' . $sTargetClass;
+			$sInitHook = sprintf( 'admin_init_%s::%s', $this->_sSubAction, $sTargetClass );
 			
 			add_action( $sInitHook, array( $this, 'coft_install' ) );
-			add_action( $sInitHook . '_Create', array( $this, 'coft_install' ) );
+			add_action( sprintf( '%s_Create', $sInitHook ), array( $this, 'coft_install' ) );
 			
 			// head
 
-			$sHeadHook = 'admin_head_' . $this->_sSubAction . '::' . $sTargetClass;
+			$sHeadHook = sprintf( 'admin_head_%s::%s', $this->_sSubAction, $sTargetClass );
 			
 			add_action( $sHeadHook, array( $this, 'coft_affixAdminHead' ) );
 			add_action( $sHeadHook, array( $this, 'co_addAdminHead' ) );
 			
-			add_action( $sHeadHook . '_Create', array( $this, 'coft_affixAdminHead' ) );
-			add_action( $sHeadHook . '_Create', array( $this, 'co_addAdminHead' ) );
+			add_action( sprintf( '%s_Create', $sHeadHook ), array( $this, 'coft_affixAdminHead' ) );
+			add_action( sprintf( '%s_Create', $sHeadHook ), array( $this, 'co_addAdminHead' ) );
 			
 		} else {
 			
@@ -116,24 +116,24 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 			
 			// init
 	
-			$sInitHook = 'admin_init_' . $this->_sSubAction . '::' . $this->_sInstanceClass;
+			$sInitHook = sprintf( 'admin_init_%s::%s' , $this->_sSubAction, $this->_sInstanceClass );
 			
-			add_action( 'admin_init_' . $this->_sSubAction, array( $this, 'doAdminInit' ) );
+			add_action( sprintf( 'admin_init_%s', $this->_sSubAction ), array( $this, 'doAdminInit' ) );
 			
 			add_action( $sInitHook, array( $this, 'coft_install' ) );
-			add_action( $sInitHook . '_Create', array( $this, 'coft_install' ) );
+			add_action( sprintf( '%s_Create', $sInitHook ), array( $this, 'coft_install' ) );
 			
 			// head
 			
-			$sHeadHook = 'admin_head_' . $this->_sSubAction . '::' . $this->_sInstanceClass;
+			$sHeadHook = sprintf( 'admin_head_%s::%s', $this->_sSubAction, $this->_sInstanceClass );
 			
-			add_action( 'admin_head_' . $this->_sSubAction, array( $this, 'doAdminHead' ) );
+			add_action( sprintf( 'admin_head_%s', $this->_sSubAction ), array( $this, 'doAdminHead' ) );
 			
 			add_action( $sHeadHook, array( $this, 'coft_affixAdminHead' ) );
 			add_action( $sHeadHook, array( $this, 'co_addAdminHead' ) );
 	
-			add_action( $sHeadHook . '_Create', array( $this, 'coft_affixAdminHead' ) );
-			add_action( $sHeadHook . '_Create', array( $this, 'co_addAdminHead' ) );
+			add_action( sprintf( '%s_Create', $sHeadHook ), array( $this, 'coft_affixAdminHead' ) );
+			add_action( sprintf( '%s_Create', $sHeadHook ), array( $this, 'co_addAdminHead' ) );
 			
 			// menu
 			
@@ -147,7 +147,7 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	public function doAdminHook( $sType ) {
 		if ( $this->isCurrentPage() ) {
 			$sClass = Geko_String::coalesce( $this->_sCurrentPage, $this->_sInstanceClass );
-			$sAction = 'admin_' . $sType . '_' . $this->_sSubAction . '::' . $sClass;
+			$sAction = sprintf( 'admin_%s_%s::%s', $sType, $this->_sSubAction, $sClass );
 			do_action( $sAction );
 		}
 	}
@@ -174,7 +174,7 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	
 	// only populated after calling inject()
 	public function getPrefixWithSep( $oPlugin = NULL ) {
-		return $this->getPrefix( $oPlugin ) . $this->getPrefixSeparator( $oPlugin );
+		return sprintf( '%s%s', $this->getPrefix( $oPlugin ), $this->getPrefixSeparator( $oPlugin ) );
 	}
 	
 	//
@@ -201,6 +201,13 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	public function getPrefixSeparator( $oPlugin = NULL ) {
 		return $this->_sPrefixSeparator;
 	}
+	
+	
+	// apply prefix with separator to field 
+	public function applyPrefix( $sFieldName, $oPlugin = NULL ) {
+		return sprintf( '%s%s', $this->getPrefixWithSep( $oPlugin ), $sFieldName );
+	}
+	
 	
 	//
 	public function getAdminUrl() {
@@ -305,7 +312,7 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 		
 		return (
 			( $this->_sCurrentPage == $this->_sInstanceClass ) || 
-			( $this->_sCurrentPage == $this->_sInstanceClass . $this->_sAddModeSuffix )
+			( $this->_sCurrentPage == sprintf( '%s%s', $this->_sInstanceClass, $this->_sAddModeSuffix ) )
 		);
 	}
 	
@@ -812,7 +819,7 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	
 	//
 	public function resolveClass( $sClass ) {
-		return Geko_Class::existsCoalesce( $sClass, 'Gloc_' . $sClass, 'Geko_Wp_' . $sClass );
+		return Geko_Class::existsCoalesce( $sClass, sprintf( 'Gloc_%s', $sClass ), sprintf( 'Geko_Wp_%s', $sClass ) );
 	}
 	
 	
@@ -1447,7 +1454,7 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 		$i = 0;
 		foreach ( $aWhere as $sField => $mValue ) {
 			$oSqlDelete->where( $wpdb->prepare(
-				'( ' . $sField . ' = ' . $aWhereFormat[ $i ] . ' )',
+				sprintf( '( %s = %s )', $sField, $aWhereFormat[ $i ] ),
 				$mValue
 			) );
 		}

@@ -35,6 +35,7 @@
 		<file id="geko-flash-loader" src="##geko_core_uri##/external/js/flash_loader.js" />
 		<file id="geko-get_scroll_xy" src="##geko_core_uri##/external/js/get_scroll_xy.js" />
 		<file id="geko-googlemaps" src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=##GOOGLEMAPS_API_KEY##" />
+		<file id="geko-sprintf" src="##geko_core_uri##/external/js/sprintf.js" />
 		<file id="geko-string_format" src="##geko_core_uri##/external/js/string_format.js" />
 		<file id="geko-swf-object" src="##geko_core_uri##/external/js/swfobject.js" />
 		<file id="geko-swipe" src="##geko_core_uri##/external/js/swipe.js" />
@@ -259,7 +260,7 @@
 		<file id="geko-jquery-geko_sysomos_feed" src="##geko_core_uri##/js/jquery.geko_sysomos_feed.js" dependencies="geko-jquery-geko_util" />
 		<file id="geko-jquery-geko_sysomos_top_ten" src="##geko_core_uri##/js/jquery.geko_sysomos_top_ten.js" dependencies="geko-jquery-geko_util geko-jquery-tinysort_charorder" />
 		<file id="geko-jquery-geko_update" src="##geko_core_uri##/js/jquery.geko_update.js" dependencies="jquery" />
-		<file id="geko-jquery-geko_util" src="##geko_core_uri##/js/jquery.geko_util.min.js" dependencies="geko-compatibility jquery" />
+		<file id="geko-jquery-geko_util" src="##geko_core_uri##/js/jquery.geko_util.min.js" dependencies="geko-compatibility geko-sprintf geko-string_format jquery" />
 		<file id="geko-jquery-geko_vertical_scroller" src="##geko_core_uri##/js/jquery.geko_vertical_scroller.js" dependencies="jquery" />
 		
 		

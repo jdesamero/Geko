@@ -1,0 +1,365 @@
+/**
+ ** file: default_old.css
+ ** label: Default Theme, Old
+ ** The default SLPLUS Theme.
+ **
+ **/
+
+/* Slider from proto.io/freebies/onoff/
+*/
+.onoffswitch-block {
+    display: inline-block;
+    float: right;
+    margin-right: 8px;
+}
+.onoffswitch-pretext {
+    display: linline-block;
+    padding-right: 12px;
+    vertical-align: super;
+}
+    .onoffswitch {
+    display: inline-block;
+    position: relative; width: 56px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+    }
+    .onoffswitch-checkbox {
+    display: none;
+    }
+    .onoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    border: 2px solid #999999; border-radius: 20px;
+    }
+    .onoffswitch-inner {
+    width: 200%; margin-left: -100%;
+    -moz-transition: margin 0.3s ease-in 0s; -webkit-transition: margin 0.3s ease-in 0s;
+    -o-transition: margin 0.3s ease-in 0s; transition: margin 0.3s ease-in 0s;
+    }
+    .onoffswitch-inner:before, .onoffswitch-inner:after {
+    float: left; width: 50%; height: 17px; padding: 0; line-height: 17px;
+    font-size: 10px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+    }
+    .onoffswitch-inner:before {
+    content: "ON";
+    padding-left: 8px;
+    background-color: #2FCCFF; color: #FFFFFF;
+    }
+    .onoffswitch-inner:after {
+    content: "OFF";
+    padding-right: 8px;
+    background-color: #EEEEEE; color: #999999;
+    text-align: right;
+    }
+    .onoffswitch-switch {
+    width: 8px; margin: 4.5px;
+    background: #FFFFFF;
+    border: 2px solid #999999; border-radius: 20px;
+    position: absolute; top: 0; bottom: 0; right: 35px;
+    -moz-transition: all 0.3s ease-in 0s; -webkit-transition: all 0.3s ease-in 0s;
+    -o-transition: all 0.3s ease-in 0s; transition: all 0.3s ease-in 0s;
+    }
+    .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+    }
+    .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 0px;
+    }
+
+/***** Area Above Map DIV. Contains Search Form Inputs *****/
+.sl_header img, .sl_header td {
+    border: none;
+    cursor: pointer;   
+}
+
+.sl_header #addressSubmit.slp_ui_button {
+    /* like-a-button */
+    background: #FFF; /* for non-css3 browsers */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFF', endColorstr='#DDDDDD'); /* for IE */
+    background: -webkit-gradient(linear, left top, left bottom, from(#FFF), to(#DDD)); /* for webkit browsers */
+    background: -moz-linear-gradient(top,  #FFF,  #DDD); /* for firefox 3.6+ */
+    text-decoration: none;
+    
+    font-size: 14px;
+    border: 1px solid #BBBBBB;
+    border-radius: 3px 3px 3px 3px;
+    height: 26px;
+    margin: 0px 2px 2px 0px;
+    padding: 0px 4px;
+    text-align: center;
+    cursor: pointer;
+    color: #5F5E5E;
+    display: block;
+    
+    /* Corners */
+    -webkit-border-radius:6px;
+    -moz-border-radius:6px;
+    border-radius:6px;
+    -khtml-border-radius: 6px;
+    
+    /* Shadow */
+    -moz-box-shadow: 0px 1px 3px #AAA;
+    -webkit-box-shadow: 0px 1px 3px #AAA;
+    box-shadow: 0px 1px 3px #AAA;           
+}    
+
+.sl_header #addressSubmit.slp_ui_button:hover {
+    margin: 2px 0px 0px 2px;
+    -moz-box-shadow: 0px 0px 0px #AAA;
+    -webkit-box-shadow: 0px 0px 0px #AAA;
+    box-shadow: 0px 0px 0px #AAA;           
+}
+
+.sl_header #addressSubmit.slp_image_button {
+}
+
+.sl_header td {
+	vertical-align:top;
+	text-align:left;
+}
+.sl_header td, .sl_header th, .sl_header tr {
+	padding:4px;
+}
+
+
+/***** Search Form Inputs  *****/
+#address_search {
+    width: 600px;
+}
+#address_search LABEL {
+    text-align: right;
+    min-width: 100px;
+    font-size: 14px;
+    display:block;
+    float: left;
+    padding-right: 8px;
+}
+
+#address_search SELECT {
+	margin:0px 6px 0px 0px;
+}
+
+#address_search INPUT {
+	margin:0px 6px 0px 0px;
+}
+
+
+
+#address_search .search_item {
+	display: block;
+	float: none;
+	clear: both;
+}
+
+#address_search .search_item INPUT {
+	border:solid 1px silver;
+	padding-left:3px; 
+	background:white url(../images/search-input.gif) repeat-x;
+	color: black;
+	margin:0px 6px 0px 0px;
+	width: 256px;
+	padding-top:0px;
+}
+
+#address_search .search_item SELECT {
+	margin:0px 6px 0px 0px;
+}
+
+#addy_in_city {
+    clear: both;
+    float: left;
+	margin-right: 6px;
+}
+#addy_in_country {
+    float: left;
+}
+#addy_in_address {
+    clear:both;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+#addy_in_radius {
+    clear:both;
+    float: left;
+    padding-top: 3px;
+    padding-right: 12px;
+}
+
+#radius_in_submit {
+    float: left;
+    width: 300px;
+    padding-top: 3px;
+}
+
+
+
+/**** Map Box
+ ** 
+ ** Since we only use these div IDs when a static image is present
+ ** we start with the image shown and map hidden.  JQuery will flip
+ ** this for us.
+ **
+ **/
+
+#map_box_image {
+    display: block; 
+}
+
+#map_box_map {
+    display: none;
+}
+div#slp_tagline {
+    text-align: right;
+    padding-right: 3px;
+}
+
+/***** Store Locator Map DIV *****/
+#sl_div {
+	padding:10px;
+	font-weight:bold;
+}
+#sl_div a {
+}
+#sl_div a.storelocatorlink {
+	color:#0000FF;
+}
+#sl_div a:hover.storelocatorlink {
+	color:#4444FF;
+}
+#sl_div img {
+	background-color:transparent;
+	background-image:none;
+	max-width:none; 
+}
+#sl_div table, #sl_div tr, #sl_div td {
+	border:none;
+}
+#sl_div #map { 
+	color:black; 
+	font-weight:normal;
+}
+
+#sl_div #map img {
+    visibility: visible;    
+}
+
+/***** Popup Info Window for Specific Location *****/
+#sl_info_bubble { 
+	padding:10px; 
+	max-width:300px; 
+	font-size:11px; 
+	font-family:Arial;
+	text-align:justify;
+	line-height:normal;
+}
+#sl_info_bubble img{
+	width:250px; 
+	max-height:200px;
+	border:0px;
+}
+#sl_info_bubble .your_location_label{
+	font-weight:bold;
+}
+#sl_info_bubble .location_detail_label{
+	font-weight:bold;
+}
+
+/***** Area Below Map DIV, before Search Results Area *****/
+.sl_footer td, .sl_footer td a, .sl_footer td a:link, .sl_footer td a:hover, .sl_footer td a:active, .sl_footer td a:visited {
+	font-weight:normal;
+	font-size:10px;
+}
+.sl_footer {
+	background-color:black;
+	padding:0px;
+	border:0px black solid;
+	color: #222;
+}
+.sl_footer a {
+	color:#666;
+	font-weight:bold;
+	border:0px black solid;
+	padding-left:5px;
+}
+.sl_footer_right_column {
+	padding-right:5px;
+	text-align:right;
+}
+.sl_footer_left_column {
+	text-align:left;
+}
+
+/*****Search Results Area *****/
+.searchResultsTable td {
+	line-height:12px;
+	font-family: Verdana;
+	font-size:10px;
+	text-align:left;
+}
+.text_below_map {
+	/*shown before search performed */
+	font-family:Arial;
+	padding:20px;
+	font-size:18px;
+	text-align:justify;
+}
+.no_results_found {
+	/*shown if no results found */
+	padding:10px;
+}
+#map_sidebar { 
+	/*shown for results found for specific query */
+	background-color:transparent;
+	font-weight:normal;
+	text-align:justify;
+	overflow: auto;
+	height:250px;
+	font-size: 11px;
+}
+.results_entry {
+	cursor:pointer;
+	padding:4px;
+	border-bottom:solid silver 1px;
+	background-color:transparent;
+}
+.results_entry:hover {
+	background-color:#F4F4AA;
+}
+.results_row_left_column {
+	width:30%;
+	padding-right:4px;
+	vertical-align:top;
+}
+.results_row_left_column .location_name {
+	font-weight:bold;
+}
+.results_row_center_column {
+	width:40%;
+	vertical-align:top;
+}
+.results_row_right_column {
+	width:30%;
+	vertical-align:top;
+	text-align:right;
+}
+
+
+span.slp_checkbox_entry {
+    padding-right: 12px;
+}
+
+span.slp_checkbox_entry input[type="checkbox"] {
+    vertical-align: text-bottom;
+}
+
+span.slp_result_address {
+    width: 100%;
+    display: inline-block;
+}
+span.slp_result_phone {
+    padding-top: 6px;
+}
+
+span.slp_result_contact {
+    width: 100%;
+    white-space: nowrap;
+}

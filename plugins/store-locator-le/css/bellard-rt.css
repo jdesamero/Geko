@@ -1,0 +1,300 @@
+/**
+ ** file: bellard-rt.css
+ ** label: Bellard RT
+ ** columns: 1
+ ** description: Side-by-Side boxes with simple colors on white.  Requires Google Fonts.  Slightly more narrow than Bellard.  Styled for RT-17 Theme.
+ **
+ **/
+
+/* Slider from proto.io/freebies/onoff/
+*/
+.onoffswitch-block {
+    display: inline-block;
+    float: right;
+    margin-right: 8px;
+}
+.onoffswitch-pretext {
+    display: linline-block;
+    padding-right: 12px;
+    vertical-align: super;
+}
+    .onoffswitch {
+    display: inline-block;
+    position: relative; width: 56px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+    }
+    .onoffswitch-checkbox {
+    display: none;
+    }
+    .onoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    border: 2px solid #999999; border-radius: 20px;
+    }
+    .onoffswitch-inner {
+    width: 200%; margin-left: -100%;
+    -moz-transition: margin 0.3s ease-in 0s; -webkit-transition: margin 0.3s ease-in 0s;
+    -o-transition: margin 0.3s ease-in 0s; transition: margin 0.3s ease-in 0s;
+    }
+    .onoffswitch-inner:before, .onoffswitch-inner:after {
+    float: left; width: 50%; height: 17px; padding: 0; line-height: 17px;
+    font-size: 10px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+    }
+    .onoffswitch-inner:before {
+    content: "ON";
+    padding-left: 8px;
+    background-color: #2FCCFF; color: #FFFFFF;
+    }
+    .onoffswitch-inner:after {
+    content: "OFF";
+    padding-right: 8px;
+    background-color: #EEEEEE; color: #999999;
+    text-align: right;
+    }
+    .onoffswitch-switch {
+    width: 8px; margin: 4.5px;
+    background: #FFFFFF;
+    border: 2px solid #999999; border-radius: 20px;
+    position: absolute; top: 0; bottom: 0; right: 35px;
+    -moz-transition: all 0.3s ease-in 0s; -webkit-transition: all 0.3s ease-in 0s;
+    -o-transition: all 0.3s ease-in 0s; transition: all 0.3s ease-in 0s;
+    }
+    .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+    }
+    .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 0px;
+    }
+
+
+/***********************
+ * Search Form
+ ***********************/
+#search_table {
+    border: none;
+    margin: 0px;
+    padding: 0px;
+}
+#search_table_body {
+}
+#search_form_table_row {
+    display: inline;     /* Keep the map right up to the bottom of the search form. */
+}
+#search_form_table_cell {
+}
+#search_table td {
+    border: none;
+}
+div#address_search {
+}
+div#addy_in_state {
+    display: inline-block;
+    margin-right: 8px;
+    position: relative;
+    width: 315px;
+}
+div#addy_in_state LABEL {
+    display: none;
+}
+#addressInputState {
+    border: solid 1px #DDDDDD;
+    background-color: #FFFFFF;
+    background-image: -webkit-linear-gradient(#FFFF,#FFFF, #FFFF);
+    color: #8F8F8F;
+    display: inline-block;
+    font-family: "Arial", sans-serif;
+    font-size: 12px;
+    height: 31px;
+    position: absolute;
+    top: -22px;
+    width: 315px;
+    white-space: nowrap;
+    -webkit-appearance: button;    
+}
+div#addy_in_address {
+    color: #8F8F8F;
+    display: inline-block;
+    font-family: "Arial", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    height: 40px;
+    margin-right: 15px;
+    width: 431px;
+}
+#addressInput {
+    width: 421px;
+}
+div#radius_in_submit {
+    display: inline-block;
+}
+#addressSubmit,
+#addressSubmit:hover
+{
+    background-color: #00D6F2;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00D6F2', endColorstr='#00D6F2'); /* for IE */
+    background: -webkit-gradient(linear, left top, left bottom, from(#00D6F2), to(#00D6F2)); /* for webkit browsers */
+    background: -moz-linear-gradient(top,  #00D6F2,  #00D6F2); /* for firefox 3.6+ */
+    border: medium none;
+    color: #FFFFFF;
+    cursor: pointer;
+    font: "Arial", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    height: 40px;
+    margin: 0;
+    padding: 0;
+    width: 145px;
+}
+
+
+ 
+/***********************
+ * Map
+ ***********************/
+#map_table {
+   border: none;
+   margin: 0px;
+   padding: 0px;
+   width: 100%;
+}
+#map_table td {
+    border: none;
+}
+div#slp_tagline {
+    text-align: right;
+    padding-right: 3px;
+}
+#map_table_row {
+    width: 100%;
+}
+#map_table_cell {
+    width: 100%;
+}
+/* Hide the default Google bubble shadow */
+div#map img[src='http://maps.gstatic.com/mapfiles/iws3.png'] {
+    display:none;
+}
+
+div.entry-content div#sl_div #map_table IMG {
+	max-width:none;
+    box-shadow: none;
+    border-radius: 0px;
+    border: none;
+    padding: 0px;
+    margin: 0px;
+}
+
+/***********************
+ * Results Table
+ ***********************/
+#results_table td {
+    border: none;
+}
+#results_table tr {
+     height: 400px;
+}
+#map_sidebar_td {
+    margin: 0px;
+    padding: 0px;
+}
+div#map_sidebar {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    width: 315px;
+}
+div.results_entry {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    width: 300px;
+}
+
+div.results_entry table.searchResultsTable {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+}
+
+#results_table .results_row_left_column {
+	width: 315px;
+	height: 55px;
+	margin: 0px;
+	padding: 0px 3px;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	border:none;
+	text-align:left;
+	color: #888;
+}
+
+#results_table .results_row_center_column {
+	width: 315px;
+	height: 90px;
+	margin: 0px;
+	padding: 0px 3px;
+	position: absolute;
+	left: 0px;
+	top: 90px;
+	border:none;
+	text-align:left;
+}
+#results_table .results_row_right_column {
+	width: 315px;
+	height: 50px;
+	margin: 0px;
+	padding: 0px 3px;
+	position: absolute;
+	left: 0px;
+	top: 230px;
+	border:none;
+	text-align:left;
+}
+
+span.location_name {
+    color: #00D6F4;
+    display: block;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 400;
+    font-size: 25px;
+    line-height: 34px;
+    max-width: 290px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+span.location_distance {
+    color: #636363;
+    display: block;
+    font-family: "News Cycle", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    margin-top: -24px;
+}
+span.slp_result_address {
+    color: #636363;
+    font-family: "News Cycle", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    display: block;
+    width: 100%;
+}
+span.slp_result_contact {
+    color: #636363;
+    font-family: "News Cycle", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+}
+span.slp_result_website {
+    display: inline-block;
+    width: 110px;
+}
+span.slp_result_directions {
+    display: inline-block;
+    width: 160px;
+}
+div.slp_hours {
+    margin-top: 20px;
+    white-space: normal;
+    width: 300px;
+}

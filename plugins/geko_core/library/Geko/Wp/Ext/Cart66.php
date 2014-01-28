@@ -7,8 +7,6 @@ class Geko_Wp_Ext_Cart66 extends Geko_Singleton_Abstract
 	const MSG_PLUGIN_NOT_ACTIVATED = '<strong>Warning!</strong> Please activate the Cart66 Pro Plugin!';
 	
 	
-	protected $bCalledInit = FALSE;
-	
 	protected $_iNumPieces = NULL;
 	protected $_iNumOrders = NULL;
 	protected $_aBilling = array();
@@ -29,26 +27,23 @@ class Geko_Wp_Ext_Cart66 extends Geko_Singleton_Abstract
 	
 	
 	//
-	public function init() {
+	public function start() {
 		
-		if ( !$this->bCalledInit ) {
+		parent::start();
+		
+		if ( class_exists( 'Cart66' ) ) {
 			
-			if ( class_exists( 'Cart66' ) ) {
-				
-				Geko_Wp_Db::addPrefix( 'cart66_products' );
-				Geko_Wp_Db::addPrefix( 'cart66_orders' );
-				Geko_Wp_Db::addPrefix( 'cart66_order_items' );
-				
-				add_action( 'init', array( $this, 'wpInit' ) );
-				
-				add_action( 'template_redirect', array( $this, 'ajaxTriggerCheck' ), 9 );
-				
-				$this->adminRedirect();
-				
-				$this->_bCart66PluginActivated = TRUE;
-			}
+			Geko_Wp_Db::addPrefix( 'cart66_products' );
+			Geko_Wp_Db::addPrefix( 'cart66_orders' );
+			Geko_Wp_Db::addPrefix( 'cart66_order_items' );
 			
-			$this->bCalledInit = TRUE;
+			add_action( 'init', array( $this, 'wpInit' ) );
+			
+			add_action( 'template_redirect', array( $this, 'ajaxTriggerCheck' ), 9 );
+			
+			$this->adminRedirect();
+			
+			$this->_bCart66PluginActivated = TRUE;
 		}
 	}
 	

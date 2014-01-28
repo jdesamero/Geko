@@ -85,10 +85,10 @@ class Gloc_Layout_Widgets extends Gloc_Layout
 	//
 	public function echoNavBreadcrumb() {
 		
-		$aParams = func_get_args();
+		$aArgs = func_get_args();
 		
 		if ( class_exists( 'Geko_Wp_NavigationManagement' ) ) {
-			call_user_func_array( array( Geko_Wp_NavigationManagement::getInstance(), 'renderBreadcrumb' ), $aParams );
+			call_user_func_array( array( Geko_Wp_NavigationManagement::getInstance(), 'renderBreadcrumb' ), $aArgs );
 		} else {
 			// TO DO: use native wordpress nav breadcrumbs?
 		}
@@ -97,10 +97,10 @@ class Gloc_Layout_Widgets extends Gloc_Layout
 	//
 	public function echoNavClassChain() {
 		
-		$aParams = func_get_args();
+		$aArgs = func_get_args();
 		
 		if ( class_exists( 'Geko_Wp_NavigationManagement' ) ) {
-			call_user_func_array( array( Geko_Wp_NavigationManagement::getInstance(), 'renderClassChain' ), $aParams );
+			call_user_func_array( array( Geko_Wp_NavigationManagement::getInstance(), 'renderClassChain' ), $aArgs );
 		} else {
 			// TO DO: use native wordpress nav breadcrumbs?
 		}
