@@ -5,15 +5,17 @@ class Geko_Sysomos
 {
 	
 	protected static $aValues = array(
-		'url.heartbeat' => 'http://api.sysomos.com/v1/heartbeat',
-		'api_key' => NULL
+		'url.heartbeat' => '%s://api.sysomos.com/v1/heartbeat',
+		'url.heartbeat_proxy' => '%s://%s/sysomosproxy/v1/heartbeat',		
+		'api_key' => NULL,
+		'url_base' => NULL
 	);
 	
 	
 	
 	//
 	protected static function _getValKey( $sKey, $sPrefix ) {
-		
+				
 		if ( $sPrefix ) {
 			return sprintf( '%s.%s', $sPrefix, $sKey );
 		}
@@ -28,7 +30,22 @@ class Geko_Sysomos
 	
 	//
 	protected static function _getVal( $sKey, $sPrefix = NULL ) {
-		return self::$aValues[ self::_getValKey( $sKey, $sPrefix ) ];
+		
+		$mValue = self::$aValues[ self::_getValKey( $sKey, $sPrefix ) ];
+		
+		// hard-coded transformations
+		if ( 'url' == $sPrefix ) {
+			
+			$sProto = ( Geko_Uri::isHttps() ) ? 'https' : 'http' ;
+			
+			if ( 'heartbeat' == $sKey ) {
+				$mValue = sprintf( $mValue, $sProto );
+			} elseif ( 'heartbeat_proxy' == $sKey ) {
+				$mValue = sprintf( $mValue, $sProto, self::getValue( 'url_base' ) );			
+			}
+		}
+		
+		return $mValue;
 	}
 	
 	
