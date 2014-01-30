@@ -12,8 +12,11 @@
 			'rebuild_stagger': 20
 		}, options );
 		
+		
 		//
 		return this.each( function() {
+			
+			var oService = opts.service;
 			
 			var mainCont = $( this );
 			
@@ -64,123 +67,128 @@
 			
 			//
 			var getTickers = function() {
-			
-				$.get(
-					opts.script.curpage,
-					{
-						'ajax_content': 1,
-						'section': 'list',
-						'hbid': iHbId
-					},
-					function( data ) {
-					
-						if ( 1 == parseInt( data.status ) ) {
+				
+				oService.get( {
+					'hbid': iHbId,
+					'callbacks': {
+						
+						'success': function( data ) {
 							
-							// aTickers = data.tickers;
-							aTags = data.tags;
-							tickerCount = data.count;
-							
-							var tickers = $.map( aTags, function( v, k ) {
-								return {
-									id: k,
-									symbol: v,
-									title: v,
-									mentions: 0
-								}
-							} );
-							
-							loadingDiv.fadeOut( fadeDelay, function() {
+							if ( 1 == parseInt( data.status ) ) {
 								
-								sourceUl.find( '.row-tmpl' ).tmpl( tickers ).appendTo( sourceUl );
-								setRank();
+								// aTickers = data.tickers;
+								aTags = data.tags;
+								tickerCount = data.count;
 								
-								sourceUl.fadeIn( fadeDelay );
-								
-								sourceUl.find( 'li' ).each( function() {
-									var li = $( this );
-									li.bind( 'update', function() {
-										
-										var tag = li.attr( 'data-tag' );
-										// var tag = aTickers[ symbol ].tag;
-										
-										var getMentions = function() {
-										
-											$.get(
-												opts.script.curpage,
-												{
-													'ajax_content': 1,
-													'section': 'mentions',
-													'hbid': iHbId,
-													'tag': tag
-												},
-												function( data2 ) {
-													
-													if ( 1 == parseInt( data2.status ) ) {
-													
-														var curMentions = parseInt( li.find( 'div.mentions' ).text() );
-														var newMentions = data2.mentions;
-														var loadMin = 100, loadMax = 1000;
-														
-														if ( 0 == curMentions ) {
-															curMentions = newMentions - 100;
-														}
-														
-														if ( ( newMentions - curMentions ) >= 100 ) {
-															// make results load faster
-															loadMin = 0;
-															loadMax = 100;
-														}
-														
-														var updateMentions = function() {
-															if ( curMentions == newMentions ) {
-																li.addClass( 'updated' );
-																if ( tickerCount == sourceUl.find( 'li.updated' ).length ) {
-																	sourceUl.find( 'li.updated' ).removeClass( 'updated' );
-																	setTimeout( function() {
-																		sourceUl.find( 'li' ).trigger( 'update' );
-																	}, updateDelay );
-																}								
-															} else {
-																
-																if ( curMentions < newMentions ) curMentions++;
-																else curMentions--;
-																
-																li.find( 'div.mentions' ).html( curMentions );
-																updateTimer = setTimeout( updateMentions, $.gekoRandomInt( loadMin, loadMax ) );
-															}
-														};
-														
-														updateMentions();
-														
-													} else {
-														setTimeout( getMentions, updateDelay );
-													}
-													
-												},
-												'json'
-											).fail( function() {
-												setTimeout( getMentions, updateDelay );
-											} );		
-										}
-										
-										getMentions();
-										
-									} );
+								var tickers = $.map( aTags, function( v, k ) {
+									return {
+										id: k,
+										symbol: v,
+										title: v,
+										mentions: 0
+									}
 								} );
 								
-								sourceUl.find( 'li' ).trigger( 'update' );
+								loadingDiv.fadeOut( fadeDelay, function() {
+									
+									sourceUl.find( '.row-tmpl' ).tmpl( tickers ).appendTo( sourceUl );
+									setRank();
+									
+									sourceUl.fadeIn( fadeDelay );
+									
+									sourceUl.find( 'li' ).each( function() {
+										var li = $( this );
+										li.bind( 'update', function() {
+											
+											var tag = li.attr( 'data-tag' );
+											// var tag = aTickers[ symbol ].tag;
+											
+											var getMentions = function() {
+												
+												oService.get( {
+													'type': 'measure',
+													'hbid': iHbId,
+													'callbacks': {
+														
+														'success': function( data2 ) {
+
+															if ( 1 == parseInt( data2.status ) ) {
+															
+																var curMentions = parseInt( li.find( 'div.mentions' ).text() );
+																var newMentions = data2.mentions;
+																var loadMin = 100, loadMax = 1000;
+																
+																if ( 0 == curMentions ) {
+																	curMentions = newMentions - 100;
+																}
+																
+																if ( ( newMentions - curMentions ) >= 100 ) {
+																	// make results load faster
+																	loadMin = 0;
+																	loadMax = 100;
+																}
+																
+																var updateMentions = function() {
+																	if ( curMentions == newMentions ) {
+																		li.addClass( 'updated' );
+																		if ( tickerCount == sourceUl.find( 'li.updated' ).length ) {
+																			sourceUl.find( 'li.updated' ).removeClass( 'updated' );
+																			setTimeout( function() {
+																				sourceUl.find( 'li' ).trigger( 'update' );
+																			}, updateDelay );
+																		}								
+																	} else {
+																		
+																		if ( curMentions < newMentions ) curMentions++;
+																		else curMentions--;
+																		
+																		li.find( 'div.mentions' ).html( curMentions );
+																		updateTimer = setTimeout( updateMentions, $.gekoRandomInt( loadMin, loadMax ) );
+																	}
+																};
+																
+																updateMentions();
+																
+															} else {
+																setTimeout( getMentions, updateDelay );
+															}
+															
+														},
+														
+														'fail': function() {
+															setTimeout( getMentions, updateDelay );
+														}
+														
+													},
+													'get_params': {
+														'tag': tag
+													}
+												} );
+													
+											}
+											
+											getMentions();
+											
+										} );
+									} );
+									
+									sourceUl.find( 'li' ).trigger( 'update' );
+									
+								} );
 								
-							} );
+							} else {
+								setTimeout( getTickers, updateDelay );
+							}
 							
-						} else {
+						},
+						
+						'fail': function() {
 							setTimeout( getTickers, updateDelay );
 						}
 						
-					},
-					'json'
-				).fail( function() {
-					setTimeout( getTickers, updateDelay );
+					}
 				} );
+				
 				
 			}
 			

@@ -8,6 +8,13 @@ class Geko_Sysomos_Heartbeat
 	
 	protected $_oClient = NULL;
 	
+	protected static $_aContentFilter = array(
+		'http://hb.sysomos.com/hb2/sidebar', 'fuck', 'bitch', 'niga', 'nigga', 'gangbang',
+		'gang bang', 'pussy', 'eat ass'
+	);
+		
+	
+	
 	//
 	public function __construct( $iHbId = NULL ) {
 		
@@ -23,6 +30,24 @@ class Geko_Sysomos_Heartbeat
 		$this->_iHbId = $iHbId;
 		return $this;
 	}
+	
+	//
+	public static function getContentFilter() {
+		return self::$_aContentFilter;
+	}
+	
+	//
+	public static function setContentFilter( $aFilter, $bMerge = TRUE ) {
+		
+		if ( $bMerge ) {
+			self::$_aContentFilter = array_merge( self::$_aContentFilter, $aFilter );
+		} else {
+			self::$_aContentFilter = $aFilter;
+		}
+		
+		return $this;
+	}
+	
 	
 	
 	//// functional stuff
@@ -204,6 +229,7 @@ class Geko_Sysomos_Heartbeat
 				
 				$sDocId = strval( $oBeat->docid );
 				$aSeq = explode( ':', $sDocId );
+				$sTime = strval( $oBeat->time );
 				$sTitle = strval( $oBeat->title );
 				$sContent = strip_tags( strval( $oBeat->content ) );
 				$sType = strtolower( strval( $oBeat->mediaType ) );
@@ -230,8 +256,8 @@ class Geko_Sysomos_Heartbeat
 					$aFeed[] = array(
 						'id' => strval( 'doc-' . ( str_replace( ':', '-', $sDocId ) ) ),
 						'seq' => intval( $aSeq[ 1 ] ),
-						'time' => strval( $oBeat->time ),
-						'ts' => strtotime( strval( $oBeat->time ) ),
+						'time' => $sTime,
+						'ts' => strtotime( $sTime ),
 						'type' => $sType,
 						'title' => $sTitle,
 						'content' => $sContent,
@@ -258,14 +284,9 @@ class Geko_Sysomos_Heartbeat
 		
 		$sContent = strtolower( trim( $sContent ) );
 		
-		$aFilter = array(
-			'http://hb.sysomos.com/hb2/sidebar', 'fuck', 'bitch', 'niga', 'nigga', 'gangbang',
-			'gang bang', 'pussy', 'eat ass'
-		);
-		
 		if ( $sContent ) {
 			
-			foreach ( $aFilter as $sFilter ) {
+			foreach ( self::$_aContentFilter as $sFilter ) {
 				if ( FALSE !== strpos( $sContent, $sFilter ) ) {
 					return FALSE;					// found bad string !!!
 				}

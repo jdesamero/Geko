@@ -15,6 +15,8 @@
 		//
 		return this.each( function() {
 			
+			var oService = opts.service;
+			
 			var mainCont = $( this );
 			
 			var sourceUl = mainCont.find( '> div > ul' );
@@ -34,53 +36,55 @@
 			//
 			var getFeed = function() {
 				
-				$.get(
-					opts.script.curpage,
-					{
-						'ajax_content': 1,
-						'section': 'list',
-						'hbid': iHbId
-					},
-					function( data ) {
-					
-						loadingDiv.fadeOut( fadeDelay, function() {
-							sourceUl.fadeIn( fadeDelay );
-						} );
+				oService.get( {
+					'type': 'rss_content',
+					'hbid': iHbId,
+					'callbacks': {
 						
-						if ( 1 == parseInt( data.status ) ) {
+						'success': function( data ) {
+
+							loadingDiv.fadeOut( fadeDelay, function() {
+								sourceUl.fadeIn( fadeDelay );
+							} );
 							
-							// alert( data.unfiltered_count + ':' + data.filtered_count );
+							if ( 1 == parseInt( data.status ) ) {
+								
+								// alert( data.unfiltered_count + ':' + data.filtered_count );
+								
+								var feed = data.feed;
+								
+								var appendFeed = function() {
+									if ( feed.length > 0 ) {
+										var item = feed.pop();
+										var html = $( '.row-tmpl' ).tmpl( [ item ] );
+										html.hide();
+										sourceUl.prepend( html );
+										html.fadeIn( fadeDelay, function() {
+											setTimeout( appendFeed, $.gekoRandomInt( loadMin, loadMax ) );
+										} );
+									} else {
+										
+										sourceUl.find( 'li' ).each( function( i ) {
+											var li = $( this );
+											if ( i > itemLimit ) li.remove();
+										} );
+										
+										setTimeout( getFeed, updateDelay );
+									}
+								};
+								
+								appendFeed();
+							}
 							
-							var feed = data.feed;
-							
-							var appendFeed = function() {
-								if ( feed.length > 0 ) {
-									var item = feed.pop();
-									var html = $( '.row-tmpl' ).tmpl( [ item ] );
-									html.hide();
-									sourceUl.prepend( html );
-									html.fadeIn( fadeDelay, function() {
-										setTimeout( appendFeed, $.gekoRandomInt( loadMin, loadMax ) );
-									} );
-								} else {
-									
-									sourceUl.find( 'li' ).each( function( i ) {
-										var li = $( this );
-										if ( i > itemLimit ) li.remove();
-									} );
-									
-									setTimeout( getFeed, updateDelay );
-								}
-							};
-							
-							appendFeed();
+						},
+						
+						'fail': function() {
+							setTimeout( getFeed, updateDelay );
 						}
 						
-					},
-					'json'
-				).fail( function() {
-					setTimeout( getFeed, updateDelay );
+					}
 				} );
+				
 			}
 			
 			getFeed();
