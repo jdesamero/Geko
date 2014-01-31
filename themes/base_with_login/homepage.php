@@ -15,7 +15,10 @@ class Gloc_Layout_Template extends Gloc_Layout
 	
 	//
 	public function echoEnqueue() {
-		$this->enqueueScript( 'geko-jquery-geko_slideshow', 'base_with_login-gallery' );
+		$this
+			->enqueueScript( 'geko-jquery-geko_slideshow' )
+			->enqueueStyle( 'base_with_login-gallery' )
+		;
 	}
 	
 	//
