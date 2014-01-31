@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<data>
+	
+	<!-- JavaScript -->
+	<scripts>
+		
+		
+	</scripts>
+	
+	<!-- css -->
+	<styles>
+		
+		<file id="base_with_login-gallery" src="##__bloginfo_stylesheet_directory##/styles/gallery.css" />
+		<file id="base_with_login-pagination" src="##__bloginfo_stylesheet_directory##/styles/pagination.css" />
+		
+	</styles>
+	
+</data>

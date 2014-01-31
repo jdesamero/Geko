@@ -11,12 +11,12 @@ class Gloc_Layout_Template extends Gloc_Layout
 		104 => 'Items Found:'
 	);
 	
+	
 	//
-	public function echoHeadLate() {
-		?>
-		<link rel="stylesheet" type="text/css" href="<?php bloginfo('stylesheet_directory'); ?>/styles/pagination.css" />
-		<?php
+	public function echoEnqueue() {
+		$this->enqueueStyle( 'base-pagination' );
 	}
+	
 	
 	//
 	public function echoContent() {
@@ -48,7 +48,7 @@ class Gloc_Layout_Template extends Gloc_Layout
 						<?php $oPost->echoTheExcerpt( 600 ); ?>
 					</p>
 					<div class="fix"></div>
-					<?php $this->pw( '<p><strong>' . $this->l_101() . '</strong> %s</p>', strval( $oPost->getTags() ) ); ?>
+					<?php $this->pw( '<p><strong>%s$1</strong> %s$0</p>', strval( $oPost->getTags() ), $this->l_101() ); ?>
 				</div>
 			</div>
 		<?php endforeach; ?>

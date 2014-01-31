@@ -8,12 +8,12 @@ error_reporting( E_ALLÊ^ÊE_NOTICE );
 // ---------------------------------------------------------------------------------------------- //
 
 function geko_render_template() {
-	include( TEMPLATEPATH . '/render.php' );
+	include( sprintf( '%s/render.php', TEMPLATEPATH ) );
 }
 
 // ---------------------------------------------------------------------------------------------- //
 
-define( 'ABS_WP_URL_ROOT', str_replace( 'http://' . $_SERVER[ 'SERVER_NAME' ], '', Geko_Wp::getUrl() ) );
+define( 'ABS_WP_URL_ROOT', str_replace( sprintf( 'http://%s', $_SERVER[ 'SERVER_NAME' ] ), '', Geko_Wp::getUrl() ) );
 
 // ---------------------------------------------------------------------------------------------- //
 
@@ -55,6 +55,8 @@ Geko_Wp_Role_Manage::getInstance()->init();
 
 Geko_Wp_User_Rewrite::getInstance()->init();
 Geko_Wp_User_Photo::getInstance()->init();
+
+Geko_Wp::registerExternalFiles( sprintf( '%s/etc/register.xml', get_bloginfo( 'template_directory' ) ) );
 
 // ---------------------------------------------------------------------------------------------- //
 

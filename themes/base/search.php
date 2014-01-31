@@ -18,11 +18,10 @@ class Gloc_Layout_Template extends Gloc_Layout
 	
 	
 	//
-	public function echoHeadLate() {
-		?>
-		<link rel="stylesheet" type="text/css" href="<?php bloginfo( 'stylesheet_directory' ); ?>/styles/pagination.css" />	
-		<?php
+	public function echoEnqueue() {
+		$this->enqueueStyle( 'base-pagination' );
 	}
+	
 	
 	//
 	public function echoContent() {
@@ -42,8 +41,8 @@ class Gloc_Layout_Template extends Gloc_Layout
 					<h3 class="entry-title"><a href="<?php $oPost->echoUrl(); ?>" title="<?php $this->pw( $this->l_105(), $oPost->escgetTitle() ); ?>" rel="bookmark"><?php $oPost->echoTitle(); ?></a></h3>
 					<div class="entry-date"><?php $oPost->echoDateCreated(); ?> - <?php $oPost->echoTimeCreated(); ?></div>
 					<div class="entry-content"><?php $oPost->echoTheExcerpt( 300 ); ?></div>
-					<?php $this->pw( '<p><strong>' . $this->l_103() . '</strong> %s</p>', strval( $oPost->getCategories() ) ); ?>
-					<?php $this->pw( '<p><strong>' . $this->l_104() . '</strong> %s</p>', strval( $oPost->getTags() ) ); ?>
+					<?php $this->pw( '<p><strong>%s$1</strong> %s$0</p>', strval( $oPost->getCategories() ), $this->l_103() ); ?>
+					<?php $this->pw( '<p><strong>%s$1</strong> %s$0</p>', strval( $oPost->getTags() ), $this->l_104() ); ?>
 				</div>
 				
 			<?php endforeach; ?>

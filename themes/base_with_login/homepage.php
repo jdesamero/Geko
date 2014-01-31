@@ -15,14 +15,12 @@ class Gloc_Layout_Template extends Gloc_Layout
 	
 	//
 	public function echoEnqueue() {
-		$this->enqueueScript( 'geko-jquery-geko_slideshow' );
+		$this->enqueueScript( 'geko-jquery-geko_slideshow', 'base_with_login-gallery' );
 	}
 	
 	//
 	public function echoHeadLate() {
 		?>
-		<link rel="stylesheet" type="text/css" href="<?php bloginfo( 'stylesheet_directory' ); ?>/styles/gallery.css" />	
-
 		<script type="text/javascript">
 					
 			jQuery( document ).ready( function( $ ) {

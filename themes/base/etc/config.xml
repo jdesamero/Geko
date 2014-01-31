@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<config for="login_pages">
+	<pages>
+		<page slug="login">
+			<title>Login</title>
+		</page>
+		<page slug="login/activate-account">
+			<title>Activate Account</title>
+			<template>page_login_activate_account.php</template>
+		</page>
+		<page slug="login/forgot-password">
+			<title>Forgot Password</title>
+			<template>page_login_forgot_password.php</template>
+		</page>
+		<page slug="login/register">
+			<title>Register</title>
+			<template>page_login_register.php</template>
+		</page>
+		<page slug="login/set-password">
+			<title>Set Password</title>
+			<template>page_login_set_password.php</template>
+		</page>
+		<page slug="login/update-profile">
+			<title>Update Profile</title>
+			<template>page_login_update_profile.php</template>
+		</page>
+	</pages>
+	<notifications>
+		<notification slug="activate-account-notification">
+			<title>Activate Your Account</title>
+			<content type="plain_text">
+
+Please go to the link below to activate your account on ##__bloginfo_url##:
+
+##activation_link##
+
+			</content>
+		</notification>
+		<notification slug="activate-account-confirm-notification">
+			<title>Your Account Is Now Activated</title>
+			<content type="plain_text">
+
+Your account is now activated. You can now log in at ##__bloginfo_url##.
+			
+			</content>
+		</notification>
+		<notification slug="set-password-notification">
+			<title>Set Your Password</title>
+			<content type="plain_text">
+
+You have requested to reset your password at ##__bloginfo_url##.
+
+Please follow the link below to set your password:
+##password_reset_link##
+
+			</content>
+		</notification>
+		<notification slug="set-password-confirm-notification">
+			<title>Your Password Was Reset</title>
+			<content type="plain_text">
+
+Your password was reset at ##__bloginfo_url##.
+
+			</content>
+		</notification>
+	</notifications>
+</config>

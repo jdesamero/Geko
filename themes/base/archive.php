@@ -12,12 +12,12 @@ class Gloc_Layout_Template extends Gloc_Layout
 		105 => 'Items Found:'
 	);
 	
+	
 	//
-	public function echoHeadLate() {
-		?>
-		<link rel="stylesheet" type="text/css" href="<?php bloginfo('stylesheet_directory'); ?>/styles/pagination.css" />	
-		<?php
+	public function echoEnqueue() {
+		$this->enqueueStyle( 'base-pagination' );
 	}
+	
 	
 	//
 	public function echoContent() {
@@ -25,8 +25,8 @@ class Gloc_Layout_Template extends Gloc_Layout
 		$aPosts = $this->newPost_Query();
 		
 		$sArchiveDate = '';
-		if ( is_year() ) $sArchiveDate = get_the_time( 'Y' );
-		if ( is_month() ) $sArchiveDate = get_the_time( 'F Y' );
+		if ( $this->is( 'year' ) ) $sArchiveDate = get_the_time( 'Y' );
+		if ( $this->is( 'month' ) ) $sArchiveDate = get_the_time( 'F Y' );
 		
 		?>
 		<h1><?php $this->l_104(); ?> <?php echo $sArchiveDate; ?></h1>
@@ -40,8 +40,8 @@ class Gloc_Layout_Template extends Gloc_Layout
 					<h2><a href="<?php $oPost->echoUrl(); ?>" title="<?php $this->pw( $this->l_103(), $oPost->escgetTitle() ); ?>" rel="bookmark"><?php $oPost->echoTitle(); ?></a></h2>
 					<p><?php $oPost->echoDateCreated(); ?> - <?php $oPost->echoTimeCreated(); ?></p>
 					<p><?php $oPost->echoTheExcerpt( 300 ); ?></p>
-					<?php $this->pw( '<p><strong>' . $this->l_101() . '</strong> %s</p>', strval( $oPost->getCategories() ) ); ?>
-					<?php $this->pw( '<p><strong>' . $this->l_102() . '</strong> %s</p>', strval( $oPost->getTags() ) ); ?>
+					<?php $this->pw( '<p><strong>%s$1</strong> %s$0</p>', strval( $oPost->getCategories() ), $this->l_101() ); ?>
+					<?php $this->pw( '<p><strong>%s$1</strong> %s$0</p>', strval( $oPost->getTags() ), $this->l_102() ); ?>
 				</div>
 			</div>
 		<?php endforeach; ?>

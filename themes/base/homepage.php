@@ -13,14 +13,15 @@ class Gloc_Layout_Template extends Gloc_Layout
 	
 	//
 	public function echoEnqueue() {
-		$this->enqueueScript( 'geko-jquery-geko_slideshow' );
+		$this
+			->enqueueScript( 'geko-jquery-geko_slideshow' )
+			->enqueueStyle( 'base-gallery' )
+		;
 	}
 	
 	//
 	public function echoHeadLate() {
 		?>
-		<link rel="stylesheet" type="text/css" href="<?php bloginfo( 'stylesheet_directory' ); ?>/styles/gallery.css" />	
-
 		<script type="text/javascript">
 					
 			jQuery( document ).ready( function( $ ) {
@@ -73,7 +74,7 @@ class Gloc_Layout_Template extends Gloc_Layout
 			<table width="100%" border="0" cellspacing="0" cellpadding="0">
 				<tr>
 					<?php foreach ( $aBoxes as $i => $oBoxPage ): ?>
-						<td class="<?php echo $i ? 'homesepline' : ''; ?>"><div class="boxcontent">
+						<td class="<?php echo $i ? 'homesepline' : '' ; ?>"><div class="boxcontent">
 							<h1><?php $oBoxPage->echoTitle(); ?></h1>
 							<?php $oBoxPage->echoContent(); ?>
 						</div></td>
@@ -81,7 +82,7 @@ class Gloc_Layout_Template extends Gloc_Layout
 				</tr>
 				<tr>
 					<?php foreach ( $aBoxes as $i => $oBoxPage ): ?>
-						<td class="<?php echo $i ? 'homesepline' : ''; ?>"><div class="boxcontent">
+						<td class="<?php echo $i ? 'homesepline' : '' ; ?>"><div class="boxcontent">
 							<div class="boxcontent"><span class="boxlinkout"><a href="<?php $oBoxPage->echoUrl(); ?>"><?php $this->l_101(); ?></a></span></div>
 						</div></td>
 					<?php endforeach; ?>

@@ -1,7 +1,7 @@
 <?php
 
 //
-class Gloc_Layout_Entity extends Gloc_Layout
+class Gloc_Layout_Shared_Entity extends Gloc_Layout
 {
 	
 	protected $_sMode = 'listing';
