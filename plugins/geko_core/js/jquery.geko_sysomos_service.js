@@ -30,7 +30,7 @@
 				'id': 'doc-%s'.printf( sDocId.replace( ':', '-' ) ),
 				'seq': aSeq[ 1 ],
 				'time': sTime,
-				'ts': 0,			// TO DO
+				'ts': sTime.strtotime(),
 				'type': sType,
 				'title': sTitle,
 				'content': sContent,

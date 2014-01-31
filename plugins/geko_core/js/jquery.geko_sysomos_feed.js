@@ -56,7 +56,7 @@
 								var appendFeed = function() {
 									if ( feed.length > 0 ) {
 										var item = feed.pop();
-										var html = $( '.row-tmpl' ).tmpl( [ item ] );
+										var html = sourceUl.find( '.row-tmpl' ).tmpl( [ item ] );
 										html.hide();
 										sourceUl.prepend( html );
 										html.fadeIn( fadeDelay, function() {
