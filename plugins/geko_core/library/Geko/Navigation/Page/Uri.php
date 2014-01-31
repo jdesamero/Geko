@@ -81,7 +81,7 @@ class Geko_Navigation_Page_Uri
 	//
     public function setOptions( array $options ) {
         $this->_origOptions = $options;
-        unset( $this->_origOptions['pages'] );
+        unset( $this->_origOptions[ 'pages' ] );
         return parent::setOptions( $options );
     }	
 	
@@ -100,7 +100,7 @@ class Geko_Navigation_Page_Uri
 		if ( $this->_title ) {
 			return $this->_title;
 		} else {
-			return 'Link to ' . $this->getLabel();
+			return sprintf( 'Link to %s', $this->getLabel() );
 		}	
 	}
 	
@@ -112,6 +112,7 @@ class Geko_Navigation_Page_Uri
 		$oMyUri = new Geko_Uri( $this->getMyUriCompare() );
 		
 		if (
+			$oMyUri->sameHost( $oCurUri ) &&
 			$oMyUri->samePath( $oCurUri ) &&
 			$oMyUri->sameVars( $oCurUri, $this->_strictMatch, $this->_ignoreVars )
 		) {
@@ -130,7 +131,7 @@ class Geko_Navigation_Page_Uri
 	
 	//
 	public function getCurUriCompare() {
-		return $_SERVER['REQUEST_URI'];
+		return NULL;
 	}
 	
 	

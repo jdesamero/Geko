@@ -470,11 +470,11 @@ class Geko_Uri
 		} elseif ( 0 === strpos( $sMethod, 'same' ) ) {
 			
 			$sPart = strtolower( substr_replace( $sMethod, '', 0, 4 ) );
-			return $this->same( $sPart, $aArgs[0] );
+			return $this->same( $sPart, $aArgs[ 0 ] );
 			
 		}
 		
-		throw new Exception( 'Invalid method ' . get_class( $this ) . '::' . $sMethod . '() called.' );
+		throw new Exception( sprintf( 'Invalid method %s::%s() called.', get_class( $this ), $sMethod ) );
 	}
 
 	

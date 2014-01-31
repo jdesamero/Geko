@@ -84,6 +84,8 @@ class Geko_Wp
 				$sRet .= 'category ' . self::slugify( single_cat_title('', FALSE) );
 			} elseif ( is_month() ) {
 				$sRet .= 'month';
+			} elseif ( is_year() ) {
+				$sRet .= 'month';
 			} elseif ( ( function_exists( 'is_tag' ) ) && ( is_tag() ) ) {
 				$sRet .= 'tag';
 			} elseif ( is_404() ) {
