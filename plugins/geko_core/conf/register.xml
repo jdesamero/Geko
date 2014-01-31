@@ -35,6 +35,7 @@
 		<file id="geko-flash-loader" src="##geko_core_uri##/external/js/flash_loader.js" />
 		<file id="geko-get_scroll_xy" src="##geko_core_uri##/external/js/get_scroll_xy.js" />
 		<file id="geko-googlemaps" src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=##GOOGLEMAPS_API_KEY##" />
+		<file id="geko-sharethis" src="http://w.sharethis.com/button/buttons.js" />
 		<file id="geko-string_format" src="##geko_core_uri##/external/js/string_format.min.js" />
 		<file id="geko-swf-object" src="##geko_core_uri##/external/js/swfobject.js" />
 		<file id="geko-swipe" src="##geko_core_uri##/external/js/swipe.js" />
@@ -201,6 +202,7 @@
 		<file id="geko-jquery-color" src="##geko_core_uri##/external/js/jquery.color.js" dependencies="jquery" />
 		<file id="geko-jquery-color_svg_names" src="##geko_core_uri##/external/js/jquery.color.svg-names.js" dependencies="geko-jquery-color" />
 		<file id="geko-jquery-cookie" src="##geko_core_uri##/external/js/jquery.cookie.js" dependencies="jquery" />
+		<file id="geko-jquery-cycle_all" src="##geko_core_uri##/external/js/jquery.cycle.all.js" dependencies="geko-jquery-easing" />
 		<file id="geko-jquery-easing" src="##geko_core_uri##/external/js/jquery.easing.1.3.js" dependencies="jquery" />
 		<file id="geko-jquery-facebook" src="##geko_core_uri##/external/js/jquery.geko_facebook.js" dependencies="jquery geko-facebook-connect" />
 		<file id="geko-jquery-fixboxmodel" src="##geko_core_uri##/external/js/jquery.fixBoxModel.js" dependencies="jquery" />
@@ -211,6 +213,7 @@
 		<file id="geko-jquery-jcarousel-simple" src="##geko_core_uri##/external/js/jquery.jcarousel-simple.js" dependencies="jquery" />
 		<file id="geko-jquery-jcarousellite" src="##geko_core_uri##/external/js/jquery.jcarousellite_1.0.1.min.js" dependencies="geko-jquery-easing" />
 		<file id="geko-jquery-jeditable" src="##geko_core_uri##/external/js/jquery.jeditable.js" dependencies="jquery" />
+		<file id="geko-jquery-jflickrfeed" src="##geko_core_uri##/external/js/jquery.jflickrfeed.min.js" dependencies="jquery" />
 		<file id="geko-jquery-jscrollbar" src="##geko_core_uri##/external/js/jquery.jScrollbar.min.js" dependencies="geko-jquery-ui-draggable geko-jquery-mousewheel" />
 		<file id="geko-jquery-jscrollpane" src="##geko_core_uri##/external/js/jquery.jscrollpane.min.js" dependencies="jquery" />
 		<file id="geko-jquery-media" src="##geko_core_uri##/external/js/jquery.media.js" dependencies="jquery geko-jquery-metadata" />
