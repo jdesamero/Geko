@@ -37,7 +37,7 @@ class Geko_Wp_Group_Member_Query extends Geko_Wp_Entity_Query
 			
 			
 			->field( 'g.title', 'group_title' )
-			->joinLeft( $wpdb->geko_groups, 'g' )
+			->joinLeft( $wpdb->geko_group, 'g' )
 				->on( 'g.group_id = gpm.group_id' )
 			
 			
@@ -55,33 +55,33 @@ class Geko_Wp_Group_Member_Query extends Geko_Wp_Entity_Query
 		
 		//// filter by status
 		
-		if ( $aParams['status'] ) {
-			$aParams['status_id'] = Geko_Wp_Options_MetaKey::getId( $aParams['status'] );
+		if ( $aParams[ 'status' ] ) {
+			$aParams[ 'status_id' ] = Geko_Wp_Options_MetaKey::getId( $aParams[ 'status' ] );
 		}
 		
-		if ( $aParams['status_id'] ) {
-			$oQuery->where( 'gpm.status_id = ?', $aParams['status_id'] );
+		if ( $aParams[ 'status_id' ] ) {
+			$oQuery->where( 'gpm.status_id = ?', $aParams[ 'status_id' ] );
 		}
 		
 		//// filter by group
 		
-		if ( $aParams['group_id'] ) {
-			$oQuery->where( 'gpm.group_id = ?', $aParams['group_id'] );
+		if ( $aParams[ 'group_id' ] ) {
+			$oQuery->where( 'gpm.group_id = ?', $aParams[ 'group_id' ] );
 		}
 		
 		// group_type, grptype_id
-		if ( $aParams['geko_group_type'] ) {
-			$aParams['geko_group_type_id'] = Geko_Wp_Options_MetaKey::getId( $aParams['geko_group_type'] );
+		if ( $aParams[ 'geko_group_type' ] ) {
+			$aParams[ 'geko_group_type_id' ] = Geko_Wp_Options_MetaKey::getId( $aParams[ 'geko_group_type' ] );
 		}
 		
-		if ( $aParams['geko_group_type_id'] ) {
-			$oQuery->where( 'g.grptype_id = ?', $aParams['geko_group_type_id'] );
+		if ( $aParams[ 'geko_group_type_id' ] ) {
+			$oQuery->where( 'g.grptype_id = ?', $aParams[ 'geko_group_type_id' ] );
 		}
 		
 		//// filter by user
 
-		if ( $aParams['user_id'] ) {
-			$oQuery->where( 'gpm.user_id = ?', $aParams['user_id'] );
+		if ( $aParams[ 'user_id' ] ) {
+			$oQuery->where( 'gpm.user_id = ?', $aParams[ 'user_id' ] );
 		}
 		
 		return $oQuery;

@@ -61,7 +61,7 @@ class Gloc_Layout_Template extends Gloc_Layout
 				var profileForm = $( '#profileform' );
 				
 				var curEmail = profileForm.find( '#email' ).val();
-
+				
 				profileForm.gekoAjaxForm( {
 					status: oParams.status,
 					process_script: oParams.script.process,

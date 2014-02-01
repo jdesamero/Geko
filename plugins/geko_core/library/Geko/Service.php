@@ -15,8 +15,12 @@ class Geko_Service extends Geko_Singleton_Abstract
 	
 	//// other stuff
 	
-	//
-	public function init() {
+	
+	
+	// implement hook method
+	public function start() {
+		
+		parent::start();
 		
 		if ( $sData = $GLOBALS[ 'HTTP_RAW_POST_DATA' ] ) {
 			try {
@@ -24,21 +28,50 @@ class Geko_Service extends Geko_Singleton_Abstract
 			} catch ( Exception $e ) { }
 		}
 		
-		$this->start();
+	}
+	
+	
+	
+	// action: do_some_stuff
+	// matching method: processDoSomeStuff()
+	
+	//
+	public function process() {
+		
+		// checks can be done during start() which can set an error status on failure
+		// if none, we're good to go
+		
+		if ( !$this->hasStatus() ) {
+		
+			if ( $sAction = $this->getAction() ) {
+				
+				// see if matching method is defined
+				
+				$sActionMethod = sprintf( 'process%s', Geko_Inflector::camelize( $sAction ) );
+				
+				if ( method_exists( $this, $sActionMethod ) ) {
+					$this->$sActionMethod();		// perform the action
+				}
+				
+			}
+		
+		}
+		
+		// no status from above? perform default action
+		if ( !$this->hasStatus() ) {
+			$this->processDefault();
+		}
+		
+		// still no status?
+		$this->setIfNoStatus( $this->getDefaultStatus() );
 		
 		return $this;
 	}
 	
 	
-	// hook method
-	public function start() { }
+	// hook for default actions
+	public function processDefault() { }
 	
-	
-	
-	//
-	public function process() {
-		return $this;
-	}
 	
 	//
 	public function output() {
@@ -63,10 +96,20 @@ class Geko_Service extends Geko_Singleton_Abstract
 	
 	//// action/status/response stuff
 	
+	// service/action paradigm
+	// eg: service: profile; action: register, update password, etc.
+	
+	
+	//
+	public function getAction() {
+		return $_REQUEST[ 'subaction' ];
+	}
+	
 	// TO DO: HACKISH!!!!!!!!
 	public function isAction( $sAction ) {
-		return ( $sAction == $_REQUEST[ 'subaction' ] ) ? TRUE : FALSE ;
+		return ( $sAction == $this->getAction() ) ? TRUE : FALSE ;
 	}
+	
 	
 	//
 	public function setStatus( $iStatus, $bArray = FALSE ) {
@@ -111,6 +154,17 @@ class Geko_Service extends Geko_Singleton_Abstract
 	public function hasStatus() {
 		return ( $this->aAjaxResponse[ 'status' ] ) ? TRUE : FALSE ;
 	}
+	
+	//
+	public function getDefaultStatus() {
+		
+		if ( defined( 'self::STAT_ERROR' ) ) {
+			return self::STAT_ERROR;
+		}
+		
+		return NULL;
+	}
+	
 	
 	//
 	public function setResponseValue( $sKey, $mValue ) {

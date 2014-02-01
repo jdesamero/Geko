@@ -27,10 +27,10 @@ class Geko_PhpQuery_FormTransform_Plugin_RowTemplate extends Geko_PhpQuery_FormT
 					$oPq2 = pq( $oElem2 );
 					
 					$sId = $oPq2->attr( 'id' );
-					$sNewId = str_replace( $sKey . '[]', $sKey . '[' . $i . ']', $sId );
+					$sNewId = str_replace( sprintf( '%s[]', $sKey ), sprintf( '%s[%d]', $sKey, $i ), $sId );
 
 					$sName = $oPq2->attr( 'name' );
-					$sNewName = str_replace( $sKey . '[]', $sKey . '[' . $i . ']', $sName );
+					$sNewName = str_replace( sprintf( '%s[]', $sKey ), sprintf( '%s[%d]', $sKey, $i ), $sName );
 					
 					$oPq2
 						->attr( 'id', $sNewId )
@@ -59,7 +59,7 @@ class Geko_PhpQuery_FormTransform_Plugin_RowTemplate extends Geko_PhpQuery_FormT
 		foreach ( $aOptionsFlat as $sKey => $sValue ) {
 			$aRegs = array();
 			if ( preg_match( '/(.+)\[([0-9]+)\]$/', $sKey, $aRegs ) ) {
-				$aUnflat[ $aRegs[1] ][ $aRegs[2] ] = $sValue;
+				$aUnflat[ $aRegs[ 1 ] ][ $aRegs[ 2 ] ] = $sValue;
 				unset( $aOptionsFlat[ $sKey ] );
 			}
 		}

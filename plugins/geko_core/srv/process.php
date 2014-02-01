@@ -20,7 +20,10 @@ if (
 }
 
 if ( @class_exists( $sServiceClass ) ) {	
-	$oService = Geko_Singleton_Abstract::getInstance( $sServiceClass )->process();
+	$oService = Geko_Singleton_Abstract::getInstance( $sServiceClass )
+		->init()
+		->process()
+	;
 }
 
 ob_end_clean();
@@ -28,6 +31,6 @@ ob_end_clean();
 if ( $oService ) {
 	$oService->output();
 } else {
-	echo Zend_Json::encode( 'Invalid action was specified: ' . $sServiceClass );
+	echo Zend_Json::encode( sprintf( 'Invalid action was specified: %s', $sServiceClass ) );
 }
 
