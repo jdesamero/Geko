@@ -11,20 +11,20 @@ class Gloc_Service_Process extends Geko_Wp_Service
 	
 	
 	//
-	public function process() {
+	public function processSomeAction() {
 		
-		global $wpdb;
+		$bEverythingIsCool = TRUE;
 		
-		if ( $this->isAction( 'some_action' ) ) {
+		if ( $bEverythingIsCool ) {
 			
-			// do DB stuff
+			$this->setResponseValue( 'data', array(
+				'foo' => 'Roses are Red',
+				'bar' => 'Violets are Blue'
+			) );
+			
 			$this->setStatus( self::STAT_SUCCESS );
-			
 		}
-		
-		$this->setIfNoStatus( self::STAT_ERROR );
-		
-		return $this;
+			
 	}
 	
 	

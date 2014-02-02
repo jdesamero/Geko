@@ -1,9 +1,6 @@
 <?php
 
-ini_set( 'display_errors', 1 );
-// ini_set( 'scream.enabled', 1 );
-error_reporting( E_ALLÊ^ÊE_NOTICE );
-// error_reporting( E_ALL );
+Geko_Error::start();				// configure error reporting
 
 // ---------------------------------------------------------------------------------------------- //
 

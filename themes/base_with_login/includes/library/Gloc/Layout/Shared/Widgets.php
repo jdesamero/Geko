@@ -39,16 +39,18 @@ class Gloc_Layout_Shared_Widgets extends Gloc_Layout
 	
 	//
 	public function echoPagination() {
+		
+		$aArgs = func_get_args();
+		
 		?><div class="navigation"><?php
-
-			if ( function_exists( 'wp_pagenavi' ) ) {
-				wp_pagenavi();
+		
+			if ( $sNavHtml = Geko_Wp_Ext_PageNavi::get( $aArgs[ 0 ] ) ) {
+				echo $sNavHtml;
 			} else {
 				posts_nav_link();
 			}
 			
-		?></div><?php
-		
+		?></div><?php		
 	}
 	
 	
