@@ -540,6 +540,20 @@
 	String.prototype.strtotime = function( now ) {
 		return strtotime( this, now );
 	};
-	
 
+	
+	
+	
+	// http://stackoverflow.com/questions/4878756/javascript-how-to-capitalize-first-letter-of-each-word-like-a-2-word-city
+	
+	var ucwords = function( str ) {
+		return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+	};
+	
+	String.prototype.ucwords = function() {
+		return ucwords( this );
+	};
+	
+	
+	
 })( window );

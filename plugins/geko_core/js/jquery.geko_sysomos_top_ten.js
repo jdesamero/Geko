@@ -4,12 +4,19 @@
 	$.fn.gekoSysomosTopTen = function( options ) {
 		
 		var opts = $.extend( {
+			
 			'update_delay': 20000,
 			'sort_refresh': 5000,
 			'sort_anim': 1500,
 			'fade_delay': 500,
 			'rebuild_delay': ( 1000 * 60 * 2 ),
-			'rebuild_stagger': 20
+			'rebuild_stagger': 20,
+			
+			'format_name': null,
+			'format_tag': null,
+			
+			'title_sel': null
+			
 		}, options );
 		
 		
@@ -32,8 +39,6 @@
 				} );
 			};
 			
-			// var aTickers = [];
-			var aTags = [];
 			
 			var updateDelay = opts.update_delay;
 			var sortRefresh = opts.sort_refresh;
@@ -66,7 +71,7 @@
 			
 			
 			//
-			var getTickers = function() {
+			var getTags = function() {
 				
 				oService.get( {
 					'hbid': iHbId,
@@ -76,22 +81,45 @@
 							
 							if ( 1 == parseInt( data.status ) ) {
 								
-								// aTickers = data.tickers;
-								aTags = data.tags;
-								tickerCount = data.count;
+								// apply format_name() callback if specified
+								var sName = data.name;
+								if ( opts.format_name ) {
+									sName = opts.format_name( sName );
+								}
 								
-								var tickers = $.map( aTags, function( v, k ) {
-									return {
+								// if title selector was supplied, then populate
+								if ( opts.title_sel ) {
+									mainCont.find( opts.title_sel ).html( sName );
+								}
+								
+								var aTags = data.tags;
+								tagCount = data.count;
+								
+								var aTagsFmt = $.map( aTags, function( v, k ) {
+									
+									var oTag =  {
 										id: k,
-										symbol: v,
-										title: v,
 										mentions: 0
+									};
+									
+									// merge params
+									if ( 'object' === $.type( v ) ) {
+										oTag = $.extend( oTag, v );
+									} else {
+										oTag.title = v;
 									}
+									
+									// apply format_tag() callback if specified
+									if ( opts.format_tag ) {
+										oTag = opts.format_tag( oTag, sName );
+									}
+									
+									return oTag;
 								} );
 								
 								loadingDiv.fadeOut( fadeDelay, function() {
 									
-									sourceUl.find( '.row-tmpl' ).tmpl( tickers ).appendTo( sourceUl );
+									sourceUl.find( '.row-tmpl' ).tmpl( aTagsFmt ).appendTo( sourceUl );
 									setRank();
 									
 									sourceUl.fadeIn( fadeDelay );
@@ -101,7 +129,7 @@
 										li.bind( 'update', function() {
 											
 											var tag = li.attr( 'data-tag' );
-											// var tag = aTickers[ symbol ].tag;
+											
 											
 											var getMentions = function() {
 												
@@ -131,7 +159,7 @@
 																var updateMentions = function() {
 																	if ( curMentions == newMentions ) {
 																		li.addClass( 'updated' );
-																		if ( tickerCount == sourceUl.find( 'li.updated' ).length ) {
+																		if ( tagCount == sourceUl.find( 'li.updated' ).length ) {
 																			sourceUl.find( 'li.updated' ).removeClass( 'updated' );
 																			setTimeout( function() {
 																				sourceUl.find( 'li' ).trigger( 'update' );
@@ -177,13 +205,13 @@
 								} );
 								
 							} else {
-								setTimeout( getTickers, updateDelay );
+								setTimeout( getTags, updateDelay );
 							}
 							
 						},
 						
 						'fail': function() {
-							setTimeout( getTickers, updateDelay );
+							setTimeout( getTags, updateDelay );
 						}
 						
 					}
@@ -233,7 +261,7 @@
 					loadingDiv.fadeIn( fadeDelay );
 
 					sourceUl.find( 'li' ).remove();
-					getTickers();
+					getTags();
 					setTimeout( rebuild, getRebuildDelay() );
 				} );
 			};

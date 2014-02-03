@@ -259,6 +259,7 @@
 		<file id="geko-jquery-geko_scroll_panel" src="##geko_core_uri##/js/jquery.geko_scroll_panel.js" dependencies="geko-css_sandpaper geko-jquery-geko_util geko-jquery-scrollpath geko-jquery-geko_animate_frames" />
 		<file id="geko-jquery-geko_slider" src="##geko_core_uri##/js/jquery.geko_slider.js" dependencies="geko-jquery-easing" />
 		<file id="geko-jquery-geko_slideshow" src="##geko_core_uri##/js/jquery.geko_slideshow.js" dependencies="jquery" />
+		<file id="geko-jquery-geko_sysomos_aggregator" src="##geko_core_uri##/js/jquery.geko_sysomos_aggregator.js" dependencies="geko-jquery-geko_sysomos_service" />
 		<file id="geko-jquery-geko_sysomos_feed" src="##geko_core_uri##/js/jquery.geko_sysomos_feed.js" dependencies="geko-jquery-geko_sysomos_service" />
 		<file id="geko-jquery-geko_sysomos_service" src="##geko_core_uri##/js/jquery.geko_sysomos_service.js" dependencies="geko-jquery-geko_util" />
 		<file id="geko-jquery-geko_sysomos_top_ten" src="##geko_core_uri##/js/jquery.geko_sysomos_top_ten.js" dependencies="geko-jquery-geko_sysomos_service geko-jquery-tinysort_charorder" />

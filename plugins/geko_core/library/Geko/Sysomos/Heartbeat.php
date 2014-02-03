@@ -134,13 +134,16 @@ class Geko_Sysomos_Heartbeat
 		
 		if ( $oXml ) {
 			
-			$aTags = $oXml->response[ 0 ]->tag;
+			$oResponse = $oXml->response[ 0 ];
+			
+			$aTags = $oResponse->tag;
 			
 			$aTagsFmt = array();
 			foreach ( $aTags as $oTag ) {
 				$aTagsFmt[ strval( $oTag->name ) ] = strval( $oTag->displayName );
 			}
 			
+			$aRes[ 'name' ] = strval( $oResponse->name );
 			$aRes[ 'tags' ] = $aTagsFmt;
 			$aRes[ 'count' ] = count( $aTagsFmt );
 		}

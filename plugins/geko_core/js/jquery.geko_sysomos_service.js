@@ -176,6 +176,7 @@
 									
 								} );
 								
+								data.name = oXml.find( 'response > name' ).text();
 								data.tags = aTags;
 								data.count = aTags.length;
 								
