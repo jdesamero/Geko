@@ -11,23 +11,6 @@
 		<file id="geko-compatibility" src="##geko_core_uri##/external/js/compatibility.js" />
 		<file id="geko-css_query" src="##geko_core_uri##/external/js/cssQuery-p.js" />
 		<file id="geko-css_sandpaper" src="##geko_core_uri##/external/js/cssSandpaper.js" dependencies="geko-event_helpers geko-css_query geko-sylvester" />
-		<file id="geko-crypto-aes" src="##geko_core_uri##/external/js/crypto/aes.js" />
-		<file id="geko-crypto-hmac-md5" src="##geko_core_uri##/external/js/crypto/hmac-md5.js" />
-		<file id="geko-crypto-hmac-sha1" src="##geko_core_uri##/external/js/crypto/hmac-sha1.js" />
-		<file id="geko-crypto-hmac-sha224" src="##geko_core_uri##/external/js/crypto/hmac-sha224.js" />
-		<file id="geko-crypto-hmac-sha256" src="##geko_core_uri##/external/js/crypto/hmac-sha256.js" />
-		<file id="geko-crypto-hmac-sha384" src="##geko_core_uri##/external/js/crypto/hmac-sha384.js" />
-		<file id="geko-crypto-hmac-sha512" src="##geko_core_uri##/external/js/crypto/hmac-sha512.js" />
-		<file id="geko-crypto-md5" src="##geko_core_uri##/external/js/crypto/md5.js" />
-		<file id="geko-crypto-pbkdf2" src="##geko_core_uri##/external/js/crypto/pbkdf2.js" />
-		<file id="geko-crypto-rabbit" src="##geko_core_uri##/external/js/crypto/rabbit.js" />
-		<file id="geko-crypto-rc4" src="##geko_core_uri##/external/js/crypto/rc4.js" />
-		<file id="geko-crypto-sha1" src="##geko_core_uri##/external/js/crypto/sha1.js" />
-		<file id="geko-crypto-sha224" src="##geko_core_uri##/external/js/crypto/sha224.js" />
-		<file id="geko-crypto-sha256" src="##geko_core_uri##/external/js/crypto/sha256.js" />
-		<file id="geko-crypto-sha384" src="##geko_core_uri##/external/js/crypto/sha384.js" />
-		<file id="geko-crypto-sha512" src="##geko_core_uri##/external/js/crypto/sha512.js" />
-		<file id="geko-crypto-tripledes" src="##geko_core_uri##/external/js/crypto/tripledes.js" />
 		<file id="geko-cufon" src="##geko_core_uri##/external/js/cufon-yui.js" dependencies="jquery" />
 		<file id="geko-date_format" src="##geko_core_uri##/external/js/date_format.js" />
 		<file id="geko-event_helpers" src="##geko_core_uri##/external/js/EventHelpers.js" />

@@ -147,7 +147,11 @@
 																var loadMin = 100, loadMax = 1000;
 																
 																if ( 0 == curMentions ) {
-																	curMentions = newMentions - 100;
+																	if ( newMentions > 100 ) {
+																		curMentions = newMentions - 100;
+																	} else {
+																		curMentions = newMentions;
+																	}
 																}
 																
 																if ( ( newMentions - curMentions ) >= 100 ) {
