@@ -216,18 +216,50 @@ class Geko_Wp_Hooks
 		self::$bFixHttpsAdmin = $bFixHttpsAdmin;
 	}
 	
+	
 	// filter that replaces http references in document from http to https if url is https
 	public static function fixHttpsFilter( $sSource ) {
 		
 		$oUrl = Geko_Uri::getGlobal();
-		$sHttpsServer = $oUrl->getServer();		// assume we are in https mode
-		$sHttpServer = str_replace( 'https://', 'http://', $oUrl->getServer() );
 		
-		$sSource = preg_replace( '/((src|href)=[\'"])http\:\/\//', '$1https://', $sSource );
+		$sServerName = $oUrl->getHost();
 		
+		$sHttpsServer = sprintf( 'https://%s', $sServerName );
+		$sHttpServer = sprintf( 'http://%s', $sServerName );
+		
+		$aRegs = array();
+		
+		// get matching opening tag with src=http://
+		if ( preg_match_all( '/<([a-z]+)([^>]+)((src|href)=[\'"])http\:\/\/([^>]+)>/i', $sSource, $aRegs ) ) {
+			
+			$aFull = $aRegs[ 0 ];
+			$aTags = $aRegs[ 1 ];
+			
+			foreach ( $aTags as $i => $sTag ) {
+				
+				$sTagNorm = strtolower( $sTag );
+				
+				$sFull = $aFull[ $i ];
+				$sFullNorm = strtolower( $sFull );
+				
+				// don't replace regular links (<a>) that are not in the same domain
+				if (
+					( 'a' != $sTagNorm ) || 
+					(
+						( 'a' == $sTagNorm ) && 
+						( FALSE !== strpos( $sFullNorm, $sServerName ) )
+					)
+				) {
+					$sReplace = str_ireplace( 'http://', 'https://', $sFull );
+					$sSource = str_replace( $sFull, $sReplace, $sSource );
+				}
+			}
+		}
+		
+		// any straglers need to be replaced for sure
 		return str_replace( $sHttpServer, $sHttpsServer, $sSource );
-
 	}
+	
 	
 }
 

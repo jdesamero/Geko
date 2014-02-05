@@ -10,21 +10,22 @@ class Geko_Browser
 	const DEVICE_MOBILE = 4;
 	
 	//
-	protected static $aDeviceHash = array(
+	protected static $_aDeviceHash = array(
 		1 => 'tv',
 		2 => 'tablet',
 		3 => 'desktop',
 		4 => 'mobile'
 	);
 	
-	protected $aBrowser = array();
+	protected $_aBrowser = array();
 	
+	protected static $_oGlobal = NULL;
 	
 	
 	
 	//
 	public function __construct( $sUserAgent = '' ) {
-		$this->aBrowser = self::detect( $sUserAgent );
+		$this->_aBrowser = self::detect( $sUserAgent );
 	}
 	
 	
@@ -32,56 +33,65 @@ class Geko_Browser
 	
 	//
 	public function isOs( $sOs ) {
-		return ( $this->aBrowser[ 'os' ] == $sOs );
+		return ( $this->_aBrowser[ 'os' ] == $sOs );
 	}
 
 	//
 	public function isName( $sName ) {
-		return ( $this->aBrowser[ 'name' ] == $sName );
+		return ( $this->_aBrowser[ 'name' ] == $sName );
 	}
 
 	//
 	public function isVersion( $sVersion ) {
-		return ( $this->aBrowser[ 'version' ] == $sVersion );
+		return ( $this->_aBrowser[ 'version' ] == $sVersion );
 	}
 	
 	//
 	public function isCode( $sCode ) {
-		return ( $this->aBrowser[ 'code' ] == $sCode );
+		return ( $this->_aBrowser[ 'code' ] == $sCode );
 	}
 	
 	//
 	public function isDevice( $iDevice ) {
-		return ( $this->aBrowser[ 'device' ] == $iDevice );
+		return ( $this->_aBrowser[ 'device' ] == $iDevice );
 	}
 	
 	// "get" methods
-
+	
+	//
+	public function getBrowser() {
+		return $this->_aBrowser;
+	}
+	
 	//
 	public function getOs() {
-		return $this->aBrowser[ 'os' ];
+		return $this->_aBrowser[ 'os' ];
 	}
 
 	//
 	public function getName() {
-		return $this->aBrowser[ 'name' ];	
+		return $this->_aBrowser[ 'name' ];	
 	}
 
 	//
 	public function getVersion() {
-		return $this->aBrowser[ 'version' ];
+		return $this->_aBrowser[ 'version' ];
 	}
 	
 	//
 	public function getCode() {
-		return $this->aBrowser[ 'code' ];		
+		return $this->_aBrowser[ 'code' ];		
 	}
 	
 	//
 	public function getDevice() {
-		return $this->aBrowser[ 'device' ];		
+		return $this->_aBrowser[ 'device' ];		
 	}
 	
+	//
+	public function getUa() {
+		return $this->_aBrowser[ 'ua' ];
+	}
 	
 	
 	//// static methods
@@ -92,6 +102,8 @@ class Geko_Browser
 		$aRet = array();
 		
 		if ( !$sUa ) $sUa = $_SERVER[ 'HTTP_USER_AGENT' ];
+		
+		$aRet[ 'ua' ] = $sUa;
 		
 		if (
 			preg_match( '/bot/i', $sUa ) || 
@@ -109,12 +121,17 @@ class Geko_Browser
 			unset( $aRegs[ 0 ], $aRegs[ 1 ] );
 			$aRet[ 'version' ] = implode( '', $aRegs );
 			
-		} elseif ( preg_match( '/msie/i', $sUa ) ) {
-		
-			preg_match( '/MSIE ([0-9\.]+)(b)?/i', $sUa, $aRegs );
+		} elseif ( preg_match( '/(msie|trident)/i', $sUa ) ) {
+
 			$aRet[ 'name' ] = 'Internet Explorer';
-			unset( $aRegs[ 0 ] );
-			$aRet[ 'version' ] = implode( '', $aRegs );
+			
+			if ( preg_match( '/MSIE ([0-9\.]+)(b)?/i', $sUa, $aRegs ) ) {
+				unset( $aRegs[ 0 ] );
+				$aRet[ 'version' ] = implode( '', $aRegs );
+			} else if ( preg_match( '/rv(:| )([0-9\.]+)(a|b)?/i', $sUa, $aRegs ) ) {
+				unset( $aRegs[ 0 ], $aRegs[ 1 ] );
+				$aRet[ 'version' ] = implode( '', $aRegs );
+			}
 			
 		} elseif ( preg_match( '/omniweb/i', $sUa ) ) {
 		
@@ -221,43 +238,43 @@ class Geko_Browser
 		
 			preg_match( '/Firebird\/([0-9\.]+)(\+)?/i', $sUa, $aRegs );
 			$aRet[ 'name' ] = 'Firebird';
-			unset($aRegs[ 0 ]);
-			$aRet[ 'version' ] = implode('', $aRegs );
+			unset( $aRegs[ 0 ] );
+			$aRet[ 'version' ] = implode( '', $aRegs );
 		
 		} elseif ( preg_match( '/phoenix/i', $sUa ) ) {
 			
 			preg_match( '/Phoenix\/([0-9\.]+)(\+)?/i', $sUa, $aRegs );
 			$aRet[ 'name' ] = 'Phoenix';
-			unset($aRegs[ 0 ]);
-			$aRet[ 'version' ] = implode('', $aRegs );
+			unset( $aRegs[ 0 ] );
+			$aRet[ 'version' ] = implode( '', $aRegs );
 		
 		} elseif ( preg_match( '/firefox/i', $sUa ) ) {
 		
 			preg_match( '/Firefox\/([0-9\.]+)(\+)?/i', $sUa, $aRegs );
 			$aRet[ 'name' ] = 'Firefox';
-			unset($aRegs[ 0 ]);
-			$aRet[ 'version' ] = implode('', $aRegs );
+			unset( $aRegs[ 0 ] );
+			$aRet[ 'version' ] = implode( '', $aRegs );
 		
 		} elseif ( preg_match( '/chimera/i', $sUa ) ) {
 		
 			preg_match( '/Chimera\/([0-9\.]+)(a|b)?(\d+)?(\+)?/i', $sUa, $aRegs );
 			$aRet[ 'name' ] = 'Chimera';
-			unset($aRegs[ 0 ]);
-			$aRet[ 'version' ] = implode('', $aRegs );
+			unset( $aRegs[ 0 ] );
+			$aRet[ 'version' ] = implode( '', $aRegs );
 		
 		} elseif ( preg_match( '/camino/i', $sUa ) ) {
 		
 			preg_match( '/Camino\/([0-9\.]+)(a|b)?(\d+)?(\+)?/i', $sUa, $aRegs );
 			$aRet[ 'name' ] = 'Camino';
-			unset($aRegs[ 0 ]);
-			$aRet[ 'version' ] = implode('', $aRegs );
+			unset( $aRegs[ 0 ] );
+			$aRet[ 'version' ] = implode( '', $aRegs );
 		
 		} elseif ( preg_match( '/seamonkey/i', $sUa ) ) {
 		
 			preg_match( '/SeaMonkey\/([0-9\.]+)(a|b)?/i', $sUa, $aRegs );
 			$aRet[ 'name' ] = 'SeaMonkey';
-			unset($aRegs[ 0 ]);
-			$aRet[ 'version' ] = implode('', $aRegs );
+			unset( $aRegs[ 0 ] );
+			$aRet[ 'version' ] = implode( '', $aRegs );
 		
 		} elseif ( preg_match( '/galeon/i', $sUa ) ) {
 		
@@ -278,8 +295,8 @@ class Geko_Browser
 			
 			preg_match( '/rv(:| )([0-9\.]+)(a|b)?/i', $sUa, $aRegs );
 			$aRet[ 'name' ] = 'Mozilla';
-			unset($aRegs[ 0 ], $aRegs[ 1 ]);
-			$aRet[ 'version' ] = implode('', $aRegs );
+			unset( $aRegs[ 0 ], $aRegs[ 1 ] );
+			$aRet[ 'version' ] = implode( '', $aRegs );
 		
 		} elseif ( preg_match( '/mozilla\/4/i', $sUa ) ) {
 		
@@ -297,8 +314,8 @@ class Geko_Browser
 		
 			preg_match( '/Links \(([0-9\.]+)(pre)?(\d+)?/i', $sUa, $aRegs );
 			$aRet[ 'name' ] = 'Links';
-			unset($aRegs[ 0 ]);
-			$aRet[ 'version' ] = implode('', $aRegs );
+			unset( $aRegs[ 0 ] );
+			$aRet[ 'version' ] = implode( '', $aRegs );
 		
 		} elseif ( preg_match( '/curl/i', $sUa ) ) {
 		
@@ -412,16 +429,29 @@ class Geko_Browser
 	public static function bodyClass( $sUa = '' ) {
 		
 		$aRet = self::detect( $sUa );
-		$aRet[ 'device' ] = self::$aDeviceHash[ $aRet[ 'device' ] ];
+		$aRet[ 'device' ] = self::$_aDeviceHash[ $aRet[ 'device' ] ];
 		
 		return implode( ' ', $aRet );
 	}
 	
 	
 	//
-	private static function format( $sValue ) {
+	protected static function format( $sValue ) {
 		return strtolower( str_replace( array( ' ', '.' ), '-', $sValue ) );
 	}
+	
+	
+	//
+	public static function getGlobal() {
+		
+		if ( !self::$_oGlobal ) {
+			$sClass = __CLASS__;
+			self::$_oGlobal = new $sClass();
+		}
+		
+		return self::$_oGlobal;
+	}
+	
 	
 }
 
