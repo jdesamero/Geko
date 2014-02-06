@@ -1,14 +1,14 @@
 ( function( $ ) {
 	
 	//
-	$.gekoSysomosAggregator = function( aHbIds, options ) {
+	var Aggregator = function( aHbIds, options ) {
 		
 		var _this = this;
 		
 		var opts = $.extend( {
 			
 			'list_update_delay': 1000 * 60 * 10,
-			'agg_update_delay': 1000 * 60 * 2
+			'item_update_delay': 1000 * 60 * 2
 			
 		}, options );
 		
@@ -17,17 +17,18 @@
 		var bStartMentions = false;
 		
 		var iListUpdateDelay = opts.list_update_delay;
-		var iAggUpdateDelay = opts.agg_update_delay;
+		var iItemUpdateDelay = opts.item_update_delay;
 		
 		
 		var oService = opts.service;
+		
 		
 		
 		var fGetKey = function( sUnhashed ) {
 			sUnhashed = new String( sUnhashed );
 			return sUnhashed.md5();
 		};
-		
+
 		
 		
 		//// properties
@@ -37,59 +38,48 @@
 		
 		var oAggregations = {};
 		
+		var aIterate = [];
+		var aMentionsQueue = [];
+		
 		// called when initializing the list
 		var oAggInit = {};
+		
+		// filter tags
+		var oAggFilter = {};
 		
 		// called when getting mentions
 		var oAggMentions = {
 			
 			'tag': function( oQueueItem, fGetNextMentions ) {
 				
-				var aTags = oQueueItem.agg.tags;
+				var oTag = oQueueItem.tag;
 				
-				var iTagCount = oQueueItem.agg.count;
-				
-				var fScheduleNext = function() {
-					if ( 0 == iTagCount ) {
-						fGetNextMentions();
-					}
-				}
-				
-				$.each( aTags, function( sTagKey, oTag ) {
+				oService.get( {
 					
-					oService.get( {
-						'type': 'measure',
-						'hbid': oTag.hbid,
-						'callbacks': {
-							
-							'success': function( data ) {
-								
-								if ( 1 == parseInt( data.status ) ) {
-									
-									oTag.prev_mentions = oTag.mentions;
-									oTag.mentions = parseInt( data.mentions );
-									
-								}
-								
-								// decrement
-								iTagCount--;
-								
-								fScheduleNext();
-							},
-							
-							'fail': function() {
+					'type': 'measure',
 
-								// decrement
-								iTagCount--;
-								
-								fScheduleNext();
-							}
+					'success': function( data ) {
+						
+						if ( 1 == parseInt( data.status ) ) {
 							
-						},
-						'get_params': {
-							'tag': oTag.tag
+							oTag.mentions = parseInt( data.mentions );
+							
+							fGetNextMentions();
+							
+						} else {
+							setTimeout( fGetNextMentions, iItemUpdateDelay );
 						}
-					} );
+						
+					},
+					
+					'fail': function() {
+						setTimeout( fGetNextMentions, iItemUpdateDelay );
+					},
+					
+					'get_params': {
+						'tag': oTag.tag,
+						'hbid': oTag.hbid
+					}
 					
 				} );
 				
@@ -97,29 +87,23 @@
 			
 			'heartbeat': function( oQueueItem, fGetNextMentions ) {
 				
-				var aTags = oQueueItem.agg.tags;
+				var oTag = oQueueItem.tag;
 				
 				var oTagAgg = oAggregations[ 'tag' ];
 				
-				// reset tags
-				$.each( aTags, function( iHbId, oTag ) {
-					oTag.prev_mentions = oTag.mentions;
-					oTag.mentions = 0;
-				} );
+				oTag.mentions = 0;
 				
-				// start aggregation
 				$.each( oTagAgg.tags, function( k, v ) {
 					
-					var sTagKey = fGetKey( v.hbid );
-					// var sTagKey = '%d:%s'.printf( v.hbid, v.tag );
-					
-					var oTag = aTags[ sTagKey ];
-
-					oTag.mentions += v.mentions;
+					// add it up
+					if ( oQueueItem.tag_key == fGetKey( v.hbid ) ) {
+						oTag.mentions += v.mentions;
+					}
 					
 				} );
 				
 				fGetNextMentions();
+				
 			}
 			
 		};
@@ -146,21 +130,22 @@
 				if ( options.mentions ) {
 					oAggMentions[ sKey ] = options.mentions;
 				}				
+
+				// filter callback
+				if ( options.filter ) {
+					oAggFilter[ sKey ] = options.filter;
+				}
 			}
 			
 		};
 		
-				
 		
-		
-		//
-		var aMentionsQueue = [];
 		
 		var fGetNextMentions = function() {
 			
 			if ( 0 == aMentionsQueue.length ) {
 				// take a break
-				setTimeout( fGetMentions, iAggUpdateDelay );
+				setTimeout( fGetMentions, iItemUpdateDelay );
 			} else {
 				// do next one immediately
 				fGetMentions();
@@ -168,29 +153,37 @@
 			
 		};
 		
-		var fGetNextMentions = function() {
-			if ( 0 == aMentionsQueue.length ) {
-				setTimeout( fGetMentions, iAggUpdateDelay );
-			} else {
-				fGetMentions();		// do next immediately
-			}
-		};
-		
+		//
 		var fGetMentions = function() {
 			
 			if ( 0 == aMentionsQueue.length ) {
-
+				
 				// populate the queue
 				$.each( oAggregations, function( sAggKey, oAgg ) {
 					
-					aMentionsQueue.push( {
-						'agg_key': sAggKey,
-						'agg': oAgg
-					} );
+					// only if there is a handler
+					if ( oAggMentions[ sAggKey ] ) {
+						
+						$.each( oAgg.tags, function( sTagKey, oTag ) {
+							
+							aMentionsQueue.push( {
+								'agg_key': sAggKey,
+								'tag_key': sTagKey,
+								'tag': oTag
+							} );
+							
+						} );
+					}
+					
+					var fFilterHandler = oAggFilter[ sAggKey ];
+					if ( fFilterHandler ) {
+						fFilterHandler.call( _this, oAgg );
+					}
 					
 				} );
-			
+				
 			}
+			
 			
 			var oQueueItem = aMentionsQueue.shift();
 			
@@ -208,112 +201,110 @@
 		
 		// gather information from each heartbeat
 		var fGetHeartbeat = function() {
-						
-			var iHbCount = aHbIds.length;
-
-			var fScheduleNext = function() {
-				
-				// take a break when done, then do it again
-				if ( 0 == iHbCount ) {
-					
-					setTimeout( fGetHeartbeat, iListUpdateDelay );
-					
-					if ( !bStartMentions ) {
-						
-						fGetMentions();		// start polling mentions
-						
-						bStartMentions = true;
-					}
-				}
-			};
 			
-			$.each( aHbIds, function ( i, iCurHbId ) {
-				
-				oService.get( {
-					'hbid': iCurHbId,
-					'callbacks': {
+			if ( 0 == aIterate.length ) {
+				aIterate = aHbIds.slice();		// make a copy
+			}
+			
+			var iCurHbId = aIterate.shift();
+			
+			oService.get( {
+			
+				'success': function( data ) {
+					
+					if ( 1 == parseInt( data.status ) ) {
 						
-						'success': function( data ) {
-							
-							if ( 1 == parseInt( data.status ) ) {
-								
-								var oTag = oAggregations.tag;
-								var oHeartbeat = oAggregations.heartbeat;
-								
-								//// assign
-								
-								var aTags = data.tags;
-								
-								var sHbKey = fGetKey( iCurHbId );
-								// var sHbKey = iCurHbId;
-								
-								if ( !oHeartbeat.tags[ sHbKey ] ) {
-									
-									oHeartbeat.tags[ sHbKey ] = {
-										title: data.name,
-										mentions: 0,
-										prev_mentions: 0,
-										hbid: iCurHbId
-									};
-									
-									oHeartbeat.count++;
-								}
-								
-								$.each( aTags, function( k, v ) {
-									
-									var sTagKey = fGetKey( '%d:%s'.printf( iCurHbId, k ) );
-									// var sTagKey = '%d:%s'.printf( iCurHbId, k );
-									
-									if ( !oTag.tags[ sTagKey ] ) {
-										
-										oTag.tags[ sTagKey ] = {
-											title: v,
-											tag: k,
-											mentions: 0,
-											prev_mentions: 0,
-											hbid: iCurHbId,
-											hb_title: data.name
-										};
-										
-										oTag.count++;
-									}
-									
-								} );
-								
-								//// other init handlers
-								
-								$.each( oAggInit, function( sKey, fInit ) {
-									
-									fInit.call( _this, oAggregations[ sKey ] );
-									
-								} );
-								
-							}
-							
-							
-							// decrement by 1
-							iHbCount--;
-							
-							fScheduleNext();
-						},
+						var oTag = oAggregations.tag;
+						var oHeartbeat = oAggregations.heartbeat;
 						
-						'fail': function() {
+						//// assign
+						
+						var aTags = data.tags;
+						
+						var sHbKey = fGetKey( iCurHbId );
+						// var sHbKey = iCurHbId;
+						
+						if ( !oHeartbeat.tags[ sHbKey ] ) {
 							
-							// decrement by 1 as well, so we don't lose count
-							iHbCount--;
+							// each heartbeat is a tag
+							oHeartbeat.tags[ sHbKey ] = {
+								title: data.name,
+								mentions: 0,
+								prev_mentions: 0,
+								hbid: iCurHbId
+							};
 							
-							fScheduleNext();
+							oHeartbeat.count++;
 						}
 						
+						$.each( aTags, function( k, v ) {
+							
+							var sTagKey = fGetKey( '%d:%s'.printf( iCurHbId, k ) );
+							// var sTagKey = '%d:%s'.printf( iCurHbId, k );
+							
+							if ( !oTag.tags[ sTagKey ] ) {
+								
+								// tags are aggregated for each request
+								oTag.tags[ sTagKey ] = {
+									title: v,
+									tag: k,
+									mentions: 0,
+									prev_mentions: 0,
+									hbid: iCurHbId,
+									hb_title: data.name
+								};
+								
+								oTag.count++;
+							}
+							
+						} );
+						
+						
+						//// other init handlers
+						
+						$.each( oAggInit, function( sKey, fInit ) {
+							
+							fInit.call( _this, oAggregations[ sKey ] );
+							
+						} );						
+						
+						if ( 0 == aIterate.length ) {
+							
+							// start getting mentions
+							if ( !bStartMentions ) {
+								
+								fGetMentions();
+								
+								bStartMentions = true;
+							}
+							
+							// take a break
+							setTimeout( fGetHeartbeat, iListUpdateDelay );
+															
+						} else {
+							// get next immediately
+							fGetHeartbeat();
+						}
+						
+					} else {
+						setTimeout( fGetHeartbeat, iListUpdateDelay );
 					}
-				} );
+					
+				},
+				
+				'fail': function() {
+					setTimeout( fGetHeartbeat, iListUpdateDelay );
+				},
+				
+				'get_params': {
+					'hbid': iCurHbId
+				}
 				
 			} );
 			
-			
 		};
 		
-				
+		
 		//// methods
 		
 		
@@ -330,12 +321,21 @@
 			return _this;
 		};
 		
+		// if bStartMentions is true, then initialization is complete
+		this.initComplete = function() {
+			return bStartMentions;
+		};
+		
 		//
 		this.getAggregation = function( sKey ) {
 			
 			if ( !sKey ) sKey = 'tag';
 			
-			return oAggregations[ sKey ];
+			
+			var oRes = oAggregations[ sKey ];
+			oRes.foo = sKey;
+			
+			return oRes;
 		};
 		
 		// create a custom aggregation
@@ -346,6 +346,15 @@
 			return _this;
 		};
 		
-	};	
-
+		
+	};
+	
+	
+	//
+	$.gekoSysomosAggregator = function( aHbIds, options ) {
+		
+		return new Aggregator( aHbIds, options );
+	};
+	
+	
 } )( jQuery );
