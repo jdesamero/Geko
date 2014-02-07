@@ -157,10 +157,21 @@ class Geko_Sysomos_Heartbeat
 		
 		//// basic parameter formatting
 		
+		$aFilters = array();		// combine filters here
+		
 		//
 		if ( $sTag = $aParams[ 'tag' ] ) {
-			$aParams[ 'fTs' ] = $sTag;
+			$aFilters[] = $sTag;
 			unset( $aParams[ 'tag' ] );
+		}
+		
+		if ( $sCountryAbbr = $aParams[ 'country' ] ) {
+			$aFilters[] = sprintf( '~COUNTRY~%s', $sCountryAbbr );
+			unset( $aParams[ 'country' ] );
+		}
+		
+		if ( !$aParams[ 'fTs' ] ) {
+			$aParams[ 'fTs' ] = implode( '%2C', $aFilters );
 		}
 		
 		//// do stuff
@@ -188,6 +199,8 @@ class Geko_Sysomos_Heartbeat
 		
 		//// basic parameter formatting
 		
+		$aFilters = array();
+		
 		//
 		if ( $sType = $aParams[ 'type' ] ) {
 			
@@ -201,10 +214,14 @@ class Geko_Sysomos_Heartbeat
 			);
 			
 			if ( $sTypeCode = $aTypes[ $sType ] ) {
-				$aParams[ 'fTs' ] = sprintf( '~SOURCE~%s%%2C', $sTypeCode );
+				$aFilters[] = sprintf( '~SOURCE~%s', $sTypeCode );
 			}
 			
 			unset( $aParams[ 'type' ] );
+		}
+		
+		if ( !$aParams[ 'fTs' ] ) {
+			$aParams[ 'fTs' ] = implode( '%2C', $aFilters );
 		}
 		
 		//// do stuff

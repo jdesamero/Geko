@@ -14,6 +14,7 @@ class Geko_App extends Geko_Singleton_Abstract
 		'db' => NULL,
 		'match' => NULL,
 		'router' => NULL,
+		'router.file' => array( 'router' ),
 		'router.service' => array( 'router' ),
 		'router.layout' => array( 'router' ),
 		'sess' => array( 'db' ),
@@ -262,6 +263,25 @@ class Geko_App extends Geko_Singleton_Abstract
 		
 		self::set( 'router', $oRouter );	
 	}
+	
+	
+	
+	
+	// router.file
+	// depends on: "router"
+	public function compRouter_File( $mArgs ) {
+		
+		$oRouter = self::get( 'router' );
+		
+		$sRouteClass = $this->getBestMatch( 'Router_Route_File' );
+		
+		$oRoute = new $sRouteClass();
+		$oRouter->addRoute( $oRoute, 3000, 'file' );
+		
+		self::set( 'router.file', $oRoute );
+	}
+	
+	
 	
 	
 	// router.service

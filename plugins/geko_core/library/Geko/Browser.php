@@ -59,7 +59,12 @@ class Geko_Browser
 	// "get" methods
 	
 	//
-	public function getBrowser() {
+	public function getBrowser( $bBodyClassFormat = FALSE ) {
+		
+		if ( $bBodyClassFormat ) {
+			return self::bodyClassFormat( $this->_aBrowser );
+		}
+		
 		return $this->_aBrowser;
 	}
 	
@@ -97,7 +102,7 @@ class Geko_Browser
 	//// static methods
 	
 	//
-	public static function detect( $sUa = '' ) {
+	public static function detect( $sUa = '', $bBodyClassFormat = FALSE ) {
 		
 		$aRet = array();
 		
@@ -154,70 +159,80 @@ class Geko_Browser
 			$aRet[ 'version' ] = $aRegs[ 1 ];
 			
 		} elseif ( preg_match( '/safari/i', $sUa ) ) {
-			
-			preg_match( '/Safari\/([0-9\.]+)/i', $sUa, $aRegs );
+
 			$aRet[ 'name' ] = 'Safari';
-			$aRet[ 'version' ] = $aRegs[ 1 ];
 			
-			$aVers = explode( '.', $aRet[ 'version' ] );
-			$iVers1 = intval( $aVers[ 0 ] );
-			$iVers2 = intval( $aVers[ 1 ] );
-			$iVers3 = intval( $aVers[ 2 ] );
+			$aRegs2 = array();
+			if ( preg_match( '/Version\/([0-9\.]+)/i', $sUa, $aRegs2 ) ) {
+				
+				$aRet[ 'version' ] = $aRegs2[ 1 ];
 			
-			if ( 85 == $iVers1 ) {
-				if ( 5 == $iVers2 ) {
-					$aRet[ 'version' ] = '1.0';
-				} elseif ( 7 == $iVers2 ) {
-					$aRet[ 'version' ] = '1.0.2';				
-				} elseif ( 8 == $iVers2 ) {
-					$aRet[ 'version' ] = '1.0.3';				
-				} else {
-					$aRet[ 'version' ] = '1.0.x';				
-				}
-			} elseif ( 100 == $iVers1 ) {
-				if ( 0 == $iVers2 ) {
-					$aRet[ 'version' ] = '1.1';		
-				} elseif ( 1 == $iVers2 ) {
-					$aRet[ 'version' ] = '1.1.1';			
-				} else {
-					$aRet[ 'version' ] = '1.1.x';				
-				}
-			} elseif ( 125 == $iVers1 ) {
-				if ( 7 == $iVers2 || 8 == $iVers2 ) {
-					$aRet[ 'version' ] = '1.2.2';				
-				} elseif ( 9 == $iVers2 ) {
-					$aRet[ 'version' ] = '1.2.3';				
-				} elseif ( 11 == $iVers2 || 12 == $iVers2 ) {
-					$aRet[ 'version' ] = '1.2.4';				
-				} else {
-					$aRet[ 'version' ] = '1.2.x';					
-				}
-			} elseif ( 312 == $iVers1 ) {
-				if ( 0 == $iVers2 ) {
-					$aRet[ 'version' ] = '1.3';
-				} elseif ( 3 == $iVers2 ) {
-					$aRet[ 'version' ] = '1.3.1';
-				} else {
-					$aRet[ 'version' ] = '1.3.x';				
-				}
-			} elseif ( $iVers1 >= 412 && $iVers1 <= 416 ) {
-				if ( 412 == $iVers1 ) {
-					if ( $iVers2 >= 0 && $iVers2 <= 2 ) {
-						$aRet[ 'version' ] = '2.0';				
-					} elseif ( 5 == $iVers2 ) {
-						$aRet[ 'version' ] = '2.0.1';				
+			} else {
+			
+				preg_match( '/Safari\/([0-9\.]+)/i', $sUa, $aRegs );
+				$aRet[ 'version' ] = $aRegs[ 1 ];
+				
+				$aVers = explode( '.', $aRet[ 'version' ] );
+				$iVers1 = intval( $aVers[ 0 ] );
+				$iVers2 = intval( $aVers[ 1 ] );
+				$iVers3 = intval( $aVers[ 2 ] );
+				
+				if ( 85 == $iVers1 ) {
+					if ( 5 == $iVers2 ) {
+						$aRet[ 'version' ] = '1.0';
+					} elseif ( 7 == $iVers2 ) {
+						$aRet[ 'version' ] = '1.0.2';				
+					} elseif ( 8 == $iVers2 ) {
+						$aRet[ 'version' ] = '1.0.3';				
 					} else {
-						$aRet[ 'version' ] = '2.0.x';					
+						$aRet[ 'version' ] = '1.0.x';				
 					}
-				} elseif ( 416 == $iVers1 ) {
-					if ( 12 == $iVers2 || 13 == $iVers2 ) {
-						$aRet[ 'version' ] = '2.0.2';					
+				} elseif ( 100 == $iVers1 ) {
+					if ( 0 == $iVers2 ) {
+						$aRet[ 'version' ] = '1.1';		
+					} elseif ( 1 == $iVers2 ) {
+						$aRet[ 'version' ] = '1.1.1';			
 					} else {
-						$aRet[ 'version' ] = '2.0.x';					
+						$aRet[ 'version' ] = '1.1.x';				
 					}
-				} else {
-					$aRet[ 'version' ] = '2.0.x';
+				} elseif ( 125 == $iVers1 ) {
+					if ( 7 == $iVers2 || 8 == $iVers2 ) {
+						$aRet[ 'version' ] = '1.2.2';				
+					} elseif ( 9 == $iVers2 ) {
+						$aRet[ 'version' ] = '1.2.3';				
+					} elseif ( 11 == $iVers2 || 12 == $iVers2 ) {
+						$aRet[ 'version' ] = '1.2.4';				
+					} else {
+						$aRet[ 'version' ] = '1.2.x';					
+					}
+				} elseif ( 312 == $iVers1 ) {
+					if ( 0 == $iVers2 ) {
+						$aRet[ 'version' ] = '1.3';
+					} elseif ( 3 == $iVers2 ) {
+						$aRet[ 'version' ] = '1.3.1';
+					} else {
+						$aRet[ 'version' ] = '1.3.x';				
+					}
+				} elseif ( $iVers1 >= 412 && $iVers1 <= 416 ) {
+					if ( 412 == $iVers1 ) {
+						if ( $iVers2 >= 0 && $iVers2 <= 2 ) {
+							$aRet[ 'version' ] = '2.0';				
+						} elseif ( 5 == $iVers2 ) {
+							$aRet[ 'version' ] = '2.0.1';				
+						} else {
+							$aRet[ 'version' ] = '2.0.x';					
+						}
+					} elseif ( 416 == $iVers1 ) {
+						if ( 12 == $iVers2 || 13 == $iVers2 ) {
+							$aRet[ 'version' ] = '2.0.2';					
+						} else {
+							$aRet[ 'version' ] = '2.0.x';					
+						}
+					} else {
+						$aRet[ 'version' ] = '2.0.x';
+					}
 				}
+				
 			}
 			
 		} elseif ( preg_match( '/konqueror/i', $sUa ) ) {
@@ -409,14 +424,32 @@ class Geko_Browser
 			
 		}
 		
-		// format
-		$aRet = array_map( array( __CLASS__, 'format' ), $aRet );
+		// normalize
+		$aRet = array_map( array( __CLASS__, 'normalize' ), $aRet );
 		
+		
+		$aCodeMap = array(
+			'internet-explorer' => 'ie',
+			'firefox' => 'ff',			
+			'chrome' => 'ch',
+			'safari' => 'sa'			
+		);
 		
 		// special
-		if ( 'internet-explorer' == $aRet[ 'name' ] ) {
-			$iFirst = intval( substr( $aRet[ 'version' ] , 0, strpos( $aRet[ 'version' ], '-' ) ) );
-			$aRet[ 'code' ] = 'ie' . $iFirst;
+		$sBrowserName = $aRet[ 'name' ];
+		$sVersion = $aRet[ 'version' ];
+		
+		if ( array_key_exists( $sBrowserName, $aCodeMap ) ) {
+			
+			$sCodePfx = $aCodeMap[ $sBrowserName ];
+			
+			$iFirst = intval( substr( $sVersion, 0, strpos( $sVersion, '-' ) ) );
+			
+			$aRet[ 'code' ] = sprintf( '%s%d', $sCodePfx, $iFirst );
+		}
+		
+		if ( $bBodyClassFormat ) {
+			$aRet = self::bodyClassFormat( $aRet );
 		}
 		
 		return $aRet;
@@ -428,16 +461,31 @@ class Geko_Browser
 	//
 	public static function bodyClass( $sUa = '' ) {
 		
-		$aRet = self::detect( $sUa );
-		$aRet[ 'device' ] = self::$_aDeviceHash[ $aRet[ 'device' ] ];
+		$aRet = self::detect( $sUa, TRUE );
 		
 		return implode( ' ', $aRet );
 	}
 	
 	
 	//
-	protected static function format( $sValue ) {
+	protected static function normalize( $sValue ) {
 		return strtolower( str_replace( array( ' ', '.' ), '-', $sValue ) );
+	}
+	
+	
+	//
+	protected static function bodyClassFormat( $aRet ) {
+		
+		// make $aRet values CSS friendly
+		
+		$aRet[ 'os' ] = sprintf( 'os_%s', $aRet[ 'os' ] );
+		$aRet[ 'name' ] = sprintf( 'vendor_%s', $aRet[ 'name' ] );
+		$aRet[ 'version' ] = sprintf( 'ver_%s', $aRet[ 'version' ] );
+		$aRet[ 'device' ] = sprintf( 'dev_%s', self::$_aDeviceHash[ $aRet[ 'device' ] ] );
+		
+		unset( $aRet[ 'ua' ] );
+		
+		return array_values( $aRet );
 	}
 	
 	
