@@ -25,9 +25,9 @@ abstract class Geko_App_Entity_Query extends Geko_Entity_Query
 			echo $this->getEntityQuery( $mParam );
 			return array();
 		} else {
-			return array_values( $oDb->fetchAssoc(
+			return $oDb->fetchAll(
 				$this->getEntityQuery( $mParam )
-			) );
+			);
 		}
 	}
 	
