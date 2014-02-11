@@ -53,7 +53,7 @@ Geko_Wp_Role_Manage::getInstance()->init();
 Geko_Wp_User_Rewrite::getInstance()->init();
 Geko_Wp_User_Photo::getInstance()->init();
 
-Geko_Wp::registerExternalFiles( sprintf( '%s/etc/register.xml', get_bloginfo( 'template_directory' ) ) );
+Geko_Wp::registerExternalFiles( sprintf( '%s/etc/register.xml', TEMPLATEPATH ) );
 
 // ---------------------------------------------------------------------------------------------- //
 
