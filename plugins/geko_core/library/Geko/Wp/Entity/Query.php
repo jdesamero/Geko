@@ -28,7 +28,7 @@ abstract class Geko_Wp_Entity_Query extends Geko_Entity_Query
 	
 	//
 	public function modifyParams( $aParams ) {
-		return apply_filters( get_class( $this ) . '::__construct::aParams', $aParams, $this );	
+		return apply_filters( sprintf( '%s::__construct::aParams', get_class( $this ) ), $aParams, $this );	
 	}
 	
 	
@@ -79,6 +79,11 @@ abstract class Geko_Wp_Entity_Query extends Geko_Entity_Query
 		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
+		
+		
+		// to use with FOUND_ROWS()
+		$oQuery->option( 'SQL_CALC_FOUND_ROWS' );
+		
 		
 		// wordpress paging
 		$iItemsPerPage = intval( $aParams[ 'posts_per_page' ] );

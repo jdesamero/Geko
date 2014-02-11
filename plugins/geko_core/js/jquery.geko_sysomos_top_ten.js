@@ -5,7 +5,7 @@
 		
 		var opts = $.extend( {
 			
-			'update_delay': 20000,
+			'update_delay': 20000,								// update mentions every 20 seconds
 			'sort_refresh': 5000,
 			'sort_anim': 1500,
 			'fade_delay': 500,
@@ -28,6 +28,13 @@
 			var mainCont = $( this );
 			
 			var sourceUl = mainCont.find( '> div > ul' );
+			
+			var holderUl = $( '<ul></ul>' );				// temporary holder
+			holderUl.hide();
+			
+			sourceUl.after( holderUl );
+			
+			
 			var loadingDiv = mainCont.find( '.loading' );
 			
 			var setRank = function() {
@@ -70,6 +77,97 @@
 			};
 			
 			
+			// mention lookup
+			var oMnLookup = {
+				'locked': false,
+				'tags': {},
+				'init': false
+			};
+			
+			var fLoadLookup = function( aTagsFmt ) {
+
+				// lock and load lookup object
+				if ( !oMnLookup.locked ) {
+				
+					oMnLookup.locked = true;
+					
+					$.each( aTagsFmt, function( k, v ) {
+						oMnLookup.tags[ v.id ] = v.mentions;
+					} );
+					
+					oMnLookup.locked = false;
+					
+				} else {
+					console.log( 'Already Locked!' );
+				}
+				
+			};
+			
+			
+			//
+			var fFormatTag = function( v, k ) {
+				
+				var oTag =  { id: k };
+				
+				// merge params
+				if ( 'object' === $.type( v ) ) {
+					oTag = $.extend( oTag, v );
+				} else {
+					oTag.title = v;
+				}
+				
+				// apply format_tag() callback if specified
+				if ( opts.format_tag ) {
+					oTag = opts.format_tag( oTag, sName );
+				}
+				
+				return oTag;
+			};
+			
+			
+			
+			// refresh
+			var fRefreshLookup = function( bInit ) {
+				
+				if ( bInit ) {
+					
+					// service just called, poll later
+					setTimeout( fRefreshLookup, updateDelay );
+					
+				} else {
+	
+					oService.get( {
+						
+						'success': function( data ) {
+							
+							if ( 1 == parseInt( data.status ) ) {
+	
+								var aTags = data.tags;
+								
+								var aTagsFmt = $.map( aTags, fFormatTag );
+								
+								fLoadLookup( aTagsFmt );
+								
+							}
+							
+							setTimeout( fRefreshLookup, updateDelay );
+							
+						},
+						
+						'fail': function() {
+							setTimeout( fRefreshLookup, updateDelay );
+						},
+						
+						'get_params': {
+							'hbid': iHbId
+						}
+						
+					} );
+				}
+				
+			};
+			
+			
 			//
 			var getTags = function() {
 				
@@ -89,126 +187,179 @@
 							if ( opts.title_sel ) {
 								mainCont.find( opts.title_sel ).html( sName );
 							}
+
+							var bHasMentionData = data.has_mention_data;
 							
 							var aTags = data.tags;
-							tagCount = data.count;
+							var aTagsFmt = $.map( aTags, fFormatTag );
 							
-							var aTagsFmt = $.map( aTags, function( v, k ) {
+							if ( bHasMentionData ) {
 								
-								var oTag =  {
-									id: k,
-									mentions: 0
-								};
+								fLoadLookup( aTagsFmt );
 								
-								// merge params
-								if ( 'object' === $.type( v ) ) {
-									oTag = $.extend( oTag, v );
-								} else {
-									oTag.title = v;
-								}
-								
-								// apply format_tag() callback if specified
-								if ( opts.format_tag ) {
-									oTag = opts.format_tag( oTag, sName );
-								}
-								
-								return oTag;
-							} );
+								if ( !oMnLookup.init ) {
+									fRefreshLookup( true );
+									oMnLookup.init = true;
+								}							
+							}
 							
+							//
 							loadingDiv.fadeOut( fadeDelay, function() {
 								
-								sourceUl.find( '.row-tmpl' ).tmpl( aTagsFmt ).appendTo( sourceUl );
+								$.each( aTagsFmt, function( i, oTag ) {
+									
+									var eLi = holderUl.find( 'li[data-tag="%s"]'.printf( oTag.id ) )
+									
+									if ( 0 == eLi.length ) {
+										
+										// create new
+										oTag.mentions = 0;
+										
+										var eNewLi = sourceUl.find( '.row-tmpl' ).tmpl( oTag );
+										
+										eNewLi.bind( 'update', function() {
+											
+											var li = $( this );
+											
+											var updateTimer = null;
+											
+											var tag = li.attr( 'data-tag' );
+											
+											var getMentions = function() {
+												
+												///
+												var fSetMention = function( newMentions ) {
+
+													if ( updateTimer ) {
+														clearTimeout( updateTimer );
+														updateTimer = null;
+													}
+													
+													var curMentions = parseInt( li.find( 'div.mentions' ).text() );
+													var loadMin = 100, loadMax = 1000;
+													
+													if ( 0 == curMentions ) {
+														if ( newMentions > 100 ) {
+															curMentions = newMentions - 100;
+														} else {
+															curMentions = newMentions;
+														}
+													}
+													
+													if ( ( newMentions - curMentions ) >= 100 ) {
+														// make results load faster
+														loadMin = 0;
+														loadMax = 100;
+													}
+													
+													
+													// update until current mentions is caught up with new mentions
+													var updateMentions = function() {
+														
+														if ( curMentions == newMentions ) {
+															
+															if ( updateTimer ) {
+																clearTimeout( updateTimer );
+																updateTimer = null;
+															}
+															
+															li.addClass( 'updated' );
+															
+															// wait until everyone has been updated
+															if ( sourceUl.find( 'li' ).length == sourceUl.find( 'li.updated' ).length ) {
+																
+																sourceUl.find( 'li.updated' ).removeClass( 'updated' );
+																
+																setTimeout( function() {
+																	sourceUl.find( 'li' ).trigger( 'update' );
+																}, updateDelay );
+															}								
+														
+														} else {
+															
+															if ( curMentions < newMentions ) curMentions++;
+															else curMentions--;
+															
+															li.find( 'div.mentions' ).html( curMentions );
+															updateTimer = setTimeout( updateMentions, $.gekoRandomInt( loadMin, loadMax ) );
+														}
+													};
+													
+													updateMentions();
+													
+												};			// end fSetMention
+												
+												
+												// -------------------------------------------------
+												
+												if ( bHasMentionData ) {
+													
+													fSetMention( oMnLookup.tags[ tag ] );
+													
+												} else {
+													
+													// poll individually
+													
+													oService.get( {
+														
+														'type': 'measure',
+														
+														'success': function( data2 ) {
+		
+															if ( 1 == parseInt( data2.status ) ) {
+																
+																fSetMention( data2.mentions );
+																
+															} else {
+																setTimeout( getMentions, updateDelay );
+															}
+															
+														},
+														
+														'fail': function() {
+															setTimeout( getMentions, updateDelay );
+														},
+															
+														'get_params': {
+															'hbid': iHbId,
+															'tag': tag
+														}
+													} );
+													
+												}
+												
+												// -------------------------------------------------
+												
+											}
+											
+											getMentions();
+											
+										} );
+										
+										sourceUl.append( eNewLi );
+										
+										// console.log( 'New :' + oTag.id );
+										
+									} else {
+										
+										// exists, reset and do other updates
+										// re-append to source ul
+										
+										eLi.removeAttr( 'style' );
+										eLi.removeData( 'h' );
+										eLi.find( 'div.mentions' ).html( 0 );
+										
+										sourceUl.append( eLi );
+										
+										// console.log( 'Existing :' + oTag.id );
+									}
+									
+								} );
+								
+								
 								setRank();
 								
 								sourceUl.fadeIn( fadeDelay );
-								
-								sourceUl.find( 'li' ).each( function() {
-									var li = $( this );
-									li.bind( 'update', function() {
-										
-										var tag = li.attr( 'data-tag' );
-										
-										var getMentions = function() {
-											
-											oService.get( {
-												
-												'type': 'measure',
-												
-												'success': function( data2 ) {
-
-													if ( 1 == parseInt( data2.status ) ) {
-														
-														var curMentions = parseInt( li.find( 'div.mentions' ).text() );
-														var newMentions = data2.mentions;
-														var loadMin = 100, loadMax = 1000;
-														
-														if ( 0 == curMentions ) {
-															if ( newMentions > 100 ) {
-																curMentions = newMentions - 100;
-															} else {
-																curMentions = newMentions;
-															}
-														}
-														
-														if ( ( newMentions - curMentions ) >= 100 ) {
-															// make results load faster
-															loadMin = 0;
-															loadMax = 100;
-														}
-														
-														var updateTimer = null;
-														
-														var updateMentions = function() {
-															
-															if ( curMentions == newMentions ) {
-																
-																if ( updateTimer ) {
-																	clearTimeout( updateTimer );
-																	updateTimer = null;
-																}
-																
-																li.addClass( 'updated' );
-																if ( tagCount == sourceUl.find( 'li.updated' ).length ) {
-																	sourceUl.find( 'li.updated' ).removeClass( 'updated' );
-																	setTimeout( function() {
-																		sourceUl.find( 'li' ).trigger( 'update' );
-																	}, updateDelay );
-																}								
-															
-															} else {
-																
-																if ( curMentions < newMentions ) curMentions++;
-																else curMentions--;
-																
-																li.find( 'div.mentions' ).html( curMentions );
-																updateTimer = setTimeout( updateMentions, $.gekoRandomInt( loadMin, loadMax ) );
-															}
-														};
-														
-														updateMentions();
-														
-													} else {
-														setTimeout( getMentions, updateDelay );
-													}
-													
-												},
-												
-												'fail': function() {
-													setTimeout( getMentions, updateDelay );
-												},
-													
-												'get_params': {
-													'hbid': iHbId,
-													'tag': tag
-												}
-											} );
-												
-										}
-										
-										getMentions();
-										
-									} );
-								} );
 								
 								sourceUl.find( 'li' ).trigger( 'update' );
 								
@@ -245,6 +396,7 @@
 				
 				var srcLi = sourceUl.find( 'li' );
 				
+				
 				var iLnH;
 				
 				srcLi.each( function( i ) {
@@ -271,11 +423,20 @@
 			
 			var rebuild = function() {
 				sourceUl.fadeOut( fadeDelay, function() {
-
+					
+					// move existing li's to holder
+					holderUl.append( sourceUl.find( 'li' ) );
+					
+					
+					// remove all nodes for a hard rebuild
+					// sourceUl.find( 'li' ).remove();
+					
 					loadingDiv.fadeIn( fadeDelay );
 					
-					sourceUl.find( 'li' ).remove();
+					
+					
 					getTags();
+					
 					setTimeout( rebuild, getRebuildDelay() );
 				} );
 			};

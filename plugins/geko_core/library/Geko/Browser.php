@@ -59,13 +59,14 @@ class Geko_Browser
 	// "get" methods
 	
 	//
-	public function getBrowser( $bBodyClassFormat = FALSE ) {
+	public function getBrowser( $bBodyClassFormat = FALSE, $bImplode = FALSE ) {
 		
-		if ( $bBodyClassFormat ) {
-			return self::bodyClassFormat( $this->_aBrowser );
-		}
+		$aRes = ( $bBodyClassFormat ) ? 
+			self::bodyClassFormat( $this->_aBrowser ) : 
+			$this->_aBrowser
+		;
 		
-		return $this->_aBrowser;
+		return ( $bImplode ) ? implode( ' ', $aRes ) : $aRes ;
 	}
 	
 	//

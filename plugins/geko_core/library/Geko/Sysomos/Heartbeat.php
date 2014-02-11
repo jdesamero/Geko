@@ -3,16 +3,32 @@
 //
 class Geko_Sysomos_Heartbeat
 {
-	
-	protected $_iHbId;
-	
-	protected $_oClient = NULL;
-	
+		
 	protected static $_aContentFilter = array(
 		'http://hb.sysomos.com/hb2/sidebar', 'fuck', 'bitch', 'niga', 'nigga', 'gangbang',
 		'gang bang', 'pussy', 'eat ass'
 	);
 		
+	
+	
+	protected $_iHbId;
+	
+	protected $_oClient = NULL;
+	
+	protected $_aDefaultParams = array(
+		'measure' => array(
+			'max' => 20,
+			'dRg' => 7,
+			'fTs' => 'me'
+		),
+		'rsscontent' => array(
+			'startid' => 0,
+			'max' => 120,
+			'dRg' => 7,
+			'fTs' => 'me'
+		)
+	);
+	
 	
 	
 	//
@@ -94,10 +110,38 @@ class Geko_Sysomos_Heartbeat
 	
 	
 	//
-	public function _getResult( $sPage, $aParams = array(), $aDefParams = array() ) {
+	public function _getResult( $sPage, $aParams = array() ) {
 		
-		$aParams = array_merge( $aDefParams, $aParams );
+		$aDefParams = $this->_aDefaultParams[ $sPage ];
 		
+		if ( is_array( $aDefParams ) ) {
+			$aParams = array_merge( $aDefParams, $this->formatFilterParams( $aParams ) );
+		}
+		
+		
+		//// start fixes
+		
+		if ( !$aParams[ 'dRg' ] ) {
+			unset( $aParams[ 'dRg' ] );		// unset if 0, otherwise it will cause problems
+		}
+		
+		$sToday = date( 'Y-m-d' );
+		
+		if ( !$aParams[ 'dRg' ] ) {
+			
+			// start day given, but no end day
+			if ( $aParams[ 'sDy' ] && !$aParams[ 'eDy' ] ) {
+				$aParams[ 'eDy' ] = $sToday;
+			}
+
+			// end day given, but no start day
+			if ( $aParams[ 'eDy' ] && !$aParams[ 'sDy' ] ) {
+				$aParams[ 'sDy' ] = $sToday;
+			}
+		}
+		
+		
+		//// end fixes
 		
 		$oClient = $this->_getClient();
 		
@@ -122,6 +166,172 @@ class Geko_Sysomos_Heartbeat
 		
 		return NULL;
 	}
+	
+	
+	
+	//// helpers
+	
+	
+	// for consistency
+	public function formatTag( $mValue ) {
+		return $mValue;
+	}
+	
+	//
+	public function formatCountry( $mValue ) {
+		
+		if ( is_array( $mValue ) ) {
+			return array_map( array( $this, 'formatCountry' ), $mValue );
+		}
+		
+		return sprintf( '~COUNTRY~%s', strtoupper( $mValue ) );
+	}
+	
+	//
+	public function formatType( $mValue ) {
+	
+		if ( is_array( $mValue ) ) {
+			return array_map( array( $this, 'formatType' ), $mValue );
+		}
+			
+		$aTypes = array(
+			'twitter' => 't',
+			'blogpost' => 'b',
+			'forum' => 'f',
+			'facebook' => 'k',
+			'news' => 'n',
+			'youtube' => 'y'
+		);
+		
+		if ( !$sTypeCode = $aTypes[ $mValue ] ) {
+			$sTypeCode = $mValue;					// use the given value
+		}
+		
+		return sprintf( '~SOURCE~%s', $sTypeCode );
+	}
+	
+	// valid values: pos, neg, none
+	public function formatSentiment( $mValue ) {
+	
+		if ( is_array( $mValue ) ) {
+			return array_map( array( $this, 'formatSentiment' ), $mValue );
+		}
+			
+		return sprintf( '~SENTIMENT~%s', strtolower( $mValue ) );
+	}
+	
+	
+	
+	//
+	public function formatFilterParams( $aParams ) {
+		
+		$aFilterTypes = array( 'tag', 'country', 'type', 'sentiment' );
+		
+		
+		// only use filters if "fTs" not explicitly set
+		if ( !$aParams[ 'fTs' ] ) {
+			
+			$aFilters = array();		// combine filters here
+			
+			// go through each filter type
+			foreach ( $aFilterTypes as $sFilterType ) {
+				
+				$sFormatMethod = sprintf( 'format%s', ucfirst( $sFilterType ) );
+				
+				if ( $mValue = $aParams[ $sFilterType ] ) {
+					
+					$aFilters = array_merge( $aFilters,
+						Geko_Array::wrap( $this->$sFormatMethod( $mValue ) )
+					);
+					
+					unset( $aParams[ $sFilterType ] );
+				}
+				
+			}
+			
+			if ( count( $aFilters ) > 0 ) {
+				$aParams[ 'fTs' ] = implode( '%2C', $aFilters );
+			}
+		}
+		
+		
+		// only use filters if "cTs" not explicitly set
+		if ( !$aParams[ 'cTs' ] ) {
+			
+			$aSubFilters = array();
+			
+			$aSubParams = $aParams[ 'subfilter' ];
+			
+			// go through each filter type
+			foreach ( $aFilterTypes as $sFilterType ) {
+				
+				$sFormatMethod = sprintf( 'format%s', ucfirst( $sFilterType ) );
+				
+				if ( $mValue = $aSubParams[ $sFilterType ] ) {
+					
+					$aSubFilters = array_merge( $aSubFilters,
+						Geko_Array::wrap( $this->$sFormatMethod( $mValue ) )
+					);
+				}	
+			}
+			
+			unset( $aParams[ 'subfilter' ] );
+			
+			if ( count( $aSubFilters ) > 0 ) {
+				$aParams[ 'cTs' ] = implode( '%2C', $aSubFilters );
+			}
+		}
+		
+		
+		
+		//// report intervals
+		
+		// number of days
+		if ( !$aParams[ 'dRg' ] ) {
+			
+			if ( isset( $aParams[ 'numdays' ] ) ) {
+				
+				$aParams[ 'dRg' ] = intval( $aParams[ 'numdays' ] );				
+				
+				unset( $aParams[ 'numdays' ] );
+			}
+		}
+		
+		// start day
+		if ( !$aParams[ 'sDy' ] ) {
+		
+			if ( $sStartDay = $aParams[ 'startday' ] ) {
+				$aParams[ 'sDy' ] = $sStartDay;
+			}
+			
+			unset( $aParams[ 'startday' ] );
+		}
+		
+		// end day
+		if ( !$aParams[ 'eDy' ] ) {
+		
+			if ( $sEndDay = $aParams[ 'endday' ] ) {
+				$aParams[ 'eDy' ] = $sEndDay;
+			}
+			
+			unset( $aParams[ 'endday' ] );
+		}
+		
+		
+		
+		return $aParams;
+	}
+	
+	
+	
+	//// params
+	
+	// hid: Integer; heartbeat id
+	// dRg: Integer; Number of days
+	// sDy: Date (2010-06-08); Start day
+	// eDy: Date (2010-06-08); End day
+	// fTs: String; list of filters
+	// cTs: String; Breakdown by filter
 	
 	
 	
@@ -155,83 +365,68 @@ class Geko_Sysomos_Heartbeat
 	//
 	public function getMeasure( $aParams = array(), $aOptions = array() ) {
 		
-		//// basic parameter formatting
-		
-		$aFilters = array();		// combine filters here
-		
-		//
-		if ( $sTag = $aParams[ 'tag' ] ) {
-			$aFilters[] = $sTag;
-			unset( $aParams[ 'tag' ] );
-		}
-		
-		if ( $sCountryAbbr = $aParams[ 'country' ] ) {
-			$aFilters[] = sprintf( '~COUNTRY~%s', $sCountryAbbr );
-			unset( $aParams[ 'country' ] );
-		}
-		
-		if ( !$aParams[ 'fTs' ] ) {
-			$aParams[ 'fTs' ] = implode( '%2C', $aFilters );
-		}
-		
 		//// do stuff
 		
-		list( $aRes, $oXml ) = $this->_getResult( 'measure', $aParams, array(
-			'max' => 20,
-			'dRg' => 7,
-			'fTs' => 'me'
-		) );
+		list( $aRes, $oXml ) = $this->_getResult( 'measure', $aParams );
 		
 		if ( $oXml ) {
 			
-			$aTags = $oXml->response[ 0 ]->tag;
+			$oResponse = $oXml->response[ 0 ];
 			
-			$aRes[ 'mentions' ] = intval( $oXml->response[ 0 ]->tagStats[ 0 ]->matchCount );
-			$aRes[ 'tag' ] = $sTag;	
+			$aTagStats = $oResponse->tagStats;
+			
+			$aTags = array();
+			
+			$bFirst = TRUE;
+			foreach ( $aTagStats as $oTagStat ) {
+				
+				$iMatchCount = intval( $oTagStat->matchCount );
+				
+				if ( $bFirst ) {
+					
+					$aRes[ 'mentions' ] = $iMatchCount;
+					$aRes[ 'tag' ] = strval( $oXml->request[ 0 ]->filterTags );
+					
+					$bFirst = FALSE;
+					
+				} else {
+					
+					$sKey = strval( $oTagStat->tag );
+					$sDisplayName = strval( $oTagStat->tagDisplayName );
+					
+					$aKeyParts = explode( '~', trim( $sKey, '~' ) );
+					
+					if ( count( $aKeyParts ) > 1 ) {
+						list( $sCat, $sSubKey ) = $aKeyParts;
+					} else {
+						$sCat = 'tag';
+						$sSubKey = $sKey;
+					}
+					
+					$sCat = strtolower( $sCat );
+					
+					$aTags[ $sCat ][ $sSubKey ] = array(
+						'title' => $sDisplayName,
+						'mentions' => $iMatchCount
+					);
+					
+				}
+			}
+			
+			$aRes[ 'tags' ] = $aTags;	
 		}
 		
 		return $aRes;
 	}
 	
 	
+	
 	//
 	public function getRssContent( $aParams = array(), $aOptions = array() ) {
 		
-		//// basic parameter formatting
-		
-		$aFilters = array();
-		
-		//
-		if ( $sType = $aParams[ 'type' ] ) {
-			
-			$aTypes = array(
-				'twitter' => 't',
-				'blogpost' => 'b',
-				'forum' => 'f',
-				'facebook' => 'k',
-				'news' => 'n',
-				'youtube' => 'y'
-			);
-			
-			if ( $sTypeCode = $aTypes[ $sType ] ) {
-				$aFilters[] = sprintf( '~SOURCE~%s', $sTypeCode );
-			}
-			
-			unset( $aParams[ 'type' ] );
-		}
-		
-		if ( !$aParams[ 'fTs' ] ) {
-			$aParams[ 'fTs' ] = implode( '%2C', $aFilters );
-		}
-		
 		//// do stuff
 		
-		list( $aRes, $oXml ) = $this->_getResult( 'rsscontent', $aParams, array(
-			'startid' => 0,
-			'max' => 120,
-			'dRg' => 7,
-			'fTs' => 'me'
-		) );
+		list( $aRes, $oXml ) = $this->_getResult( 'rsscontent', $aParams );
 		
 		$aOptions = array_merge( array(
 			'truncate_length' => 120

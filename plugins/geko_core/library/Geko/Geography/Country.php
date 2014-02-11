@@ -38,7 +38,7 @@ class Geko_Geography_Country
 				'PA' => 'Panama',
 				'PR' => 'Puerto Rico',
 				'KN' => 'Saint Kitts and Nevis',
-				'LC' => 'Saint LUCIA',
+				'LC' => 'Saint Lucia',
 				'VC' => 'Saint Vincent and the Grenadines',
 				'PM' => 'St. Pierre and Miquelon',
 				'TT' => 'Trinidad and Tobago',
@@ -161,11 +161,11 @@ class Geko_Geography_Country
 				'IL' => 'Israel',
 				'JP' => 'Japan',
 				'JO' => 'Jordan',
-				'KP' => 'Korea, Democratic People\'s Republic of',
+				'KP' => "Korea, Democratic People's Republic of",
 				'KR' => 'Korea, Republic of',
 				'KW' => 'Kuwait',
 				'KG' => 'Kyrgyzstan',
-				'LA' => 'Lao People\'s Democratic Republic',
+				'LA' => "Lao People's Democratic Republic",
 				'LB' => 'Lebanon',
 				'MO' => 'Macau',
 				'MY' => 'Malaysia',
@@ -208,7 +208,7 @@ class Geko_Geography_Country
 				'KM' => 'Comoros',
 				'CG' => 'Congo',
 				'CD' => 'Congo, the Democratic Republic of the',
-				'CI' => 'Cote d\'Ivoire',
+				'CI' => "Cote d'Ivoire",
 				'DJ' => 'Djibouti',
 				'EG' => 'Egypt',
 				'GQ' => 'Equatorial Guinea',
@@ -290,16 +290,67 @@ class Geko_Geography_Country
 	//
 	public static $aCountries = array();
 	public static $aCountryContinentHash = array();
-
+	
+	// hard coded exceptions
+	public static $aCountryCodeHash = array(
+		'Russia' => 'RU',
+		'Slovenia' => 'SI',
+		'Slovakia' => 'SK',
+		'USA' => 'US'
+	);
+	
+	
+	
+	// three letter country code
+	public static $a3LetterCode = array(
+		'AST' => 'AT',
+		'CAN' => 'CA',
+		'CHE' => 'CH',
+		'CZE' => 'CZ',
+		'FIN' => 'FI',
+		'LVA' => 'LV',
+		'NOR' => 'NO',
+		'RUS' => 'RU',
+		'SLO' => 'SI',
+		'SVK' => 'SK',
+		'SWE' => 'SE',
+		'USA' => 'US'
+	);
+	
+	
+	public static $aCountryNameVariations = array(
+		1 => array(
+			'VN' => 'Vietnam'
+		)
+	);
+	
+	
 	
 	//
 	private static function init() {
+		
 		if ( 0 == count( self::$aCountries ) ) {
+			
+			$aNorm = array();
+			
+			foreach ( self::$aCountryCodeHash as $sKey => $sValue ) {
+				$aNorm[ strtoupper( $sKey ) ] = $sValue;
+			}
+			
+			self::$aCountryCodeHash = $aNorm;
+			
 			foreach ( self::$aContinents as $sContinentCode => $aContinent ) {
+				
 				self::$aCountries = array_merge( self::$aCountries, $aContinent[ 'countries' ] );
+				
 				foreach ( $aContinent[ 'countries' ] as $sCountryCode => $sCountryName ) {
+					
+					$sCountryNameNorm = strtoupper( $sCountryName );
+					
 					self::$aCountryContinentHash[ $sCountryCode ] = $sContinentCode;
-					self::$aCountryContinentHash[ strtoupper( $sCountryName ) ] = $sContinentCode;
+					self::$aCountryContinentHash[ $sCountryNameNorm ] = $sContinentCode;
+					self::$aCountryCodeHash[ $sCountryNameNorm ] = $sCountryCode;
+					
 				}
 			}
 		}
@@ -313,17 +364,41 @@ class Geko_Geography_Country
 
 	//
 	public static function getCountries() {
+		
 		self::init();
+		
 		return self::$aCountries;
 	}
 	
 	//
-	public static function getCountryNameFromCountryCode( $sCountryCode ) {
+	public static function getCountryNameFromCountryCode( $sCountryCode, $iVariation = 0 ) {
+		
 		self::init();
-		$sCountryCodeNormalize = strtoupper( trim( $sCountryCode ) );		// normalize
-		$sRet = self::$aCountries[ $sCountryCodeNormalize ];
+		
+		if ( $iVariation ) {
+			$sRet = self::$aCountryNameVariations[ $iVariation ][ $sCountryCode ];
+		}
+		
+		if ( !$sRet ) {
+			$sCountryCodeNormalize = strtoupper( trim( $sCountryCode ) );		// normalize
+			$sRet = self::$aCountries[ $sCountryCodeNormalize ];
+		}
+		
 		return ( '' == $sRet ) ? $sCountryCode : $sRet;
 	}
+	
+	
+	//
+	public static function getCountryCodeFromCountryName( $sCountryName ) {
+		
+		self::init();
+		
+		$sCountryNameNormalize = strtoupper( trim( $sCountryName ) );		// normalize
+		$sRet = self::$aCountryCodeHash[ $sCountryNameNormalize ];
+		
+		return ( '' == $sRet ) ? $sCountryName : $sRet;
+	}
+	
 	
 	// alias
 	public static function getNameFromCode( $sCode ) {
@@ -332,17 +407,29 @@ class Geko_Geography_Country
 	
 	// $sCountry could be code or name
 	public static function getContinentCodeFromCountry( $sCountry ) {
+		
 		self::init();
+		
 		$sCountry = strtoupper( trim( $sCountry ) );						// normalize
+		
 		return self::$aCountryContinentHash[ $sCountry ];
 	}
 
 	// $sState could be code or name
 	public static function getContinentNameFromCountry( $sCountry ) {
+		
 		self::init();
+		
 		return self::$aContinents[ self::getContinentCodeFromCountry( $sCountry ) ][ 'name' ];
 	}
-		
+	
+	
+	//
+	public static function getCountryCodeFrom3Letter( $s3Letter ) {
+		return self::$a3LetterCode[ strtoupper( $s3Letter ) ];
+	}
+	
+	
 	
 }
 

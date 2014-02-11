@@ -65,7 +65,7 @@ class Geko_Router_Route_Service extends Geko_Router_Route
 		
 		try {
 		
-			//// routed layout
+			//// routed service
 			
 			if ( $sBestMatch = $this->_sBestMatch ) {
 				

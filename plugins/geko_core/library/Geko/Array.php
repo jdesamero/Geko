@@ -355,6 +355,26 @@ class Geko_Array
 	}
 	
 	
+	// http://ca2.php.net/shuffle
+	public static function shuffle( $aSubject ) {
+		
+		if ( !is_array( $aSubject ) ) {
+			return $aSubject;
+		}
+		
+		$aRandom = array();
+		$aKeys = array_keys( $aSubject );
+		
+		shuffle( $aKeys );
+		
+		foreach ( $aKeys as $sKey ) {
+			$aRandom[ $sKey ] = $aSubject[ $sKey ];
+		}
+		
+		return $aRandom;
+	}
+	
+	
 }
 
 

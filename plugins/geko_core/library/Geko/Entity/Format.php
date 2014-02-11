@@ -18,7 +18,7 @@ class Geko_Entity_Format
 			}
 		}
 		
-		throw new Exception( 'Invalid method ' . __CLASS__ . '::' . $sMethod . '() called.' );
+		throw new Exception( sprintf( 'Invalid method %s::%s() called.', __CLASS__, $sMethod ) );
 	}
 	
 }

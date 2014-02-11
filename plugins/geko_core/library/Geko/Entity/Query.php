@@ -394,7 +394,11 @@ abstract class Geko_Entity_Query
 	
 	// to be implemented by sub-classes that have to
 	// query the database directly
-	public function constructQuery( $aParams ) {
+	public function constructQuery( $aParams = NULL, $bReturnObject = FALSE ) {
+		
+		if ( NULL === $aParams ) {
+			$aParams = $this->_aParams;
+		}
 		
 		$oQuery = NULL;
 		
@@ -408,7 +412,7 @@ abstract class Geko_Entity_Query
 		// further manipulate by sub-class
 		$oQuery = $this->modifyQuery( $oQuery, $aParams );
 		
-		return strval( $oQuery );
+		return ( $bReturnObject ) ? $oQuery : strval( $oQuery ) ;
 	}
 	
 	
@@ -418,12 +422,10 @@ abstract class Geko_Entity_Query
 	}
 	
 	
-	//
+	// this part has to be completely database vendor agnostic!!!
 	public function modifyQuery( $oQuery, $aParams ) {
 		
 		// $oQuery is an instance of Geko_Sql_Select
-		
-		$oQuery->option( 'SQL_CALC_FOUND_ROWS' );
 		
 		
 		//// distinct option
@@ -435,35 +437,66 @@ abstract class Geko_Entity_Query
 		
 		//// sorting
 		
-		if ( is_array( $aOrder = $aParams[ 'orderby' ] ) ) {
+		if ( is_array( $aParams[ 'orderby' ] ) ) {
 			
-			foreach ( $aOrder as $sKey => $sOrder ) {
+			$aOrderBy = $aParams[ 'orderby' ];
+			
+			foreach ( $aOrderBy as $sKey => $sOrder ) {
 				$oQuery->order( $sKey, $sOrder, $sKey );			
 			}
 			
 		} else {
 			
+			$sOrderBy = $aParams[ 'orderby' ];
+			$sOrderDir = $aParams[ 'order' ];
+			
 			// sorting direction
-			if ( $aParams[ 'order' ] ) {
-				$aParams[ 'order' ] = strtoupper( $aParams[ 'order' ] );
-				if ( !in_array( $aParams[ 'order' ], array( 'ASC', 'DESC', 'NONE' ) ) ) {
-					$aParams[ 'order' ] = 'ASC';
-				} elseif ( 'NONE' == $aParams[ 'order' ] ) {
-					$aParams[ 'order' ] = '';
+			if ( $sOrderDir ) {
+				
+				$sOrderDir = strtoupper( $sOrderDir );
+				
+				if ( !in_array( $sOrderDir, array( 'ASC', 'DESC', 'NONE' ) ) ) {
+					$sOrderDir = 'ASC';
+				} elseif ( 'NONE' == $sOrderDir ) {
+					$sOrderDir = '';
 				}
+				
 			} else {
-				$aParams[ 'order' ] = 'ASC';		// default
+				$sOrderDir = 'ASC';		// default
 			}
 			
 			//
-			if ( 'random' == $aParams[ 'orderby' ] ) {
+			if ( 'random' == $sOrderBy ) {
+				
 				// random
-				$oQuery->order( 'RAND()', '', $aParams[ 'orderby' ] );
-			} elseif ( $aParams[ 'orderby' ] ) {
+				$oQuery = $this->modifyQueryOrderRandom( $oQuery, $aParams );
+				
+			} elseif ( $sOrderBy ) {
+				
 				// arbitrary
-				$oQuery->order( $aParams[ 'orderby' ], $aParams[ 'order' ], $aParams[ 'orderby' ] );
+				$oQuery->order( $sOrderBy, $sOrderDir, $sOrderBy );
 			}
 		}
+		
+		
+		//// limit/offset
+		
+		if ( $iLimit = $aParams[ 'limit' ] ) {
+			$oQuery->limit( $iLimit );
+		}
+		
+		if ( $iOffset = $aParams[ 'offset' ] ) {
+			$oQuery->offset( $iOffset );
+		}
+		
+		return $oQuery;
+	}
+	
+	// manipulate query object for random ordering
+	public function modifyQueryOrderRandom( $oQuery, $aParams ) {
+		
+		// random, MySQL only!!!
+		$oQuery->order( 'RAND()', '', 'random' );
 		
 		return $oQuery;
 	}

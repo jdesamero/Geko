@@ -12,8 +12,11 @@ abstract class Geko_App_Entity_Query extends Geko_Entity_Query
 		
 		$oDb = Geko_App::get( 'db' );
 		
-		return $oDb->fetchOne( 'SELECT FOUND_ROWS()' );
+		$sFoundRowsQuery = $oDb->gekoQueryFoundRows( $this );
+		
+		return $oDb->fetchOne( $sFoundRowsQuery );
 	}
+	
 	
 	
 	//
@@ -48,6 +51,34 @@ abstract class Geko_App_Entity_Query extends Geko_Entity_Query
 		$oDb = Geko_App::get( 'db' );
 		
 		return new Geko_Sql_Select( $oDb );
+	}
+	
+	
+	
+	//// query methods
+	
+	//
+	public function modifyQuery( $oQuery, $aParams ) {
+		
+		$oDb = Geko_App::get( 'db' );
+		
+		// apply super-class manipulations
+		$oQuery = parent::modifyQuery( $oQuery, $aParams );
+		
+		$oQuery = $oDb->gekoQueryInit( $oQuery, $aParams );
+		
+		return $oQuery;
+	}
+	
+	
+	// manipulate query object for random ordering
+	public function modifyQueryOrderRandom( $oQuery, $aParams ) {
+		
+		$oDb = Geko_App::get( 'db' );
+		
+		$oQuery = $oDb->gekoQueryOrderRandom( $oQuery, $aParams );
+		
+		return $oQuery;
 	}
 
 	

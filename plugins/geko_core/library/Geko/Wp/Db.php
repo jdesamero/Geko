@@ -1,6 +1,6 @@
 <?php
 
-// static class container for WP functions for Geek Oracle themes
+//
 class Geko_Wp_Db
 {
 	
@@ -20,15 +20,21 @@ class Geko_Wp_Db
 		$sName = sanitize_title_with_dashes( $sTitle );
 		$sName = preg_replace( '/-[0-9]+$/', '', $sName );	// strip trailing digits, if any
 		
-		$aMatches = $wpdb->get_col("
-			SELECT
-				$sSlugField
-			FROM
-				{$sTable}
-			WHERE
-				( $sSlugField RLIKE '" . $wpdb->escape( $sName ) . "-[0-9]+' ) OR
-				( $sSlugField = '" . $wpdb->escape( $sName ) . "' )
-		");
+		$aMatches = $wpdb->get_col( sprintf(
+			
+			"SELECT				%s
+			FROM				%s
+			WHERE				( %s RLIKE '%s-[0-9]+' ) OR
+								( %s = '%s' )",
+			
+			$sSlugField,
+			$sTable,
+			$sSlugField,
+			$wpdb->escape( $sName ),
+			$sSlugField,
+			$wpdb->escape( $sName )
+		
+		) );
 		
 		if ( 0 == count( $aMatches ) ) {
 			return $sName;										// not in db
@@ -41,7 +47,7 @@ class Geko_Wp_Db
 			if ( $sSlug == $sName ) {
 				$bHasIndexless = TRUE;
 			} else {
-				$iIndex = intval( str_replace( $sName . '-', '', $sSlug ) );
+				$iIndex = intval( str_replace( sprintf( '%s-', $sName ), '', $sSlug ) );
 				$aFilter[ $iIndex ] = $iIndex;			
 			}
 		}
@@ -50,10 +56,10 @@ class Geko_Wp_Db
 		
 		sort( $aFilter );
 		foreach ( $aFilter as $i => $iIndex ) {
-			if ( $iIndex != $i ) return $sName . '-' . $i;		// gap found
+			if ( $iIndex != $i ) return sprintf( '%s-%d', $sName, $i );		// gap found
 		}
 		
-		return $sName . '-' . count( $aFilter );				// increment max
+		return sprintf( '%s-%d', $sName, count( $aFilter ) );				// increment max
 	}
 	
 	
@@ -63,7 +69,7 @@ class Geko_Wp_Db
 		global $wpdb;
 		
 		if ( !$wpdb->$sTableName ) {
-			$wpdb->$sTableName = $wpdb->prefix . $sTableName;
+			$wpdb->$sTableName = sprintf( '%s%s', $wpdb->prefix, $sTableName );
 		}
 	}
 	
@@ -86,7 +92,7 @@ class Geko_Wp_Db
 		$sTableName = ( $wpdb->$sTableName ) ? $wpdb->$sTableName : $sTableName ;
 		
 		if ( $sTableName && $sSql && !self::tableExists( $sTableName ) ) {
-			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+			require_once( sprintf( '%swp-admin/includes/upgrade.php', ABSPATH ) );
 			return dbDelta( sprintf( $sSql, $sTableName ) );
 		}
 		
@@ -100,9 +106,9 @@ class Geko_Wp_Db
 	) {
 		global $wpdb;
 		
-		$sTablePrefixed = $wpdb->prefix . $sTable;
-		$sFuncName = $sTablePrefixed . '_path';
-		$sSql = Geko_Db_Mysql::getRoutineExistsQuery( $sFuncName );
+		$sTablePrefixed = sprintf( '%s%s', $wpdb->prefix, $sTable );
+		$sFuncName = sprintf( '%s_path', $sTablePrefixed );
+		$sSql = Geko_Db_Mysql::getRoutineExistsQuery( $sFuncName, DB_NAME );
 		
 		if ( !$wpdb->get_var( $sSql ) ) {
 			
@@ -126,9 +132,9 @@ class Geko_Wp_Db
 	) {
 		global $wpdb;
 		
-		$sTablePrefixed = $wpdb->prefix . $sTable;
-		$sFuncName = $sTablePrefixed . '_connect';
-		$sSql = Geko_Db_Mysql::getRoutineExistsQuery( $sFuncName );
+		$sTablePrefixed = sprintf( '%s%s', $wpdb->prefix, $sTable );
+		$sFuncName = sprintf( '%s_connect', $sTablePrefixed );
+		$sSql = Geko_Db_Mysql::getRoutineExistsQuery( $sFuncName, DB_NAME );
 		
 		if ( !$wpdb->get_var( $sSql ) ) {
 			
@@ -219,20 +225,20 @@ class Geko_Wp_Db
 						$sReplace = implode( ', ', $mValue );
 					} else {
 						$mValue = array_map( array( $wpdb, 'escape' ), $mValue );
-						$sReplace = "'" . implode( "', '", $mValue ) . "'";					
+						$sReplace = sprintf( "'%s'", implode( "', '", $mValue ) );					
 					}
 					
-					$sReplace = ' IN (' . $sReplace . ') ';
+					$sReplace = sprintf( ' IN (%s) ', $sReplace );
 					
 				} else {
 
 					if ( 'd' == $sType ) {
 						$mValue = intval( $mValue );
 					} else {
-						$mValue = "'" . $wpdb->escape( $mValue ) . "'";					
+						$mValue = sprintf( "'%s'", $wpdb->escape( $mValue ) );					
 					}
 					
-					$sReplace = ' = ' . $mValue . ' ';	
+					$sReplace = sprintf( ' = %s ', $mValue );
 				}
 				
 				$sExpression = substr_replace( $sExpression, $sReplace, strpos( $sExpression, $sPattern ), strlen( $sPattern ) );
@@ -257,12 +263,12 @@ class Geko_Wp_Db
 		foreach ( $aKeywords as $sKeyword ) {
 			$aExp = array();
 			foreach ( $aFields as $sField ) {
-				$aExp[] = " ( $sField LIKE '%" . $wpdb->escape( $sKeyword ) . "%' ) ";	
+				$aExp[] = sprintf( " ( %s LIKE '%%%s%%' ) ", $sField, $wpdb->escape( $sKeyword ) );	
 			}
-			$aMain[] = ' ( ' . implode( ' OR ', $aExp ) . ' ) ';
+			$aMain[] = sprintf( ' ( %s ) ', implode( ' OR ', $aExp ) );
 		}
 		
-		return ' ( ' . implode( ' AND ', $aMain ) . ' ) ';
+		return sprintf( ' ( %s ) ', implode( ' AND ', $aMain ) );
 	}
 	
 	
@@ -328,18 +334,24 @@ class Geko_Wp_Db
 	
 	//
 	public static function tableExists( $sTable ) {
+		
 		global $wpdb;
-		return ( $wpdb->get_var( "SHOW TABLES LIKE '$sTable'" ) == $sTable ) ? TRUE : FALSE ;
+		
+		$sQuery = sprintf( "SHOW TABLES LIKE '%s'", $sTable );
+		return ( $wpdb->get_var( $sQuery ) == $sTable ) ? TRUE : FALSE ;
 	}
 	
 	//
 	public static function getTableNumRows( $sTable ) {
 		
 		global $wpdb;
+		
 		$sTableName = $wpdb->$sTable;
 		
+		$sQuery = sprintf( 'SELECT COUNT(*) AS num_rows FROM %s', $sTableName );
+		
 		if ( self::tableExists( $sTableName ) ) {
-			return intval( $wpdb->get_var( 'SELECT COUNT(*) AS num_rows FROM ' . $sTableName ) );
+			return intval( $wpdb->get_var( $sQuery ) );
 		}
 		
 		return FALSE;

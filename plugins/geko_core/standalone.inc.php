@@ -4,18 +4,18 @@
 
 // path constants
 
-define( 'GEKO_CORE_EXTERNAL_LIB_ROOT', realpath( GEKO_CORE_ROOT . '/external/libs' ) );
-define( 'GEKO_LOG', realpath( GEKO_STANDALONE_PATH . '/logs/logs.txt' ) );
-define( 'GEKO_REGISTER_EXTRA_XML', realpath( GEKO_CORE_ROOT . '/conf/register_extra.xml' ) );
-define( 'GEKO_REGISTER_XML', realpath( GEKO_CORE_ROOT . '/conf/register.xml' ) );
-define( 'GEKO_VIEW_HELPER_PATH', realpath( GEKO_CORE_ROOT . '/library' ) );
+define( 'GEKO_CORE_EXTERNAL_LIB_ROOT', realpath( sprintf( '%s/external/libs', GEKO_CORE_ROOT ) ) );
+define( 'GEKO_LOG', realpath( sprintf( '%s/logs/logs.txt', GEKO_STANDALONE_PATH ) ) );
+define( 'GEKO_REGISTER_EXTRA_XML', realpath(  sprintf( '%s/conf/register_extra.xml', GEKO_CORE_ROOT ) ) );
+define( 'GEKO_REGISTER_XML', realpath( sprintf( '%s/conf/register.xml', GEKO_CORE_ROOT ) ) );
+define( 'GEKO_VIEW_HELPER_PATH', realpath( sprintf( '%s/library', GEKO_CORE_ROOT ) ) );
 
 
 
 // include path
 set_include_path( implode( PATH_SEPARATOR, array_filter( array(
-	realpath( GEKO_CORE_EXTERNAL_LIB_ROOT . '/ZendFramework-1.10.6-geko/library' ),
-	realpath( GEKO_CORE_ROOT . '/library' ),
+	realpath( sprintf( '%s/ZendFramework-1.10.6-geko/library', GEKO_CORE_EXTERNAL_LIB_ROOT ) ),
+	realpath( sprintf( '%s/library', GEKO_CORE_ROOT ) ),
 	get_include_path()
 ) ) ) );
 
@@ -65,6 +65,12 @@ $oLoader
 	->registerFromXmlConfigFile( GEKO_REGISTER_XML )
 ;
 
+
+if ( method_exists( 'Geko_Constant_Values', 'getUrls' ) ) {
+	$oLoader->setMergeParams( Geko_Constant_Values::getUrls() );
+}
+
+
 if ( defined( 'GEKO_TEMPLATE_URL' ) ) {
 	$oLoader->setMergeParams( array(
 		'geko_template_url' => GEKO_TEMPLATE_URL
@@ -77,7 +83,7 @@ if ( defined( 'GEKO_TEMPLATE_PATH' ) ) {
 		'geko_template_path' => GEKO_TEMPLATE_PATH
 	) );
 	
-	$sRegFile = GEKO_TEMPLATE_PATH . '/etc/register.xml';
+	$sRegFile = sprintf( '%s/etc/register.xml', GEKO_TEMPLATE_PATH );
 	if ( is_file( $sRegFile ) ) {
 		$oLoader->registerFromXmlConfigFile( $sRegFile );
 	}
@@ -86,15 +92,15 @@ if ( defined( 'GEKO_TEMPLATE_PATH' ) ) {
 
 // register global urls to services
 Geko_Uri::setUrl( array(
-	'geko_export' => GEKO_CORE_URI . '/srv/export.php',
-	'geko_pdf' => GEKO_CORE_URI . '/srv/pdf.php',
-	'geko_process' => GEKO_CORE_URI . '/srv/process.php',
-	'geko_thumb' => GEKO_CORE_URI . '/srv/thumb.php',
-	'geko_upload' => GEKO_CORE_URI . '/srv/upload.php',
-	'geko_styles' => GEKO_CORE_URI . '/styles',
-	'geko_ext_styles' => GEKO_CORE_URI . '/external/styles',
-	'geko_ext_swf' => GEKO_CORE_URI . '/external/swf',
-	'geko_app_srv' => GEKO_STANDALONE_URL . '/srv'
+	'geko_export' => sprintf( '%s/srv/export.php', GEKO_CORE_URI ),
+	'geko_pdf' => sprintf( '%s/srv/pdf.php', GEKO_CORE_URI ),
+	'geko_process' => sprintf( '%s/srv/process.php', GEKO_CORE_URI ),
+	'geko_thumb' => sprintf( '%s/srv/thumb.php', GEKO_CORE_URI ),
+	'geko_upload' => sprintf( '%s/srv/upload.php', GEKO_CORE_URI ),
+	'geko_styles' => sprintf( '%s/styles', GEKO_CORE_URI ),
+	'geko_ext_styles' => sprintf( '%s/external/styles', GEKO_CORE_URI ),
+	'geko_ext_swf' => sprintf( '%s/external/swf', GEKO_CORE_URI ),
+	'geko_app_srv' => sprintf( '%s/srv', GEKO_CORE_URI )
 ) );
 
 

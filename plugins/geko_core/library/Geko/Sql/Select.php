@@ -311,6 +311,7 @@ class Geko_Sql_Select
 	
 	
 	
+	
 	//// unset
 	
 	// standard methods
@@ -414,7 +415,7 @@ class Geko_Sql_Select
 				
 			case self::UNION :
 				
-				if (NULL === $mIndex) {
+				if ( NULL === $mIndex) {
 					unset( $this->_aUnion );
 					$this->_aUnion = array();
 				} else {
@@ -554,6 +555,195 @@ class Geko_Sql_Select
 			->unsetOffset()
 		;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	//// has
+	
+	// standard methods
+	
+	//
+	public function hasClause( $iClause = NULL, $mIndex = NULL, $mSubIndex = NULL ) {
+		
+		switch ( $iClause ) {
+			
+			case self::OPTION :
+				
+				if ( NULL === $mIndex ) {
+					return ( count( $this->_aOptions ) > 0 ) ? TRUE : FALSE ;
+				} else {
+					return ( $this->_aOptions[ $mIndex ] ) ? TRUE : FALSE ;
+				}
+				
+			case self::FIELD :
+				
+				if ( NULL === $mIndex ) {
+					return ( count( $this->_aFields ) > 0 ) ? TRUE : FALSE ;
+				} else {
+					return ( $this->_aFields[ $mIndex ] ) ? TRUE : FALSE ;
+				}
+				
+			case self::FROM :
+				
+				if ( NULL === $mIndex ) {
+					return ( count( $this->_aFrom ) > 0 ) ? TRUE : FALSE ;
+				} else {
+					return ( $this->_aFields[ $mIndex ] ) ? TRUE : FALSE ;
+				}
+				
+			case self::JOIN :
+				
+				if ( NULL === $mIndex ) {
+					return ( count( $this->_aJoins ) > 0 ) ? TRUE : FALSE ;
+				} else {
+					return ( $this->_aJoins[ $mIndex ] ) ? TRUE : FALSE ;
+				}
+				
+			case self::ON :
+				
+				if ( NULL === $mIndex ) {
+					return ( count( $this->_aOn ) > 0 ) ? TRUE : FALSE ;
+				} else {
+					if ( NULL === $mSubIndex ) {
+						return ( $this->_aOn[ $mIndex ] ) ? TRUE : FALSE ;
+					} else {
+						return ( $this->_aOn[ $mIndex ][ $mSubIndex ] ) ? TRUE : FALSE ;
+					}
+				}
+				
+			case self::WHERE :
+				
+				if ( NULL === $mIndex ) {
+					return ( count( $this->_aWhere ) > 0 ) ? TRUE : FALSE ;
+				} else {
+					return ( $this->_aWhere[ $mIndex ] ) ? TRUE : FALSE ;
+				}
+				
+			case self::GROUP :
+				
+				if ( NULL === $mIndex ) {
+					return ( count( $this->_aGroup ) > 0 ) ? TRUE : FALSE ;
+				} else {
+					return ( $this->_aGroup[ $mIndex ] ) ? TRUE : FALSE ;
+				}
+				
+			case self::HAVING :
+				
+				if ( NULL === $mIndex ) {
+					return ( count( $this->_aHaving ) > 0 ) ? TRUE : FALSE ;
+				} else {
+					return ( $this->_aHaving[ $mIndex ] ) ? TRUE : FALSE ;
+				}
+				
+			case self::UNION :
+				
+				if ( NULL === $mIndex) {
+					return ( count( $this->_aUnion ) > 0 ) ? TRUE : FALSE ;
+				} else {
+					return ( $this->_aUnion[ $mIndex ] ) ? TRUE : FALSE ;
+				}
+				
+			case self::ORDER :
+				
+				if ( NULL === $mIndex ) {
+					return ( count( $this->_aOrder ) > 0 ) ? TRUE : FALSE ;
+				} else {
+					return ( $this->_aOrder[ $mIndex ] ) ? TRUE : FALSE ;
+				}
+				
+			case self::LIMIT :
+				
+				return ( FALSE !== $this->_iLimit ) ? TRUE : FALSE ;
+				
+			case self::OFFSET :
+
+				return ( FALSE !== $this->_iOffset ) ? TRUE : FALSE ;
+				
+		}
+		
+		return NULL;
+	}
+	
+	//
+	public function hasOption( $mIndex = NULL ) {
+		return $this->hasClause( self::OPTION, $mIndex );
+	}
+	
+	//
+	public function hasField( $mIndex = NULL ) {
+		return $this->hasClause( self::FIELD, $mIndex );
+	}
+
+	//
+	public function hasFrom( $mIndex = NULL ) {
+		return $this->hasClause( self::FROM, $mIndex );
+	}
+	
+	//
+	public function hasJoin( $mIndex = NULL ) {
+		return $this->hasClause( self::JOIN, $mIndex );
+	}
+	
+	//
+	public function hasOn( $mIndex = NULL, $mSubIndex = NULL ) {
+		return $this->hasClause( self::ON, $mIndex, $mSubIndex );
+	}
+	
+	//
+	public function hasWhere( $mIndex = NULL ) {
+		return $this->hasClause( self::WHERE, $mIndex );
+	}
+	
+	//
+	public function hasGroup( $mIndex = NULL ) {
+		return $this->hasClause( self::GROUP, $mIndex );
+	}
+	
+	//
+	public function hasHaving( $mIndex = NULL ) {
+		return $this->hasClause( self::HAVING, $mIndex );
+	}
+	
+	//
+	public function hasUnion( $mIndex = NULL ) {
+		return $this->hasClause( self::UNION, $mIndex );
+	}
+	
+	//
+	public function hasOrder( $mIndex = NULL ) {
+		return $this->hasClause( self::ORDER, $mIndex );
+	}
+	
+	//
+	public function hasLimit() {
+		return $this->hasClause( self::LIMIT );
+	}
+	
+	//
+	public function hasOffset() {
+		return $this->hasClause( self::OFFSET );
+	}
+	
+	//
+	public function hasLimitOffset() {
+		return ( $this->hasLimit() && $this->hasOffset() ) ? TRUE : FALSE ;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	// kvp methods
@@ -829,8 +1019,7 @@ class Geko_Sql_Select
 		
 		// from clause
 		if ( count( $this->_aFrom ) > 0 ) {
-			$sOutput .= 'FROM ';
-			$sOutput .= $this->createFieldList( $this->_aFrom );
+			$sOutput .= sprintf( 'FROM %s ', $this->createFieldList( $this->_aFrom ) );
 		}
 		
 		// join clauses
@@ -848,31 +1037,27 @@ class Geko_Sql_Select
 		
 		// where clauses
 		if ( count( $this->_aWhere ) > 0 ) {
-			$sOutput .= 'WHERE ' . $this->createExpressionList( $this->_aWhere );
+			$sOutput .= sprintf( 'WHERE %s ', $this->createExpressionList( $this->_aWhere ) );
 		}
 		
 		// group by clauses
 		if ( count( $this->_aGroup ) > 0 ) {
-			$sOutput .= 'GROUP BY ' . implode( ', ', $this->_aGroup ) . ' ';
+			$sOutput .= sprintf( 'GROUP BY %s ', implode( ', ', $this->_aGroup ) );
 		}
 		
 		// having clauses
 		if ( count( $this->_aHaving ) > 0 ) {
-			$sOutput .= 'HAVING ' . $this->createExpressionList( $this->_aHaving );
+			$sOutput .= sprintf( 'HAVING %s ', $this->createExpressionList( $this->_aHaving ) );
 		}
 		
 		// union clauses
 		foreach ( $this->_aUnion as $mSelect ) {
-			
-			$sOutput .= 'UNION ';
-			$sOutput .= strval( $mSelect );
-			
-			$sOutput .= ' ';
+			$sOutput .= sprintf( 'UNION %s ', strval( $mSelect ) );
 		}
 		
 		// order by clauses
 		if ( count( $this->_aOrder ) > 0 ) {
-			$sOutput .= 'ORDER BY ' . implode( ', ', $this->_aOrder ) . ' ';
+			$sOutput .= sprintf( 'ORDER BY %s ', implode( ', ', $this->_aOrder ) );
 		}
 		
 		// limit

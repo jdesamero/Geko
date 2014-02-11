@@ -5,21 +5,30 @@ class Geko_Db_Mysql
 {
 	
 	//
-	public static function getRoutineExistsQuery( $sRoutineName ) {
-		return "
-			SELECT			*
+	public static function getRoutineExistsQuery( $sRoutineName, $sDbName ) {
+		
+		//
+		return sprintf(
+			
+			"SELECT			*
 			FROM 			information_schema.routines
-			WHERE			( SPECIFIC_NAME = '" . $sRoutineName . "' ) AND 
-							( ROUTINE_SCHEMA = '" . DB_NAME . "' )
-		";
+			WHERE			( SPECIFIC_NAME = '%s' ) AND 
+							( ROUTINE_SCHEMA = '%s' )",
+			
+			$sRoutineName,
+			$sDbName
+		);
 	}
 	
 	//
 	public static function getHierarchyPathQuery(
 		$sFuncName, $sTableName, $sIdFieldName, $sParentFieldName, $sWhereCondition = ''
 	) {
-		return '
-			CREATE FUNCTION ' . $sFuncName . '(delimiter TEXT, node INT) RETURNS TEXT
+		
+		//
+		return sprintf(
+			
+			'CREATE FUNCTION %s(delimiter TEXT, node INT) RETURNS TEXT
 			NOT DETERMINISTIC
 			READS SQL DATA
 			BEGIN
@@ -32,26 +41,36 @@ class Geko_Db_Mysql
 					SET _path = _id;
 					
 					LOOP
-							SELECT  ' . $sParentFieldName . '
+							SELECT  %s
 							INTO    _id
-							FROM    ' . $sTableName . '
-							WHERE   ' . $sIdFieldName . ' = _id
-									' . $sWhereCondition . '
-									AND COALESCE(' . $sIdFieldName . ' <> @start_with, TRUE);
+							FROM    %s
+							WHERE   %s = _id
+									%s
+									AND COALESCE(%s <> @start_with, TRUE);
 							
 							SET _path = CONCAT(_id, delimiter, _path);
 					
 					END LOOP;
-			END
-		';
+			END',
+			
+			$sFuncName,
+			$sParentFieldName,
+			$sTableName,
+			$sIdFieldName,
+			$sWhereCondition,
+			$sIdFieldName
+			
+		);
 	}
+	
 	
 	//
 	public static function getHierarchyConnectQuery(
 		$sFuncName, $sTableName, $sIdFieldName, $sParentFieldName, $sWhereCondition = ''
 	) {
-		return '
-			CREATE FUNCTION ' . $sFuncName . '(value INT, maxlevel INT) RETURNS INT
+		return sprintf(
+		
+			'CREATE FUNCTION %s(value INT, maxlevel INT) RETURNS INT
 			NOT DETERMINISTIC
 			READS SQL DATA
 			BEGIN
@@ -70,14 +89,14 @@ class Geko_Db_Mysql
 					END IF;
 			
 					LOOP
-							SELECT  MIN(' . $sIdFieldName . ')
+							SELECT  MIN(%s)
 							INTO    @id
-							FROM    ' . $sTableName . '
-							WHERE   ' . $sParentFieldName . ' = _parent
-									' . $sWhereCondition . '
-									AND ' . $sIdFieldName . ' > _id
+							FROM    %s
+							WHERE   %s = _parent
+									%s
+									AND %s > _id
 									-- Checking for @start_with in descendants
-									AND ' . $sIdFieldName . ' <> @start_with
+									AND %s <> @start_with
 									AND COALESCE(@level < maxlevel, TRUE);
 							
 							IF @id IS NOT NULL OR _parent = @start_with THEN
@@ -87,25 +106,33 @@ class Geko_Db_Mysql
 							
 							SET @level := @level - 1;
 							
-							SELECT  ' . $sIdFieldName . ', ' . $sParentFieldName . '
+							SELECT  %s, %s
 							INTO    _id, _parent
-							FROM    ' . $sTableName . '
-							WHERE   ' . $sIdFieldName . ' = _parent
-									' . $sWhereCondition . ';
+							FROM    %s
+							WHERE   %s = _parent
+									%s;
 							
 							SET _i = _i + 1;
 					END LOOP;
 					
 					RETURN NULL;
-			END
-		';
+			END',
+			
+			$sFuncName,
+			$sIdFieldName,
+			$sTableName,
+			$sParentFieldName,
+			$sWhereCondition,
+			$sIdFieldName,
+			$sIdFieldName,
+			$sIdFieldName,
+			$sParentFieldName,
+			$sTableName,
+			$sIdFieldName,
+			$sWhereCondition
+			
+		);
 		
-	}
-	
-	//
-	public static function getTimestamp( $iTimestamp = NULL ) {
-		if ( NULL == $iTimestamp ) $iTimestamp = time();
-		return @date( 'Y-m-d H:i:s', $iTimestamp );
 	}
 	
 	
@@ -120,7 +147,7 @@ class Geko_Db_Mysql
 		$rLink = mysql_connect( $sDbHost, $sDbUser, $sDbPwd );
 		
 		if ( !$rLink ) {
-			echo 'Could not connect: ' . mysql_error() . "\n";
+			echo sprintf( "Could not connect: %s\n", mysql_error() );
 			return FALSE;
 		}
 		
@@ -132,7 +159,7 @@ class Geko_Db_Mysql
 	// insert one record
 	public static function insert( $sTable, $aValues ) {
 		
-		$sQuery = 'INSERT INTO ' . $sTable . ' ( ';
+		$sQuery = sprintf( 'INSERT INTO %s ( ', $sTable );
 		
 		$aFields = array_keys( $aValues );
 		
@@ -142,8 +169,8 @@ class Geko_Db_Mysql
 		$bFirst = TRUE;
 		foreach ( $aValues as $sValue ) {
 			if ( $bFirst ) $bFirst = FALSE;
-			else $sQuery .= ', ';	
-			$sQuery .= "'" . addslashes( $sValue ) . "'";
+			else $sQuery .= ', ';
+			$sQuery .= sprintf( "'%s'", addslashes( $sValue ) );
 		}
 		
 		$sQuery .= ' )';
@@ -169,13 +196,13 @@ class Geko_Db_Mysql
 	// update one record
 	public static function update( $sTable, $aValues, $aKeys ) {
 	
-		$sQuery = 'UPDATE ' . $sTable . ' SET ';
+		$sQuery = sprintf( 'UPDATE %s SET ', $sTable );
 		
 		$bFirst = TRUE;
 		foreach ( $aValues as $sField => $sValue ) {
 			if ( $bFirst ) $bFirst = FALSE;
 			else $sQuery .= ', ';	
-			$sQuery .= ' ' . $sField . " = '" . addslashes( $sValue ) . "'";
+			$sQuery .= sprintf( " %s = '%s'", $sField, addslashes( $sValue ) );
 		}
 		
 		$sQuery .= ' WHERE ';
@@ -184,7 +211,7 @@ class Geko_Db_Mysql
 		foreach ( $aKeys as $sField => $sValue ) {
 			if ( $bFirst ) $bFirst = FALSE;
 			else $sQuery .= ' AND ';	
-			$sQuery .= ' ( ' . $sField . " = '" . addslashes( $sValue ) . "' ) ";
+			$sQuery .= sprintf( " ( %s = '%s' ) ", $sField, addslashes( $sValue ) );
 		}
 		
 		return mysql_query( $sQuery );
@@ -211,13 +238,13 @@ class Geko_Db_Mysql
 	// delete one record
 	public static function delete( $sTable, $aKeys ) {
 		
-		$sQuery = 'DELETE FROM ' . $sTable . ' WHERE ';
+		$sQuery = sprintf( 'DELETE FROM %s WHERE ', $sTable );
 		
 		$bFirst = TRUE;
 		foreach ( $aKeys as $sFldName => $mValue ) {
 			if ( $bFirst ) $bFirst = FALSE;
 			else $sQuery .= ' AND ';
-			$sQuery .= ' ( ' . $sFldName . " = '" . addslashes( $mValue ) . "' ) ";
+			$sQuery .= sprintf( " ( %s = '%s' ) ", $sFldName, addslashes( $mValue ) );
 		}
 		
 		return mysql_query( $sQuery );
@@ -253,7 +280,7 @@ class Geko_Db_Mysql
 	
 	// check if table exists
 	public static function tableExists( $sTableName ) {
-		$rRes = mysql_query( "SHOW TABLES LIKE '" . $sTableName . "'" );
+		$rRes = mysql_query( sprintf( "SHOW TABLES LIKE '%s'", $sTableName ) );
 		return mysql_num_rows( $rRes ) ? TRUE : FALSE;	
 	}
 	
@@ -279,16 +306,23 @@ class Geko_Db_Mysql
 	
 	// get the number of fields in a table
 	public static function tableNumFields( $sDbName, $sTableName ) {
-		$sQuery = "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = '" . $sDbName . "' AND table_name = '" . $sTableName . "'";
+		
+		$sQuery = sprintf(
+			"SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = '%s' AND table_name = '%s'",
+			$sDbName,
+			$sTableName
+		);
+		
 		$rRes = mysql_query( $sQuery );
 		return self::fetchValue( $rRes );
 	}
 	
 	// get the field names in a table
 	public static function tableGetFieldNames( $sDbName, $sTableName ) {
+		
 		$aFields = array();
 		
-		$sQuery = "SHOW FIELDS FROM " . $sDbName . "." . $sTableName;
+		$sQuery = sprintf( 'SHOW FIELDS FROM %s.%s', $sDbName, $sTableName );
 		$rRes = mysql_query( $sQuery );
 		
 		while( $aRow = mysql_fetch_array( $rRes ) ) {
@@ -300,14 +334,14 @@ class Geko_Db_Mysql
 	
 	// get the number of rows of a table
 	public static function tableNumRows( $sTableName ) {
-		$rRes = mysql_query( "SELECT COUNT(*) FROM " . $sTableName );
+		$rRes = mysql_query( sprintf( 'SELECT COUNT(*) FROM %s', $sTableName ) );
 		$aRes = mysql_fetch_row( $rRes );
 		return $aRes[ 0 ];
 	}
 	
 	// check if database exists
 	public static function dbExists( $sDbName ) {
-		$rRes = mysql_query( "SHOW DATABASES LIKE '" . $sDbName . "'" );
+		$rRes = mysql_query( sprintf( "SHOW DATABASES LIKE '%s'", $sDbName ) );
 		return mysql_num_rows( $rRes ) ? TRUE : FALSE;	
 	}
 	
@@ -350,6 +384,41 @@ class Geko_Db_Mysql
 		return NULL;
 	}
 
+	
+	
+	//// helpers for Geko_Entity_Query class
+	
+	// deal with vendor specific functionality
+	
+	
+	//
+	public static function getTimestamp( $iTimestamp = NULL ) {
+		if ( NULL == $iTimestamp ) $iTimestamp = time();
+		return @date( 'Y-m-d H:i:s', $iTimestamp );
+	}
+	
+	//
+	public static function gekoQueryInit( $oQuery, $aParams ) {
+		
+		$oQuery->option( 'SQL_CALC_FOUND_ROWS' );
+		
+		return $oQuery;
+	}
+	
+	//
+	public static function gekoQueryOrderRandom( $oQuery, $aParams ) {
+		
+		$oQuery->order( 'RAND()', '', 'random' );
+		
+		return $oQuery;
+	}
+	
+	//
+	public static function gekoQueryFoundRows( $oEntityQuery ) {
+		return 'SELECT FOUND_ROWS()';	
+	}
+	
+	
 	
 	
 }
