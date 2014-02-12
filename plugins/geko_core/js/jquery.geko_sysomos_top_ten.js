@@ -346,6 +346,7 @@
 										// re-append to source ul
 										
 										eLi.removeAttr( 'style' );
+										eLi.css( { position: 'relative' } );
 										eLi.removeData( 'h' );
 										eLi.find( 'div.mentions' ).html( 0 );
 										
