@@ -6,16 +6,23 @@
 		var opts = $.extend( {
 			
 			'update_delay': 20000,								// update mentions every 20 seconds
-			'sort_refresh': 5000,
+			'sort_refresh': 1000,
 			'sort_anim': 1500,
 			'fade_delay': 500,
 			'rebuild_delay': ( 1000 * 60 * 2 ),
 			'rebuild_stagger': 20,
 			
+			'drama_group': 1,
+			'drama_delay': 500,
+			
+			'line_height': null,
+			
 			'format_name': null,
 			'format_tag': null,
 			
-			'title_sel': null
+			'title_sel': null,
+			
+			'rank_after_sort': false
 			
 		}, options );
 		
@@ -55,6 +62,12 @@
 			var rebuildDelay = opts.rebuild_delay;
 			var rebuildStagger = opts.rebuild_stagger;
 			
+			var iDramaGroup = opts.drama_group;
+			var iDramaDelay = opts.drama_delay;
+			
+			var iLineHeight = opts.line_height;
+			
+			
 			
 			var iHbId = mainCont.attr( 'data-hbid' );
 			
@@ -70,8 +83,6 @@
 				} else {
 					calcRebuildDelay = rebuildDelay;
 				}
-				
-				// console.log( calcRebuildDelay );
 				
 				return calcRebuildDelay;
 			};
@@ -95,10 +106,7 @@
 						oMnLookup.tags[ v.id ] = v.mentions;
 					} );
 					
-					oMnLookup.locked = false;
-					
-				} else {
-					console.log( 'Already Locked!' );
+					oMnLookup.locked = false;	
 				}
 				
 			};
@@ -206,7 +214,11 @@
 							//
 							loadingDiv.fadeOut( fadeDelay, function() {
 								
+								sourceUl.data( 'lock_update', true );
+								
 								$.each( aTagsFmt, function( i, oTag ) {
+									
+									var eAppendLi = null;
 									
 									var eLi = holderUl.find( 'li[data-tag="%s"]'.printf( oTag.id ) )
 									
@@ -225,11 +237,12 @@
 											
 											var tag = li.attr( 'data-tag' );
 											
+											//
 											var getMentions = function() {
-												
-												///
+																								
+												//
 												var fSetMention = function( newMentions ) {
-
+													
 													if ( updateTimer ) {
 														clearTimeout( updateTimer );
 														updateTimer = null;
@@ -238,12 +251,8 @@
 													var curMentions = parseInt( li.find( 'div.mentions' ).text() );
 													var loadMin = 100, loadMax = 1000;
 													
-													if ( 0 == curMentions ) {
-														if ( newMentions > 100 ) {
-															curMentions = newMentions - 100;
-														} else {
-															curMentions = newMentions;
-														}
+													if ( ( 0 == curMentions ) && ( newMentions > 100 ) ) {
+														curMentions = newMentions - 100;
 													}
 													
 													if ( ( newMentions - curMentions ) >= 100 ) {
@@ -258,6 +267,9 @@
 														
 														if ( curMentions == newMentions ) {
 															
+															// mentions equalized, so unlock
+															li.data( 'lock_mention', false )
+															
 															if ( updateTimer ) {
 																clearTimeout( updateTimer );
 																updateTimer = null;
@@ -269,6 +281,8 @@
 															if ( sourceUl.find( 'li' ).length == sourceUl.find( 'li.updated' ).length ) {
 																
 																sourceUl.find( 'li.updated' ).removeClass( 'updated' );
+																
+																sourceUl.data( 'lock_update', false );
 																
 																setTimeout( function() {
 																	sourceUl.find( 'li' ).trigger( 'update' );
@@ -292,53 +306,68 @@
 												
 												// -------------------------------------------------
 												
-												if ( bHasMentionData ) {
+												var bLockDrama = li.data( 'lock_drama' );
+												
+												var fDoDrama = function() {
 													
-													fSetMention( oMnLookup.tags[ tag ] );
-													
-												} else {
-													
-													// poll individually
-													
-													oService.get( {
+													if ( bHasMentionData ) {
 														
-														'type': 'measure',
+														fSetMention( oMnLookup.tags[ tag ] );
 														
-														'success': function( data2 ) {
-		
-															if ( 1 == parseInt( data2.status ) ) {
+													} else {
+														
+														// poll individually
+														
+														oService.get( {
+															
+															'type': 'measure',
+															
+															'success': function( data2 ) {
+			
+																if ( 1 == parseInt( data2.status ) ) {
+																	
+																	fSetMention( data2.mentions );
+																	
+																} else {
+																	setTimeout( getMentions, updateDelay );
+																}
 																
-																fSetMention( data2.mentions );
-																
-															} else {
+															},
+															
+															'fail': function() {
 																setTimeout( getMentions, updateDelay );
+															},
+																
+															'get_params': {
+																'hbid': iHbId,
+																'tag': tag
 															}
-															
-														},
+														} );
 														
-														'fail': function() {
-															setTimeout( getMentions, updateDelay );
-														},
-															
-														'get_params': {
-															'hbid': iHbId,
-															'tag': tag
-														}
-													} );
-													
+													}
+												};
+												
+												if ( bLockDrama ) {
+													var iDramaGroup = li.data( 'drama_group' );
+													setTimeout( fDoDrama, iDramaGroup * iDramaDelay );
+													li.data( 'lock_drama', false );
+												} else {
+													fDoDrama();
 												}
 												
 												// -------------------------------------------------
 												
 											}
 											
-											getMentions();
-											
+											// only initiate if mention lock is not set
+											if ( !li.data( 'lock_mention' ) ) {
+												li.data( 'lock_mention', true );
+												getMentions();
+											}
+
 										} );
 										
-										sourceUl.append( eNewLi );
-										
-										// console.log( 'New :' + oTag.id );
+										eAppendLi = eNewLi;
 										
 									} else {
 										
@@ -350,10 +379,15 @@
 										eLi.removeData( 'h' );
 										eLi.find( 'div.mentions' ).html( 0 );
 										
-										sourceUl.append( eLi );
+										eAppendLi = eLi;
 										
-										// console.log( 'Existing :' + oTag.id );
 									}
+									
+									//
+									eAppendLi.data( 'lock_drama', true );
+									eAppendLi.data( 'drama_group', parseInt( i / iDramaGroup ) );
+									
+									sourceUl.append( eAppendLi );
 									
 								} );
 								
@@ -363,6 +397,9 @@
 								sourceUl.fadeIn( fadeDelay );
 								
 								sourceUl.find( 'li' ).trigger( 'update' );
+								
+								sourceUl.data( 'lock_rebuild', false );
+								
 								
 							} );
 							
@@ -384,65 +421,134 @@
 				} );
 				
 				
-			}
+			};
+			
 			
 			// re-sort every [sortRefresh] seconds
 			var reSortList = function() {
-
-				sourceUl.css( {
-					position: 'relative',
-					height: sourceUl.height(),
-					display: 'block'
-				} );
 				
 				var srcLi = sourceUl.find( 'li' );
+				var iNumLis = srcLi.length;
 				
+				if ( ( 0 !== iNumLis ) && ( !sourceUl.data( 'lock_rebuild' ) ) ) {
+					
+					sourceUl.data( 'lock_sort', true );
+					
+					sourceUl.css( {
+						position: 'relative',
+						height: sourceUl.height(),
+						display: 'block'
+					} );
+					
+					
+					var iLnH = null;
+					
+					if ( iLineHeight ) {
+						iLnH = iLineHeight;			// force static line height
+					}
+					
+					
+					//
+					srcLi.each( function( i ) {
+						
+						var iY = null;
+						var li = $( this );
+						
+						if ( !iLnH ) {
+							
+							iY = li.position().top;
+							if ( i === 1 ) {
+								iLnH = iY;
+							}
+							
+						} else {
+	
+							iY = i * iLnH;
+						}
+						
+						li.data( 'h', iY );
+						
+					} );
+					
+					
+					//
+					srcLi.tsort( 'div.mentions', {
+						order: 'desc'
+					} ).each( function( i ) {
+						
+						var li = $( this );
+						var iFr = li.data( 'h' );
+						var iTo = i * iLnH;
+						
+						li.css( {
+							position: 'absolute',
+							top: iFr
+						} ).animate( { top: iTo }, sortAnim, 'swing', function() {
+							
+							if ( i == ( iNumLis - 1 ) ) {
+								
+								if ( opts.rank_after_sort ) {
+									setRank();
+								}
+								
+								sourceUl.data( 'lock_sort', false );
+								
+								setTimeout( reSortList, sortRefresh );
+							}
+													
+						} );
+						
+					} );
+					
+					if ( !opts.rank_after_sort ) {
+						setRank();
+					}								
+					
+				} else {
+					
+					// try again in half a second
+					setTimeout( reSortList, 500 );
+				}
 				
-				var iLnH;
-				
-				srcLi.each( function( i ) {
-					var li = $( this );
-					var iY = li.position().top;
-					li.data( 'h', iY );
-					if ( i === 1 ) iLnH = iY;
-				} );
-				
-				srcLi.tsort( 'div.mentions', {
-					order: 'desc'
-				} ).each( function( i ) {
-					var li = $( this );
-					var iFr = li.data( 'h' );
-					var iTo = i * iLnH;
-					li.css( { position: 'absolute', top: iFr } ).animate( { top: iTo }, sortAnim );
-				} );
-				
-				setRank();
-				setTimeout( reSortList, sortRefresh );
-			}
+			};
 			
 			reSortList();
 			
+			
+			// rebuild list by querying new data
 			var rebuild = function() {
-				sourceUl.fadeOut( fadeDelay, function() {
+				
+				if ( !sourceUl.data( 'lock_sort' ) && !sourceUl.data( 'lock_update' ) ) {
 					
-					// move existing li's to holder
-					holderUl.append( sourceUl.find( 'li' ) );
+					sourceUl.data( 'lock_rebuild', true );
 					
+					sourceUl.fadeOut( fadeDelay, function() {
+						
+						// move existing li's to holder
+						holderUl.append( sourceUl.find( 'li' ) );
+						
+						// remove all nodes for a hard rebuild
+						// sourceUl.find( 'li' ).remove();
+						
+						loadingDiv.fadeIn( fadeDelay, function() {
+							
+							getTags();
+							
+							setTimeout( rebuild, getRebuildDelay() );
+							
+						} );
+						
+					} );
 					
-					// remove all nodes for a hard rebuild
-					// sourceUl.find( 'li' ).remove();
+				} else {
 					
-					loadingDiv.fadeIn( fadeDelay );
-					
-					
-					
-					getTags();
-					
-					setTimeout( rebuild, getRebuildDelay() );
-				} );
+					// try again in half a second
+					setTimeout( rebuild, 500 );					
+				}
 			};
 			
 			rebuild();
+			
 			
 		} );
 		
