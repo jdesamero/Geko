@@ -102,6 +102,13 @@ abstract class Geko_Wp_Entity_Query extends Geko_Entity_Query
 		
 		//// keyword search
 		if ( $aParams[ 'kwsearch' ] ) {
+			
+			if ( is_array( $aParams[ 'kwsearch_override_default_fields' ] ) ) {
+				// override completely
+				$aParams[ 'kwsearch_fields' ] = $aParams[ 'kwsearch_override_default_fields' ];
+				unset( $aParams[ 'kwsearch_override_default_fields' ] );
+			}
+			
 			$oQuery->where( Geko_Wp_Db::keywordSearch(
 				$aParams[ 'kwsearch' ], $aParams[ 'kwsearch_fields' ]
 			) );
