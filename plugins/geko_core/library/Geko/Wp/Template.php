@@ -154,18 +154,18 @@ class Geko_Wp_Template extends Geko_Singleton_Abstract
 			$sPhpCode = file_get_contents( $sTemplateFile );
 			
 			$aRegs = array();
-			if ( preg_match( '/class\s([a-zA-Z0-1_]+)\sextends\sWp_Layout/si', $sPhpCode, $aRegs ) ) {
-		
+			if ( preg_match( '/class\s([a-zA-Z0-1_]+)\sextends\sGloc_Layout/si', $sPhpCode, $aRegs ) ) {
+				
 				// we have a layout class
 				$sClass = $aRegs[1];
 				
-				if ( 'Wp_Layout_Template' == $sClass ) {
+				if ( 'Gloc_Layout_Template' == $sClass ) {
 					
 					// not unique					
 					$sClass .= '_' . $iIdx;		// make it unique
 					
 					$sPhpCode = preg_replace( '/<\?php/si', '', $sPhpCode, 1 );
-					$sPhpCode = preg_replace( '/class\sWp_Layout_Template/si', 'class ' . $sClass, $sPhpCode );
+					$sPhpCode = preg_replace( '/class\sGloc_Layout_Template/si', 'class ' . $sClass, $sPhpCode );
 					$sPhpCode = preg_replace( '/geko_render_template\(\);/si', '', $sPhpCode );
 					
 					eval( $sPhpCode );

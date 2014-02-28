@@ -5,7 +5,11 @@ class Gloc_Layout_Shared_Widgets extends Gloc_Layout
 {
 	
 	protected $_aLabels = array(
-		101 => 'Pages:'
+		101 => 'Pages:',
+		102 => '&laquo; First',
+		103 => 'Last &raquo;',
+		104 => 'Pages %s of %s',
+		105 => 'Search'
 	);
 	
 	
@@ -43,8 +47,16 @@ class Gloc_Layout_Shared_Widgets extends Gloc_Layout
 		$aArgs = func_get_args();
 		
 		?><div class="navigation"><?php
-		
-			if ( $sNavHtml = Geko_Wp_Ext_PageNavi::get( $aArgs[ 0 ] ) ) {
+			
+			$aPnvParams = Geko_Array::wrap( $aArgs[ 0 ] );
+			
+			$aPnvParams[ 'localize' ] = array(
+				'first' => $this->l_102(),
+				'last' => $this->l_103(),
+				'pages' => $this->l_104()
+			);
+			
+			if ( $sNavHtml = Geko_Wp_Ext_PageNavi::get( $aPnvParams ) ) {
 				echo $sNavHtml;
 			} else {
 				posts_nav_link();
@@ -124,7 +136,8 @@ class Gloc_Layout_Shared_Widgets extends Gloc_Layout
 	
 	//
 	public function getSearchTerm() {
-		return wp_specialchars( stripslashes( $_GET[ 's' ] ), TRUE );
+		$sTerm = wp_specialchars( stripslashes( $_GET[ 's' ] ), TRUE );
+		return ( $sTerm ) ? $sTerm : $this->l_105() ;
 	}
 	
 	//

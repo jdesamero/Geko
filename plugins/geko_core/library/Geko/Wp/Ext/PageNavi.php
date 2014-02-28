@@ -33,32 +33,69 @@ class Geko_Wp_Ext_PageNavi
 			
 			if ( $aParams ) {
 				
-				if ( $sVarName = $aParams[ 'varname' ] ) {
+				if (
+					( $sVarName = $aParams[ 'varname' ] ) || 
+					( $aLocalize = $aParams[ 'localize' ] )
+				) {
 					
 					$oDoc = phpQuery::newDocument( $sRes );
 					
-					foreach ( $oDoc[ 'a' ] as $oLink ) {
+					//// multi-pagination support
+					
+					if ( $sVarName ) {
 						
-						$oLinkPq = pq( $oLink );
-						$sHref = $oLinkPq->attr( 'href' );
-						$aRegs = array();
-						
-						$iPageNum = NULL;
-						if ( preg_match( '/page\/([0-9]+)/', $sHref, $aRegs ) ) {
-							$iPageNum = $aRegs[ 1 ];
-							$sHref = str_replace( sprintf( '/page/%d', $iPageNum ), '', $sHref );
+						foreach ( $oDoc[ 'a' ] as $oLink ) {
+							
+							$oLinkPq = pq( $oLink );
+							$sHref = $oLinkPq->attr( 'href' );
+							$aRegs = array();
+							
+							$iPageNum = NULL;
+							if ( preg_match( '/page\/([0-9]+)/', $sHref, $aRegs ) ) {
+								$iPageNum = $aRegs[ 1 ];
+								$sHref = str_replace( sprintf( '/page/%d', $iPageNum ), '', $sHref );
+							}
+							
+							$oUrl = new Geko_Uri( $sHref );
+							
+							if ( $iPageNum ) {
+								$oUrl->setVar( $sVarName, $iPageNum );
+							} else {
+								$oUrl->unsetVar( $sVarName );
+							}
+							
+							$oLinkPq->attr( 'href', strval( $oUrl ) );
 						}
-						
-						$oUrl = new Geko_Uri( $sHref );
-						
-						if ( $iPageNum ) {
-							$oUrl->setVar( $sVarName, $iPageNum );
-						} else {
-							$oUrl->unsetVar( $sVarName );
-						}
-						
-						$oLinkPq->attr( 'href', strval( $oUrl ) );
 					}
+					
+					
+					//// localization support
+					
+					if ( $aLocalize && is_array( $aLocalize ) ) {
+						
+						// '&laquo; First'
+						if ( $sFirstLabel = $aLocalize[ 'first' ] ) {
+							$oDoc[ 'a.first' ]->html( $sFirstLabel );
+						}
+						
+						// 'Last &raquo;'
+						if ( $sLastLabel = $aLocalize[ 'last' ] ) {
+							$oDoc[ 'a.last' ]->html( $sLastLabel );
+						}
+						
+						// 'Pages %s of %s'
+						if ( $sPagesLabel = $aLocalize[ 'pages' ] ) {
+							
+							$sPagesLabelCur = $oDoc[ 'span.pages' ]->html();
+							
+							preg_match( '/([0-9]+)[^0-9]+([0-9]+)/', $sPagesLabelCur, $aRegs );
+							$sPagesLabel = sprintf( $sPagesLabel, $aRegs[ 1 ], $aRegs[ 2 ] );
+							
+							$oDoc[ 'span.pages' ]->html( $sPagesLabel );
+						
+						}
+					}
+					
 					
 					$sRes = strval( $oDoc );
 				}

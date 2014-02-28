@@ -10,6 +10,7 @@ class Geko_Wp_Language_String_Manage extends Geko_Wp_Options_Manage
 	protected $_sSubject = 'Strings';
 	protected $_sDescription = 'String values that can be translated.';
 	protected $_sType = 'lang-str';
+	protected $_sPrefix = 'geko_lang_str';
 	
 	protected $_aJsParams = array(
 		'row_template' => array()
@@ -43,9 +44,10 @@ class Geko_Wp_Language_String_Manage extends Geko_Wp_Options_Manage
 		
 		return $this;	
 	}
-		
+	
+	
 	// create table
-	public function install() {
+	public function install() {		
 		$this->createTable( $this->getPrimaryTable() );
 		return $this;
 	}
