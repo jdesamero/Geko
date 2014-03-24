@@ -5,6 +5,9 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 {
 	protected static $aLanguages = NULL;
 	protected static $aLangCodeHash = NULL;
+	protected static $aLangDomainHash = NULL;
+	protected static $aLangDomainCount = array();
+	
 	protected static $oDefaultLang = NULL;
 	
 	protected $_bPrefixFormElems = FALSE;		// turn off prefixing
@@ -44,6 +47,7 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 			->fieldVarChar( 'code', array( 'size' => 8, 'unq' ) )
 			->fieldVarChar( 'title', array( 'size' => 256 ) )
 			->fieldBool( 'is_default' )
+			->fieldVarChar( 'domain', array( 'size' => 256 ) )
 			->fieldDateTime( 'date_created' )
 			->fieldDateTime( 'date_modified' )
 		;
@@ -117,7 +121,7 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 			$aArgs = func_get_args();
 			
 			foreach ( $aArgs as $sClass ) {
-				$sSubClass = __CLASS__ . '_' . $sClass;
+				$sSubClass = sprintf( '%s_%s', __CLASS__, $sClass );
 				if ( @is_subclass_of( $sSubClass, __CLASS__ ) ) {
 					Geko_Singleton_Abstract::getInstance( $sSubClass )->init();
 				} elseif ( @is_subclass_of( $sClass, __CLASS__ ) ) {
@@ -153,8 +157,22 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 			$aLangs = new Geko_Wp_Language_Query( $aParams, FALSE );
 			
 			foreach ( $aLangs as $oLang ) {
-				self::$aLanguages[ $oLang->getId() ] = $oLang;
-				self::$aLangCodeHash[ $oLang->getSlug() ] = $oLang->getId();
+				
+				$iLangId = $oLang->getId();
+				$sLangSlug = $oLang->getSlug();
+				$sLangDomain = $oLang->getDomain();
+				
+				self::$aLanguages[ $iLangId ] = $oLang;
+				
+				self::$aLangCodeHash[ $sLangSlug ] = $iLangId;
+				self::$aLangDomainHash[ $sLangDomain ] = $iLangId;
+				
+				if ( !self::$aLangDomainCount[ $sLangDomain ] ) {
+					self::$aLangDomainCount[ $sLangDomain ] = 1;
+				} else {
+					self::$aLangDomainCount[ $sLangDomain ]++;
+				}
+				
 				if ( $oLang->getIsDefault() ) self::$oDefaultLang = $oLang;
 			}
 		}
@@ -164,11 +182,31 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 	
 	//
 	public function getLangCode( $iLangId = NULL ) {
+		
 		if ( $oLang = $this->getLanguage( $iLangId ) ) {
 			return $oLang->getSlug();
 		}
+		
 		return NULL;
 	}
+	
+	//
+	public function getLangCodeFromDomain( $sDomain ) {
+		
+		$this->getLanguages();		// initialize lang array
+		
+		if ( $iLangId = self::$aLangDomainHash[ $sDomain ] ) {
+			return $this->getLangCode( $iLangId );
+		}
+		
+		return NULL;
+	}
+	
+	//
+	public function getLangDomainCount( $sDomain ) {
+		return self::$aLangDomainCount[ $sDomain ];
+	}
+	
 	
 	// will return the default language id
 	public function getLangId( $sLangSlug = NULL ) {
@@ -337,12 +375,12 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 	
 	// pretty useless, should be implemented by sub-class
 	public function getSelExistLink( $aParams ) {
-		return '<a href="#">' . $aParams[ 'title' ] . '</a>';
+		return sprintf( '<a href="#">%s</a>', $aParams[ 'title' ] );
 	}
 	
 	// pretty useless, should be implemented by sub-class
 	public function getSelNonExistLink( $aParams ) {
-		return '<a href="#">' . $aParams[ 'title' ] . '</a>';
+		return sprintf( '<a href="#">%s</a>', $aParams[ 'title' ] );
 	}
 	
 	
@@ -409,6 +447,12 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 				<th><label for="lang_is_default">Is Default?</label></th>
 				<td>
 					<input id="lang_is_default" name="lang_is_default" type="checkbox" value="1" />
+				</td>
+			</tr>
+			<tr>
+				<th><label for="lang_domain">Domain</label></th>
+				<td>
+					<input id="lang_domain" name="lang_domain" type="text" class="regular-text" value="" />
 				</td>
 			</tr>
 			<?php $this->customFieldsMain(); ?>

@@ -7,6 +7,7 @@ class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 	
 	//
 	protected $_oNavMgmt = NULL;
+	protected $_oLangMgm = NULL;
 	protected $_oLangRslv = NULL;
 	
 	protected $_aPlugins = array();
@@ -32,6 +33,7 @@ class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 		add_filter( 'admin_geko_wp_nav_redirect', array( $this, 'modRedirect' ) );
 		
 		$this->_oNavMgmt = Geko_Wp_NavigationManagement::getInstance();
+		$this->_oLangMgm = Geko_Wp_Language_Manage::getInstance();
 		$this->_oLangRslv = Geko_Wp_Language_Resolver::getInstance();
 		
 		// activate plugins
@@ -108,7 +110,7 @@ class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 		if ( is_string( $mPlugin ) ) {
 			
 			$sPluginClass = 'Geko_Wp_NavigationManagement_Language_Plugin';
-			$sSubClass = $sPluginClass . '_' . $mPlugin;
+			$sSubClass = sprintf( '%s_%s', $sPluginClass, $mPlugin );
 			
 			if ( @is_subclass_of( $sSubClass, $sPluginClass ) ) {
 				$oPlugin = Geko_Singleton_Abstract::getInstance( $sSubClass )->init();
@@ -220,7 +222,7 @@ class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 	public function modAjaxUrl( $sAjaxUrl ) {
 		
 		if ( $sAjaxUrl && ( $iLangId = $_REQUEST[ $this->sLangQueryVar ] ) ) {
-			$sAjaxUrl .= '&' . $this->sLangQueryVar . '=' . $iLangId;
+			$sAjaxUrl .= sprintf( '&%s=%d', $this->sLangQueryVar, $iLangId );
 		}
 		
 		return $sAjaxUrl;
@@ -267,7 +269,7 @@ class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 	//
 	public function modQueryParams( $aParams ) {
 		if ( $this->isDefLang() ) {
-			$aParams['lang'] = $this->getLangCode();
+			$aParams[ 'lang' ] = $this->getLangCode();
 		}
 		return $aParams;
 	}
@@ -329,7 +331,7 @@ class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 		}
 		
 		
-		if ( is_array( $aSibParams['filter'] ) ) {
+		if ( is_array( $aSibParams[ 'filter' ] ) ) {
 			
 			$aItems = new Geko_Wp_Language_Member_Query( $aSibParams, FALSE );
 			$aSibsFmt = array();
@@ -381,8 +383,8 @@ class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 					$aParams[ $i ] = $oPlugin->rebuildParams( $aParams[ $i ], $aSibsFmt, $sLang );
 				}
 				
-				if ( $aParam['pages'] ) {
-					$aParams[ $i ]['pages'] = $this->rebuildParams( $aParam['pages'], $aSibsFmt, $sLang );
+				if ( $aParam[ 'pages' ] ) {
+					$aParams[ $i ][ 'pages' ] = $this->rebuildParams( $aParam[ 'pages' ], $aSibsFmt, $sLang );
 				}
 			}
 		}
@@ -398,10 +400,10 @@ class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 		if ( is_array( $aParams ) ) {
 			
 			foreach ( $aParams as $i => $aParam ) {
-				unset( $aParam['pages'] );
+				unset( $aParam[ 'pages' ] );
 				$aFlat[] = $aParam;	
-				if ( $aParams[ $i ]['pages'] ) {
-					$aFlat = array_merge( $aFlat, $this->flattenParams( $aParams[ $i ]['pages'] ) );
+				if ( $aParams[ $i ][ 'pages' ] ) {
+					$aFlat = array_merge( $aFlat, $this->flattenParams( $aParams[ $i ][ 'pages' ] ) );
 				}
 			}		
 		}
@@ -417,11 +419,11 @@ class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 			foreach ( $aParams as $i => $aParam ) {
 				
 				if (
-					( isset( $aParam['item_idx'] ) ) && 
-					( $aOld = $aFlat[ $aParam['item_idx'] ] )
+					( isset( $aParam[ 'item_idx' ] ) ) && 
+					( $aOld = $aFlat[ $aParam[ 'item_idx' ] ] )
 				) {
-					if ( $aOld['title'] ) $aParams[ $i ]['title'] = $aOld['title'];
-					if ( $aOld['label'] ) $aParams[ $i ]['label'] = $aOld['label'];
+					if ( $aOld[ 'title' ] ) $aParams[ $i ][ 'title' ] = $aOld[ 'title' ];
+					if ( $aOld[ 'label' ] ) $aParams[ $i ][ 'label' ] = $aOld[ 'label' ];
 
 					// loop through plugins
 					foreach ( $this->_aPlugins as $oPlugin ) {
@@ -429,8 +431,8 @@ class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 					}
 				}
 				
-				if ( $aParam['pages'] ) {
-					$aParams[ $i ]['pages'] = $this->reconcileSave( $aParam['pages'], $aFlat );
+				if ( $aParam[ 'pages' ] ) {
+					$aParams[ $i ][ 'pages' ] = $this->reconcileSave( $aParam[ 'pages' ], $aFlat );
 				}
 			}
 		}
@@ -457,22 +459,30 @@ class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 		
 		$aNav = array();
 		$aLangs = $this->getLanguages();
-		$oUrl = new Geko_Uri();
-		
+				
 		foreach ( $aLangs as $oLang ) {
-						
-			if ( $aNavItem = $aNavSpecific[ $oLang->getId() ] ) {
+			
+			$iLangId = $oLang->getId();
+			
+			if ( $aNavItem = $aNavSpecific[ $iLangId ] ) {
 				
 				// nav item of a specific type
-				$aNavItem['label'] = $oLang->getTitle();
+				$aNavItem[ 'label' ] = $oLang->getTitle();
 				$aNav[] = $aNavItem;
 			
 			} else {
 				
-				if ( $oLang->getIsDefault() ) {
+				$oUrl = new Geko_Uri();
+				
+				$oUrl = $this->_oLangRslv->resolveUrl( $oUrl, $iLangId );
+				
+				if (
+					( $oLang->getIsDefault() ) || 
+					( 1 === $this->_oLangMgm->getLangDomainCount( $oUrl->getHost() ) )
+				) {
 					$oUrl->unsetVar( 'lang' );
 				} else {
-					$oUrl->setVar( 'lang', $oLang->getSlug() );					
+					$oUrl->setVar( 'lang', $oLang->getSlug() );
 				}
 				
 				// generic nav item (Geko_Navigation_Page_Uri)

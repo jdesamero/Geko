@@ -128,7 +128,7 @@ class Gloc_Layout_Shared_Widgets extends Gloc_Layout
 	//
 	public function echoLinkPages() {
 		wp_link_pages( array(
-			'before' => '<div class="page-link">' . $this->l_101(),
+			'before' => sprintf( '<div class="page-link">%s', $this->l_101() ),
 			'after' => '</div>',
 			'next_or_number' => 'number'
 		) );

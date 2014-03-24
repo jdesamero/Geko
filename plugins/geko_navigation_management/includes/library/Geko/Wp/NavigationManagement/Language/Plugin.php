@@ -3,8 +3,14 @@
 //
 class Geko_Wp_NavigationManagement_Language_Plugin extends Geko_Singleton_Abstract
 {
+	
 	protected $_sNavigationPageClass = '';
 	protected $_sNavigationPageManagerClass = '';
+	
+	protected $_oLangMgm = NULL;
+	protected $_oLangRslv = NULL;
+	
+	
 	
 	//
 	public function init() {
@@ -12,6 +18,9 @@ class Geko_Wp_NavigationManagement_Language_Plugin extends Geko_Singleton_Abstra
 		$this->_sNavigationPageManagerClass = Geko_Navigation_PageManager::resolvePageManagerClass(
 			$this->_sNavigationPageClass, $this->_sNavigationPageManagerClass
 		);
+		
+		$this->_oLangMgm = Geko_Wp_Language_Manage::getInstance();
+		$this->_oLangRslv = Geko_Wp_Language_Resolver::getInstance();
 		
 		return $this;
 	}

@@ -23,7 +23,7 @@ class Geko_Wp_NavigationManagement_Page_Page
 	//
 	public function getHref() {
 		return apply_filters(
-			__METHOD__ . '::page',
+			sprintf( '%s::page', __METHOD__ ),
 			get_permalink( $this->_pageId ),
 			$this->_pageId,
 			$this
@@ -33,7 +33,7 @@ class Geko_Wp_NavigationManagement_Page_Page
 	//
 	public function getImplicitLabel() {
 		return apply_filters(
-			__METHOD__ . '::page',
+			sprintf( '%s::page', __METHOD__ ),
 			get_the_title( $this->_pageId ),
 			$this->_pageId,
 			$this
@@ -52,7 +52,7 @@ class Geko_Wp_NavigationManagement_Page_Page
 	//
 	public function isCurrentPage() {
 		return apply_filters(
-			__METHOD__ . '::page',
+			sprintf( '%s::page', __METHOD__ ),
 			is_page( $this->_pageId ),
 			$this->_pageId,
 			$this

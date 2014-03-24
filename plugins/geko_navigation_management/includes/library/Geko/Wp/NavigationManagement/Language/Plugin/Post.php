@@ -29,14 +29,14 @@ class Geko_Wp_NavigationManagement_Language_Plugin_Post
 		$aCatIds = array();
 		
 		foreach ( $aFlat as $aParam ) {
-			if ( $this->_sNavigationPageClass == $aParam['type'] ) {
-				if ( $this->TYPE_CAT == $aParam['post_type_id'] ) {
-					$aCatIds[] = $aParam['cat_id'];
+			if ( $this->_sNavigationPageClass == $aParam[ 'type' ] ) {
+				if ( $this->TYPE_CAT == $aParam[ 'post_type_id' ] ) {
+					$aCatIds[] = $aParam[ 'cat_id' ];
 				}
 			}
 		}
 		
-		$aSibParams['filter'][] = array(
+		$aSibParams[ 'filter' ][] = array(
 			'obj_id' => $aCatIds,
 			'type' => 'category'
 		);
@@ -49,10 +49,10 @@ class Geko_Wp_NavigationManagement_Language_Plugin_Post
 		
 		if ( $this->_sNavigationPageClass == $aParam['type'] ) {
 			if (
-				( $iCatId = $aSibsFmt['category'][ $aParam['cat_id'] ][ $sLang ] ) && 
-				( $this->TYPE_CAT == $aParam['post_type_id'] )
+				( $iCatId = $aSibsFmt[ 'category' ][ $aParam[ 'cat_id' ] ][ $sLang ] ) && 
+				( $this->TYPE_CAT == $aParam[ 'post_type_id' ] )
 			) {
-				$aParam['cat_id'] = $iCatId;
+				$aParam[ 'cat_id' ] = $iCatId;
 			}
 		}
 		

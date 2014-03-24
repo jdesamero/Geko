@@ -8,6 +8,10 @@ class Geko_Wp
 	private static $aStandardPlaceholders = FALSE;
 	private static $bInitLoader = FALSE;
 	
+	private static $sUrl = '';
+	private static $sDefaultUrl = '';
+	
+	
 	
 	//
 	public static function setUseIsHome( $bUseIsHome ) {
@@ -421,13 +425,28 @@ class Geko_Wp
 	}
 	
 	//
-	public static function echoUrl() {
-		echo self::getUrl();
+	public static function echoUrl( $bForceDefault = FALSE ) {
+		echo self::getUrl( $bForceDefault );
 	}
 	
 	//
-	public static function getUrl() {
-		return get_bloginfo( 'wpurl' );
+	public static function getUrl( $bForceDefault = FALSE ) {
+		
+		if ( $bForceDefault ) {
+			
+			if ( !self::$sDefaultUrl ) {
+				global $wpdb;
+				self::$sDefaultUrl = $wpdb->get_var( "SELECT option_value FROM $wpdb->options WHERE option_name = 'siteurl'" );
+			}
+			
+			return self::$sDefaultUrl;
+		}
+		
+		if ( !self::$sUrl ) {
+			self::$sUrl = get_bloginfo( 'wpurl' );
+		}
+		
+		return self::$sUrl;
 	}
 	
 	//

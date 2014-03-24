@@ -7,6 +7,7 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 	protected $sLangQueryVar = 'lang';
 	
 	protected $oLangMgm;
+	protected $sDefaultDomain;
 	protected $iFrontPage = FALSE;
 	
 	
@@ -27,6 +28,9 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 			add_filter( 'Geko_Wp::getHomepageUrl', array( $this, 'getHomepageUrl' ), 10, 2 );
 			
 			$this->oLangMgm = Geko_Wp_Language_Manage::getInstance();
+			
+			$oUrl = new Geko_Uri( Geko_Wp::getUrl( TRUE ) );
+			$this->sDefaultDomain = $oUrl->getHost();
 			
 			$bCalled = TRUE;
 		}
@@ -101,13 +105,13 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 					$iPostId = $aQuery->query_vars[ 'p' ];
 					if ( !$iPostId ) {
 						global $wpdb;
-						$iPostId = $wpdb->get_var("
+						$iPostId = $wpdb->get_var( sprintf( "
 							SELECT		id
-							FROM		$wpdb->posts p
-							WHERE		( p.post_name = '" . sanitize_title_for_query( $aQuery->query_vars[ 'name' ] ) . "' ) AND 
+							FROM		%s p
+							WHERE		( p.post_name = '%s' ) AND 
 										( p.post_status = 'publish' ) AND 
 										( p.post_type = 'post' )
-						");
+						", $wpdb->posts, sanitize_title_for_query( $aQuery->query_vars[ 'name' ] ) ) );
 					}
 					
 					$aParams = array(
@@ -141,16 +145,18 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 				
 				// check for query var lang
 				if (
-					( $_REQUEST[ $this->sLangQueryVar ] ) && 
-					( $oLang = $this->oLangMgm->getLanguage( $sInherentLang ) ) && 
-					( $oLang->getIsDefault() )
+					( $sLangCode = $_REQUEST[ $this->sLangQueryVar ] ) && 
+					( !$sInherentLang )
 				) {
-					$this->sCurLang = $this->oLangMgm->getLanguage( $_REQUEST[ $this->sLangQueryVar ] )->getSlug();
+					$this->sCurLang = $this->oLangMgm->getLanguage( $sLangCode )->getSlug();
 				}
 				
+				// check domain
+				if ( !$this->sCurLang && !$sInherentLang ) {
+					$oUrl = Geko_Uri::getGlobal();
+					$this->sCurLang = $this->oLangMgm->getLangCodeFromDomain( $oUrl->getHost() );
+				}
 				
-				// var_dump( $sInherentLang );
-				// var_dump( $this->sCurLang );
 				
 				
 				////// resolve entity
@@ -227,6 +233,34 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 	}
 	
 	//
+	public function resolveUrl( $mUrl, $iLangId ) {
+		
+		$oCurUrl = Geko_Uri::getGlobal();
+		$oLang = $this->oLangMgm->getLanguage( $iLangId );
+		
+		$sLangDomain = Geko_String::coalesce( $oLang->getDomain(), $this->sDefaultDomain );
+		
+		if ( $oCurUrl->getHost() != $sLangDomain ) {
+			
+			if ( $mUrl instanceof Geko_Uri ) {
+				
+				$mUrl->setHost( $sLangDomain );
+			
+			} elseif ( is_string( $mUrl ) ) {
+				
+				$oUrl = new Geko_Uri( $mUrl );
+				$oUrl->setHost( $sLangDomain );
+				
+				return strval( $oUrl );
+			}
+			
+		}
+		
+		return $mUrl;
+	}
+	
+	
+	//
 	public function getPageOnFront( $mRet ) {
 		if ( $this->iFrontPage ) return $this->iFrontPage;
 		return $mRet;
@@ -255,8 +289,13 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 	public function getHomepageUrl( $sUrl, $sInvokerClass ) {
 		
 		if ( $this->sCurLang ) {
+			
 			$oUrl = new Geko_Uri( $sUrl );
-			$oUrl->setVar( 'lang', $this->sCurLang );
+			
+			if ( 1 !== $this->oLangMgm->getLangDomainCount( $oUrl->getHost() ) ) {
+				$oUrl->setVar( 'lang', $this->sCurLang );
+			}
+			
 			return strval( $oUrl );
 		}
 		

@@ -86,6 +86,27 @@ class Geko_Uri
 	
 	
 	
+	//// host
+	
+	//
+	public function setHost( $sHost, $bSetIfEmpty = TRUE ) {
+		
+		if ( $this->_bMutable ) {
+			if (
+				( $bSetIfEmpty ) || 
+				( !$bSetIfEmpty && $sHost )
+			) {
+				$this->_aParsed[ 'host' ] = $sHost;
+			}
+		} else {
+			throw new Exception( 'This object is not mutable (eg: set* methods cannot be used).' );
+		}
+		
+		return $this;
+	}
+	
+	
+	
 	//// vars
 	
 	//
