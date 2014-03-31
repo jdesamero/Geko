@@ -43,8 +43,8 @@ class Geko_Wp_Point_Event_Manage extends Geko_Wp_Options_Manage
 		$oSqlTable
 			->create( $wpdb->$sTableName, 'e' )
 			->fieldBigInt( 'pntevt_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
-			->fieldVarChar( 'name', array( 'size' => 255 ) )
-			->fieldVarChar( 'slug', array( 'size' => 255, 'unq' ) )
+			->fieldVarChar( 'name', array( 'size' => 256 ) )
+			->fieldVarChar( 'slug', array( 'size' => 256, 'unq' ) )
 			->fieldBigInt( 'value', array( 'unsgnd', 'notnull' ) )
 			->fieldLongText( 'description' )
 			->fieldLongText( 'meta_keys' )

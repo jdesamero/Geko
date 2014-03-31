@@ -397,109 +397,6 @@ abstract class Geko_Entity
 	}
 	
 	
-	//// date methods
-	
-	//
-	public function getDateCreated( $sFormat = '' ) {
-		return $this->dateFormat(
-			$this->getEntityPropertyValue( 'date_created' ),
-			$sFormat
-		);
-	}
-	
-	//
-	public function getDateModified( $sFormat = '' ) {
-		return $this->dateFormat(
-			$this->getEntityPropertyValue( 'date_modified' ),
-			$sFormat
-		);
-	}
-	
-	//
-	public function getDateCreatedGmt( $sFormat = '' ) {
-		return $this->dateFormat(
-			$this->getEntityPropertyValue( 'date_created_gmt' ),
-			$sFormat
-		);
-	}
-	
-	//
-	public function getDateModifiedGmt( $sFormat = '' ) {
-		return $this->dateFormat(
-			$this->getEntityPropertyValue( 'date_modified_gmt' ),
-			$sFormat
-		);
-	}
-	
-	// time
-	
-	//
-	public function getTimeCreated( $sFormat = '' ) {
-		return $this->timeFormat(
-			$this->getEntityPropertyValue( 'date_created' ),
-			$sFormat
-		);
-	}
-	
-	//
-	public function getTimeModified( $sFormat = '' ) {
-		return $this->timeFormat(
-			$this->getEntityPropertyValue( 'date_modified' ),
-			$sFormat
-		);
-	}
-	
-	//
-	public function getTimeCreatedGmt( $sFormat = '' ) {
-		return $this->timeFormat(
-			$this->getEntityPropertyValue( 'date_created_gmt' ),
-			$sFormat
-		);
-	}
-	
-	//
-	public function getTimeModifiedGmt( $sFormat = '' ) {
-		return $this->timeFormat(
-			$this->getEntityPropertyValue( 'date_modified_gmt' ),
-			$sFormat
-		);
-	}
-	
-	// date-time
-	
-	//
-	public function getDateTimeCreated( $sFormat = '' ) {
-		return $this->dateTimeFormat(
-			$this->getEntityPropertyValue( 'date_created' ),
-			$sFormat
-		);
-	}
-	
-	//
-	public function getDateTimeModified( $sFormat = '' ) {
-		return $this->dateTimeFormat(
-			$this->getEntityPropertyValue( 'date_modified' ),
-			$sFormat
-		);
-	}
-	
-	//
-	public function getDateTimeCreatedGmt( $sFormat = '' ) {
-		return $this->dateTimeFormat(
-			$this->getEntityPropertyValue( 'date_created_gmt' ),
-			$sFormat
-		);
-	}
-	
-	//
-	public function getDateTimeModifiedGmt( $sFormat = '' ) {
-		return $this->dateTimeFormat(
-			$this->getEntityPropertyValue( 'date_modified_gmt' ),
-			$sFormat
-		);
-	}
-	
-	
 	
 	
 	
@@ -695,23 +592,40 @@ abstract class Geko_Entity
 		return htmlspecialchars( $sValue );
 	}
 	
+	//
+	public function boolFormat( $mValue, $sTrueLabel = '', $sFalseLabel = '' ) {
+		
+		$sTrueLabel = ( $sTrueLabel ) ? $sTrueLabel : 'Yes';
+		$sFalseLabel = ( $sFalseLabel ) ? $sFalseLabel : 'No';
+		
+		return intval( $mValue ) ? $sTrueLabel : $sFalseLabel ;
+	}
+	
+	
+	
+	
 	
 	//// url and file handling/resolution
 
 	//
 	public function _getFileLoc( $sValue, $sProp, $sBase, $sDirSep ) {
+		
 		if ( $sValue ) {
+			
 			$sPropFmt = Geko_Inflector::underscore( $sProp );
 			$sSubDir = '';
+			
 			if ( isset( $this->_aFileSubdirMap[ $sPropFmt ] ) ) {
 				$sSubDir = $this->_aFileSubdirMap[ $sPropFmt ];
 				$sSubDir = str_replace( '##base_dir##', $this->_sFileBaseDir, $sSubDir );
 			} else {
 				// default
-				$sSubDir = $this->_sFileBaseDir . $sDirSep . $sPropFmt;
+				$sSubDir = sprintf( '%s%s%s', $this->_sFileBaseDir, $sDirSep, $sPropFmt );
 			}
-			return $sBase . $sDirSep . $sSubDir . $sDirSep . $sValue;
+			
+			return sprintf( '%s%s%s%s%s', $sBase, $sDirSep, $sSubDir, $sDirSep, $sValue );
 		}
+		
 		return '';	
 	}
 	
@@ -752,6 +666,8 @@ abstract class Geko_Entity
 		}
 		return FALSE;	
 	}
+	
+	
 	
 	
 	
@@ -824,6 +740,59 @@ abstract class Geko_Entity
 		//
 		if ( 0 === strpos( $sMethod, 'get' ) ) {
 			
+			
+			// Auto date/time formatting
+			if ( 0 === strpos( $sMethod, 'getDateTime' ) ) {
+				
+				$sPropName = sprintf( 'date_%s', Geko_Inflector::underscore( substr( $sMethod, 11 ) ) );
+				
+				if ( $this->hasEntityProperty( $sPropName ) ) {
+					
+					return $this->dateTimeFormat(
+						$this->getEntityPropertyValue( $sPropName ),
+						$aArgs[ 0 ]
+					);
+				}
+				
+			} elseif ( 0 === strpos( $sMethod, 'getTime' ) ) {
+				
+				$sPropName = sprintf( 'date_%s', Geko_Inflector::underscore( substr( $sMethod, 7 ) ) );
+
+				if ( $this->hasEntityProperty( $sPropName ) ) {
+					
+					return $this->timeFormat(
+						$this->getEntityPropertyValue( $sPropName ),
+						$aArgs[ 0 ]
+					);
+				}
+				
+			} elseif ( 0 === strpos( $sMethod, 'getDate' ) ) {
+				
+				$sPropName = sprintf( 'date_%s', Geko_Inflector::underscore( substr( $sMethod, 7 ) ) );
+
+				if ( $this->hasEntityProperty( $sPropName ) ) {
+					
+					return $this->dateFormat(
+						$this->getEntityPropertyValue( $sPropName ),
+						$aArgs[ 0 ]
+					);
+				}
+				
+			} elseif ( 0 === strpos( $sMethod, 'getBool' ) ) {			// format boolean to human-readable
+
+				$sPropName = Geko_Inflector::underscore( substr( $sMethod, 7 ) );
+				
+				if ( $this->hasEntityProperty( $sPropName ) ) {
+					
+					return $this->boolFormat(
+						$this->getEntityPropertyValue( $sPropName ),
+						$aArgs[ 0 ], $aArgs[ 1 ]
+					);
+				}
+				
+			}
+			
+			
 			// attempt to call get*() method if it exists (!)
 			// this is to allow routing of direct invocation of __call()
 			if ( $bDirect && method_exists( $this, $sMethod ) ) {
@@ -837,7 +806,7 @@ abstract class Geko_Entity
 			}
 			
 			// see if a corresponding entity value can be found
-			$sEntityProperty = Geko_Inflector::underscore( substr_replace( $sMethod, '', 0, 3 ) );
+			$sEntityProperty = Geko_Inflector::underscore( substr( $sMethod, 3 ) );
 			if ( $this->hasEntityProperty( $sEntityProperty ) ) {
 				return $this->getEntityPropertyValue( $sEntityProperty );
 			}
@@ -852,20 +821,23 @@ abstract class Geko_Entity
 				return $sOut;
 			}
 			
+			
+			//// file formatting
+			
 			$aRegs = array();
+			
 			if ( preg_match( '/get([a-zA-Z0-9]+)Url/', $sMethod, $aRegs ) ) {
+				
 				$sCall = sprintf( 'fileurl%s', $aRegs[ 1 ] );
 				return $this->__call( $sCall, $aArgs );
-			}
-			
-			$aRegs = array();
-			if ( preg_match( '/get([a-zA-Z0-9]+)Path/', $sMethod, $aRegs ) ) {
+				
+			} elseif ( preg_match( '/get([a-zA-Z0-9]+)Path/', $sMethod, $aRegs ) ) {
+				
 				$sCall = sprintf( 'filepath%s', $aRegs[ 1 ] );
 				return $this->__call( $sCall, $aArgs );
-			}
-			
-			$aRegs = array();
-			if ( preg_match( '/get([a-zA-Z0-9]+)Size/', $sMethod, $aRegs ) ) {
+				
+			} elseif ( preg_match( '/get([a-zA-Z0-9]+)Size/', $sMethod, $aRegs ) ) {
+				
 				$sCall = sprintf( 'filesize%s', $aRegs[ 1 ] );
 				return $this->__call( $sCall, $aArgs );
 			}

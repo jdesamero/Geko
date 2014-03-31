@@ -158,8 +158,11 @@ class Geko_Service extends Geko_Singleton_Abstract
 	//
 	public function getDefaultStatus() {
 		
-		if ( defined( 'self::STAT_ERROR' ) ) {
-			return self::STAT_ERROR;
+		// Note: self::STAT_ERROR will not work for sub-classes
+		//    Use static::STAT_ERROR instead
+		
+		if ( defined( 'static::STAT_ERROR' ) ) {
+			return static::STAT_ERROR;
 		}
 		
 		return NULL;

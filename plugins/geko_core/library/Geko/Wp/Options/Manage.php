@@ -1396,17 +1396,17 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	// hook method
 	public function customFieldsPre() {
 		$oEntity = $this->_oCurrentEntity;
-		$sAction = $this->_sActionPrefix . '_main_fields';
+		$sAction = sprintf( '%s_main_fields', $this->_sActionPrefix );
 		do_action( $sAction, $oEntity, 'pre' );
-		if ( $this->_sSlug ) do_action( $sAction . '_' . $this->_sSlug, $oEntity, 'pre', $this->_sSlug );
+		if ( $this->_sSlug ) do_action( sprintf( '%s_%s', $sAction, $this->_sSlug ), $oEntity, 'pre', $this->_sSlug );
 	}
 	
 	// hook method
 	public function customFieldsMain() {
 		$oEntity = $this->_oCurrentEntity;
-		$sAction = $this->_sActionPrefix . '_main_fields';
+		$sAction = sprintf( '%s_main_fields', $this->_sActionPrefix );
 		do_action( $sAction, $oEntity, 'main' );
-		if ( $this->_sSlug ) do_action( $sAction . '_' . $this->_sSlug, $oEntity, 'main', $this->_sSlug );
+		if ( $this->_sSlug ) do_action( sprintf( '%s_%s', $sAction, $this->_sSlug ), $oEntity, 'main', $this->_sSlug );
 	}
 	
 	//
@@ -1458,7 +1458,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 			->unsetVar( $this->_sEntityIdVarName )
 		;
 		
-		$sDupTitleFld = 'duplicate_' . $this->_sType . '_title';
+		$sDupTitleFld = sprintf( 'duplicate_%s_title', $this->_sType );
 		
 		?>
 		
@@ -1569,7 +1569,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 				) {
 					
 					if ( !$mRes = $this->doCustomActions( 'add', $aParams ) ) {
-						if ( $this->_bCanImport && $_POST[ 'import_' . $this->_sType ] ) {
+						if ( $this->_bCanImport && $_POST[ sprintf( 'import_%s', $this->_sType ) ] ) {
 							$aParams = $this->doImportAction( $aParams );
 						} else {
 							$aParams = $this->doAddAction( $aParams );
@@ -1585,11 +1585,11 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 				) {
 					
 					if ( !$mRes = $this->doCustomActions( 'edit', $aParams ) ) {
-						if ( $this->_bCanDuplicate && $_POST[ 'duplicate_' . $this->_sType ] ) {
+						if ( $this->_bCanDuplicate && $_POST[ sprintf( 'duplicate_%s', $this->_sType ) ] ) {
 							$aParams = $this->doDuplicateAction( $aParams );
-						} elseif ( $this->_bCanExport && $_POST[ 'export_' . $this->_sType ] ) {
+						} elseif ( $this->_bCanExport && $_POST[ sprintf( 'export_%s', $this->_sType ) ] ) {
 							$aParams = $this->doExportAction( $aParams );
-						} elseif ( $this->_bCanRestore && $_POST[ 'restore_' . $this->_sType ] ) {
+						} elseif ( $this->_bCanRestore && $_POST[ sprintf( 'restore_%s', $this->_sType ) ] ) {
 							$aParams = $this->doRestoreAction( $aParams );
 						} else {
 							$aParams = $this->doEditAction( $aParams );
@@ -1600,7 +1600,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 					
 				} elseif (
 					( $this->_sDelAction == $sAction ) &&
-					( check_admin_referer( $sActionTarget . $this->_sDelAction ) ) && 
+					( check_admin_referer( sprintf( '%s%s', $sActionTarget, $this->_sDelAction ) ) ) && 
 					( $aParams[ 'entity_id' ] )
 				) {
 					
@@ -1614,7 +1614,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 			}
 			
 			if ( $aParams[ 'referer' ] ) {
-				header( 'Location: ' . $aParams[ 'referer' ] );
+				header( sprintf( 'Location: %s', $aParams[ 'referer' ] ) );
 				die();
 			}
 		}
@@ -1645,7 +1645,9 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 
 	//
 	public function getInsertData( $aParams, $aValues = NULL ) {
+		
 		$aValues = ( NULL !== $aValues ) ? $aValues : $this->getValidPostVals() ;
+		
 		return $this->getFormattedPostData(
 			$aParams,
 			$this->modifyInsertPostVals( $aValues )
@@ -1695,9 +1697,9 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 			// hook method
 			$this->postAddAction( $aParams, $oInsertedEntity );
 			
-			$sAction = $this->_sActionPrefix . '_add';
+			$sAction = sprintf( '%s_add', $this->_sActionPrefix );
 			do_action( $sAction, $oInsertedEntity, $aParams );
-			if ( $this->_sSlug ) do_action( $sAction . '_' . $this->_sSlug, $oInsertedEntity, $aParams, $this->_sSlug );				
+			if ( $this->_sSlug ) do_action( sprintf( '%s_%s', $sAction, $this->_sSlug ), $oInsertedEntity, $aParams, $this->_sSlug );				
 			
 			$this->triggerNotifyMsg( 'm101' );										// success!!!
 		}
@@ -1720,7 +1722,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		
 		$bContinue = TRUE;
 		
-		$aFile = $_FILES[ 'import_' . $this->_sType . '_file' ];
+		$aFile = $_FILES[ sprintf( 'import_%s_file', $this->_sType ) ];
 		
 		if ( $bContinue && !$aFile ) {
 			$bContinue = FALSE;
@@ -1770,19 +1772,36 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	// update methods main
 	
 	//
-	public function getUpdateData( $aParams, $oEntity ) {
+	public function getUpdateData( $aParams, $oEntity, $aValues, $aKeys ) {
+		
+		//// format values
+		
+		$aValues = ( NULL !== $aValues ) ? $aValues : $this->getValidPostVals() ;
+		
 		$aData = $this->getFormattedPostData(
 			$aParams,
-			$this->modifyUpdatePostVals( $this->getValidPostVals(), $oEntity )
+			$this->modifyUpdatePostVals( $aValues, $oEntity )
 		);
-		$oPkf = $this->getPrimaryTablePrimaryKeyField();
-		return array(
-			$aData[ 0 ],
-			array( $oPkf->getFieldName() => $aParams[ 'entity_id' ] ),
-			$aData[ 1 ],
-			array( $oPkf->getFormat() )
-		);
+		
+		//// format keys
+		
+		if ( NULL === $aKeys ) {
+			
+			// default
+			$oPkf = $this->getPrimaryTablePrimaryKeyField();
+			
+			// TO DO: Handle multi-key scenario!!!
+			$aKeys = array( $oPkf->getFieldName() => $oEntity->getId() );
+		}
+		
+		$aKeysFmt = $this->getFormattedPostData( $aParams, $aKeys );
+		
+		
+		//// return data
+		
+		return array( $aData[ 0 ], $aKeysFmt[ 0 ], $aData[ 1 ], $aKeysFmt[ 1 ] );
 	}
+	
 	
 	// hook
 	public function modifyUpdatePostVals( $aPostValues, $oEntity ) {
@@ -1795,22 +1814,25 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	}
 	
 	//
-	public function doEditAction( $aParams ) {
+	public function doEditAction( $aParams, $oEntity = NULL, $aValues = NULL, $aKeys = NULL ) {
 		
 		global $wpdb;
 		
 		$bContinue = TRUE;
 		
 		// check the entity id given
-		$sEntityClass = $this->_sEntityClass;			
-		$oEntity = new $sEntityClass( $aParams[ 'entity_id' ] );
+		$sEntityClass = $this->_sEntityClass;
+		
+		if ( NULL === $oEntity ) {
+			$oEntity = new $sEntityClass( $aParams[ 'entity_id' ] );
+		}
 		
 		if ( !$oEntity->isValid() ) {
 			$bContinue = FALSE;
 			$this->triggerErrorMsg( 'm202' );										// bad entity id given
 		}
 		
-		$aUpdateData = $this->getUpdateData( $aParams, $oEntity );
+		$aUpdateData = $this->getUpdateData( $aParams, $oEntity, $aValues, $aKeys );
 		
 		if ( $bContinue && $this->getUpdateContinue( $aUpdateData, $aParams, $oEntity ) ) {
 			
@@ -1824,14 +1846,14 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 			);
 			
 			$sEntityClass = $this->_sEntityClass;			
-			$oUpdatedEntity = new $sEntityClass( $aParams[ 'entity_id' ] );
+			$oUpdatedEntity = new $sEntityClass( $oEntity->getId() );
 			
 			// hook method
 			$this->postEditAction( $aParams, $oEntity, $oUpdatedEntity );
 			
-			$sAction = $this->_sActionPrefix . '_edit';
+			$sAction = sprintf( '%s_edit', $this->_sActionPrefix );
 			do_action( $sAction, $oEntity, $oUpdatedEntity, $aParams );
-			if ( $this->_sSlug ) do_action( $sAction . '_' . $this->_sSlug, $oEntity, $oUpdatedEntity, $aParams, $this->_sSlug );
+			if ( $this->_sSlug ) do_action( sprintf( '%s_%s', $sAction, $this->_sSlug ), $oEntity, $oUpdatedEntity, $aParams, $this->_sSlug );
 			
 			$this->triggerNotifyMsg( 'm102' );										// success!!!
 			
@@ -1859,7 +1881,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		$sEntityClass = $this->_sEntityClass;			
 		$oEntity = new $sEntityClass( $aParams[ 'entity_id' ] );
 		
-		$sDuplicateTitle = $_POST[ 'duplicate_' . $this->_sType . '_title' ];
+		$sDuplicateTitle = $_POST[ sprintf( 'duplicate_%s_title', $this->_sType ) ];
 		
 		if ( $bContinue && !$oEntity->isValid() ) {
 			$bContinue = FALSE;
@@ -1959,7 +1981,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		$sEntityClass = $this->_sEntityClass;			
 		$oEntity = new $sEntityClass( $aParams[ 'entity_id' ] );
 		
-		$aFile = $_FILES[ 'restore_' . $this->_sType . '_file' ];
+		$aFile = $_FILES[ sprintf( 'restore_%s_file', $this->_sType ) ];
 		
 		if ( $bContinue && !$oEntity->isValid() ) {
 			$bContinue = FALSE;
@@ -2019,7 +2041,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	}
 	
 	//
-	public function doDelAction( $aParams ) {
+	public function doDelAction( $aParams, $oEntity = NULL, $aKeys = NULL ) {
 		
 		global $wpdb;
 
@@ -2027,7 +2049,10 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		
 		// check the entity id given
 		$sEntityClass = $this->_sEntityClass;
-		$oEntity = new $sEntityClass( $aParams[ 'entity_id' ] );
+		
+		if ( NULL === $oEntity ) {
+			$oEntity = new $sEntityClass( $aParams[ 'entity_id' ] );
+		}
 		
 		if ( !$oEntity->isValid() ) {
 			$bContinue = FALSE;
@@ -2036,22 +2061,30 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		
 		if ( $bContinue && $this->getDeleteContinue( $aParams, $oEntity ) ) {
 			
-			$oPk = $this->getPrimaryTablePrimaryKeyField();
+			if ( NULL === $aKeys ) {
+				
+				// default
+				$oPk = $this->getPrimaryTablePrimaryKeyField();
+				
+				// TO DO: Handle multi-key scenario!!!
+				$aKeys = array( $oPk->getFieldName() => $oEntity->getId() );
+			}
 			
 			$oSqlDelete = new Geko_Sql_Delete();
-			$oSqlDelete
-				->from( $this->_sPrimaryTable )
-				->where( $oPk->getFieldName() . ' = ?', $aParams[ 'entity_id' ] )
-			;
+			$oSqlDelete->from( $this->_sPrimaryTable );
+			
+			foreach ( $aKeys as $sFieldName => $mFieldValue ) {
+				$oSqlDelete->where( sprintf( '%s = ?', $sFieldName ), $mFieldValue );
+			}
 			
 			$wpdb->query( $oSqlDelete );
 			
 			// hook method
 			$this->postDeleteAction( $aParams, $oEntity );
 			
-			$sAction = $this->_sActionPrefix . '_delete';
+			$sAction = sprintf( '%s_delete', $this->_sActionPrefix );
 			do_action( $sAction, $oEntity, $aParams );
-			if ( $this->_sSlug ) do_action( $sAction . '_' . $this->_sSlug, $oEntity, $aParams, $this->_sSlug );
+			if ( $this->_sSlug ) do_action( sprintf( '%s_%s', $sAction, $this->_sSlug ), $oEntity, $aParams, $this->_sSlug );
 			
 			$this->triggerNotifyMsg( 'm103' );										// success!!!
 			
@@ -2075,7 +2108,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 				$oSqlDelete = new Geko_Sql_Delete();
 				$oSqlDelete
 					->from( $this->_sPrimaryTable )
-					->where( $sMainEntPkfName . ' = ?', $oMainEnt->getId() )
+					->where( sprintf( '%s = ?', $sMainEntPkfName ), $oMainEnt->getId() )
 				;
 				
 				$wpdb->query( strval( $oSqlDelete ) );
@@ -2093,7 +2126,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	//
 	public function doSubAddAction( $oMainEnt, $aParams, $oPlugin = NULL ) {
 		$this->updateSubEntities( $oMainEnt, $aParams );
-		$sAction = $this->_sActionPrefix . '_subadd';
+		$sAction = sprintf( '%s_subadd', $this->_sActionPrefix );
 		apply_filters( $sAction, $oMainEnt, $aParams );
 	}
 	
@@ -2107,7 +2140,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	//
 	public function doSubEditAction( $oMainEnt, $oUpdMainEnt, $aParams, $oPlugin = NULL ) {
 		$this->updateSubEntities( $oUpdMainEnt, $aParams );	
-		$sAction = $this->_sActionPrefix . '_subedit';
+		$sAction = sprintf( '%s_subedit', $this->_sActionPrefix );
 		apply_filters( $sAction, $oMainEnt, $oUpdMainEnt, $aParams );
 	}
 	
@@ -2136,14 +2169,14 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 				$oSqlDelete = new Geko_Sql_Delete();
 				$oSqlDelete
 					->from( $this->_sPrimaryTable )
-					->where( $sMainEntPkfName . ' = ?', $oMainEnt->getId() )
+					->where( sprintf( '%s = ?', $sMainEntPkfName ), $oMainEnt->getId() )
 				;
 				
 				$wpdb->query( strval( $oSqlDelete ) );
 			}
 		}
 		
-		$sAction = $this->_sActionPrefix . '_subdelete';
+		$sAction = sprintf( '%s_subdelete', $this->_sActionPrefix );
 		apply_filters( $sAction, $oMainEnt, $aParams );
 		
 	}
@@ -2219,23 +2252,27 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	
 	// iterate through $_POST and find values with default prefix
 	public function getValidPostVals() {
+		
 		$aValues = array();
-		$sPrefix = $this->_sType . '_';
+		$sPrefix = sprintf( '%s_', $this->_sType );
+		
 		foreach ( $_POST as $sKey => $mValue ) {
 			if ( 0 === strpos( $sKey, $sPrefix ) ) {
 				$sShortKey = substr_replace( $sKey, '', 0, strlen( $sPrefix ) );
 				$aValues[ $sShortKey ] = $mValue;
 			}
 		}
+		
 		return $aValues;
 	}
 	
-	//
+	
+	// $aParams is not used
 	public function getFormattedPostData( $aParams, $aPostVals ) {
 		
 		if ( NULL === $aPostVals ) {
 			// default behavior
-			$sPrefix = $this->_sType . '_';
+			$sPrefix = sprintf( '%s_', $this->_sType );
 			$aPostVals = $_POST;
 		} else {
 			$sPrefix = '';		
@@ -2247,8 +2284,10 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		$aFields = $this->getPrimaryTableFields();
 		
 		foreach ( $aFields as $oField ) {
+			
 			$sFieldName = $oField->getFieldName();
-			$sKey = $sPrefix . $sFieldName;
+			$sKey = sprintf( '%s%s', $sPrefix, $sFieldName );
+			
 			if ( isset( $aPostVals[ $sKey ] ) ) {
 				$aValues[ $sFieldName ] = $oField->getFormattedValue( $aPostVals[ $sKey ] );
 				$aFormat[] = $oField->getFormat();
@@ -2257,6 +2296,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		
 		return array( $aValues, $aFormat );
 	}
+	
 	
 	//
 	public function updateRelatedEntities( $aQueryParams, $aPostData, $aParams ) {
@@ -2340,7 +2380,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 				$oSqlDelete = new Geko_Sql_Delete();
 				$oSqlDelete
 					->from( $this->_sPrimaryTable )
-					->where( $sMainEntPkfName . ' * ($)', $mMainEntId )
+					->where( sprintf( '%s * ($)', $sMainEntPkfName ), $mMainEntId )
 				;
 				
 				$oSqlDelete = $this->updateRelatedDelete( $oSqlDelete, $aDelIds, $aKeyFields );
@@ -2396,18 +2436,18 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 			$aAnd = array();
 			foreach ( $aKeyFields as $oField ) {
 				$aAnd[] = sprintf(
-					'( %s = ' . $oField->getFormat() . ' )',
+					'( %s = ' . $oField->getFormat() . ' )',		// !!! !!! !!!
 					$oField->getName(),
 					$aIds[ $i ]
 				);
 				$i++;
 			}
 			
-			$aWhere[] = '( ' . implode( ' AND ', $aAnd ) . ' )';
+			$aWhere[] = sprintf( '( %s )', implode( ' AND ', $aAnd ) );
 			
 		}
 		
-		$oSqlDelete->where( '( ' . implode( ' OR ', $aWhere ) . ' )' );
+		$oSqlDelete->where( sprintf( '( %s )', implode( ' OR ', $aWhere ) ) );
 		
 		return $oSqlDelete;
 	}
@@ -2480,7 +2520,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	//
 	public function parseDataFromImportFile( $aFile ) {
 		
-		$sFile = ABSPATH . 'wp-content/tmp/' . $this->_sType . '_import.txt';
+		$sFile = sprintf( '%swp-content/tmp/%s_import.txt', ABSPATH, $this->_sType );
 		
 		if ( move_uploaded_file( $aFile[ 'tmp_name' ], $sFile ) ) {
 		
@@ -2509,10 +2549,10 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 			$sSlug = 'export';
 		}
 		
-		$sFilename = $this->_sType . '_' . $sSlug . '_' . date( 'Y-m-d' ) . '.txt';
+		$sFilename = sprintf( '%s_%s_%s.txt', $this->_sType, $sSlug, date( 'Y-m-d' ) );
 		
 		header( 'Content-Type: text/plain' );
-		header( 'Content-Disposition: attachment; filename="' . $sFilename . '";' );
+		header( sprintf( 'Content-Disposition: attachment; filename="%s";', $sFilename ) );
 		
 		$aHeaders = array(
 			'Date Created' => date( 'l, F j, Y - h:i:s A' ),
