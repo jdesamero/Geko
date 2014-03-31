@@ -22,11 +22,13 @@ class GekoX_Test_Wp_Full_Manage extends Geko_Wp_Options_Manage
 	//// init
 	
 	//
-	public function affix() {
+	public function add() {
 
 		global $wpdb;
 		
-		Geko_Wp_Enumeration_Manage::getInstance()->affix();
+		parent::add();
+		
+		Geko_Wp_Enumeration_Manage::getInstance()->add();
 		
 		Geko_Wp_Db::addPrefix( 'geko_test_entity' );
 		
@@ -51,7 +53,11 @@ class GekoX_Test_Wp_Full_Manage extends Geko_Wp_Options_Manage
 	
 	// create table
 	public function install() {
-		$this->createTable( $this->getPrimaryTable() );
+		
+		parent::install();
+		
+		$this->createTableOnce();
+		
 		return $this;
 	}
 	

@@ -3,6 +3,11 @@
 // listing
 class Geko_Wp_Booking_Request_Query extends Geko_Wp_Entity_Query
 {
+	
+	protected $_bUseManageQuery = TRUE;
+	
+	
+	
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		global $wpdb;
@@ -11,13 +16,7 @@ class Geko_Wp_Booking_Request_Query extends Geko_Wp_Entity_Query
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
 		
 		$oQuery
-			
-			->field( 'brq.bkreq_id' )
-			->field( 'brq.bkitm_id' )
-			->field( 'brq.user_id' )
-			->field( 'brq.date_created' )
-			->from( $wpdb->geko_bkng_request, 'brq' )
-			
+						
 			->field( 'u.user_email', 'email' )
 			->joinLeft( $wpdb->users, 'u' )
 				->on( 'u.ID = brq.user_id' )

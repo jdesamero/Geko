@@ -3,12 +3,21 @@
 //
 abstract class Geko_Singleton_Abstract
 {
+	
 	public static $aSingletonInstances = array();
-
+	
+	protected $_sInstanceClass;
+	
+	
+	
+	
+	
 	// prevent external instantiation
 	protected function __construct() {
-	
+		
+		$this->_sInstanceClass = get_class( $this );
 	}
+	
 	
 	// It will always belong to the superclass
 	// Unless overridden by the subclass
@@ -53,6 +62,17 @@ abstract class Geko_Singleton_Abstract
 			$this->postStart();
 			
 			$this->_bCalledInit = TRUE;
+		}
+		
+		return $this;
+	}
+	
+	
+	// usually pass __CLASS__ to this
+	public function forceInit( $sInstanceClass ) {
+		
+		if ( $this->_sInstanceClass != $sInstanceClass ) {
+			self::getInstance( $sInstanceClass )->init();
 		}
 		
 		return $this;

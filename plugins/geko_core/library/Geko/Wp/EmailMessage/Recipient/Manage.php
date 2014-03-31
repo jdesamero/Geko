@@ -28,9 +28,11 @@ class Geko_Wp_EmailMessage_Recipient_Manage extends Geko_Wp_Options_Manage
 	//// init
 	
 	//
-	public function affix() {
+	public function add() {
 		
 		global $wpdb;
+		
+		parent::add();
 		
 		$sTableName = 'geko_emsg_recipients';
 		Geko_Wp_Db::addPrefix( $sTableName );

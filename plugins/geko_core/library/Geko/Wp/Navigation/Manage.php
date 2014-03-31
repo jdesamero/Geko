@@ -20,9 +20,11 @@ class Geko_Wp_Navigation_Manage extends Geko_Wp_Options_Manage
 	
 	
 	//
-	public function affix() {
+	public function add() {
 		
 		global $wpdb;
+		
+		parent::add();
 		
 		Geko_Wp_Db::addPrefix( 'geko_navigation' );
 		
@@ -48,7 +50,11 @@ class Geko_Wp_Navigation_Manage extends Geko_Wp_Options_Manage
 	
 	// create table
 	public function install() {
-		$this->createTable( $this->getPrimaryTable() );
+		
+		parent::install();
+		
+		$this->createTableOnce();
+		
 		return $this;
 	}
 	

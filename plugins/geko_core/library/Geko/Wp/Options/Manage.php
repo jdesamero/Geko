@@ -149,7 +149,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 					if ( $mButton[ 'btn_title' ] ) $sBtnTitle = $mButton[ 'btn_title' ];
 				}
 				
-				if ( !$sId ) $sId = $sKey . '_btn';
+				if ( !$sId ) $sId = sprintf( '%s_btn', $sKey );
 				if ( !$sBtnTitle ) $sBtnTitle = Geko_Inflector::humanize( $sKey );
 				
 				$aActionNormalized[ 'button' ] = array(
@@ -250,7 +250,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 					
 					if ( $sEnumKey = $aItmPrms[ 'enum' ] ) {
 						
-						$sSlugPfx = ( $aItmPrms[ 'slug_pfx' ] ) ? $aItmPrms[ 'slug_pfx' ] : $sEnumKey . '-';
+						$sSlugPfx = ( $aItmPrms[ 'slug_pfx' ] ) ? $aItmPrms[ 'slug_pfx' ] : sprintf( '%s-', $sEnumKey );
 						
 						$aEnum = Geko_Wp_Enumeration_Query::getSet( $sEnumKey );
 						
@@ -309,39 +309,39 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 			
 			$sSubAction = $oSubMng->getActionPrefix();
 			
-			add_action( $sSubAction . '_init_entities', array( $this, 'initEntities' ), 10, 2 );
-			add_filter( $sSubAction . '_getstoredopts', array( $this, 'getStoredSubOptions' ), 10, 3 );
-			add_filter( $sSubAction . '_getdefaultopts', array( $this, 'getDefaultSubOptions' ), 10, 2 );
+			add_action( sprintf( '%s_init_entities', $sSubAction ), array( $this, 'initEntities' ), 10, 2 );
+			add_filter( sprintf( '%s_getstoredopts', $sSubAction ), array( $this, 'getStoredSubOptions' ), 10, 3 );
+			add_filter( sprintf( '%s_getdefaultopts', $sSubAction ), array( $this, 'getDefaultSubOptions' ), 10, 2 );
 			
-			add_action( $sSubAction . '_add', array( $this, 'doSubAddAction' ), 10, 2 );
-			add_action( $sSubAction . '_edit', array( $this, 'doSubEditAction' ), 10, 4 );
-			add_action( $sSubAction . '_delete', array( $this, 'doSubDelAction' ), 10, 2 );
+			add_action( sprintf( '%s_add', $sSubAction ), array( $this, 'doSubAddAction' ), 10, 2 );
+			add_action( sprintf( '%s_edit', $sSubAction ), array( $this, 'doSubEditAction' ), 10, 4 );
+			add_action( sprintf( '%s_delete', $sSubAction ), array( $this, 'doSubDelAction' ), 10, 2 );
 			
 			if ( $this->_bSubMainFields ) {
 				
-				add_action( $sSubAction . '_main_fields', array( $this, 'formFields' ), 10, 3 );
-				add_action( $sSubAction . '_sub_main_field_titles', array( $this, 'subMainFieldTitles' ), 10, 2 );			// ???
-				add_action( $sSubAction . '_sub_main_field_columns', array( $this, 'subMainFieldColumns' ), 10, 2 );			// ???
-				add_filter( $sSubAction . '_getstoredsubopts', array( $this, 'getStoredSubOptions' ), 10, 3 );
+				add_action( sprintf( '%s_main_fields', $sSubAction ), array( $this, 'formFields' ), 10, 3 );
+				add_action( sprintf( '%s_sub_main_field_titles', $sSubAction ), array( $this, 'subMainFieldTitles' ), 10, 2 );			// ???
+				add_action( sprintf( '%s_sub_main_field_columns', $sSubAction ), array( $this, 'subMainFieldColumns' ), 10, 2 );			// ???
+				add_filter( sprintf( '%s_getstoredsubopts', $sSubAction ), array( $this, 'getStoredSubOptions' ), 10, 3 );
 				
-				add_action( $sSubAction . '_subadd', array( $this, 'doSubAddAction' ), 10, 3 );
-				add_action( $sSubAction . '_subedit', array( $this, 'doSubEditAction' ), 10, 4 );
-				add_action( $sSubAction . '_subdelete', array( $this, 'doSubDelAction' ), 10, 3 );
+				add_action( sprintf( '%s_subadd', $sSubAction ), array( $this, 'doSubAddAction' ), 10, 3 );
+				add_action( sprintf( '%s_subedit', $sSubAction ), array( $this, 'doSubEditAction' ), 10, 4 );
+				add_action( sprintf( '%s_subdelete', $sSubAction ), array( $this, 'doSubDelAction' ), 10, 3 );
 				
 			}
 			
 			if ( $this->_bSubExtraFields ) {
-				add_action( $sSubAction . '_extra_fields', array( $this, 'outputForm' ), 10, 2 );
+				add_action( sprintf( '%s_extra_fields', $sSubAction ), array( $this, 'outputForm' ), 10, 2 );
 			}
 			
 			if ( $this->_bExtraForms ) {
-				add_action( $sSubAction . '_extra_forms', array( $this, 'extraForms' ), 10, 2 );
+				add_action( sprintf( '%s_extra_forms', $sSubAction ), array( $this, 'extraForms' ), 10, 2 );
 			}
 						
 		} else {
 
 			if ( $this->_bExtraForms ) {
-				add_action( $this->_sActionPrefix . '_extra_forms', array( $this, 'extraForms' ), 10, 2 );
+				add_action( sprintf( '%s_extra_forms', $this->_sActionPrefix ), array( $this, 'extraForms' ), 10, 2 );
 			}
 			
 		}
@@ -361,9 +361,9 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		$this->_sMenuTitle = $this->_sMenuTitle ? $this->_sMenuTitle : $this->_sSubjectPlural;
 		$this->_sListingTitle = $this->_sListingTitle ? $this->_sListingTitle : $this->_sSubject;
 		
-		$this->_sAddAction = $this->_sAddAction ? $this->_sAddAction : 'add' . $this->_sType;
-		$this->_sEditAction = $this->_sEditAction ? $this->_sEditAction : 'edit' . $this->_sType;
-		$this->_sDelAction = $this->_sDelAction ? $this->_sDelAction : 'delete' . $this->_sType;
+		$this->_sAddAction = $this->_sAddAction ? $this->_sAddAction : sprintf( 'add%s', $this->_sType );
+		$this->_sEditAction = $this->_sEditAction ? $this->_sEditAction : sprintf( 'edit%s', $this->_sType );
+		$this->_sDelAction = $this->_sDelAction ? $this->_sDelAction : sprintf( 'delete%s', $this->_sType );
 		
 		
 		// list mode is default
@@ -528,10 +528,12 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	//
 	public function initEntities() {
 		
+		Geko_Debug::out( $this->_sInstanceClass, __METHOD__ );
+		
 		if ( $this->_iCurrentEntityId && !$this->_oCurrentEntity ) {
 			$this->_oCurrentEntity = new $this->_sEntityClass( $this->_iCurrentEntityId );
 			if ( $this->_oCurrentEntity->isValid() ) {
-				do_action( $this->_sActionPrefix . '_init_entities', $this->_oCurrentEntity );
+				do_action( sprintf( '%s_init_entities', $this->_sActionPrefix ), $this->_oCurrentEntity );
 			}
 		}
 		
@@ -616,17 +618,18 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 			
 			foreach ( $aFields as $oField ) {
 				$sFieldName = $oField->getFieldName();
-				$aRet[ $this->_sType . '_' . $sFieldName ] = $oEntity->getEntityPropertyValue( $sFieldName );
+				$sRetKey = sprintf( '%s_%s', $this->_sType, $sFieldName );
+				$aRet[ $sRetKey ] = $oEntity->getEntityPropertyValue( $sFieldName );
 			}
 			
 			// hook method
 			$aRet = $this->modifyStoredOptions( $aRet, $oEntity );
-			$sAction = $this->_sActionPrefix . '_getstoredopts';
+			$sAction = sprintf( '%s_getstoredopts', $this->_sActionPrefix );
 			
 			$aRet = apply_filters( $sAction, $aRet, $oEntity, $this );
 			
 			if ( $oEntity->hasEntityProperty( 'slug' ) ) {
-				$aRet = apply_filters( $sAction . '_' . $oEntity->getSlug(), $aRet, $oEntity );
+				$aRet = apply_filters( sprintf( '%s_%s', $sAction, $oEntity->getSlug() ), $aRet, $oEntity );
 			}
 			
 		} else {
@@ -645,7 +648,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 				$this->getStoredSubOptionParams( $oMainMng, $oMainEnt )
 			);
 			
-			$sAction = $this->_sActionPrefix . '_getstoredsubopts';
+			$sAction = sprintf( '%s_getstoredsubopts', $this->_sActionPrefix );
 			$aRet = apply_filters( $sAction, $aRet, $oMainEnt, $this );
 			
 		}
@@ -671,7 +674,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	
 	//
 	public function getDefaultOptions( $aRet, $oPlugin = NULL ) {
-		$sAction = $this->_sActionPrefix . '_getdefaultopts';
+		$sAction = sprintf( '%s_getdefaultopts', $this->_sActionPrefix );
 		$aRet = apply_filters( $sAction, $aRet, $this );
 		return $aRet;
 	}
@@ -865,32 +868,32 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	//
 	protected function getNotificationMsgs() {
 		return array(
-			'm101' => $this->_sSubject . ' added successfully.',
-			'm102' => $this->_sSubject . ' was updated successfully.',
-			'm103' => $this->_sSubject . ' was deleted successfully.',
-			'm104' => $this->_sSubject . ' was duplicated successfully.',
-			'm105' => '%d of %d ' . $this->_sSubjectPlural . ' was imported successfully!',
-			'm106' => $this->_sSubject . ' was restored successfully.'
+			'm101' => sprintf( '%s added successfully.', $this->_sSubject ),
+			'm102' => sprintf( '%s was updated successfully.', $this->_sSubject ),
+			'm103' => sprintf( '%s was deleted successfully.', $this->_sSubject ),
+			'm104' => sprintf( '%s was duplicated successfully.', $this->_sSubject ),
+			'm105' => sprintf( '%%d of %%d %s was imported successfully!', $this->_sSubjectPlural ),
+			'm106' => sprintf( '%s was restored successfully.', $this->_sSubject )
 		);
 	}
 	
 	//
 	protected function getErrorMsgs() {
 		return array(
-			'm201' => 'Please specify a title for the ' . strtolower( $this->_sSubject ) . '.',
-			'm202' => 'Bad ' . strtolower( $this->_sSubject ) . ' id given. Operation cannot be completed.',
-			'm203' => 'A type was not specified for the ' . strtolower( $this->_sSubject ) . '.',
-			'm204' => "You don't have enough privileges to manage " . strtolower( $this->_sSubjectPlural ) . '.',
-			'm205' => 'The specified ' . $this->_sSubject . ' cannot be duplicated!',
-			'm206' => 'Please specify a name for the ' . $this->_sSubject . ' to be duplicated!',
-			'm207' => 'Failed to duplicate the ' . $this->_sSubject . '! Please try again.',
-			'm208' => 'There was no ' . $this->_sSubject . ' import file uploaded. Please upload a valid %s file!',
-			'm209' => 'There was an error with the ' . $this->_sSubject . ' import file upload. Please try again.',
-			'm210' => 'Incorrect ' . $this->_sSubject . ' import file uploaded. Please upload a valid %s file!',
-			'm211' => 'An invalid ' . $this->_sSubject . ' was specified!',
-			'm212' => 'There was an error parsing the ' . $this->_sSubject . ' import file. Please try again.',
-			'm213' => '%d of %d ' . $this->_sSubjectPlural . ' was partially imported. Please check for any errors.',
-			'm214' => 'Unable to restore the ' . $this->_sSubject . '. Please try again.'
+			'm201' => sprintf( 'Please specify a title for the %s.', strtolower( $this->_sSubject ) ),
+			'm202' => sprintf( 'Bad %%s id given. Operation cannot be completed.', strtolower( $this->_sSubject ) ),
+			'm203' => sprintf( 'A type was not specified for the %s.', strtolower( $this->_sSubject ) ),
+			'm204' => sprintf( "You don't have enough privileges to manage %s.", strtolower( $this->_sSubjectPlural ) ),
+			'm205' => sprintf( 'The specified %s cannot be duplicated!', $this->_sSubject ),
+			'm206' => sprintf( 'Please specify a name for the %s to be duplicated!', $this->_sSubject ),
+			'm207' => sprintf( 'Failed to duplicate the %s! Please try again.', $this->_sSubject ),
+			'm208' => sprintf( 'There was no %s import file uploaded. Please upload a valid %%s file!', $this->_sSubject ),
+			'm209' => sprintf( 'There was an error with the %s import file upload. Please try again.', $this->_sSubject ),
+			'm210' => sprintf( 'Incorrect %s import file uploaded. Please upload a valid %%s file!', $this->_sSubject ),
+			'm211' => sprintf( 'An invalid %s was specified!', $this->_sSubject ),
+			'm212' => sprintf( 'There was an error parsing the %s import file. Please try again.', $this->_sSubject ),
+			'm213' => sprintf( '%%d of %%d %s was partially imported. Please check for any errors.', $this->_sSubjectPlural ),
+			'm214' => sprintf( 'Unable to restore the %s. Please try again.', $this->_sSubject )
 		);
 	}
 	
@@ -979,8 +982,8 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		$iTotalRows = $aEntities->getTotalRows();
 		$sPaginateLinks = $this->getPaginationLinks( $iTotalRows );
 		
-		$sAction = 'add' . $this->_sType;
-		$sNonceField = $this->_sInstanceClass . $sAction;
+		$sAction = sprintf( 'add%s', $this->_sType );
+		$sNonceField = sprintf( '%s%s', $this->_sInstanceClass, $sAction );
 		
 		?>
 		<div class="wrap">
@@ -2436,7 +2439,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 			$aAnd = array();
 			foreach ( $aKeyFields as $oField ) {
 				$aAnd[] = sprintf(
-					'( %s = ' . $oField->getFormat() . ' )',		// !!! !!! !!!
+					sprintf( '( %%s = %s )', $oField->getFormat() ),
 					$oField->getName(),
 					$aIds[ $i ]
 				);

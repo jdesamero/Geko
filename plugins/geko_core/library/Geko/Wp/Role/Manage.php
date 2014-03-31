@@ -22,18 +22,21 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 	
 	//// init
 	
-	public function affix() {
+	public function add() {
 		
 		global $wpdb;
 		
-		Geko_Wp_Db::addPrefix( 'geko_roles' );
-
+		parent::add();
+		
+		$sTableName = 'geko_roles';
+		Geko_Wp_Db::addPrefix( $sTableName );
+		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->geko_roles, 'r' )
+			->create( $wpdb->$sTableName, 'r' )
 			->fieldSmallInt( 'role_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
-			->fieldVarChar( 'title', array( 'size' => 255 ) )
-			->fieldVarChar( 'slug', array( 'size' => 255, 'unq' ) )
+			->fieldVarChar( 'title', array( 'size' => 256 ) )
+			->fieldVarChar( 'slug', array( 'size' => 256, 'unq' ) )
 			->fieldVarChar( 'type', array( 'size' => 64 ) )
 			->fieldLongText( 'description' )
 		;
@@ -44,11 +47,13 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 	}
 	
 	//
-	public function affixAdmin() {
+	public function addAdmin() {
 		
 		global $wpdb;
 		
-		add_action( 'update_option_' . $wpdb->prefix . 'user_roles', array( $this, 'updateRole' ), 10, 2 );
+		parent::addAdmin();
+		
+		add_action( sprintf( 'update_option_%suser_roles', $wpdb->prefix ), array( $this, 'updateRole' ), 10, 2 );
 		
 		// reconcile assigned for the types that need it
 		Geko_Wp_Role_Types::getInstance()->reconcileAssigned();
@@ -60,7 +65,9 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 	// create table
 	public function install() {
 		
-		if ( $this->createTable( $this->getPrimaryTable() ) ) {
+		parent::install();
+		
+		if ( $this->createTableOnce() ) {
 			
 			// initial database sync with roles array
 			global $wp_roles;

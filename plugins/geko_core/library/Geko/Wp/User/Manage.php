@@ -151,7 +151,7 @@ class Geko_Wp_User_Manage extends Geko_Wp_Options_Manage
 		
 		// re-route
 		if ( $aParams ) {
-			header( 'Location: ' . $aParams[ 'referer' ] );
+			header( sprintf( 'Location: %s', $aParams[ 'referer' ] ) );
 			die();
 		}
 	}

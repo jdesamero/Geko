@@ -40,9 +40,12 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 	//// init
 	
 	//
-	public function affix() {
+	public function add() {
 		
 		global $wpdb;
+		
+		parent::add();
+		
 		
 		$sTableName = 'geko_form';
 		Geko_Wp_Db::addPrefix( $sTableName );
@@ -69,7 +72,11 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 	
 	// create table
 	public function install() {
-		$this->createTable( $this->getPrimaryTable() );
+		
+		parent::install();
+		
+		$this->createTableOnce();
+		
 		return $this;
 	}
 	

@@ -15,20 +15,27 @@ class Geko_Debug
 	
 	
 	//
-	private static $iMaxLevels = 20;
-	private static $aObjectRegistry = array();
-	private static $bShowLevels = FALSE;
-	private static $bShowType = FALSE;
-	private static $bShowObjectMethods = TRUE;
-	private static $bShowClassConstants = TRUE;
-	private static $bShowScope = TRUE;
-	private static $bRecognizeClassNames = TRUE;
-	private static $aScopes = array( 'public', 'protected', 'private' );
+	protected static $iMaxLevels = 20;
+	protected static $aObjectRegistry = array();
+	protected static $bShowLevels = FALSE;
+	protected static $bShowType = FALSE;
+	protected static $bShowObjectMethods = TRUE;
+	protected static $bShowClassConstants = TRUE;
+	protected static $bShowScope = TRUE;
+	protected static $bRecognizeClassNames = TRUE;
+	protected static $aScopes = array( 'public', 'protected', 'private' );
+	
+	
+	protected static $sOutBreak = '<br />';
+	protected static $aOutEnable = NULL;
+	protected static $aOutDisable = NULL;
+	protected static $bShowOut = FALSE;
+	
 	
 	
 	
 	// prevent instantiation
-	private function __construct() {
+	protected function __construct() {
 		// do nothing
 	}
 	
@@ -677,6 +684,69 @@ class Geko_Debug
 	public static function display( $mData ) {
 		printf( '<br />%s<br />', self::dump( $mData ) );
 	}
+	
+	
+	
+	
+	//// out*() debugging methods
+	
+	
+	//
+	public static function setOutBreak( $sOutBreak ) {
+		self::$sOutBreak = $sOutBreak;
+	}
+	
+	//
+	public static function setShowOut( $bShowOut ) {
+		self::$bShowOut = $bShowOut;
+	}
+	
+	
+	//// setOutEnable/Disable takes a list of "groups"
+	
+	//
+	public static function setOutEnable() {
+		
+		self::$aOutDisable = NULL;			// switch off the other mode
+		
+		self::$aOutEnable = func_get_args();
+	}
+
+	//
+	public static function setOutDisable() {
+		
+		self::$aOutEnable = NULL;			// switch off the other mode
+		
+		self::$aOutDisable = func_get_args();
+	}
+	
+	//
+	public static function out( $sValue, $sGroup = '' ) {
+		
+		if ( self::$bShowOut ) {
+			
+			if (
+				(
+					( is_array( self::$aOutEnable ) ) && 
+					( in_array( $sGroup, self::$aOutEnable ) )
+				) || (
+					( is_array( self::$aOutDisable ) ) && 
+					( !in_array( $sGroup, self::$aOutDisable ) )				
+				) || (
+					( NULL === self::$aOutEnable ) && 
+					( NULL === self::$aOutDisable )					
+				)
+			) {
+				
+				$sPrefix = ( $sGroup ) ? sprintf( '%s - ', $sGroup ) : '' ;
+				
+				printf( '%s%s%s', $sPrefix, $sValue, self::$sOutBreak );
+				
+			}				
+			
+		}
+	}
+	
 	
 }
 

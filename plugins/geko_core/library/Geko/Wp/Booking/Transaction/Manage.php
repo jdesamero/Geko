@@ -30,20 +30,46 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 	
 	
 	//
-	public function affix() {
-		Geko_Wp_Db::addPrefix( 'geko_bkng_transaction' );
-		return $this;
-	}
-	
-	
-	
-	//
 	public function add() {
+		
+		global $wpdb;
 		
 		parent::add();
 		
+		
+		//// action stuff
+		
 		add_action( 'admin_geko_bkitm_add', array( $this, 'addItem' ), 10 );
 		add_action( 'admin_geko_bkitm_delete', array( $this, 'deleteItem' ), 10 );
+		
+		
+		//// database stuff
+		
+		$sTableName = 'geko_bkng_transaction';
+		Geko_Wp_Db::addPrefix( $sTableName );
+		
+		$oSqlTable = new Geko_Sql_Table();
+		$oSqlTable
+			->create( $wpdb->$sTableName, 'btr' )
+			->fieldBigInt( 'bktrn_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
+			->fieldBigInt( 'orig_trn_id', array( 'unsgnd', 'key' ) )
+			->fieldTinyInt( 'transaction_type_id', array( 'unsgnd' ) )
+			->fieldTinyInt( 'gateway_id', array( 'unsgnd' ) )
+			->fieldTinyInt( 'status_id', array( 'unsgnd' ) )
+			->fieldTinyInt( 'is_test', array( 'unsgnd' ) )
+			->fieldBigInt( 'bkitm_id', array( 'unsgnd', 'key' ) )
+			->fieldLongText( 'details' )
+			->fieldFloat( 'units', array( 'unsgnd', 'size' => '5,2' ) )
+			->fieldFloat( 'cost', array( 'unsgnd', 'size' => '10,2' ) )
+			->fieldFloat( 'discount', array( 'unsgnd', 'size' => '10,2' ) )
+			->fieldFloat( 'tax', array( 'unsgnd', 'size' => '10,2' ) )
+			->fieldFloat( 'amount', array( 'unsgnd', 'size' => '10,2' ) )
+			->fieldBigInt( 'user_id', array( 'unsgnd', 'key' ) )
+			->fieldDateTime( 'date_created' )
+		;
+		
+		$this->addTable( $oSqlTable );
+		
 		
 		return $this;
 	}
@@ -52,29 +78,10 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 	
 	// create table
 	public function install() {
-		$sSql = '
-			CREATE TABLE %s
-			(
-				bktrn_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-				orig_trn_id BIGINT UNSIGNED,
-				transaction_type_id TINYINT UNSIGNED,
-				gateway_id TINYINT UNSIGNED,
-				status_id TINYINT UNSIGNED,
-				is_test TINYINT UNSIGNED,
-				bkitm_id BIGINT UNSIGNED,
-				details LONGTEXT,
-				units FLOAT(5,2) UNSIGNED,
-				cost FLOAT(10,2) UNSIGNED,
-				discount FLOAT(10,2) UNSIGNED,
-				tax FLOAT(10,2) UNSIGNED,
-				amount FLOAT(10,2) UNSIGNED,
-				user_id BIGINT UNSIGNED,
-				date_created DATETIME,
-				PRIMARY KEY(bktrn_id)
-			)
-		';
 		
-		Geko_Wp_Db::createTable( 'geko_bkng_transaction', $sSql );
+		parent::install();
+		
+		$this->createTableOnce();
 				
 		return $this;
 	}

@@ -19,9 +19,12 @@ class Geko_Wp_Form_ItemValue_Manage extends Geko_Wp_Options_Manage
 	//// init
 	
 	//
-	public function affix() {
+	public function add() {
 
 		global $wpdb;
+		
+		parent::add();
+		
 		
 		$sTable = 'geko_form_item_value';
 		Geko_Wp_Db::addPrefix( $sTable );
@@ -49,7 +52,11 @@ class Geko_Wp_Form_ItemValue_Manage extends Geko_Wp_Options_Manage
 	
 	// create table
 	public function install() {
-		$this->createTable( $this->getPrimaryTable() );
+		
+		parent::install();
+		
+		$this->createTableOnce();
+		
 		return $this;
 	}
 	

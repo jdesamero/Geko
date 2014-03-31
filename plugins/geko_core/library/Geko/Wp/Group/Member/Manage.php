@@ -26,32 +26,46 @@ class Geko_Wp_Group_Member_Manage extends Geko_Wp_Options_Manage
 	
 	
 	//
-	public function affix() {
-		Geko_Wp_Db::addPrefix( 'geko_group_members' );
+	public function add() {
+		
+		global $wpdb;
+		
+		parent::add();
+		
+		
+		$sTable = 'geko_group_members';
+		Geko_Wp_Db::addPrefix( $sTable );
+		
+		$oSqlTable = new Geko_Sql_Table();
+		$oSqlTable
+			->create( $wpdb->$sTable, 'gm' )
+			->fieldBigInt( 'group_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
+			->fieldBigInt( 'user_id', array( 'unsgnd', 'key' ) )
+			->fieldSmallInt( 'status_id', array( 'unsgnd' ) )
+			->fieldDateTime( 'date_requested' )
+			->fieldDateTime( 'date_joined' )
+			->indexUnq( 'group_user_id', array( 'group_id', 'user_id' ) )
+		;
+		
+		$this->addTable( $oSqlTable );
+		
+		
 		return $this;
 	}
 	
 	// create table
 	public function install() {
 		
+		parent::install();
+		
 		Geko_Wp_Options_MetaKey::install();
 		
-		$sSql = '
-			CREATE TABLE %s
-			(
-				group_id BIGINT,
-				user_id BIGINT,
-				status_id SMALLINT,
-				date_requested DATETIME,
-				date_joined DATETIME,
-				KEY group_user_id(group_id, user_id)
-			)
-		';
-		
-		Geko_Wp_Db::createTable( 'geko_group_members', $sSql );
+		$this->createTableOnce();
 		
 		return $this;
 	}
+	
+	
 	
 	
 	
@@ -76,12 +90,13 @@ class Geko_Wp_Group_Member_Manage extends Geko_Wp_Options_Manage
 	//
 	public function attachPage() {
 		
-		//parent::attachPage();
+		// parent::attachPage();
 		
-		// printf( '%s - %s<br />', $this->_sSubOptionParentClass, $this->_sManagementCapability );
-		add_submenu_page( $this->_sSubOptionParentClass, 'Pending Membership Requests', 'Pending', $this->_sManagementCapability, $this->_sInstanceClass . '_Pending', array( $this, 'pendingPage' ) );
+		Geko_Debug::log( sprintf( '%s - %s', $this->_sSubOptionParentClass, $this->_sManagementCapability ), __METHOD__ );
 		
-		$iEntityId = Geko_String::coalesce( $_GET['parent_entity_id'], $_GET['group_id'] );
+		add_submenu_page( $this->_sSubOptionParentClass, 'Pending Membership Requests', 'Pending', $this->_sManagementCapability, sprintf( '%s_Pending', $this->_sInstanceClass ), array( $this, 'pendingPage' ) );
+		
+		$iEntityId = Geko_String::coalesce( $_GET[ 'parent_entity_id' ], $_GET[ 'group_id' ] );
 		
 		$sUrl = sprintf( '%s?page=%s&%s=%d', Geko_Uri::getUrl( 'wp_admin' ), $this->_sInstanceClass, $this->_sParentEntityIdVarName, $iEntityId );
 		Geko_Wp_Admin_Menu::addMenu( $this->_sSubOptionParentClass, 'Members', $sUrl );

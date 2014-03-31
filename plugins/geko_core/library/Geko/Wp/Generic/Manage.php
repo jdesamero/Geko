@@ -15,9 +15,11 @@ class Geko_Wp_Generic_Manage extends Geko_Wp_Options_Manage
 	
 	
 	//
-	public function affix() {
+	public function add() {
 		
 		global $wpdb;
+		
+		parent::add();
 		
 		Geko_Wp_Options_MetaKey::init();
 		
@@ -45,8 +47,13 @@ class Geko_Wp_Generic_Manage extends Geko_Wp_Options_Manage
 	
 	//
 	public function install() {
+		
+		parent::install();
+		
 		Geko_Wp_Options_MetaKey::install();
-		$this->createTable( $this->getPrimaryTable() );
+		
+		$this->createTableOnce();
+		
 		return $this;
 	}
 	

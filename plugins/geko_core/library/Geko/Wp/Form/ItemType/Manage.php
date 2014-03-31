@@ -18,9 +18,11 @@ class Geko_Wp_Form_ItemType_Manage extends Geko_Wp_Options_Manage
 	//// init
 	
 	//
-	public function affix() {
+	public function add() {
 		
 		global $wpdb;
+		
+		parent::add();
 		
 		$sTable = 'geko_form_item_type';
 		Geko_Wp_Db::addPrefix( $sTable );
@@ -47,11 +49,22 @@ class Geko_Wp_Form_ItemType_Manage extends Geko_Wp_Options_Manage
 	// create table
 	public function install() {
 		
-		$this->createTable( $this->getPrimaryTable() );
+		parent::install();
+		
+		$this->createTableOnce();
 		
 		// populate with default values if table is empty
 		
 		$sTable = 'geko_form_item_type';
+		
+		Geko_Once::run( sprintf( '%s::populate' ), array( $this, 'populateTable' ), array( $sTable ) );
+		
+		return $this;
+	}
+	
+	
+	//
+	public function populateTable( $sTable ) {
 		
 		if ( 0 === Geko_Wp_Db::getTableNumRows( $sTable ) ) {
 
@@ -65,8 +78,6 @@ class Geko_Wp_Form_ItemType_Manage extends Geko_Wp_Options_Manage
 				array( 'slug:%s' => 'select_multi', 'name:%s' => 'Select (Multiple)', 'has_multiple_values:%d' => 1, 'has_multiple_response:%d' => 1, 'has_choice_subs:%d' => 0 )
 			) );
 		}
-		
-		return $this;
 	}
 	
 	

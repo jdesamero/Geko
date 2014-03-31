@@ -75,16 +75,14 @@ class Geko_Wp_Booking_Schedule_Time_Manage extends Geko_Wp_Options_Manage
 	
 	
 	//
-	public function affix() {
-		Geko_Wp_Db::addPrefix( 'geko_bkng_schedule_time' );
-		return $this;
-	}
-	
-	
-	//
 	public function add() {
 		
+		global $wpdb;
+		
 		parent::add();
+		
+		
+		//// action stuff
 		
 		add_action( 'admin_geko_bksch_main_fields', array( $this, 'formFields' ), 10, 2 );
 		
@@ -93,6 +91,23 @@ class Geko_Wp_Booking_Schedule_Time_Manage extends Geko_Wp_Options_Manage
 		add_action( 'admin_geko_bkschs_delete', array( $this, 'doDelAction' ) );
 		add_filter( 'admin_geko_bkschs_getstoredopts', array( $this, 'getStoredOptions' ), 10, 2 );
 		
+		
+		//// database stuff
+		
+		$sTableName = 'geko_bkng_schedule_time';
+		Geko_Wp_Db::addPrefix( $sTableName );
+		
+		$oSqlTable = new Geko_Sql_Table();
+		$oSqlTable
+			->create( $wpdb->$sTableName, 'bst' )
+			->fieldBigInt( 'bksctm_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
+			->fieldBigInt( 'bksch_id', array( 'unsgnd', 'key' ) )
+			->fieldTinyInt( 'weekday_id', array( 'unsgnd' ) )
+			->fieldVarChar( 'time_start', array( 'size' => 16 ) )
+			->fieldVarChar( 'time_end', array( 'size' => 16 ) )
+		;
+		
+		
 		return $this;
 	}
 	
@@ -100,22 +115,13 @@ class Geko_Wp_Booking_Schedule_Time_Manage extends Geko_Wp_Options_Manage
 	// create table
 	public function install() {
 		
-		$sSql = '
-			CREATE TABLE %s
-			(
-				bksctm_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-				bksch_id BIGINT UNSIGNED,
-				weekday_id TINYINT,
-				time_start VARCHAR(16),
-				time_end VARCHAR(16),
-				PRIMARY KEY(bksctm_id)
-			)
-		';
+		parent::install();
 		
-		Geko_Wp_Db::createTable( 'geko_bkng_schedule_time', $sSql );
-				
+		$this->createTableOnce();
+		
 		return $this;
 	}
+	
 	
 	
 	

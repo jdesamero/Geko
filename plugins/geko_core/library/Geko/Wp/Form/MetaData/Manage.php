@@ -20,11 +20,13 @@ class Geko_Wp_Form_MetaData_Manage extends Geko_Wp_Options_Manage
 	//// init
 	
 	//
-	public function affix() {
+	public function add() {
 
 		global $wpdb;
 		
-		Geko_Wp_Enumeration_Manage::getInstance()->affix();
+		parent::add();
+		
+		Geko_Wp_Enumeration_Manage::getInstance()->add();
 		
 		$sTableName = 'geko_form_meta_data';
 		Geko_Wp_Db::addPrefix( $sTableName );
@@ -50,7 +52,19 @@ class Geko_Wp_Form_MetaData_Manage extends Geko_Wp_Options_Manage
 	
 	// create table
 	public function install() {
-
+		
+		parent::install();
+		
+		Geko_Once::run( sprintf( '%s::enumeration', __CLASS__ ), array( $this, 'installEnumeration' ) );
+				
+		$this->createTableOnce();
+		
+		return $this;
+	}
+	
+	//
+	public function installEnumeration() {
+		
 		Geko_Wp_Enumeration_Manage::getInstance()->install();
 		Geko_Wp_Enumeration_Manage::populate( array(
 			array( 'title' => 'Form Context', 'slug' => 'geko-form-context', 'description' => 'List of areas where meta data is applicable.' ),
@@ -61,10 +75,8 @@ class Geko_Wp_Form_MetaData_Manage extends Geko_Wp_Options_Manage
 			)
 		) );
 		
-		$this->createTable( $this->getPrimaryTable() );
-		
-		return $this;
 	}
+	
 	
 	
 	//

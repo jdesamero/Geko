@@ -18,6 +18,7 @@ class Geko_Once
 		}
 	}
 	
+	
 	//
 	public static function call( $sKey ) {
 		
@@ -25,18 +26,21 @@ class Geko_Once
 		
 		if ( ( $aCall = $aReg[ $sKey ] ) && ( !$aCall[ 0 ] ) ) {
 			
-			call_user_func_array( $aCall[ 1 ], $aCall[ 2 ] );
-			
 			$aReg[ $sKey ][ 0 ] = TRUE;
+			
+			return call_user_func_array( $aCall[ 1 ], $aCall[ 2 ] );
 		}
 	}
+	
 	
 	// perform register() / call() in one shot
 	public static function run( $sKey, $fCallback, $aArgs = array() ) {
 		
 		self::register( $sKey, $fCallback, $aArgs );
-		self::call( $sKey );
+		
+		return self::call( $sKey );
 	}
+	
 	
 	//
 	public static function unregister( $sKey ) {
@@ -46,6 +50,7 @@ class Geko_Once
 		unset( $aReg[ $sKey ] );
 	}
 	
+	
 	//
 	public static function debug() {
 		// print_r( self::$aRegistry );
@@ -53,5 +58,6 @@ class Geko_Once
 	}
 	
 }
+
 
 

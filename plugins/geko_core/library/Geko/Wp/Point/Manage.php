@@ -30,22 +30,25 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 	
 	//// init
 	
-	public function add() {
-		
-		parent::add();
-		
-		add_action( 'delete_user', array( $this, 'deleteUser' ) );
-		
-		return $this;
-		
-	}
-	
 	//
-	public function affix() {
+	public function add() {
 		
 		global $wpdb;
 		
+		parent::add();
+		
+		
+		//// dependencies
+		
 		Geko_Wp_Enumeration_Manage::getInstance()->affix();
+		
+		
+		//// actions
+		
+		add_action( 'delete_user', array( $this, 'deleteUser' ) );
+		
+		
+		//// database stuff
 		
 		$sTableName = 'geko_point';
 		Geko_Wp_Db::addPrefix( $sTableName );
@@ -75,7 +78,20 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 	
 	// create table
 	public function install() {
-
+		
+		parent::install();
+		
+		Geko_Once::run( sprintf( '%s::enumeration', __CLASS__ ), array( $this, 'installEnumeration' ) );
+		
+		$this->createTableOnce();
+		
+		return $this;
+	}
+	
+	
+	//
+	public function installEnumeration() {
+		
 		Geko_Wp_Enumeration_Manage::getInstance()->install();
 		Geko_Wp_Enumeration_Manage::populate( array(
 			array( 'title' => 'Point Status', 'slug' => 'geko-point-status', 'description' => 'List of point statuses.' ),
@@ -100,11 +116,8 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 			)
 		) );
 		
-		$this->createTable( $this->getPrimaryTable() );
-		
-		return $this;
 	}
-	
+
 	
 	
 	//// accessors

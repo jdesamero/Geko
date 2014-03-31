@@ -15,9 +15,13 @@ class Geko_Wp_Group_Meta extends Geko_Wp_Options_Meta
 	//// init
 	
 	//
-	public function affix() {
+	public function add() {
 		
 		global $wpdb;
+		
+		parent::add();
+		
+		$this->forceInit( __CLASS__ );
 		
 		$sTableName = 'geko_group_meta';
 		Geko_Wp_Db::addPrefix( $sTableName );
@@ -56,23 +60,14 @@ class Geko_Wp_Group_Meta extends Geko_Wp_Options_Meta
 	// create table
 	public function install() {
 		
+		parent::install();
+		
 		global $wpdb;
 		
-		$this->createTable( $this->getPrimaryTable() );
-		$this->createTable( $wpdb->geko_group_meta_members );
+		$this->createTableOnce();
+		$this->createTableOnce( $wpdb->geko_group_meta_members );
 		
 		return $this;
-	}
-	
-	//
-	public function getPrimaryTable() {
-		
-		if ( $this->_sInstanceClass != __CLASS__ ) {
-			$oMng = Geko_Singleton_Abstract::getInstance( __CLASS__ );
-			return $oMng->getPrimaryTable();
-		}
-		
-		return parent::getPrimaryTable();
 	}
 	
 	

@@ -68,7 +68,7 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 				}
 			}
 		}
-				
+		
 		return $this;
 	}
 	
@@ -94,22 +94,11 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 		if ( $sTargetClass = Geko_String::coalesce( $this->_sBindToClass, $this->_sSubOptionParentClass ) ) {
 			
 			// init
-			
 			$sInitHook = sprintf( 'admin_init_%s::%s', $this->_sSubAction, $sTargetClass );
 			
-			add_action( $sInitHook, array( $this, 'coft_install' ) );
-			add_action( sprintf( '%s_Create', $sInitHook ), array( $this, 'coft_install' ) );
-			
 			// head
-
 			$sHeadHook = sprintf( 'admin_head_%s::%s', $this->_sSubAction, $sTargetClass );
-			
-			add_action( $sHeadHook, array( $this, 'coft_affixAdminHead' ) );
-			add_action( $sHeadHook, array( $this, 'co_addAdminHead' ) );
-			
-			add_action( sprintf( '%s_Create', $sHeadHook ), array( $this, 'coft_affixAdminHead' ) );
-			add_action( sprintf( '%s_Create', $sHeadHook ), array( $this, 'co_addAdminHead' ) );
-			
+						
 		} else {
 			
 			//// will trigger doAdmin*() actions for current page
@@ -119,26 +108,30 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 			$sInitHook = sprintf( 'admin_init_%s::%s' , $this->_sSubAction, $this->_sInstanceClass );
 			
 			add_action( sprintf( 'admin_init_%s', $this->_sSubAction ), array( $this, 'doAdminInit' ) );
-			
-			add_action( $sInitHook, array( $this, 'coft_install' ) );
-			add_action( sprintf( '%s_Create', $sInitHook ), array( $this, 'coft_install' ) );
-			
+						
 			// head
 			
 			$sHeadHook = sprintf( 'admin_head_%s::%s', $this->_sSubAction, $this->_sInstanceClass );
 			
 			add_action( sprintf( 'admin_head_%s', $this->_sSubAction ), array( $this, 'doAdminHead' ) );
-			
-			add_action( $sHeadHook, array( $this, 'coft_affixAdminHead' ) );
-			add_action( $sHeadHook, array( $this, 'co_addAdminHead' ) );
-	
-			add_action( sprintf( '%s_Create', $sHeadHook ), array( $this, 'coft_affixAdminHead' ) );
-			add_action( sprintf( '%s_Create', $sHeadHook ), array( $this, 'co_addAdminHead' ) );
-			
+						
 			// menu
 			
 			add_action( 'admin_menu', array( $this, 'attachPage' ) );
 		}
+		
+		
+		//// add actions
+		
+		// init
+		add_action( $sInitHook, array( $this, 'install' ) );
+		add_action( sprintf( '%s_Create', $sInitHook ), array( $this, 'install' ) );
+				
+		// head
+		add_action( $sHeadHook, array( $this, 'addAdminHead' ) );
+		add_action( sprintf( '%s_Create', $sHeadHook ), array( $this, 'addAdminHead' ) );
+		
+		Geko_Debug::out( $this->_sInstanceClass, __METHOD__ );
 		
 		return $this;
 	}
@@ -386,33 +379,70 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 		return FALSE;
 	}
 	
+	//
+	public function createTableOnce( $mSqlTable = NULL ) {
+		
+		if ( !$mSqlTable ) {
+			$mSqlTable = $this->getPrimaryTable();
+		}
+		
+		$oSqlTable = NULL;
+		if ( $mSqlTable instanceof Geko_Sql_Table ) {
+			$oSqlTable = $mSqlTable;
+		} else {
+			$oSqlTable = $this->resolveTable( $mSqlTable );
+		}
+		
+		if ( $oSqlTable ) {
+			return Geko_Once::run( $oSqlTable->getTableName(), array( $this, 'createTable' ), array( $oSqlTable ) );
+		}
+		
+		return FALSE;
+	}
+	
+	
 	// register an <sql table object> into _aTables property
 	// use <table name> as a key
 	// if second arg is TRUE, register as _sPrimaryTable property
 	public function addTable( $oSqlTable, $bPrimaryTable = TRUE ) {
+		
 		$sTableName = $oSqlTable->getTableName();
+		
 		$this->_aTables[ $sTableName ] = $oSqlTable;
+		
 		if ( $bPrimaryTable ) {
+			
 			$this->_sPrimaryTable = $sTableName;
+			
 			if ( !$this->_sEntityIdVarName && ( $oPkf = $oSqlTable->getPrimaryKeyField() ) ) {
 				$this->_sEntityIdVarName = $oPkf->getFieldName();
 			}
 		}
+		
  		return $this;
 	}
 	
 	// get matching <table name> from _aTables
 	// if <table name> is not provided, get the primary table
 	public function getTable( $sTableName = '' ) {
+		
 		if ( $sTableName ) {
 			return $this->_aTables[ $sTableName ];
 		}
+		
 		return $this->getPrimaryTable();
 	}
 	
 	// get _sPrimaryTable from _aTables
 	public function getPrimaryTable() {
-		return $this->_aTables[ $this->_sPrimaryTable ];	
+		
+		Geko_Debug::out( $this->_sInstanceClass, __METHOD__ );
+		
+		$mRes = $this->_aTables[ $this->_sPrimaryTable ];
+		
+		Geko_Debug::out( gettype( $mRes ), sprintf( '%s::result', __METHOD__ ) );
+		
+		return $mRes;	
 	}
 	
 	// drop the provided <sql table object> or <table name> from the database
@@ -429,10 +459,12 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	
 	// drop the provided <sql table object> or <table name> from the database then create it
 	public function resetTable( $mSqlTable ) {
+		
 		$this
 			->dropTable( $mSqlTable )
 			->createTable( $mSqlTable )
 		;
+		
 		return $this;
 	}
 	

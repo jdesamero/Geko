@@ -18,22 +18,21 @@ class Geko_Wp_Form_Item_Manage extends Geko_Wp_Options_Manage
 	
 	//// init
 	
+	
 	//
 	public function add() {
 		
+		global $wpdb;
+		
 		parent::add();
+		
+		
+		//// actions
 		
 		add_action( 'Geko_Wp_Form_ItemValue_Manage::updateRelatedEntities', array( $this, 'updateParentIds' ), 10 );
 		
-		return $this;
 		
-	}
-	
-	
-	//
-	public function affix() {
-
-		global $wpdb;
+		//// database
 		
 		$sTable = 'geko_form_item';
 		Geko_Wp_Db::addPrefix( $sTable );
@@ -63,7 +62,11 @@ class Geko_Wp_Form_Item_Manage extends Geko_Wp_Options_Manage
 	
 	// create table
 	public function install() {
-		$this->createTable( $this->getPrimaryTable() );
+		
+		parent::install();
+		
+		$this->createTableOnce();
+		
 		return $this;
 	}
 	

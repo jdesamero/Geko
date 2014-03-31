@@ -14,17 +14,17 @@ Author URI: http://geekoracle.com
 
 define( 'GEKO_CORE_ROOT', realpath( dirname( __FILE__ ) ) );
 define( 'GEKO_CORE_URI', plugins_url( '', __FILE__ ) );
-define( 'GEKO_CORE_EXTERNAL_LIB_ROOT', realpath( GEKO_CORE_ROOT . '/external/libs' ) );
-define( 'GEKO_LOG', realpath( ABSPATH . '/wp-content/logs/logs.txt' ) );
-define( 'GEKO_REGISTER_XML', realpath( GEKO_CORE_ROOT . '/conf/register.xml' ) );
-define( 'GEKO_VIEW_HELPER_PATH', realpath( GEKO_CORE_ROOT . '/library' ) );
+define( 'GEKO_CORE_EXTERNAL_LIB_ROOT', realpath( sprintf( '%s/external/libs', GEKO_CORE_ROOT ) ) );
+define( 'GEKO_LOG', realpath( sprintf( '%s/wp-content/logs/logs.txt', ABSPATH ) ) );
+define( 'GEKO_REGISTER_XML', realpath( sprintf( '%s/conf/register.xml', GEKO_CORE_ROOT ) ) );
+define( 'GEKO_VIEW_HELPER_PATH', realpath( sprintf( '%s/library', GEKO_CORE_ROOT ) ) );
 
 
 
 // include path
 set_include_path( implode( PATH_SEPARATOR, array_filter( array(
-	realpath( GEKO_CORE_EXTERNAL_LIB_ROOT . '/ZendFramework-1.10.6-geko/library' ),
-	realpath( GEKO_CORE_ROOT . '/library' ),
+	realpath( sprintf( '%s/ZendFramework-1.10.6-geko/library', GEKO_CORE_EXTERNAL_LIB_ROOT ) ),
+	realpath( sprintf( '%s/library', GEKO_CORE_ROOT ) ),
 	get_include_path()
 ) ) ) );
 
@@ -72,19 +72,19 @@ Geko_Wp::registerExternalFiles( GEKO_REGISTER_XML );
 
 // register global urls to services
 Geko_Uri::setUrl( array(
-	'wp_admin' => get_bloginfo( 'url' ) . '/wp-admin/admin.php',
-	'wp_login' => get_bloginfo( 'url' ) . '/wp-login.php',
-	'wp_user_edit' => get_bloginfo( 'url' ) . '/wp-admin/user-edit.php',
-	'geko_export' => GEKO_CORE_URI . '/srv/export.php',
-	'geko_pdf' => GEKO_CORE_URI . '/srv/pdf.php',
-	'geko_process' => GEKO_CORE_URI . '/srv/process.php',
-	'geko_thumb' => GEKO_CORE_URI . '/srv/thumb.php',
-	'geko_upload' => GEKO_CORE_URI . '/srv/upload.php',
-	'geko_styles' => GEKO_CORE_URI . '/styles',
-	'geko_ext' => GEKO_CORE_URI . '/external',
-	'geko_ext_images' => GEKO_CORE_URI . '/external/images',
-	'geko_ext_styles' => GEKO_CORE_URI . '/external/styles',
-	'geko_ext_swf' => GEKO_CORE_URI . '/external/swf'
+	'wp_admin' => sprintf( '%s/wp-admin/admin.php', get_bloginfo( 'url' ) ),
+	'wp_login' => sprintf( '%s/wp-login.php', get_bloginfo( 'url' ) ),
+	'wp_user_edit' => sprintf( '%s/wp-admin/user-edit.php', get_bloginfo( 'url' ) ),
+	'geko_export' => sprintf( '%s/srv/export.php', GEKO_CORE_URI ),
+	'geko_pdf' => sprintf( '%s/srv/pdf.php', GEKO_CORE_URI ),
+	'geko_process' => sprintf( '%s/srv/process.php', GEKO_CORE_URI ),
+	'geko_thumb' => sprintf( '%s/srv/thumb.php', GEKO_CORE_URI ),
+	'geko_upload' => sprintf( '%s/srv/upload.php', GEKO_CORE_URI ),
+	'geko_styles' => sprintf( '%s/styles', GEKO_CORE_URI ),
+	'geko_ext' => sprintf( '%s/external', GEKO_CORE_URI ),
+	'geko_ext_images' => sprintf( '%s/external/images', GEKO_CORE_URI ),
+	'geko_ext_styles' => sprintf( '%s/external/styles', GEKO_CORE_URI ),
+	'geko_ext_swf' => sprintf( '%s/external/swf', GEKO_CORE_URI )
 ) );
 
 

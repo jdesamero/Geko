@@ -26,9 +26,11 @@ class Geko_Wp_Group_Manage extends Geko_Wp_Options_Manage
 	//// init
 	
 	//
-	public function affix() {
+	public function add() {
 		
 		global $wpdb;
+		
+		parent::add();
 		
 		Geko_Wp_Options_MetaKey::init();
 		
@@ -57,8 +59,13 @@ class Geko_Wp_Group_Manage extends Geko_Wp_Options_Manage
 	
 	// create table
 	public function install() {
+		
+		parent::install();
+		
 		Geko_Wp_Options_MetaKey::install();
-		$this->createTable( $this->getPrimaryTable() );
+		
+		$this->createTableOnce();
+		
 		return $this;
 	}
 	
@@ -88,8 +95,10 @@ class Geko_Wp_Group_Manage extends Geko_Wp_Options_Manage
 		
 		$aRet = parent::getStoredOptions();
 		
-		if ( !$aRet[ $this->_sType . '_type' ] ) {
-			$aRet[ $this->_sType . '_type' ] = $this->_sSlug;
+		$sTypeKey = sprintf( '%s_type', $this->_sType );
+		
+		if ( !$aRet[ $sTypeKey ] ) {
+			$aRet[ $sTypeKey ] = $this->_sSlug;
 		}
 		
 		return $aRet;
@@ -140,15 +149,15 @@ class Geko_Wp_Group_Manage extends Geko_Wp_Options_Manage
 			
 			$iRoleId = intval( $_GET[ 'role_id' ] );
 			
-			$sRoleType = ucfirst( strtolower( ( $this->_sSubject ) ) ) . ' role';
+			$sRoleType = sprintf( '%s role', ucfirst( strtolower( ( $this->_sSubject ) ) ) );
 			$aRoles = new Geko_Wp_Role_Query( array( 'role_type' => $sRoleType ) );
 			
 			if ( count( $aRoles ) > 0 ):
 				?><div class="filter">
 					<ul class="subsubsub">
 						<?php foreach ( $aRoles as $i => $oRole ):
-							$sDelim = ( $i ) ? '| ' : '';
-							$sCurrentCssClass = ( $iRoleId == $oRole->getId() ) ? 'class="current"' : '';
+							$sDelim = ( $i ) ? '| ' : '' ;
+							$sCurrentCssClass = ( $iRoleId == $oRole->getId() ) ? 'class="current"' : '' ;
 							?><li><?php echo $sDelim; ?><a <?php echo $sCurrentCssClass; ?> href="<?php $oRole->echoAssignedCountUrl(); ?>"><?php $oRole->echoTitle(); ?> <span class="count">(<?php $oRole->echoAssignedCount(); ?>)</span></a></li>
 						<?php endforeach; ?>
 					</ul>

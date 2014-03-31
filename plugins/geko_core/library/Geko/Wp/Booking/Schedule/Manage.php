@@ -33,8 +33,34 @@ class Geko_Wp_Booking_Schedule_Manage extends Geko_Wp_Options_Manage
 	
 	
 	//
-	public function affix() {
-		Geko_Wp_Db::addPrefix( 'geko_bkng_schedule' );
+	public function add() {
+		
+		global $wpdb;
+		
+		parent::add();
+		
+		$sTableName = 'geko_bkng_schedule';
+		Geko_Wp_Db::addPrefix( $sTableName );
+		
+		$oSqlTable = new Geko_Sql_Table();
+		$oSqlTable
+			->create( $wpdb->$sTableName, 'bs' )
+			->fieldBigInt( 'bksch_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
+			->fieldBigInt( 'bksch_id', array( 'unsgnd', 'key' ) )
+			->fieldLongText( 'name' )
+			->fieldVarChar( 'slug', array( 'size' => 256 ) )
+			->fieldLongText( 'description' )
+			->fieldDateTime( 'date_start' )
+			->fieldDateTime( 'date_end' )
+			->fieldTinyInt( 'booking_type', array( 'unsgnd' ) )
+			->fieldFloat( 'unit', array( 'unsgnd', 'size' => '5,2' ) )
+			->fieldFloat( 'cost', array( 'unsgnd', 'size' => '10,2' ) )
+			->fieldSmallInt( 'slots' )
+			->fieldDateTime( 'date_created' )
+			->fieldDateTime( 'date_modified' )
+		;
+		
+		
 		return $this;
 	}
 	
@@ -44,28 +70,10 @@ class Geko_Wp_Booking_Schedule_Manage extends Geko_Wp_Options_Manage
 	// create table
 	public function install() {
 		
-		$sSql = '
-			CREATE TABLE %s
-			(
-				bksch_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-				bkng_id BIGINT UNSIGNED,
-				name LONGTEXT,
-				slug VARCHAR(255),
-				description LONGTEXT,
-				date_start DATETIME,
-				date_end DATETIME,
-				booking_type TINYINT,
-				unit FLOAT(5,2) UNSIGNED,
-				cost FLOAT(10,2) UNSIGNED,
-				slots SMALLINT UNSIGNED,
-				date_created DATETIME,
-				date_modified DATETIME,
-				PRIMARY KEY(bksch_id)
-			)
-		';
+		parent::install();
 		
-		Geko_Wp_Db::createTable( 'geko_bkng_schedule', $sSql );
-				
+		$this->createTableOnce();
+		
 		return $this;
 	}
 	

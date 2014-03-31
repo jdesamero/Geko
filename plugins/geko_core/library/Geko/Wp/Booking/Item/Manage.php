@@ -21,23 +21,44 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 	//// init
 	
 	
-	//
-	public function affix() {
-		Geko_Wp_Db::addPrefix( 'geko_bkng_item' );
-		return $this;
-	}
+	
 	
 	
 	//
 	public function add() {
 		
+		global $wpdb;
+		
 		parent::add();
+		
+		
+		//// action stuff
 		
 		add_action( 'admin_geko_bkschs_add', array( $this, 'activateSchedule' ), 11 );
 		add_action( 'admin_geko_bkschs_edit', array( $this, 'activateSchedule' ), 11, 2 );
 		add_action( 'admin_geko_bkschs_edit', array( $this, 'deactivateSchedule' ), 11, 2 );
 		add_action( 'admin_geko_bkschs_extend', array( $this, 'activateSchedule' ), 11, 2 );
 		add_action( 'admin_geko_bkschs_delete', array( $this, 'deactivateSchedule' ), 11 );
+		
+		
+		//// database stuff
+		
+		$sTableName = 'geko_bkng_item';
+		Geko_Wp_Db::addPrefix( $sTableName );
+		
+		$oSqlTable = new Geko_Sql_Table();
+		$oSqlTable
+			->create( $wpdb->$sTableName, 'bsi' )
+			->fieldBigInt( 'bkitm_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
+			->fieldBigInt( 'bksch_id', array( 'unsgnd', 'key' ) )
+			->fieldDateTime( 'date_item' )
+			->fieldVarChar( 'time_start', array( 'size' => 16 ) )
+			->fieldVarChar( 'time_end', array( 'size' => 16 ) )
+			->fieldBigInt( 'user_id', array( 'unsgnd', 'key' ) )
+		;
+		
+		$this->addTable( $oSqlTable );
+		
 		
 		return $this;
 	}
@@ -48,20 +69,9 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 	// create table
 	public function install() {
 		
-		$sSql = '
-			CREATE TABLE %s
-			(
-				bkitm_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-				bksch_id BIGINT UNSIGNED,
-				date_item DATETIME,
-				time_start VARCHAR(16),
-				time_end VARCHAR(16),
-				user_id BIGINT UNSIGNED,
-				PRIMARY KEY(bkitm_id)
-			)
-		';
+		parent::install();
 		
-		Geko_Wp_Db::createTable( 'geko_bkng_item', $sSql );
+		$this->createTableOnce();
 				
 		return $this;
 	}

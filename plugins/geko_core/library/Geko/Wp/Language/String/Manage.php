@@ -24,9 +24,11 @@ class Geko_Wp_Language_String_Manage extends Geko_Wp_Options_Manage
 	//// init
 	
 	//
-	public function affix() {
+	public function add() {
 		
 		global $wpdb;
+		
+		parent::add();
 		
 		$sTableName = 'geko_lang_strings';
 		Geko_Wp_Db::addPrefix( $sTableName );
@@ -47,8 +49,12 @@ class Geko_Wp_Language_String_Manage extends Geko_Wp_Options_Manage
 	
 	
 	// create table
-	public function install() {		
-		$this->createTable( $this->getPrimaryTable() );
+	public function install() {	
+		
+		parent::install();
+		
+		$this->createTableOnce();
+		
 		return $this;
 	}
 	
@@ -67,7 +73,7 @@ class Geko_Wp_Language_String_Manage extends Geko_Wp_Options_Manage
 		
 		$oTmpl = Geko_Wp_Template::getInstance();
 		return $oTmpl->getTemplateValues( array(
-			'prefix' => $this->getPrefix() . '-translate_keys',
+			'prefix' => sprintf( '%s-translate_keys', $this->getPrefix() ),
 			'callback' => array( $oTmpl, 'introspectTemplateValuesCallback' ),
 			'introspect_callback' => array( $this, 'tsIntrospectCallback' )
 		) );

@@ -57,9 +57,11 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 	//// methods
 	
 	//
-	public function affix() {
+	public function add() {
 		
 		global $wpdb;
+		
+		parent::add();
 		
 		Geko_Wp_Options_MetaKey::init();
 		
@@ -105,11 +107,11 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 	// create table
 	public function install() {
 		
-		global $wpdb;
+		parent::install();
 		
 		Geko_Wp_Options_MetaKey::install();
 		
-		$this->createTable( $this->getPrimaryTable() );
+		$this->createTableOnce();
 		
 		return $this;		
 	}

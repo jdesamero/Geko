@@ -3,6 +3,11 @@
 // listing
 class Geko_Wp_Booking_Item_Query extends Geko_Wp_Entity_Query
 {
+	
+	protected $_bUseManageQuery = TRUE;
+	
+	
+	
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
@@ -22,11 +27,6 @@ class Geko_Wp_Booking_Item_Query extends Geko_Wp_Entity_Query
 		
 		$oQuery
 			
-			->field( 'bsi.bkitm_id' )
-			->field( 'bsi.bksch_id' )
-			->field( 'bsi.date_item' )
-			->field( 'bsi.time_start' )
-			->field( 'bsi.time_end' )
 			->field(
 				"STR_TO_DATE( CONCAT( DATE_FORMAT( bsi.date_item, '%Y-%m-%d' ), ' ', bsi.time_start ), '%Y-%m-%d %l:%i %p' )",
 				'datetime_start'
@@ -43,7 +43,6 @@ class Geko_Wp_Booking_Item_Query extends Geko_Wp_Entity_Query
 			->field( 'bst.slots_taken' )
 			
 			
-			->from( $wpdb->geko_bkng_item, 'bsi' )
 			->joinLeft( $wpdb->geko_bkng_schedule, 'bs' )
 				->on( 'bs.bksch_id = bsi.bksch_id' )
 			->joinLeft( $wpdb->geko_booking, 'b' )

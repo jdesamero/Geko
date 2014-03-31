@@ -16,7 +16,7 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 	// HACK!!!
 	public function _getCatId() {
 		return ( $this->bHasTagId ) ?
-			intval( Geko_String::coalesce( $_GET['tag_ID'], $_GET['cat_ID'] ) ) :
+			intval( Geko_String::coalesce( $_GET[ 'tag_ID' ], $_GET[ 'cat_ID' ] ) ) :
 			0
 		;
 	}
@@ -24,12 +24,14 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 	
 	
 	//
-	public function affix() {
+	public function add() {
+		
+		parent::add();
 		
 		// HACK!!!
-		if ( !$_GET['tag_ID'] ) {
-			$_GET['tag_ID'] = 1;
-			$_REQUEST['tag_ID'] = 1;
+		if ( !$_GET[ 'tag_ID' ] ) {
+			$_GET[ 'tag_ID' ] = 1;
+			$_REQUEST[ 'tag_ID' ] = 1;
 			$this->bHasTagId = FALSE;
 		}
 		

@@ -30,9 +30,11 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 	
 	
 	//
-	public function affix() {
+	public function add() {
 		
 		global $wpdb;
+		
+		parent::add();
 		
 		Geko_Wp_Options_MetaKey::init();
 		
@@ -95,14 +97,14 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 		
 		global $wpdb;
 		
+		parent::install();
+		
 		Geko_Wp_Options_MetaKey::install();
 		
-		$this->createTable( $this->getPrimaryTable() );
+		$this->createTableOnce();
+		$this->createTableOnce( $wpdb->geko_lang_groups );
+		$this->createTableOnce( $wpdb->geko_lang_group_members );
 		
-		$this->createTable( $wpdb->geko_lang_groups );
-		$this->createTable( $wpdb->geko_lang_group_members );
-		
-		Geko_Wp_Language_String_Manage::getInstance()->install();
 		
 		return $this;
 	}
@@ -116,7 +118,7 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 	//
 	public function registerPlugins() {
 		
-		if ( $this->_sInstanceClass == __CLASS__ ) {
+		if ( __CLASS__ == $this->_sInstanceClass ) {
 			
 			$aArgs = func_get_args();
 			

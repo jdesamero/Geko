@@ -39,9 +39,11 @@ class Geko_Wp_EmailMessage_Transport_Manage extends Geko_Wp_Options_Manage
 	
 	
 	//
-	public function affix() {
+	public function add() {
 		
 		global $wpdb;
+		
+		parent::add();
 		
 		Geko_Wp_Enumeration_Manage::getInstance()->affix();
 		
@@ -77,7 +79,18 @@ class Geko_Wp_EmailMessage_Transport_Manage extends Geko_Wp_Options_Manage
 	// create table
 	public function install() {
 		
-		global $wpdb;
+		parent::install();
+		
+		Geko_Once::run( sprintf( '%s::enumeration', __CLASS__ ), array( $this, 'installEnumeration' ) );
+		
+		$this->createTableOnce();
+		
+		return $this;
+	}
+	
+	
+	//
+	public function installEnumeration() {
 		
 		Geko_Wp_Enumeration_Manage::getInstance()->install();
 		Geko_Wp_Enumeration_Manage::populate( array(
@@ -88,9 +101,6 @@ class Geko_Wp_EmailMessage_Transport_Manage extends Geko_Wp_Options_Manage
 			)
 		) );
 		
-		$this->createTable( $this->getPrimaryTable() );
-		
-		return $this;
 	}
 	
 	

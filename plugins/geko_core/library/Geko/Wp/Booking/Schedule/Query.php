@@ -3,6 +3,11 @@
 // listing
 class Geko_Wp_Booking_Schedule_Query extends Geko_Wp_Entity_Query
 {
+	
+	protected $_bUseManageQuery = TRUE;
+	
+	
+	
 	//
 	public function getDefaultParams() {
 		return $this->setWpQueryVars( 'paged', 'posts_per_page' );
@@ -20,23 +25,8 @@ class Geko_Wp_Booking_Schedule_Query extends Geko_Wp_Entity_Query
 		
 		$oQuery
 			
-			->field( 'bs.bksch_id' )
-			->field( 'bs.bkng_id' )
-			->field( 'bs.name' )
-			->field( 'bs.slug' )
-			->field( 'bs.description' )
-			->field( 'bs.date_start' )
-			->field( 'bs.date_end' )
-			->field( 'bs.unit' )
-			->field( 'bs.cost' )
-			->field( 'bs.slots' )
-			->field( 'bs.booking_type' )
-			->field( 'bs.date_created' )
-			->field( 'bs.date_modified' )
-
 			->field( 'b.name', 'booking_name' )
 			
-			->from( $wpdb->geko_bkng_schedule, 'bs' )
 			->joinLeft( $wpdb->geko_booking, 'b' )
 				->on( 'b.bkng_id = bs.bkng_id' )
 			

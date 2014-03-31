@@ -10,14 +10,18 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 	
 	
 	//
-	public function affix() {
+	public function add() {
+		
+		parent::add();
 		
 		Geko_Wp_Language_Manage_Post_QueryHooks::register();		
 		return $this;
 	}
 	
 	//
-	public function affixAdmin() {
+	public function addAdmin() {
+		
+		parent::addAdmin();
 		
 		// post		
 		// add_action( 'submitpost_box', array( $this, 'addPostSelector' ) );
@@ -61,8 +65,8 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 	public function addPostMetabox() {
 		
 		if ( function_exists( 'add_meta_box' ) ) {
-			add_meta_box( 'geko-language', __('Language', 'geko-expiry_textdomain'), array( $this, 'addPostSelector' ), 'post', 'side' );
-			add_meta_box( 'geko-language', __('Language', 'geko-expiry_textdomain'), array( $this, 'addPostSelector' ), 'page', 'side' );
+			add_meta_box( 'geko-language', __( 'Language', 'geko-expiry_textdomain' ), array( $this, 'addPostSelector' ), 'post', 'side' );
+			add_meta_box( 'geko-language', __( 'Language', 'geko-expiry_textdomain' ), array( $this, 'addPostSelector' ), 'page', 'side' );
 		} else {
 			add_action( 'dbx_post_advanced', array( $this, 'addPostSelector' ) );
 			add_action( 'dbx_page_advanced', array( $this, 'addPostSelector' ) );		

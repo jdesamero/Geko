@@ -66,11 +66,13 @@ class Geko_Wp_EmailMessage_Manage extends Geko_Wp_Options_Manage
 	
 	
 	//
-	public function affix() {
+	public function add() {
 		
 		global $wpdb;
 		
-		Geko_Wp_Enumeration_Manage::getInstance()->affix();
+		parent::add();
+		
+		Geko_Wp_Enumeration_Manage::getInstance()->add();
 		
 		$sTableName = 'geko_email_message';
 		Geko_Wp_Db::addPrefix( $sTableName );
@@ -104,6 +106,19 @@ class Geko_Wp_EmailMessage_Manage extends Geko_Wp_Options_Manage
 	// create table
 	public function install() {
 		
+		parent::install();
+		
+		Geko_Once::run( sprintf( '%s::enumeration', __CLASS__ ), array( $this, 'installEnumeration' ) );
+		
+		$this->createTableOnce();
+		
+		return $this;
+	}
+	
+	
+	//
+	public function installEnumeration() {
+		
 		Geko_Wp_Enumeration_Manage::getInstance()->install();
 		Geko_Wp_Enumeration_Manage::populate( array(
 			array( 'title' => 'Email Message Type', 'slug' => 'geko-emsg-type', 'description' => 'List of email formatting options.' ),
@@ -114,11 +129,8 @@ class Geko_Wp_EmailMessage_Manage extends Geko_Wp_Options_Manage
 			)
 		) );
 		
-		$this->createTable( $this->getPrimaryTable() );
-		
-		return $this;
 	}
-	
+
 	
 	
 		

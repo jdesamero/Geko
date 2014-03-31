@@ -57,9 +57,13 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	//// methods
 	
 	//
-	public function affix() {
+	public function add() {
 		
 		global $wpdb;
+		
+		parent::add();
+		
+		$this->forceInit( __CLASS__ );
 		
 		Geko_Wp_Options_MetaKey::init();
 		
@@ -98,12 +102,12 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		
 		// province
 		
-		$sTableName1 = 'geko_location_province';
-		Geko_Wp_Db::addPrefix( $sTableName1 );
+		$sTableName2 = 'geko_location_province';
+		Geko_Wp_Db::addPrefix( $sTableName2 );
 		
-		$oSqlTable1 = new Geko_Sql_Table();
-		$oSqlTable1
-			->create( $wpdb->$sTableName1, 'p' )
+		$oSqlTable2 = new Geko_Sql_Table();
+		$oSqlTable2
+			->create( $wpdb->$sTableName2, 'p' )
 			->fieldInt( 'province_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldVarChar( 'province_name', array( 'size' => 256 ) )
 			->fieldVarChar( 'province_abbr', array( 'size' => 16 ) )
@@ -111,17 +115,17 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 			->fieldInt( 'rank', array( 'unsgnd' ) )
 		;
 		
-		$this->addTable( $oSqlTable1, FALSE );
+		$this->addTable( $oSqlTable2, FALSE );
 		
 		
 		// country
 		
-		$sTableName2 = 'geko_location_country';
-		Geko_Wp_Db::addPrefix( $sTableName2 );
+		$sTableName3 = 'geko_location_country';
+		Geko_Wp_Db::addPrefix( $sTableName3 );
 		
-		$oSqlTable2 = new Geko_Sql_Table();
-		$oSqlTable2
-			->create( $wpdb->$sTableName2, 'c' )
+		$oSqlTable3 = new Geko_Sql_Table();
+		$oSqlTable3
+			->create( $wpdb->$sTableName3, 'c' )
 			->fieldInt( 'country_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldVarChar( 'country_name', array( 'size' => 256 ) )
 			->fieldVarChar( 'country_abbr', array( 'size' => 16 ) )
@@ -129,40 +133,40 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 			->fieldInt( 'rank', array( 'unsgnd' ) )
 		;
 		
-		$this->addTable( $oSqlTable2, FALSE );
+		$this->addTable( $oSqlTable3, FALSE );
 		
 		
 		// continent
 		
-		$sTableName3 = 'geko_location_continent';
-		Geko_Wp_Db::addPrefix( $sTableName3 );
+		$sTableName4 = 'geko_location_continent';
+		Geko_Wp_Db::addPrefix( $sTableName4 );
 
-		$oSqlTable3 = new Geko_Sql_Table();
-		$oSqlTable3
-			->create( $wpdb->$sTableName3, 't' )
+		$oSqlTable4 = new Geko_Sql_Table();
+		$oSqlTable4
+			->create( $wpdb->$sTableName4, 't' )
 			->fieldTinyInt( 'continent_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldVarChar( 'continent_name', array( 'size' => 256 ) )
 			->fieldVarChar( 'continent_abbr', array( 'size' => 16 ) )
 			->fieldTinyInt( 'rank', array( 'unsgnd' ) )
 		;
 		
-		$this->addTable( $oSqlTable3, FALSE );
+		$this->addTable( $oSqlTable4, FALSE );
 		
 		
 		// geocache
 		
-		$sTableName4 = 'geko_location_geocache';
-		Geko_Wp_Db::addPrefix( $sTableName4 );
+		$sTableName5 = 'geko_location_geocache';
+		Geko_Wp_Db::addPrefix( $sTableName5 );
 
-		$oSqlTable4 = new Geko_Sql_Table();
-		$oSqlTable4
-			->create( $wpdb->$sTableName4, 'g' )
+		$oSqlTable5 = new Geko_Sql_Table();
+		$oSqlTable5
+			->create( $wpdb->$sTableName5, 'g' )
 			->fieldVarChar( 'geo_key', array( 'size' => 64, 'notnull', 'prky' ) )
 			->fieldFloat( 'latitude', array( 'size' => '10,7', 'sgnd' ) )
 			->fieldFloat( 'longitude', array( 'size' => '10,7', 'sgnd' ) )
 		;
 		
-		$this->addTable( $oSqlTable4, FALSE );
+		$this->addTable( $oSqlTable5, FALSE );
 		
 		
 		return $this;
@@ -170,8 +174,12 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	
 	
 	//
-	public function affixAdmin() {
+	public function addAdmin() {
+		
+		parent::addAdmin();
+		
 		wp_enqueue_script( 'geko_wp_location' );
+		
 		return $this;
 	}
 	
@@ -181,14 +189,16 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		
 		global $wpdb;
 		
+		parent::install();
+		
 		Geko_Wp_Options_MetaKey::install();
 		
-		$this->createTable( $this->getPrimaryTable() );
+		$this->createTableOnce();
+		$this->createTableOnce( $wpdb->geko_location_province );
+		$this->createTableOnce( $wpdb->geko_location_country );
+		$this->createTableOnce( $wpdb->geko_location_continent );
+		$this->createTableOnce( $wpdb->geko_location_geocache );
 		
-		$this->createTable( $wpdb->geko_location_province );
-		$this->createTable( $wpdb->geko_location_country );
-		$this->createTable( $wpdb->geko_location_continent );
-		$this->createTable( $wpdb->geko_location_geocache );
 		
 		return $this;		
 	}
