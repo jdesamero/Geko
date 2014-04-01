@@ -16,9 +16,11 @@ class Geko_Wp_Post_Meta extends Geko_Wp_Options_Meta
 	//// init
 	
 	//
-	public function affix() {
-
+	public function add() {
+		
 		global $wpdb;
+		
+		parent::add();
 		
 		$sTableName = 'geko_post_meta_members';
 		Geko_Wp_Db::addPrefix( $sTableName );
@@ -39,7 +41,11 @@ class Geko_Wp_Post_Meta extends Geko_Wp_Options_Meta
 	
 	//
 	public function install() {
-		$this->createTable( $this->getPrimaryTable() );
+		
+		parent::install();
+		
+		$this->createTableOnce();
+		
 		return $this;
 	}
 	
@@ -52,9 +58,8 @@ class Geko_Wp_Post_Meta extends Geko_Wp_Options_Meta
 		
 		add_action( 'admin_menu', array( $this, 'attachPage' ) );
 		
-		add_action( 'admin_init_post', array( $this, 'coft_install' )  );
-		add_action( 'admin_head_post', array( $this, 'coft_affixAdminHead' )  );
-		add_action( 'admin_head_post', array( $this, 'co_addAdminHead' )  );
+		add_action( 'admin_init_post', array( $this, 'install' )  );
+		add_action( 'admin_head_post', array( $this, 'addAdminHead' )  );
 		
 		add_action( 'wp_insert_post', array( $this, 'insert' ) );
 		
@@ -65,7 +70,7 @@ class Geko_Wp_Post_Meta extends Geko_Wp_Options_Meta
 	//
 	public function attachPage() {
 		if ( TRUE == function_exists( 'add_meta_box' ) ) {
-			add_meta_box( sanitize_title( $this->_sInstanceClass ), $this->aThemeData[ 'Name' ] . ' Custom Settings', array( $this, 'outputForm' ), 'post', 'normal' );
+			add_meta_box( sanitize_title( $this->_sInstanceClass ), sprintf( '%s Custom Settings', $this->aThemeData[ 'Name' ] ), array( $this, 'outputForm' ), 'post', 'normal' );
 		}
 	}	
 	

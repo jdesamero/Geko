@@ -38,11 +38,11 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 	protected function __construct() {
 		
 		if ( $this->_sTableSuffix && !$this->_sTableName ) {
-			$this->_sTableName = 'geko_logs_' . $this->_sTableSuffix;
+			$this->_sTableName = sprintf( 'geko_logs_%s', $this->_sTableSuffix );
 		}
 		
 		if ( $this->_sTableName && !$this->_sMetaTableName && $this->_bUseMetaTable ) {
-			$this->_sMetaTableName = $this->_sTableName . '_meta';
+			$this->_sMetaTableName = sprintf( '%s_meta', $this->_sTableName );
 		}
 		
 		parent::__construct();
@@ -128,7 +128,7 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 		}
 		
 		if ( !$this->_sExportCapability ) {
-			$this->_sExportCapability = 'export_' . $this->_sTableSuffix . '_logs';
+			$this->_sExportCapability = sprintf( 'export_%s_logs', $this->_sTableSuffix );
 		}
 		
 		if (
@@ -139,21 +139,17 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 			$this->_bHasExportCapability = TRUE;
 		}
 		
+		
+		//
+		Geko_Once::run( __METHOD__, array( $this, 'setManagementCapability' ) );
+		
+		
 		return $this;
 	}
 	
-	// hook method
-	public function modifyPrimaryTable( $oSqlTable ) {
-		return $oSqlTable;
-	}
-
-	// hook method
-	public function modifyMetaTable( $oSqlTable ) {
-		return $oSqlTable;
-	}
 	
 	//
-	public function affix() {
+	public function setManagementCapability() {
 		
 		self::$sManagementCapability = 'view_log_reports';
 		
@@ -165,8 +161,21 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 			self::$bHasManagementCapability = TRUE;
 		}
 		
-		return $this;
 	}
+
+
+
+	
+	// hook method
+	public function modifyPrimaryTable( $oSqlTable ) {
+		return $oSqlTable;
+	}
+
+	// hook method
+	public function modifyMetaTable( $oSqlTable ) {
+		return $oSqlTable;
+	}
+	
 	
 	//
 	public function addAdmin() {
@@ -196,8 +205,30 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 		////
 		add_action( 'admin_init', array( $this, 'doActions' ) );
 		
+		
+		//
+		Geko_Once::run( __METHOD__, array( $this, 'setRoleCapability' ) );			// !!! badly done...
+		
+		
 		return $this;
 	}
+	
+	//
+	public function setRoleCapability() {
+		
+		// assign management capabilities to the admin role
+		$oWpRole = get_role( 'administrator' );
+		if ( !$oWpRole->has_cap( self::$sManagementCapability ) ) {
+			$oWpRole->add_cap( self::$sManagementCapability );
+			// $oWpRole->remove_cap( 'manage_geko_wp_log_manage' );
+		}
+				
+		add_action( 'admin_menu', array( $this, 'attachPage' ) );
+		
+	}
+	
+	
+	
 	
 	//
 	public function enqueueAdmin() {
@@ -210,22 +241,8 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 		
 		return $this;
 	}
-
 	
-	//
-	public function affixAdmin() {
-		
-		// assign management capabilities to the admin role
-		$oWpRole = get_role( 'administrator' );
-		if ( !$oWpRole->has_cap( self::$sManagementCapability ) ) {
-			$oWpRole->add_cap( self::$sManagementCapability );
-			// $oWpRole->remove_cap( 'manage_geko_wp_log_manage' );
-		}
-				
-		add_action( 'admin_menu', array( $this, 'attachPage' ) );
-		
-		return $this;
-	}
+	
 	
 	
 	// create table

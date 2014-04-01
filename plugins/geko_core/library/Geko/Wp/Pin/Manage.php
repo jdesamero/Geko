@@ -27,7 +27,7 @@ class Geko_Wp_Pin_Manage extends Geko_Wp_Options_Manage
 		
 		parent::add();
 		
-		// Geko_Wp_Enumeration_Manage::getInstance()->affix();
+		// Geko_Wp_Enumeration_Manage::getInstance()->add();
 		
 		$sTableName = 'geko_pin';
 		Geko_Wp_Db::addPrefix( $sTableName );

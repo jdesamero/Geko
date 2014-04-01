@@ -4,61 +4,69 @@
 class Geko_Wp_Location_Meta extends Geko_Wp_Options_Meta
 {
 
-
-
+	
+	
+	
 	//// init
 	
 	//
-	public function affix()
-	{
-		Geko_Wp_Db::addPrefix('geko_location_meta');
-		Geko_Wp_Db::addPrefix('geko_location_meta_members');
+	public function add() {
+		
+		global $wpdb;
+		
+		parent::add();
+		
+		
+		$sTable = 'geko_location_meta';
+		Geko_Wp_Db::addPrefix( $sTable );
+		
+		$oSqlTable = new Geko_Sql_Table();
+		$oSqlTable
+			->create( $wpdb->$sTable, 'am' )
+			->fieldBigInt( 'ameta_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
+			->fieldBigInt( 'address_id', array( 'unsgnd', 'key' ) )
+			->fieldSmallInt( 'mkey_id', array( 'unsgnd', 'key' ) )
+			->fieldLongText( 'meta_value' )
+		;
+		
+		$this->addTable( $oSqlTable );
+		
+		
+		$sTable2 = 'geko_location_meta_members';
+		Geko_Wp_Db::addPrefix( $sTable2 );
+		
+		$oSqlTable2 = new Geko_Sql_Table();
+		$oSqlTable2
+			->create( $wpdb->$sTable2, 'amm' )
+			->fieldBigInt( 'ameta_id', array( 'unsgnd', 'key' ) )
+			->fieldBigInt( 'member_id', array( 'unsgnd', 'key' ) )
+			->fieldLongText( 'member_value' )
+			->fieldLongText( 'flags' )
+		;
+		
+		$this->addTable( $oSqlTable2, FALSE );
+		
+		
 		
 		return $this;
 	}
 	
 	// create table
-	public function install()
-	{
-		Geko_Wp_Options_MetaKey::install();
+	public function install() {
 		
+		global $wpdb;
 		
-		$sSql = "
-			CREATE TABLE %s
-			(
-				ameta_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-				address_id BIGINT UNSIGNED,
-				meta_key VARCHAR(255),
-				meta_value LONGTEXT,
-				PRIMARY KEY(ameta_id),
-				KEY address_id(address_id),
-				KEY meta_key(meta_key)
-			)
-		";
+		parent::install();
 		
-		Geko_Wp_Db::createTable( 'geko_location_meta', $sSql );
-							
-		$sSql = '
-			CREATE TABLE %s
-			(
-				ameta_id BIGINT UNSIGNED,
-				member_id BIGINT UNSIGNED,
-				member_value LONGTEXT,
-				flags LONGTEXT,
-				KEY ameta_id(ameta_id),
-				KEY member_id(member_id)
-			)
-		';
-		
-		Geko_Wp_Db::createTable( 'geko_location_meta_members', $sSql );
-		
+		$this->createTableOnce();
+		$this->createTableOnce( $wpdb->geko_location_meta_members );
 		
 		return $this;
 	}
 	
-
-
-
+	
+	
+	
 }
 
 

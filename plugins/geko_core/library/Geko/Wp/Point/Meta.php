@@ -10,11 +10,14 @@ class Geko_Wp_Point_Meta extends Geko_Wp_Options_Meta
 	//// init
 	
 	//
-	public function affix() {
+	public function add() {
 		
 		global $wpdb;
 		
+		parent::add();
+		
 		Geko_Wp_Options_MetaKey::init();
+		
 		
 		$sTableName = 'geko_point_meta';
 		Geko_Wp_Db::addPrefix( $sTableName );
@@ -39,8 +42,13 @@ class Geko_Wp_Point_Meta extends Geko_Wp_Options_Meta
 	
 	// create table
 	public function install() {
+		
+		parent::install();
+		
 		Geko_Wp_Options_MetaKey::install();
-		$this->createTable( $this->getPrimaryTable() );
+		
+		$this->createTableOnce();
+		
 		return $this;
 	}
 	
@@ -49,6 +57,8 @@ class Geko_Wp_Point_Meta extends Geko_Wp_Options_Meta
 	public function save() {
 	
 	}
+	
+	
 	
 }
 

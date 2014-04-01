@@ -27,39 +27,14 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 	//// init
 	
 	//
-	public function affix() {
+	public function add() {
 		
 		global $wpdb;
 		
-		$sTableName = 'geko_user_meta_members';
-		Geko_Wp_Db::addPrefix( $sTableName );
-		
-		$oSqlTable = new Geko_Sql_Table();
-		$oSqlTable
-			->create( $wpdb->$sTableName, 'umm' )
-			->fieldBigInt( 'umeta_id', array( 'unsgnd', 'key' ) )
-			->fieldBigInt( 'member_id', array( 'unsgnd', 'key' ) )
-			->fieldLongText( 'member_value' )
-			->fieldLongText( 'flags' )
-		;
-		
-		$this->addTable( $oSqlTable );
-		
-		return $this;
-	}
-	
-	//
-	public function install() {
-		$this->createTable( $this->getPrimaryTable() );
-		return $this;
-	}
-	
-	
-	
-	//
-	public function add() {
-		
 		parent::add();
+		
+		
+		//// file upload stuff
 		
 		if ( $this->_bHasFileUpload ) {
 						
@@ -101,8 +76,39 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 			
 		}
 		
+		
+		//// database stuff
+		
+		$sTableName = 'geko_user_meta_members';
+		Geko_Wp_Db::addPrefix( $sTableName );
+		
+		$oSqlTable = new Geko_Sql_Table();
+		$oSqlTable
+			->create( $wpdb->$sTableName, 'umm' )
+			->fieldBigInt( 'umeta_id', array( 'unsgnd', 'key' ) )
+			->fieldBigInt( 'member_id', array( 'unsgnd', 'key' ) )
+			->fieldLongText( 'member_value' )
+			->fieldLongText( 'flags' )
+		;
+		
+		$this->addTable( $oSqlTable );
+		
+		
 		return $this;
 	}
+	
+	//
+	public function install() {
+		
+		parent::install();
+		
+		$this->createTableOnce();
+		
+		return $this;
+	}
+	
+	
+	
 	
 	// helper accessors for $this->_aUploadPaths
 	
@@ -138,9 +144,8 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 		
 		parent::addAdmin();
 		
-		add_action( 'admin_init_user', array( $this, 'coft_install' )  );		
-		add_action( 'admin_head_user', array( $this, 'coft_affixAdminHead' )  );
-		add_action( 'admin_head_user', array( $this, 'co_addAdminHead' )  );
+		add_action( 'admin_init_user', array( $this, 'install' )  );		
+		add_action( 'admin_head_user', array( $this, 'addAdminHead' )  );
 				
 		////
 		
@@ -253,7 +258,7 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 		if ( !$sMetaKey || !$sFullPathRoot ) return '';
 		
 		if ( $sFile = $this->getMeta( $iUserId, $sMetaKey, TRUE ) ) {
-			return $sFullPathRoot . '/' . $sFile;
+			return sprintf( '%s/%s', $sFullPathRoot, $sFile );
 		}
 		
 		return '';
@@ -267,7 +272,7 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 		foreach ( $this->_aUploadPaths as $aPath ) {
 			foreach( $aPath[ 'meta_keys' ] as $sKey ) {
 				if ( $sFile = $this->getMeta( $iUserId, $sKey, TRUE ) ) {
-					$aPaths[] = $aPath[ $sPathType ] . '/' . $sFile;
+					$aPaths[] = sprintf( '%s/%s', $aPath[ $sPathType ], $sFile );
 				}
 			}
 		}

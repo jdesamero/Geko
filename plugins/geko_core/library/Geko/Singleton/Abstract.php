@@ -8,6 +8,8 @@ abstract class Geko_Singleton_Abstract
 	
 	protected $_sInstanceClass;
 	
+	protected $_bCalledInit = FALSE;
+	
 	
 	
 	
@@ -50,8 +52,6 @@ abstract class Geko_Singleton_Abstract
 	
 	////
 	
-	protected $_bCalledInit = FALSE;
-	
 	// ensure init is called once
 	public function init() {
 		
@@ -65,6 +65,12 @@ abstract class Geko_Singleton_Abstract
 		}
 		
 		return $this;
+	}
+	
+	
+	//
+	public function getCalledInit() {
+		return $this->_bCalledInit;
 	}
 	
 	

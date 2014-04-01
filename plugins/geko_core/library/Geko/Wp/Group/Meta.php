@@ -60,9 +60,9 @@ class Geko_Wp_Group_Meta extends Geko_Wp_Options_Meta
 	// create table
 	public function install() {
 		
-		parent::install();
-		
 		global $wpdb;
+		
+		parent::install();
 		
 		$this->createTableOnce();
 		$this->createTableOnce( $wpdb->geko_group_meta_members );

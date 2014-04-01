@@ -14,9 +14,11 @@ class Geko_Wp_Generic_Meta extends Geko_Wp_Options_Meta
 	//// init
 	
 	//
-	public function affix() {
+	public function add() {
 		
 		global $wpdb;
+		
+		parent::add();
 		
 		Geko_Wp_Options_MetaKey::init();
 		
@@ -62,10 +64,12 @@ class Geko_Wp_Generic_Meta extends Geko_Wp_Options_Meta
 		
 		global $wpdb;
 		
+		parent::install();
+		
 		Geko_Wp_Options_MetaKey::install();
 		
-		$this->createTable( $this->getPrimaryTable() );
-		$this->createTable( $wpdb->geko_generic_meta_members );
+		$this->createTableOnce();
+		$this->createTableOnce( $wpdb->geko_generic_meta_members );
 		
 		return $this;
 	}

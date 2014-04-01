@@ -40,7 +40,7 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 		
 		//// dependencies
 		
-		Geko_Wp_Enumeration_Manage::getInstance()->affix();
+		Geko_Wp_Enumeration_Manage::getInstance()->add();
 		
 		
 		//// actions

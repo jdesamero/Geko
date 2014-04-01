@@ -14,15 +14,61 @@ class Geko_Wp_Role_Meta extends Geko_Wp_Options_Meta
 	//// init
 	
 	//
-	public function affix() {
+	public function add() {
+		
+		global $wpdb;
 		
 		parent::add();
 		
-		Geko_Wp_Db::addPrefix( 'geko_role_meta' );
-		Geko_Wp_Db::addPrefix( 'geko_role_meta_members' );
+		
+		$sTable = 'geko_role_meta';
+		Geko_Wp_Db::addPrefix( $sTable );
+		
+		$oSqlTable = new Geko_Sql_Table();
+		$oSqlTable
+			->create( $wpdb->$sTable, 'rm' )
+			->fieldBigInt( 'rmeta_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
+			->fieldBigInt( 'role_id', array( 'unsgnd', 'key' ) )
+			->fieldSmallInt( 'mkey_id', array( 'unsgnd', 'key' ) )
+			->fieldLongText( 'meta_value' )
+			->indexKey( 'role_mkey_id', array( 'role_id', 'mkey_id' ) )
+		;
+		
+		$this->addTable( $oSqlTable );
+		
+		
+		$sTable2 = 'geko_role_meta_members';
+		Geko_Wp_Db::addPrefix( $sTable2 );
+		
+		$oSqlTable2 = new Geko_Sql_Table();
+		$oSqlTable2
+			->create( $wpdb->$sTable2, 'rmm' )
+			->fieldBigInt( 'rmeta_id', array( 'unsgnd', 'key' ) )
+			->fieldBigInt( 'member_id', array( 'unsgnd', 'key' ) )
+			->fieldLongText( 'member_value' )
+			->fieldLongText( 'flags' )
+		;
+		
+		$this->addTable( $oSqlTable2, FALSE );
+		
+		
 		
 		return $this;
 	}
+	
+	// create table
+	public function install() {
+		
+		global $wpdb;
+		
+		parent::install();
+		
+		$this->createTableOnce();
+		$this->createTableOnce( $wpdb->geko_role_meta );
+		
+		return $this;
+	}
+	
 	
 	//
 	public function addAdmin() {
@@ -39,41 +85,6 @@ class Geko_Wp_Role_Meta extends Geko_Wp_Options_Meta
 		return $this;
 	}
 	
-	// create table
-	public function install() {
-		
-		// create tables
-		$sSql = '
-			CREATE TABLE %s
-			(
-				rmeta_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-				role_id BIGINT UNSIGNED,
-				mkey_id SMALLINT UNSIGNED,
-				meta_value LONGTEXT,
-				PRIMARY KEY(rmeta_id),
-				KEY role_mkey_id (role_id, mkey_id)
-			)
-		';
-		
-		Geko_Wp_Db::createTable( 'geko_role_meta', $sSql );
-
-		// create tables
-		$sSql = '
-			CREATE TABLE %s
-			(
-				rmeta_id BIGINT UNSIGNED,
-				member_id BIGINT UNSIGNED,
-				member_value LONGTEXT,
-				flags LONGTEXT,
-				KEY rmeta_id (rmeta_id),
-				KEY member_id (member_id)
-			)
-		';
-		
-		Geko_Wp_Db::createTable( 'geko_role_meta_members', $sSql );
-		
-		return $this;
-	}
 	
 	
 	//// accessors

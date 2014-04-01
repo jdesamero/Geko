@@ -31,6 +31,14 @@ class Geko_Wp_Initialize extends Geko_Singleton_Abstract
 	}
 	
 	
+	
+	//
+	public function isCurrentPage() {
+		return FALSE;
+	}
+	
+	
+	
 	//// hook methods
 	
 	//
@@ -44,6 +52,11 @@ class Geko_Wp_Initialize extends Geko_Singleton_Abstract
 	//
 	public function addAdmin() {
 		return $this;
+	}
+	
+	//
+	public function addAdminHead() {
+		return $this;	
 	}
 	
 	//

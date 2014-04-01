@@ -45,7 +45,7 @@ class Geko_Wp_EmailMessage_Transport_Manage extends Geko_Wp_Options_Manage
 		
 		parent::add();
 		
-		Geko_Wp_Enumeration_Manage::getInstance()->affix();
+		Geko_Wp_Enumeration_Manage::getInstance()->add();
 		
 		$sTableName = 'geko_emsg_transport';
 		Geko_Wp_Db::addPrefix( $sTableName );

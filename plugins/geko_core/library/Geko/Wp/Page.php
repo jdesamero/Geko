@@ -13,12 +13,12 @@ class Geko_Wp_Page extends Geko_Wp_Post
 		// if page aliasing is activated, return the apparent page
 		$oPageAlias = Geko_Wp_Page_Alias::getInstance();
 		if (
-			( $oPageAlias->getCalled_affix() ) && 
+			( $oPageAlias->getCalledInit() ) && 
 			( is_page() ) && 
 			( $this->getId() == $oPageAlias->getApparentPage()->getId() )
 		) {
 			// can't use getTitle() since it will cause an infinite loop
-			return $oPageAlias->getApparentPage()->getEntityPropertyValue('title');
+			return $oPageAlias->getApparentPage()->getEntityPropertyValue( 'title' );
 		}
 		
 		return parent::getTitle();
@@ -31,7 +31,7 @@ class Geko_Wp_Page extends Geko_Wp_Post
 		// if page aliasing is activated, return the actual page
 		$oPageAlias = Geko_Wp_Page_Alias::getInstance();
 		if (
-			( $oPageAlias->getCalled_affix() ) && 
+			( $oPageAlias->getCalledInit() ) && 
 			( is_page() ) && 
 			( $this->getId() == $oPageAlias->getApparentPage()->getId() )
 		) {

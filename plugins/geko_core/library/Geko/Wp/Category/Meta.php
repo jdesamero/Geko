@@ -16,9 +16,11 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 	//// init
 	
 	//
-	public function affix() {
+	public function add() {
 		
 		global $wpdb;
+		
+		parent::add();
 		
 		Geko_Wp_Options_MetaKey::init();
 		
@@ -64,10 +66,12 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 		
 		global $wpdb;
 		
+		parent::install();
+		
 		Geko_Wp_Options_MetaKey::install();
 		
-		$this->createTable( $this->getPrimaryTable() );
-		$this->createTable( $wpdb->geko_term_meta_members );
+		$this->createTableOnce();
+		$this->createTableOnce( $wpdb->geko_term_meta_members );
 		
 		// create hierarchy functions
 		if ( self::$bUseTermTaxonomy ) {
@@ -83,10 +87,8 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 		
 		parent::addAdmin();
 		
-		add_filter( 'admin_init_category', array( $this, 'coft_install' ) );
-		
-		add_filter( 'admin_head_category', array( $this, 'coft_affixAdminHead' ) );
-		add_filter( 'admin_head_category', array( $this, 'co_addAdminHead' ) );
+		add_filter( 'admin_init_category', array( $this, 'install' ) );
+		add_filter( 'admin_head_category', array( $this, 'addAdminHead' ) );
 		
 		add_filter( 'admin_category_add_fields_pq', array( $this, 'setupAddFields' ) );
 		add_filter( 'admin_category_edit_fields_pq', array( $this, 'setupEditFields' ) );
@@ -377,8 +379,14 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 	
 	//// front-end display methods
 	
-	//
-	public function affixAdminHead() {
+	public function addAdminHead() {
+		
+		Geko_Once::run( sprintf( '%s::js', __METHOD__ ), array( $this, 'adminHeadJs' ) );
+		
+	}
+	
+	// TO DO: This stuff should be enqueued
+	public function adminHeadJs() {
 		
 		$sParentId = Geko_Wp_Admin_Hooks::getCurrentPlugin()->getValue( 'parent_id' );
 		
@@ -408,18 +416,18 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 			var ajaxUpdateCallbacks = new Array();
 			var parent_id_sel = '#<?php echo $sParentId; ?>';
 			
-			jQuery(document).ready(function($) {
+			jQuery( document ).ready( function( $ ) {
 				
 				// setup
 				var catParentId;
 				
-				var updateFields = function ( fade, delay ) {
+				var updateFields = function( fade, delay ) {
 					
 					catParentId = parseInt( $( parent_id_sel ).val() );
 					
-					$( '.form-field.inheritable' ).each(function () {
-						var fieldGroup = $(this).find( '.field-group' );
-						var inheritToggle = $(this).find( '.inherit-toggle' );
+					$( '.form-field.inheritable' ).each( function() {
+						var fieldGroup = $( this ).find( '.field-group' );
+						var inheritToggle = $( this ).find( '.inherit-toggle' );
 						
 						if ( -1 == catParentId ) {
 							fieldGroup.showX( fade, delay );
@@ -430,41 +438,44 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 							
 							inheritToggle.showX( fade, delay );
 						}
-					});
+					} );
 					
 				}
 				
 				updateFields();									// update with no effects
 				ajaxUpdateCallbacks.push( updateFields );		// register so it's triggered during an ajax request
 				
-				$( parent_id_sel ).change(function () {
-					catParentId = parseInt( $(this).val() );
+				$( parent_id_sel ).change( function () {
+					catParentId = parseInt( $( this ).val() );
 					updateFields( true );		// update with effects
-				});
+				} );
 				
-				$( '.inherit-toggle .checkbox' ).click(function () {
-					var fieldGroup = $(this).parent().parent().find( '.field-group' );
+				$( '.inherit-toggle .checkbox' ).click( function () {
+					var fieldGroup = $( this ).parent().parent().find( '.field-group' );
 					
-					if ( $(this).attr( 'checked' ) ) fieldGroup.fadeOut( 200 );
+					if ( $( this ).attr( 'checked' ) ) fieldGroup.fadeOut( 200 );
 					else fieldGroup.fadeIn( 200 );					
-				});
+				} );
 				
-				$( '#addcat' ).ajaxComplete(function (evt, req, settings) {
+				$( '#addcat' ).ajaxComplete( function ( evt, req, settings) {
 					if ( 'add-cat' == settings.action ) {
-						$( '.inherit-toggle .checkbox' ).each(function () {
-							$(this).attr( 'checked', 'checked' );
-						});
-						$.each( ajaxUpdateCallbacks, function () {
+						
+						$( '.inherit-toggle .checkbox' ).each( function() {
+							$( this ).attr( 'checked', 'checked' );
+						} );
+						
+						$.each( ajaxUpdateCallbacks, function() {
 							this();
-						});
+						} );
 					}
-				});
+				} );
 				
-			});
+			} );
 			
 		</script><?php
 		
 	}
+	
 	
 	
 	// do nothing, implement by singleton instance if needed

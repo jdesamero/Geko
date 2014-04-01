@@ -8,9 +8,11 @@ class Geko_Wp_Form_Response_Meta extends Geko_Wp_Options_Meta
 	//// init
 	
 	//
-	public function affix() {
+	public function add() {
 		
 		global $wpdb;
+		
+		parent::add();
 		
 		$sTableName = 'geko_form_response_meta';
 		Geko_Wp_Db::addPrefix( $sTableName );
@@ -27,12 +29,18 @@ class Geko_Wp_Form_Response_Meta extends Geko_Wp_Options_Meta
 		
 		$this->addTable( $oSqlTable );
 		
+		
+		return $this;
 	}
 	
 	
 	// create table
 	public function install() {
-		$this->createTable( $this->getPrimaryTable() );
+		
+		parent::install();
+		
+		$this->createTableOnce();
+		
 		return $this;
 	}
 	

@@ -30,11 +30,12 @@ class GekoX_Test_Wp_Full_Manage extends Geko_Wp_Options_Manage
 		
 		Geko_Wp_Enumeration_Manage::getInstance()->add();
 		
-		Geko_Wp_Db::addPrefix( 'geko_test_entity' );
+		$sTable = 'geko_test_entity';
+		Geko_Wp_Db::addPrefix( $sTable );
 		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->geko_test_entity, 't' )
+			->create( $wpdb->$sTable, 't' )
 			->fieldBigInt( 'test_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldLongText( 'title' )
 			->fieldVarChar( 'slug', array( 'size' => 255, 'unq' ) )

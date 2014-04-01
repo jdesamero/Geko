@@ -9,33 +9,52 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 	//// init
 	
 	//
-	public function add()
-	{
+	public function add() {
+		
+		global $wpdb;
+		
 		parent::add();
 		
 		Geko_Wp_Post_ExpirationDate_QueryHooks::register();
 		
+		
+		$sTableName = 'geko_expiry';
+		Geko_Wp_Db::addPrefix( $sTableName );
+		
+		$oSqlTable = new Geko_Sql_Table();
+		$oSqlTable
+			->create( $wpdb->$sTableName, 'e' )
+			->fieldBigInt( 'post_id', array( 'unsgnd', 'key' ) )
+			->fieldDateTime( 'start_date' )
+			->fieldDateTime( 'expiry_date' )
+		;
+		
+		$this->addTable( $oSqlTable );
+		
+		
 		return $this;
 	}
 	
-	//
-	public function affix()
-	{
-		Geko_Wp_Db::addPrefix('geko_expiry');			
+	// create table
+	public function install() {
+		
+		parent::install();
+		
+		$this->createTableOnce();
 		
 		return $this;
 	}
 	
 	
 	//
-	public function addAdmin()
-	{
+	public function addAdmin() {
+		
 		parent::addAdmin();
 		
 		add_action( 'admin_menu', array( $this, 'attachPage' ) );
 		
-		add_action( 'admin_init_post', array( $this, 'coft_install' ) );		
-		add_action( 'admin_head_post', array( $this, 'coft_affixAdminHead' ) );
+		add_action( 'admin_init_post', array( $this, 'install' ) );		
+		add_action( 'admin_head_post', array( $this, 'addAdminHead' ) );
 		
 		add_action( 'save_post', array( $this, 'savePostdata' ) );	
 		add_action( 'delete_post', array( $this, 'deletePostdata' ) );
@@ -43,28 +62,11 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 		return $this;
 	}
 	
-	// create table
-	public function install()
-	{
-		global $wpdb;
-		
-		$sSql = '
-			CREATE TABLE %s
-			(
-				post_id BIGINT UNSIGNED,
-				start_date DATETIME,
-				expiry_date DATETIME
-			)
-		';
-		
-		Geko_Wp_Db::createTable( 'geko_expiry', $sSql );
-		
-		return $this;
-	}
+	
 	
 	//
-	public function affixAdminHead()
-	{
+	public function addAdminHead() {
+		
 		if ( $this->isDisplayMode( 'add|edit' ) ):
 			
 			?><style type="text/css">
@@ -105,10 +107,10 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 	}
 	
 	// Adds a custom section to the "advanced" Post and Page edit screens
-	public function attachPage()
-	{
-		if ( function_exists('add_meta_box') ) {			
-			$this->addMetaBox('post', 'advanced');
+	public function attachPage() {
+		
+		if ( function_exists( 'add_meta_box' ) ) {			
+			$this->addMetaBox( 'post', 'advanced' );
 			//$this->add_meta_box('page', 'advanced');
 		} else {
 			add_action( 'dbx_post_advanced', array( $this, 'oldCustomBox' ) );
@@ -117,11 +119,11 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 	}
 	
 	//
-	private function addMetaBox($page = 'post', $context = 'advanced')
-	{
+	private function addMetaBox( $page = 'post', $context = 'advanced' ) {
+		
 		add_meta_box(
 			'geko-expiry',
-			__('Expiration Date', 'geko-expiry_textdomain'),
+			__( 'Expiration Date', 'geko-expiry_textdomain' ),
 			array( $this, 'innerCustomBox' ),
 			$page,
 			$context
@@ -133,13 +135,12 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 	//// front-end display methods
 	
 	// Prints the edit form for pre-WordPress 2.5 post/page
-	public function oldCustomBox()
-	{
+	public function oldCustomBox() {
 		?>
 		<div class="dbx-b-ox-wrapper">
 			<fieldset id="geko-expiry_fieldsetid" class="dbx-box">
 				<div class="dbx-h-andle-wrapper">
-					<h3 class="dbx-handle"><?php echo __('Expiration Date', 'geko-expiry_textdomain'); ?></h3>
+					<h3 class="dbx-handle"><?php echo __( 'Expiration Date', 'geko-expiry_textdomain' ); ?></h3>
 				</div>
 				<div class="dbx-c-ontent-wrapper"><div class="dbx-content">
 					<?php $this->innerCustomBox(); ?>
@@ -151,8 +152,8 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 	
 	
 	//
-	private function dateFields($prefix, $label, $iTs = NULL)
-	{
+	private function dateFields( $prefix, $label, $iTs = NULL ) {
+		
 		////// arrays
 		
 		$aMonths = array(
@@ -171,45 +172,48 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 		);
 		
 		$aDays = array();
-		for ($i = 1; $i <= 31; $i++) {
+		for ( $i = 1; $i <= 31; $i++ ) {
 			$aDays[] = $i;
 		}
-
+		
 		$aYears = array();
-		for ($i = 1990; $i <= 2020; $i++) {
+		for ( $i = 1990; $i <= 2020; $i++ ) {
 			$aYears[] = $i;
 		}
 		
-		$aHours = array(12 => 12);		// start at 12
-		for ($i = 1; $i <= 11; $i++) {
-			$aHours[] = sprintf("%'02d", $i);
+		$aHours = array( 12 => 12 );		// start at 12
+		for ( $i = 1; $i <= 11; $i++ ) {
+			$aHours[] = sprintf( "%'02d", $i );
 		}
 		
 		$aMins = array();
-		for ($i = 0; $i <= 55; $i += 5) {
-			$aMins[] = sprintf("%'02d", $i);
+		for ( $i = 0; $i <= 55; $i += 5 ) {
+			$aMins[] = sprintf( "%'02d", $i );
 		}
 		
-		$aAmPm = array('AM', 'PM');
+		$aAmPm = array( 'AM', 'PM' );
 		
 		////// current value
 		
-		if (NULL == $iTs) {
+		if ( NULL == $iTs ) {
+			
 			$iTs = time();
 			$sDisable = ' disabled="disabled" ';
 			$sCbxCheck = '';
+		
 		} else {
+			
 			// $iTs has a value
 			$sDisable = '';
 			$sCbxCheck = ' checked="checked" ';
 		}
 		
-		$iCurMonth = date('n', $iTs);
-		$iCurDay = date('j', $iTs);
-		$iCurYear = date('Y', $iTs);
-		$iCurHour = date('h', $iTs);
-		$iCurMin = round(intval(date('i', $iTs)) / 5) * 5;
-		$sCurAmPm = date('A', $iTs);
+		$iCurMonth = date( 'n', $iTs );
+		$iCurDay = date( 'j', $iTs );
+		$iCurYear = date( 'Y', $iTs );
+		$iCurHour = date( 'h', $iTs );
+		$iCurMin = round( intval( date( 'i', $iTs ) ) / 5 ) * 5;
+		$sCurAmPm = date( 'A', $iTs );
 		
 		?>
 			<tr>
@@ -217,35 +221,35 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 				<th class="label"><?php echo $label; ?></th>
 				<td>
 					<select id="<?php echo $prefix; ?>-mon" name="<?php echo $prefix; ?>-mon" <?php echo $sDisable; ?> >
-						<?php foreach($aMonths as $i => $sMonth): ?>
-							<option value="<?php echo $i; ?>" <?php echo ($iCurMonth == $i) ? 'selected="selected"' : ''; ?> ><?php echo $sMonth; ?></option>
+						<?php foreach( $aMonths as $i => $sMonth ): ?>
+							<option value="<?php echo $i; ?>" <?php echo ( $iCurMonth == $i ) ? 'selected="selected"' : '' ; ?> ><?php echo $sMonth; ?></option>
 						<?php endforeach; ?>
 					</select>
 					<select id="<?php echo $prefix; ?>-dy" name="<?php echo $prefix; ?>-dy" <?php echo $sDisable; ?> >
-						<?php foreach($aDays as $iDay): ?>
-							<option value="<?php echo $iDay; ?>" <?php echo ($iCurDay == $iDay) ? 'selected="selected"' : ''; ?> ><?php echo $iDay; ?></option>
+						<?php foreach( $aDays as $iDay ): ?>
+							<option value="<?php echo $iDay; ?>" <?php echo ( $iCurDay == $iDay ) ? 'selected="selected"' : '' ; ?> ><?php echo $iDay; ?></option>
 						<?php endforeach; ?>
 					</select>,
 					<select id="<?php echo $prefix; ?>-yr" name="<?php echo $prefix; ?>-yr" <?php echo $sDisable; ?> >
-						<?php foreach($aYears as $iYear): ?>
-							<option value="<?php echo $iYear; ?>" <?php echo ($iCurYear == $iYear) ? 'selected="selected"' : ''; ?> ><?php echo $iYear; ?></option>
+						<?php foreach( $aYears as $iYear ): ?>
+							<option value="<?php echo $iYear; ?>" <?php echo ( $iCurYear == $iYear ) ? 'selected="selected"' : '' ; ?> ><?php echo $iYear; ?></option>
 						<?php endforeach; ?>
 					</select>
 					@
 					<select id="<?php echo $prefix; ?>-hr" name="<?php echo $prefix; ?>-hr" <?php echo $sDisable; ?> >
-						<?php foreach($aHours as $iHour): ?>
-							<option value="<?php echo $iHour; ?>" <?php echo ($iCurHour == $iHour) ? 'selected="selected"' : ''; ?> ><?php echo $iHour; ?></option>
+						<?php foreach( $aHours as $iHour ): ?>
+							<option value="<?php echo $iHour; ?>" <?php echo ( $iCurHour == $iHour ) ? 'selected="selected"' : '' ; ?> ><?php echo $iHour; ?></option>
 						<?php endforeach; ?>
 					</select>
 					:
 					<select id="<?php echo $prefix; ?>-min" name="<?php echo $prefix; ?>-min" <?php echo $sDisable; ?> >
-						<?php foreach($aMins as $iMin): ?>
-							<option value="<?php echo $iMin; ?>" <?php echo ($iCurMin == $iMin) ? 'selected="selected"' : ''; ?> ><?php echo $iMin; ?></option>
+						<?php foreach( $aMins as $iMin ): ?>
+							<option value="<?php echo $iMin; ?>" <?php echo ( $iCurMin == $iMin ) ? 'selected="selected"' : '' ; ?> ><?php echo $iMin; ?></option>
 						<?php endforeach; ?>
 					</select>
 					<select id="<?php echo $prefix; ?>-ampm" name="<?php echo $prefix; ?>-ampm" <?php echo $sDisable; ?> >
-						<?php foreach($aAmPm as $sLabel): ?>
-							<option value="<?php echo $sLabel; ?>" <?php echo ($sCurAmPm == $sLabel) ? 'selected="selected"' : ''; ?> ><?php echo $sLabel; ?></option>
+						<?php foreach( $aAmPm as $sLabel ): ?>
+							<option value="<?php echo $sLabel; ?>" <?php echo ( $sCurAmPm == $sLabel ) ? 'selected="selected"' : '' ; ?> ><?php echo $sLabel; ?></option>
 						<?php endforeach; ?>
 					</select>
 				</td>
@@ -255,12 +259,12 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 	
 	
 	// Prints the inner fields for the custom post/page section
-	public function innerCustomBox()
-	{
+	public function innerCustomBox() {
+		
 		global $post;
 		global $wpdb;
 		
-		$aRes = $wpdb->get_row("
+		$aRes = $wpdb->get_row( "
 			SELECT
 				e.start_date AS start_date,
 				e.expiry_date AS expiry_date
@@ -268,9 +272,9 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 				$wpdb->geko_expiry e
 			WHERE
 				e.post_id = $post->ID
-		", ARRAY_A);
+		", ARRAY_A );
 		
-		//var_dump($aRes);
+		// var_dump( $aRes );
 		
 		// Use nonce for verification
 		?>
@@ -278,11 +282,11 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 		<input type="hidden" name="geko-expiry_noncename" id="geko-expiry_noncename" value="<?php echo wp_create_nonce(plugin_basename(__FILE__)); ?>" />
 		<!-- The actual fields for data entry -->
 		
-		<!-- <p><?php // echo date('l jS \of F Y h:i:s A'); ?></p> -->
+		<!-- <p><?php // echo date( 'l jS \of F Y h:i:s A' ); ?></p> -->
 		
 		<table class="gexp">
-			<?php $this->dateFields('gexp-start', 'Start Date:', strtotime( $aRes['start_date'] ) ); ?>
-			<?php $this->dateFields('gexp-expiry', 'Expiration Date:', strtotime( $aRes['expiry_date'] ) ); ?>
+			<?php $this->dateFields( 'gexp-start', 'Start Date:', strtotime( $aRes[ 'start_date' ] ) ); ?>
+			<?php $this->dateFields( 'gexp-expiry', 'Expiration Date:', strtotime( $aRes[ 'expiry_date' ] ) ); ?>
 		</table>
 		
 		<?php
@@ -293,30 +297,30 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 	//// helpers
 	
 	//
-	private function getMysqlDateFromPost( $prefix )
-	{
-		$iHr = $_POST[$prefix . '-hr'];
-		if ('PM' == $_POST[$prefix . '-ampm']) {
-			if (12 != $iHr) $iHr += 12;			
+	private function getMysqlDateFromPost( $prefix ) {
+		
+		$iHr = $_POST[ $prefix . '-hr' ];
+		if ( 'PM' == $_POST[ $prefix . '-ampm' ] ) {
+			if ( 12 != $iHr ) $iHr += 12;			
 		} else {
-			if (12 == $iHr) $iHr = 0;
+			if ( 12 == $iHr ) $iHr = 0;
 		}
 		
 		return sprintf(
 			"%s-%'02d-%'02d %'02d:%'02d:00",
-			$_POST[$prefix . '-yr'],
-			$_POST[$prefix . '-mon'],
-			$_POST[$prefix . '-dy'],
+			$_POST[ $prefix . '-yr' ],
+			$_POST[ $prefix . '-mon' ],
+			$_POST[ $prefix . '-dy' ],
 			$iHr,
-			$_POST[$prefix . '-min']
+			$_POST[ $prefix . '-min' ]
 		);
 	}
 	
 	//
-	private function getMysqlDateInsertValue( $prefix )
-	{
-		if ($_POST[$prefix . '-check']) {
-			return "'" . $this->getMysqlDateFromPost($prefix) . "'";
+	private function getMysqlDateInsertValue( $prefix ) {
+		
+		if ( $_POST[ $prefix . '-check' ] ) {
+			return "'" . $this->getMysqlDateFromPost( $prefix ) . "'";
 		} else {
 			return 'NULL';
 		}
@@ -328,44 +332,41 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 	//// crud methods
 	
 	// When the post is saved, saves our custom data
-	public function savePostdata($post_id)
-	{
+	public function savePostdata( $post_id ) {
+		
 		global $wpdb;
 		
 		// verify this came from the our screen and with proper authorization,
 		// because save_post can be triggered at other times
 		
-		if (FALSE == wp_verify_nonce($_POST['geko-expiry_noncename'], plugin_basename(__FILE__)))
-		{
+		if ( FALSE == wp_verify_nonce( $_POST[ 'geko-expiry_noncename' ], plugin_basename( __FILE__ ) ) ) {
 			return $post_id;
 		}
 		
-		if ('page' == $_POST['post_type'])
-		{
-			if (FALSE == current_user_can('edit_page', $post_id)) {
+		if ( 'page' == $_POST[ 'post_type' ] ) {
+			
+			if ( FALSE == current_user_can( 'edit_page', $post_id ) ) {
 				return $post_id;
 			}
-		}
-		else
-		{
-			if (FALSE == current_user_can('edit_post', $post_id)) {
+		} else {
+			if ( FALSE == current_user_can( 'edit_post', $post_id ) ) {
 				return $post_id;
 			}
 		}
 		
 		/* /
-		if ($_POST['gexp-start-check']) {
+		if ( $_POST[ 'gexp-start-check' ] ) {
 			print 'Has Start: ';
-			print $this->getMysqlDateFromPost('gexp-start');
+			print $this->getMysqlDateFromPost( 'gexp-start' );
 		} else {
 			print 'Has No Start';		
 		}
 		
 		print '<br /><br /><br />';
 
-		if ($_POST['gexp-expiry-check']) {
+		if ( $_POST[ 'gexp-expiry-check' ] ) {
 			print 'Has Expiry: ';
-			print $this->getMysqlDateFromPost('gexp-expiry');
+			print $this->getMysqlDateFromPost( 'gexp-expiry' );
 		} else {
 			print 'Has No Expiry';
 		}
@@ -378,11 +379,11 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 		//// DB stuff
 		
 		// Clean-up first
-		$wpdb->query("DELETE FROM $wpdb->geko_expiry WHERE post_id = $post_id");
+		$wpdb->query( "DELETE FROM $wpdb->geko_expiry WHERE post_id = $post_id" );
 		
 		// Insert if present
-		if ($_POST['gexp-start-check'] || $_POST['gexp-expiry-check']) {
-			$wpdb->query("
+		if ( $_POST[ 'gexp-start-check' ] || $_POST[ 'gexp-expiry-check' ] ) {
+			$wpdb->query( "
 				INSERT INTO
 					$wpdb->geko_expiry
 					(
@@ -393,26 +394,28 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 				VALUES
 					(
 						$post_id, " .
-						$this->getMysqlDateInsertValue('gexp-start') . ", " .
-						$this->getMysqlDateInsertValue('gexp-expiry') . "
+						$this->getMysqlDateInsertValue( 'gexp-start' ) . ", " .
+						$this->getMysqlDateInsertValue( 'gexp-expiry' ) . "
 					)
-			");
+			" );
 		}
 		
 		return TRUE;	// ???
 	}
 	
 	// When post is deleted
-	public function deletePostdata($post_id)
-	{
-		global $wpdb;
-		$wpdb->query("DELETE FROM $wpdb->geko_expiry WHERE post_id = $post_id");
+	public function deletePostdata( $post_id ) {
 		
-		return TRUE;	// ???		
+		global $wpdb;
+		
+		$wpdb->query( "DELETE FROM $wpdb->geko_expiry WHERE post_id = $post_id" );
+		
+		return TRUE;	// ???
 	}
 	
 	
 	
 }
+
 
 

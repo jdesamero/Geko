@@ -28,21 +28,21 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 			
 			$sSubAction = $oSubMng->getActionPrefix();
 			$this->_sSlug = $oSubMng->getSlug();
-						
-			add_action( $sSubAction . '_main_fields', array( $this, 'outputForm' ), 10, 2 );
-			add_action( $sSubAction . '_main_fields_' . $this->_sSlug, array( $this, 'outputForm' ), 10, 3 );
 			
-			add_action( $sSubAction . '_extra_fields', array( $this, 'outputForm' ), 10, 2 );
-			add_action( $sSubAction . '_extra_fields_' . $this->_sSlug, array( $this, 'outputForm' ), 10, 3 );
+			add_action( sprintf( '%s_main_fields', $sSubAction ), array( $this, 'outputForm' ), 10, 2 );
+			add_action( sprintf( '%s_main_fields_%s', $sSubAction, $this->_sSlug ), array( $this, 'outputForm' ), 10, 3 );
 			
-			add_action( $sSubAction . '_add', array( $this, 'insert' ) );
-			add_action( $sSubAction . '_add_' . $this->_sSlug, array( $this, 'insertType' ) );
+			add_action( sprintf( '%s_extra_fields', $sSubAction ), array( $this, 'outputForm' ), 10, 2 );
+			add_action( sprintf( '%s_extra_fields_%s', $sSubAction, $this->_sSlug ), array( $this, 'outputForm' ), 10, 3 );
 			
-			add_action( $sSubAction . '_edit', array( $this, 'update' ), 10, 2 );
-			add_action( $sSubAction . '_edit_' . $this->_sSlug, array( $this, 'updateType' ), 10, 2 );
+			add_action( sprintf( '%s_add', $sSubAction ), array( $this, 'insert' ) );
+			add_action( sprintf( '%s_add_%s', $sSubAction, $this->_sSlug ), array( $this, 'insertType' ) );
 			
-			add_action( $sSubAction . '_delete', array( $this, 'delete' ) );
-			add_action( $sSubAction . '_delete_' . $this->_sSlug, array( $this, 'deleteType' ) );
+			add_action( sprintf( '%s_edit', $sSubAction ), array( $this, 'update' ), 10, 2 );
+			add_action( sprintf( '%s_edit_%s', $sSubAction, $this->_sSlug ), array( $this, 'updateType' ), 10, 2 );
+			
+			add_action( sprintf( '%s_delete', $sSubAction ), array( $this, 'delete' ) );
+			add_action( sprintf( '%s_delete_%s', $sSubAction, $this->_sSlug ), array( $this, 'deleteType' ) );
 			
 		}
 		
@@ -100,7 +100,7 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 		
 		$oQuery = new Geko_Sql_Select();
 		$oQuery
-			->field( 'm.' . $sField )
+			->field( sprintf( 'm.%s', $sField ) )
 			->field( 'k.meta_key' )
 			->field( 'm.meta_value' )
 			->from( $this->_sPrimaryTable, 'm' )
@@ -109,7 +109,7 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 		;
 		
 		if ( $aParams[ 'parent_ids' ] ) {
-			$oQuery->where( 'm.' . $sField . ' * ($)', $aParams[ 'parent_ids' ] );
+			$oQuery->where( sprintf( 'm.%s * ($)', $sField ), $aParams[ 'parent_ids' ] );
 		}
 		
 		$aRes = $wpdb->get_results( strval( $oQuery ) );
@@ -137,12 +137,12 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 		}
 		
 		$sMetaMemberTable = $wpdb->$sMetaMemberTable;
-		$aSubFmt = $wpdb->get_results( "
+		$aSubFmt = $wpdb->get_results( sprintf( "
 			SELECT			*
 			FROM			$sMetaMemberTable
-			WHERE			" . Geko_Wp_Db::prepare( ' ( ' . $sMetaIdFieldName . ' ##d## ) ', $aMetaIds ) . "
+			WHERE			%s
 			ORDER BY		member_id, member_value
-		" );
+		", Geko_Wp_Db::prepare( sprintf( ' ( %s ##d## ) ', $sMetaIdFieldName ), $aMetaIds ) ) );
 		
 		$aSubVals = array();
 		foreach ( $aSubFmt as $oSubItem ) {

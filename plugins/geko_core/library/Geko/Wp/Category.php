@@ -186,7 +186,7 @@ class Geko_Wp_Category extends Geko_Wp_Entity
 			
 			// if category aliasing is activated, return the apparent category
 			$oCatAlias = Geko_Wp_Category_Alias::getInstance();
-			if ( $oCatAlias->getCalled_affix() ) {
+			if ( $oCatAlias->getCalledInit() ) {
 				return $oCatAlias->getApparentCat()->getRawEntity();
 			}
 			

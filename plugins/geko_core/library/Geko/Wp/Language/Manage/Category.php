@@ -42,7 +42,9 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 	
 	
 	//
-	public function affixAdmin() {
+	public function addAdmin() {
+		
+		parent::addAdmin();
 		
 		// category
 		add_action( 'admin_category_add_fields_pq', array( $this, 'addCategorySelector' ) );
@@ -61,6 +63,7 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 		add_action( 'admin_init_post_edit', array( $this, 'filterPostAdminCategories' ) );
 		
 		Geko_Hooks::addFilter( 'admin_page_source', array( $this, 'tweakTitle' ) );
+		
 		
 		return $this;
 	}
@@ -113,17 +116,17 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 	public function addCategorySelectorJs() {
 		
 		$oUrl = new Geko_Uri();
-		$oUrl->unsetVar('cat_lang_id');
+		$oUrl->unsetVar( 'cat_lang_id' );
 		
 		?><script type="text/javascript">
 			
-			jQuery(document).ready(function($) {
+			jQuery( document ).ready( function( $ ) {
 				
-				$('#geko_lang_id').change( function() {
-					window.location = '<?php echo strval( $oUrl ); ?>&cat_lang_id=' + $(this).val();
+				$( '#geko_lang_id' ).change( function() {
+					window.location = '<?php echo strval( $oUrl ); ?>&cat_lang_id=' + $( this ).val();
 				} );
 				
-			});
+			} );
 			
 		</script><?php
 		
@@ -133,11 +136,11 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 	public function addCategorySelector( $oPq ) {
 		
 		$aVals = array();
-		if ( $iLangId = $_REQUEST['cat_lang_id'] ) {
-			$aVals['geko_lang_id'] = $iLangId;
+		if ( $iLangId = $_REQUEST[ 'cat_lang_id' ] ) {
+			$aVals[ 'geko_lang_id' ] = $iLangId;
 		}
 		
-		$oPq->find('form')->prepend('
+		$oPq->find( 'form' )->prepend('
 			<div class="form-field">
 				<label for="geko_lang_id">Language</label>
 				' . Geko_Html::populateForm( $this->getLanguageSelect(), $aVals ) . '
@@ -150,8 +153,8 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 	//
 	public function editCategorySelector( $oPq ) {
 		
-		$iLangId = intval( $_GET['cat_lang_id'] );
-		$iLangGroupId = intval( $_GET['cat_lgroup_id'] );
+		$iLangId = intval( $_GET[ 'cat_lang_id' ] );
+		$iLangGroupId = intval( $_GET[ 'cat_lgroup_id' ] );
 		$iCatId = $this->_getCatId();
 		$bNewSibling = ( !$iLangGroupId || !$iLangId ) ? FALSE : TRUE;
 		
@@ -178,7 +181,7 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 		// manipulate $oPq
 		$oPq->prepend( $this->getNotificationHtml() );
 		
-		$sCatId = ( $_GET['cat_ID'] ) ? 'editcat' : 'edittag';
+		$sCatId = ( $_GET[ 'cat_ID' ] ) ? 'editcat' : 'edittag';
 		
 		$oPq->find('form#' . $sCatId . ' > table')->prepend('
 			<tr class="form-field">
@@ -196,9 +199,9 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 			$oPq->find('#slug')->attr( 'value', '' );
 		}
 		
-		if ( ( 'edit' == $_GET['action'] ) && ( $this->_getCatId() ) ) {
+		if ( ( 'edit' == $_GET[ 'action' ] ) && ( $this->_getCatId() ) ) {
 			$oUrl = new Geko_Uri();
-			$oPq->find('input[name="_wp_original_http_referer"]')->val( strval( $oUrl ) );
+			$oPq->find( 'input[name="_wp_original_http_referer"]' )->val( strval( $oUrl ) );
 		}
 		
 		return $oPq;
@@ -265,8 +268,8 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 	public function saveCategorySibling() {
 		
 		if (
-			( $sReferer = $_POST['_wp_http_referer'] ) && 
-			( $oUrl = new Geko_Uri( 'http://' . $_SERVER['SERVER_NAME'] . $sReferer ) ) && 
+			( $sReferer = $_POST[ '_wp_http_referer' ] ) && 
+			( $oUrl = new Geko_Uri( sprintf( 'http://%s%s', $_SERVER[ 'SERVER_NAME' ], $sReferer ) ) ) && 
 			(
 				( FALSE !== strpos( $sReferer, '/wp-admin/categories.php' ) ) || 
 				(
@@ -276,17 +279,17 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 			)
 		) {
 			if (
-				( 'edit' == $oUrl->getVar('action') ) &&
-				$oUrl->hasVar('cat_lgroup_id') &&
-				$oUrl->hasVar('cat_lang_id')
+				( 'edit' == $oUrl->getVar( 'action' ) ) &&
+				$oUrl->hasVar( 'cat_lgroup_id' ) &&
+				$oUrl->hasVar( 'cat_lang_id' )
 			) {
 				// $iCatId = wp_insert_category( $_POST );
-				$mCatId = wp_insert_term( $_POST['name'], 'category', $_POST );
-				$mCatId = ( is_array( $mCatId ) ) ? $mCatId['term_id'] : $mCatId;
+				$mCatId = wp_insert_term( $_POST[ 'name' ], 'category', $_POST );
+				$mCatId = ( is_array( $mCatId ) ) ? $mCatId[ 'term_id' ] : $mCatId;
 				
 				$oUrl
-					->unsetVar('cat_lgroup_id')
-					->unsetVar('cat_lang_id')
+					->unsetVar( 'cat_lgroup_id' )
+					->unsetVar( 'cat_lang_id' )
 				;
 				
 				$sCatIdVar = ( FALSE !== strpos( $sReferer, '/wp-admin/categories.php' ) ) ? 'cat_ID' : 'tag_ID';
@@ -294,7 +297,7 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 				
 				$this->triggerNotifyMsg( 'm101' );
 				
-				header( 'Location: ' . strval( $oUrl ) );
+				header( sprintf( 'Location: %s', strval( $oUrl ) ) );
 				die();
 			}
 		}
@@ -319,10 +322,10 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 		
 		$sLangCode = '';
 		
-		if ( $iPostId = $_REQUEST['post'] ) {
+		if ( $iPostId = $_REQUEST[ 'post' ] ) {
 			$oObj = Geko_Wp_Language_Member::getOne( array( 'obj_id' => $iPostId, 'type' => 'post' ), FALSE );
 			if ( $oObj->isValid() ) $sLangCode = $oObj->getLangCode();
-		} elseif ( $iLangId = $_REQUEST['post_lang_id'] ) {
+		} elseif ( $iLangId = $_REQUEST[ 'post_lang_id' ] ) {
 			$sLangCode = $this->getLanguage( $iLangId )->getSlug();
 		}
 		
@@ -338,7 +341,7 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 		
 		$sLangCode = '';
 		
-		if ( $iLangId = $_REQUEST['cat_lang_id'] ) {
+		if ( $iLangId = $_REQUEST[ 'cat_lang_id' ] ) {
 			$sLangCode = $this->getLanguage( $iLangId )->getSlug();
 		} else {
 			$sLangCode = self::$oDefaultLang->getSlug();
@@ -354,10 +357,10 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 		
 		$sLangCode = '';
 		
-		if ( $iCatId = $_REQUEST['tag_ID'] ) {
+		if ( $iCatId = $_REQUEST[ 'tag_ID' ] ) {
 			$oObj = Geko_Wp_Language_Member::getOne( array( 'obj_id' => $iCatId, 'type' => 'category' ), FALSE );
 			if ( $oObj->isValid() ) $sLangCode = $oObj->getLangCode();
-		} elseif ( $iLangId = $_REQUEST['cat_lang_id'] ) {
+		} elseif ( $iLangId = $_REQUEST[ 'cat_lang_id' ] ) {
 			$sLangCode = $this->getLanguage( $iLangId )->getSlug();
 		}
 		
@@ -371,17 +374,18 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 		
 		$this->getLanguages();		// initialize lang array
 		
-		if ( $this->sFilterLangCode ) $aArgs['lang'] = $this->sFilterLangCode;
+		if ( $this->sFilterLangCode ) $aArgs[ 'lang' ] = $this->sFilterLangCode;
 		
 		if (
-			( 'category' == $aTx[0] ) && 
-			( $sLangCode = $aArgs['lang'] )
+			( 'category' == $aTx[ 0 ] ) && 
+			( $sLangCode = $aArgs[ 'lang' ] )
 		) {
+			
 			global $wpdb;
 			
 			$bLangIsDefault = ( self::$oDefaultLang->getSlug() == $sLangCode );
 			
-			$aCatIds = $wpdb->get_col("
+			$aCatIds = $wpdb->get_col( "
 				SELECT			m.obj_id
 				FROM			$wpdb->geko_lang_group_members m
 				LEFT JOIN		$wpdb->geko_lang_groups g
@@ -390,7 +394,7 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 					ON			l.lang_id = m.lang_id
 				WHERE			( g.type_id = ( SELECT mkey_id FROM $wpdb->geko_meta_key WHERE meta_key = 'category' ) ) AND 
 								( l.code " . ( $bLangIsDefault ? '!' : '' ) . "= '$sLangCode' )
-			");
+			" );
 			
 			$aFiltered = array();
 			

@@ -22,9 +22,8 @@ class Geko_Wp_User_Location_Manage extends Geko_Wp_Location_Manage
 		
 		parent::addAdmin();
 		
-		add_action( 'admin_init_' . $this->_sSubAction, array( $this, 'coft_install' )  );		
-		add_action( 'admin_head_' . $this->_sSubAction, array( $this, 'coft_affixAdminHead' )  );
-		add_action( 'admin_head_' . $this->_sSubAction, array( $this, 'co_addAdminHead' )  );
+		add_action( sprintf( 'admin_init_%s', $this->_sSubAction ), array( $this, 'install' )  );		
+		add_action( sprintf( 'admin_head_%s', $this->_sSubAction ), array( $this, 'addAdminHead' )  );
 		
 		////
 		

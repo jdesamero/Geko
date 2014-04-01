@@ -137,6 +137,15 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	}
 	
 	//
+	public function addAdminHead( $oPlugin = NULL ) {
+		
+		parent::addAdminHead( $oPlugin );
+		
+		Geko_Once::run( sprintf( '%s::js', __METHOD__ ), array( $this, 'adminHeadJs0' ) );
+		
+	}
+	
+	//
 	public function doAdminHook( $sType ) {
 		if ( $this->isCurrentPage() ) {
 			$sClass = Geko_String::coalesce( $this->_sCurrentPage, $this->_sInstanceClass );
@@ -647,7 +656,8 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	//// form processing/injection methods
 	
 	// shared javascript
-	public function affixAdminHead() {
+	// TO DO: this should 
+	public function adminHeadJs0() {
 		
 		?><script type="text/javascript">		
 			
