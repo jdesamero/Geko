@@ -100,7 +100,7 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 				( 'category' == $oUrl->getVar( 'taxonomy' ) )
 			)
 		) {
-			if ( ( 'edit' == $_GET['action'] ) && $_GET['cat_lgroup_id'] && $_GET['cat_lang_id'] ) {
+			if ( ( 'edit' == $_GET[ 'action' ] ) && $_GET[ 'cat_lgroup_id' ] && $_GET[ 'cat_lang_id' ] ) {
 				$sContent = str_replace(
 					array( '<h2>Edit Category</h2>', '<input type="submit" class="button-primary" name="submit" value="Update">' ),
 					array( '<h2>Add Category</h2>', '<input type="submit" class="button-primary" name="submit" value="Add">' ),
@@ -118,12 +118,18 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 		$oUrl = new Geko_Uri();
 		$oUrl->unsetVar( 'cat_lang_id' );
 		
+		$aJsonParams = array(
+			'thisurl' => strval( $oUrl )
+		);
+		
 		?><script type="text/javascript">
 			
 			jQuery( document ).ready( function( $ ) {
 				
+				var oParams = <?php echo Zend_Json::encode( $aJsonParams ); ?>;
+				
 				$( '#geko_lang_id' ).change( function() {
-					window.location = '<?php echo strval( $oUrl ); ?>&cat_lang_id=' + $( this ).val();
+					window.location = oParams.thisurl + '&cat_lang_id=' + $( this ).val();
 				} );
 				
 			} );
@@ -131,6 +137,7 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 		</script><?php
 		
 	}
+	
 	
 	//
 	public function addCategorySelector( $oPq ) {
@@ -140,12 +147,12 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 			$aVals[ 'geko_lang_id' ] = $iLangId;
 		}
 		
-		$oPq->find( 'form' )->prepend('
+		$oPq->find( 'form' )->prepend( sprintf( '
 			<div class="form-field">
 				<label for="geko_lang_id">Language</label>
-				' . Geko_Html::populateForm( $this->getLanguageSelect(), $aVals ) . '
+				%s
 			</div>
-		');
+		', Geko_Html::populateForm( $this->getLanguageSelect(), $aVals ) ) );
 		
 		return $oPq;
 	}
@@ -183,20 +190,20 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 		
 		$sCatId = ( $_GET[ 'cat_ID' ] ) ? 'editcat' : 'edittag';
 		
-		$oPq->find('form#' . $sCatId . ' > table')->prepend('
+		$oPq->find( sprintf( 'form#%s > table', $sCatId ) )->prepend( sprintf( '
 			<tr class="form-field">
 				<th valign="top" scope="row"><label for="geko_lang_id">Language</label></th>
-				<td>' . $sField . '</td>
+				<td>%s</td>
 			</tr>
-		');
+		', $sField ) );
 		
 		// HACK!!!
 		if ( FALSE == $this->bHasTagId ) {
-			$oPq->find('input[name=tag_ID]')->attr( 'value', '' );
-			$oPq->find('input[name=action]')->attr( 'value', 'add-tag' );
-			$oPq->find('#_wpnonce')->attr( 'value', wp_create_nonce('add-tag') );
-			$oPq->find('#name')->attr( 'value', '' );
-			$oPq->find('#slug')->attr( 'value', '' );
+			$oPq->find( 'input[name=tag_ID]' )->attr( 'value', '' );
+			$oPq->find( 'input[name=action]' )->attr( 'value', 'add-tag' );
+			$oPq->find( '#_wpnonce' )->attr( 'value', wp_create_nonce( 'add-tag' ) );
+			$oPq->find( '#name' )->attr( 'value', '' );
+			$oPq->find( '#slug' )->attr( 'value', '' );
 		}
 		
 		if ( ( 'edit' == $_GET[ 'action' ] ) && ( $this->_getCatId() ) ) {

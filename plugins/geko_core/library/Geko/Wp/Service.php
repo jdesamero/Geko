@@ -4,6 +4,23 @@
 class Geko_Wp_Service extends Geko_Service
 {
 	
+	protected $_sManageClassPrefix = 'Geko_Wp_';
+	
+	protected $_aManageClassOverrides = array();
+	
+	
+	/* /
+	protected $_aManageClassOverrides = array(
+		'User_Meta' => 'Geko_Wp_User_Meta',
+		'User_Location_Manage' => 'Geko_Wp_User_Location_Manage'
+	);
+	/* */
+	
+	
+	
+	
+	////// convenience methods for saving to database
+	
 	
 	//// email delivery stuff
 	
@@ -49,7 +66,142 @@ class Geko_Wp_Service extends Geko_Service
 	}
 	
 	
+	
+	
+	//// create wordpress user
+	
+	
+	//
+	public function createUser( $sLogin, $sPassword, $sEmail, $sRole = 'subscriber' ) {
 		
+		// create user
+		
+		$iUserId = wp_create_user( $sLogin, $sPassword, $sEmail );
+		
+		// set user role
+		
+		$oWpUser = new WP_User( $iUserId );
+		$oWpUser->set_role( $sRole );
+		
+		Geko_Wp_User_RoleType::getInstance()->reconcileAssigned();
+		
+		
+		return $iUserId;
+		
+	}
+	
+	
+	//// enumeration
+	
+	
+	//
+	public function getEnumeration( $sSlug ) {
+		return Geko_Wp_Enumeration_Query::getSet( $sSlug );
+	}
+	
+	
+	//// user meta
+	
+	//
+	public function insertUserMeta( $iUserId, $aValues, $sManageClass = NULL ) {
+		
+		if ( $oMng = $this->resolveClassInstance( 'User_Meta', $sManageClass ) ) {
+			
+			$oMng->setUserId( $iUserId );
+			
+			return $oMng->save( $iUserId, 'insert', NULL, $aValues );
+		}
+		
+		return NULL;
+	}
+	
+	//
+	public function updateUserMeta( $iUserId, $aValues, $sManageClass = NULL ) {
+		
+		if ( $oMng = $this->resolveClassInstance( 'User_Meta', $sManageClass ) ) {
+			
+			$oMng->setUserId( $iUserId );
+			
+			return $oMng->save( $iUserId, 'update', NULL, $aValues );
+		}
+		
+		return NULL;
+	}
+	
+	
+	//// user location
+	
+	//
+	public function insertUserLocation( $iUserId, $aValues, $sManageClass = NULL ) {
+		
+		if ( $oMng = $this->resolveClassInstance( 'User_Location_Manage', $sManageClass ) ) {
+
+			return $oLocManage->save(
+				array(
+					'object_id' => $iUserId,
+					'object_type' => 'user'
+				),
+				'insert',
+				$aValues
+			);
+		}
+		
+		return NULL;
+	}
+	
+	//
+	public function updateUserLocation( $iUserId, $aValues, $sManageClass = NULL ) {
+
+		if ( $oMng = $this->resolveClassInstance( 'User_Location_Manage', $sManageClass ) ) {
+
+			return $oLocManage->save(
+				array(
+					'object_id' => $iUserId,
+					'object_type' => 'user'
+				),
+				'update',
+				$aValues
+			);
+		}
+		
+		return NULL;	
+	}
+	
+	
+	
+	
+	//// helpers
+	
+	//
+	public function resolveClass( $sClassSuffix, $sManageClass = NULL ) {
+		
+		// inline override
+		if ( $sManageClass ) return $sManageClass;
+		
+		// class override
+		$sClass = $this->_aManageClassOverrides[ $sClassSuffix ];
+		if ( $sClass ) return $sClass;
+		
+		// default
+		$sClass = sprintf( '%s%s', $this->_sManageClassPrefix, $sClassSuffix );
+		if ( class_exists( $sClass ) ) return $sClass;
+		
+		return NULL;
+	}
+	
+	//
+	public function resolveClassInstance( $sClassSuffix, $sManageClass = NULL ) {
+		
+		if ( $sClass = $this->resolveClass( $sClassSuffix, $sManageClass ) ) {
+			
+			return Geko_Singleton_Abstract::getInstance( $sClass )->init();
+		}
+		
+		return NULL;
+	}
+	
+	
 }
+
 
 
