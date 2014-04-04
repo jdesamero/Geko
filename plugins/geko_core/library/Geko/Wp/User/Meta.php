@@ -154,12 +154,7 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 		add_action( 'personal_options_update', array( $this,'update' ) );
 		add_action( 'edit_user_profile_update', array( $this, 'update' ) );
 		add_action( 'deleted_user', array( $this, 'delete' ) );
-		
-		//// custom columns
-		
-		add_action( 'manage_users_columns', array( $this, 'columnTitle' ) );
-		add_action( 'manage_users_custom_column', array( $this, 'columnValue' ), 10, 3 );
-		
+				
 		//
 		if ( $this->_bHasFileUpload ) {
 			if ( !self::$_bHasFileUploadAdded ) {
@@ -175,15 +170,6 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 	
 	
 	
-	//
-	public function columnTitle( $aColumn ) {
-		return $aColumn;
-	}
-	
-	//
-	public function columnValue( $sValue, $sColumnName, $iUserId ) {
-		return $sValue;
-	}
 	
 	
 	

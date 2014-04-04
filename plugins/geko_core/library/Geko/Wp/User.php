@@ -128,7 +128,7 @@ class Geko_Wp_User extends Geko_Wp_Entity
 	
 	//
 	public function getFullName() {
-		return trim( $this->getFirstName() . ' ' . $this->getLastName() );
+		return trim( sprintf( '%s %s', $this->getFirstName(), $this->getLastName() ) );
 	}
 	
 	

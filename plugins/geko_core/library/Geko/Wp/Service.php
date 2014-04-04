@@ -103,26 +103,26 @@ class Geko_Wp_Service extends Geko_Service
 	//// user meta
 	
 	//
-	public function insertUserMeta( $iUserId, $aValues, $sManageClass = NULL ) {
+	public function insertUserMeta( $iUserId, $aValues, $aFiles = NULL, $sManageClass = NULL ) {
 		
 		if ( $oMng = $this->resolveClassInstance( 'User_Meta', $sManageClass ) ) {
 			
 			$oMng->setUserId( $iUserId );
 			
-			return $oMng->save( $iUserId, 'insert', NULL, $aValues );
+			return $oMng->save( $iUserId, 'insert', NULL, $aValues, $aFiles );
 		}
 		
 		return NULL;
 	}
 	
 	//
-	public function updateUserMeta( $iUserId, $aValues, $sManageClass = NULL ) {
+	public function updateUserMeta( $iUserId, $aValues, $aFiles = NULL, $sManageClass = NULL ) {
 		
 		if ( $oMng = $this->resolveClassInstance( 'User_Meta', $sManageClass ) ) {
 			
 			$oMng->setUserId( $iUserId );
 			
-			return $oMng->save( $iUserId, 'update', NULL, $aValues );
+			return $oMng->save( $iUserId, 'update', NULL, $aValues, $aFiles );
 		}
 		
 		return NULL;
@@ -136,7 +136,7 @@ class Geko_Wp_Service extends Geko_Service
 		
 		if ( $oMng = $this->resolveClassInstance( 'User_Location_Manage', $sManageClass ) ) {
 
-			return $oLocManage->save(
+			return $oMng->save(
 				array(
 					'object_id' => $iUserId,
 					'object_type' => 'user'
@@ -154,7 +154,7 @@ class Geko_Wp_Service extends Geko_Service
 
 		if ( $oMng = $this->resolveClassInstance( 'User_Location_Manage', $sManageClass ) ) {
 
-			return $oLocManage->save(
+			return $oMng->save(
 				array(
 					'object_id' => $iUserId,
 					'object_type' => 'user'

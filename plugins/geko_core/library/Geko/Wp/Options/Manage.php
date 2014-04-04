@@ -19,6 +19,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	protected $_iCurrentEntityId;
 	protected $_oCurrentEntity;
 	protected $_sEntityIdVarName = 'entity_id';
+	protected $_aEntityCache = array();
 	
 	protected $_sParentEntityClass;
 	protected $_sParentManageClass;
@@ -739,6 +740,8 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	
 	
 	
+	//// entities
+	
 	//
 	public function getCurrentEntityId() {
 		if ( $this->_oCurrentEntity ) return $this->_oCurrentEntity->getId();
@@ -750,36 +753,6 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		return intval( Geko_String::coalesce( $_GET[ $this->_sParentEntityIdVarName ], $_POST[ $this->_sParentEntityIdVarName ] ) );
 	}
 	
-	//
-	public function getParentManageClass() {
-		return $this->_sParentManageClass;
-	}
-	
-	//
-	public function getDetailsMenuHandle() {
-		return $this->_sParentManageClass ? $this->_sParentManageClass : $this->_sInstanceClass;
-	}
-	
-	//
-	public function userHasManagementCapability() {
-		return $this->_bHasManagementCapability;
-	}
-	
-	//
-	public function enablePage() {
-		
-		if ( $this->_sParentEntityClass ) {
-			return ( $this->_oCurrentParentEntity ) ? TRUE : FALSE;
-		}
-		
-		return TRUE;
-	}
-	
-	//
-	public function getPageNum() {
-		return ( $_GET[ 'pagenum' ] ) ? intval( $_GET[ 'pagenum' ] ) : 1;
-	}
-
 	//
 	public function getCurrentEntity( $oPlugin = NULL ) {
 		
@@ -796,6 +769,69 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		$this->_iCurrentEntityId = $oEntity->getId();
 		return $this;
 	}
+	
+	//
+	public function getEntityClass() {
+		return $this->_sEntityClass;
+	}
+		
+	// return a prefix
+	public function getUpdateRelatedEntities( $oPlugin = NULL ) {
+		if ( is_a( $oPlugin, 'Geko_Wp_Options_Plugin' ) ) {
+			return $oPlugin->getUpdateRelatedEntities();
+		}
+		return $this->_bUpdateRelatedEntities;
+	}
+	
+	//
+	public function enablePage() {
+		
+		if ( $this->_sParentEntityClass ) {
+			return ( $this->_oCurrentParentEntity ) ? TRUE : FALSE;
+		}
+		
+		return TRUE;
+	}
+	
+	//
+	public function getCachedEntity( $iEntityId ) {
+		
+		if ( !$oEntity = $this->_aEntityCache[ $iEntityId ] ) {
+			
+			$sEntityClass = $this->_sEntityClass;
+			$oEntity = new $sEntityClass( $iEntityId );
+			
+			$this->_aEntityCache[ $iEntityId ] = $oEntity;
+		}
+		
+		return $oEntity;
+	}
+	
+	
+	
+	
+	
+	//
+	public function getParentManageClass() {
+		return $this->_sParentManageClass;
+	}
+	
+	//
+	public function getDetailsMenuHandle() {
+		return $this->_sParentManageClass ? $this->_sParentManageClass : $this->_sInstanceClass;
+	}
+	
+	//
+	public function userHasManagementCapability() {
+		return $this->_bHasManagementCapability;
+	}
+	
+	
+	//
+	public function getPageNum() {
+		return ( $_GET[ 'pagenum' ] ) ? intval( $_GET[ 'pagenum' ] ) : 1;
+	}
+
 	
 	//
 	public function setSubject( $sSubject ) {
@@ -827,12 +863,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	public function getSlug() {
 		return $this->_sSlug;
 	}
-	
-	//
-	public function getEntityClass() {
-		return $this->_sEntityClass;
-	}
-	
+		
 	//
 	public function getType() {
 		return $this->_sType;
@@ -853,13 +884,6 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		return $this->_sMenuTitle;
 	}
 		
-	// return a prefix
-	public function getUpdateRelatedEntities( $oPlugin = NULL ) {
-		if ( is_a( $oPlugin, 'Geko_Wp_Options_Plugin' ) ) {
-			return $oPlugin->getUpdateRelatedEntities();
-		}
-		return $this->_bUpdateRelatedEntities;
-	}
 	
 	
 	

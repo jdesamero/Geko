@@ -23,9 +23,6 @@ class Geko_Layout extends Geko_Singleton_Abstract
 		
 	);
 	
-	protected $_bIntrospect = FALSE;
-	protected $_aExcludeFromIntrospection = array();
-	
 	protected $_aTemplates = array();
 	
 	
@@ -69,7 +66,11 @@ class Geko_Layout extends Geko_Singleton_Abstract
 	// labels
 	
 	//
-	public function _getLabel( $iIdx ) {
+	public function _getLabel() {
+		
+		$aArgs = func_get_args();
+		$iIdx = $aArgs[ 0 ];
+		
 		return $this->_aLabels[ $iIdx ];
 	}
 	
@@ -109,41 +110,7 @@ class Geko_Layout extends Geko_Singleton_Abstract
 	}
 	
 	
-	
-	// used to trigger methods implemented by concrete classes to determine
-	// "constant" values triggered by certain functions so certain admin
-	// functionality can be automated
-	// DEPRACATED: Can break things easily when called
-	public function introspect() {
 		
-		// set introspect mode
-		$this->_bIntrospect = TRUE;
-		
-		$sClass = get_class( $this );
-		
-		$oReflect = new ReflectionClass( $sClass );
-		
-		$aMethods = $oReflect->getMethods();
-		
-		foreach ( $aMethods as $oMethod ) {
-			if (
-				( $oMethod->isPublic() ) && 
-				( 0 == $oMethod->getNumberOfRequiredParameters() ) && 
-				( $sMethod = $oMethod->getName() ) && 
-				( $sClass == $oMethod->getDeclaringClass()->getName() ) && 
-				( !in_array( $sMethod, $this->_aExcludeFromIntrospection ) )
-			) {
-				// invoke method to trigger introspection
-				ob_start();
-				$oMethod->invoke( $this );
-				ob_end_clean();
-			}
-		}
-		
-		// unset introspect mode
-		$this->_bIntrospect = FALSE;
-		
-	}
 	
 	
 	//// helpers
@@ -504,12 +471,17 @@ class Geko_Layout extends Geko_Singleton_Abstract
 		} elseif ( 0 === strpos( $sMethod, 'l_' ) ) {
 			
 			$iIdx = str_replace( 'l_', '', $sMethod );
-			return $this->_getLabel( $iIdx );
+			array_unshift( $aArgs, $iIdx );			// prepend
+			
+			return call_user_func_array( array( $this, '_getLabel' ), $aArgs );
 			
 		} elseif ( 0 === strpos( $sMethod, 'e_' ) ) {
 			
 			$iIdx = str_replace( 'e_', '', $sMethod );
-			echo $this->_getLabel( $iIdx );
+			array_unshift( $aArgs, $iIdx );			// prepend
+			
+			echo call_user_func_array( array( $this, '_getLabel' ), $aArgs );
+			
 			return NULL;
 			
 		}

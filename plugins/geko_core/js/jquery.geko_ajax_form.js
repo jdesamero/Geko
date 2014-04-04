@@ -9,7 +9,7 @@
 			classes: {
 				init: '.error, .success',
 				loading: '.loading',
-				form_elems: 'input, select, textarea',
+				// form_elems: 'input, select, textarea',	// Depracated!!!
 				error: '.error',
 				success: '.success',
 				error_field: 'error_field'
@@ -77,9 +77,23 @@
 				return form;
 			}
 			
+			
+			
+			//// value helpers
+			
 			//
 			form.getTrimVal = function( elemSel ) {
-				return $.trim( form.find( elemSel ).val() )
+				return $.trim( form.find( elemSel ).val() );
+			}
+			
+			// works well for radio buttons
+			form.getCheckedVal = function( elemSel ) {
+				return $.trim( form.find( elemSel + ':checked' ).val() );
+			}
+			
+			// works well for a single checkbox
+			form.getIsChecked = function( elemSel ) {
+				return form.find( elemSel ).is( ':checked' );
 			}
 			
 			
@@ -156,7 +170,7 @@
 						
 						form.find( opts.classes.init ).hide();
 						form.find( opts.classes.loading ).show();
-						form.find( opts.classes.form_elems ).removeClass( opts.classes.error_field );
+						form.find( '.' + opts.classes.error_field ).removeClass( opts.classes.error_field );
 						
 						var errors = [];
 						
@@ -188,7 +202,7 @@
 					
 					form.find( opts.classes.init ).hide();
 					form.find( opts.classes.loading ).show();
-					form.find( opts.classes.form_elems ).removeClass( opts.classes.error_field );
+					form.find( '.' + opts.classes.error_field ).removeClass( opts.classes.error_field );
 					
 					var errors = [];
 					

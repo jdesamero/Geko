@@ -66,6 +66,13 @@ class Geko_Wp_User_Manage extends Geko_Wp_Options_Manage
 	
 		parent::addAdmin();
 		
+		//// custom columns
+		
+		add_action( 'manage_users_columns', array( $this, 'columnTitle' ) );
+		add_action( 'manage_users_custom_column', array( $this, 'columnValue' ), 10, 3 );
+		
+		////
+		
 		$oUrl = Geko_Uri::getGlobal();
 		$sUrlPath = $oUrl->getPath();
 		if ( FALSE !== strpos( $sUrlPath, '/wp-admin/profile.php' ) ) {
@@ -112,6 +119,23 @@ class Geko_Wp_User_Manage extends Geko_Wp_Options_Manage
 		
 		return $oDoc;
 	}
+	
+	
+	
+	
+	//// custom column stuff
+	
+	//
+	public function columnTitle( $aColumn ) {
+		return $aColumn;
+	}
+	
+	//
+	public function columnValue( $sValue, $sColumnName, $iUserId ) {
+		return $sValue;
+	}
+	
+	
 	
 	
 	

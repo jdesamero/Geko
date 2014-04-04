@@ -26,9 +26,9 @@ class Geko_Wp_Layout extends Geko_Layout
 	
 	
 	//
-	public function init( $bUnshift = FALSE ) {
+	public function start() {
 		
-		parent::init( $bUnshift );
+		parent::start();
 		
 		$this->_aMapMethods = array_merge( $this->_aMapMethods, array(
 			
@@ -42,7 +42,6 @@ class Geko_Wp_Layout extends Geko_Layout
 			
 		) );
 		
-		return $this;
 	}
 	
 	
@@ -62,22 +61,16 @@ class Geko_Wp_Layout extends Geko_Layout
 	//// language translation handling
 	
 	//
-	public function _t( $sValue = '', $iFlag = NULL ) {
-		
-		if ( $this->_bIntrospect && $sValue && ( NULL === $iFlag ) ) {
-			
-			// introspection mode, so track what was called
-			$this->_aTranslatedValues[ $sValue ] = TRUE;
-			return NULL;
-			
-		}
+	public function _t( $sValue = '', $iFlag = NULL, $sCurLang = NULL ) {
 		
 		$oResolver = Geko_Wp_Language_Resolver::getInstance();
 		$oLangMgmt = Geko_Wp_Language_Manage::getInstance();
 		
 		if ( !$sValue ) return $oResolver->getCurLang( FALSE );
 		
-		$sCurLang = $oResolver->getCurLang();
+		if ( NULL === $sCurLang ) {
+			$sCurLang = $oResolver->getCurLang();
+		}
 		
 		if ( ( self::REPLACE == $iFlag ) || ( self::FORCE_REPLACE == $iFlag ) ) {
 			
@@ -110,23 +103,23 @@ class Geko_Wp_Layout extends Geko_Layout
 				
 			} else {
 			
-				if ( !$this->_aTranslatedValues ) {
+				if ( !$this->_aTranslatedValues[ $iLangId ] ) {
 					
-					$this->_aTranslatedValues = array();
+					$this->_aTranslatedValues[ $iLangId ] = array();
 					
 					$iLangId = $oLangMgmt->getLanguage( $sCurLang )->getId();
 					$aStrings = new Geko_Wp_Language_String_Query( array( 'lang_id' => $iLangId ) );
 					
 					foreach ( $aStrings as $oString ) {
-						$this->_aTranslatedValues[ $oString->getKeyId() ] = $oString->getContent();
+						$this->_aTranslatedValues[ $iLangId ][ $oString->getKeyId() ] = $oString->getContent();
 					}
 					
 				}
 				
 				$iKeyId = Geko_Wp_Options_MetaKey::getId( $sValue );
 				
-				if ( $this->_aTranslatedValues[ $iKeyId ] ) {
-					return $this->_aTranslatedValues[ $iKeyId ];
+				if ( $this->_aTranslatedValues[ $iLangId ][ $iKeyId ] ) {
+					return $this->_aTranslatedValues[ $iLangId ][ $iKeyId ];
 				}
 			
 			}
@@ -137,8 +130,8 @@ class Geko_Wp_Layout extends Geko_Layout
 	}
 	
 	//
-	public function _e( $sValue = '', $iFlag = NULL ) {
-		echo $this->_t( $sValue, $iFlag );
+	public function _e( $sValue = '', $iFlag = NULL, $sCurLang = NULL ) {
+		echo $this->_t( $sValue, $iFlag, $sCurLang );
 	}
 	
 	//
@@ -147,17 +140,26 @@ class Geko_Wp_Layout extends Geko_Layout
 	}
 	
 	// translate labels
-	public function _getLabel( $iIdx ) {
-		return $this->_t( parent::_getLabel( $iIdx ) );
+	public function _getLabel() {
+
+		$aArgs = func_get_args();
+		
+		$sCurLang = $aArgs[ 1 ];
+		$sLabel = call_user_func_array( array( parent, '_getLabel' ), $aArgs );
+		
+		return $this->_t( $sLabel, NULL, $sCurLang );
 	}
 	
 	//
 	public function _getLabels() {
+		
 		$aLabels = parent::_getLabels();
 		$aRet = array();
+		
 		foreach ( $aLabels as $iIdx => $sValue ) {
 			$aRet[ $iIdx ] = $this->_t( $sValue );
 		}
+		
 		return $aRet;
 	}
 	
@@ -235,7 +237,7 @@ class Geko_Wp_Layout extends Geko_Layout
 			);
 			
 			if ( !in_array( $sAction, $this->_aUnprefixedActions ) ) {
-				$sAction = 'theme_' . $sAction;
+				$sAction = sprintf( 'theme_%s', $sAction );
 			}
 			
 			parent::__call( $sMethod, $aArgs );
@@ -251,7 +253,7 @@ class Geko_Wp_Layout extends Geko_Layout
 			);
 			
 			if ( !in_array( $sFilter, $this->_aUnprefixedFilters ) ) {
-				$sFilter = 'theme_' . $sFilter;
+				$sFilter = sprintf( 'theme_%s', $sFilter );
 			}
 			
 			$mRes = parent::__call( $sMethod, $aArgs );
