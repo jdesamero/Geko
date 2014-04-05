@@ -17,7 +17,7 @@ class Geko_Wp_Template extends Geko_Singleton_Abstract
 	
 	//
 	public function getDirKey( $sDirectory, $iLevels ) {
-		return md5( $sDirectory . '_' . intval( $iLevels ) );
+		return md5( sprintf( '%s_%d', $sDirectory, intval( $iLevels ) ) );
 	}
 	
 	//
@@ -38,8 +38,8 @@ class Geko_Wp_Template extends Geko_Singleton_Abstract
 		if ( !$this->aChanged[ $sDirKey ] ) {
 			
 			$sHashKey = ( TEMPLATEPATH == $sDirectory ) ? 
-				self::HASH_PREFIX . Geko_Wp_Theme::getPrefix() : 				// retrieve template files from current theme
-				self::HASH_PREFIX . $sPrefix									// retrieve template files from a plugin directory or some other source
+				sprintf( '%s%s', self::HASH_PREFIX, Geko_Wp_Theme::getPrefix() ) : 				// retrieve template files from current theme
+				sprintf( '%s%s', self::HASH_PREFIX, $sPrefix )									// retrieve template files from a plugin directory or some other source
 			;
 			
 			$this->aChanged[ $sDirKey ] = $this->getParseCheck( $sDirectory, $iLevels )->changed( $sHashKey );
@@ -84,7 +84,7 @@ class Geko_Wp_Template extends Geko_Singleton_Abstract
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 		
-		$sCacheKey = $sPrefix . '-cache';
+		$sCacheKey = sprintf( '%s-cache', $sPrefix );
 		
 		$mRet = NULL;
 		

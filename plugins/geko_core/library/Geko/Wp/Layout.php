@@ -116,7 +116,8 @@ class Geko_Wp_Layout extends Geko_Layout
 					
 				}
 				
-				$iKeyId = Geko_Wp_Options_MetaKey::getId( $sValue );
+				$oStrMgmt = Geko_Wp_Language_String_Manage::getInstance()->init();
+				$iKeyId = $oStrMgmt->getTransId( $sValue );
 				
 				if ( $this->_aTranslatedValues[ $iLangId ][ $iKeyId ] ) {
 					return $this->_aTranslatedValues[ $iLangId ][ $iKeyId ];

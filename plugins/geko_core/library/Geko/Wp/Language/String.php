@@ -15,7 +15,7 @@ class Geko_Wp_Language_String extends Geko_Wp_Entity
 			->setEntityMapping( 'id', 'str_id' )
 			->setEntityMapping( 'content', 'val' )
 			->setEntityMapping( 'value', 'val' )
-			->setEntityMapping( 'key_id', 'mkey_id' )
+			->setEntityMapping( 'key_id', 'trans_str_id' )
 		;
 		
 		return $this;

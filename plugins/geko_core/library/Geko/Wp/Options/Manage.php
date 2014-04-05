@@ -936,12 +936,12 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		}
 		
 		if ( !self::$aFixMenuInstances[ $sHandle ] ) {
-						
-			$sMatchToken = ' id="toplevel_page_' . $sHandle . '"';
+			
+			$sMatchToken = sprintf( ' id="toplevel_page_%s"', $sHandle );
 			
 			if ( FALSE !== strpos( $sContent, $sMatchToken ) ) {
 				
-				$sContent = preg_replace( '/<li(.+?)(' . $sMatchToken . ')>/', '<li\2\1>', $sContent );
+				$sContent = preg_replace( sprintf( '/<li(.+?)(%s)>/', $sMatchToken ), '<li\2\1>', $sContent );
 				
 				$aChunks = Geko_String::extractDelimitered(
 					$sContent, array( '<li', $sMatchToken ), '</li>', '##%d##', 0
