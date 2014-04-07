@@ -14,23 +14,22 @@ class Geko_Date
 		array( 'value' => 1, 'long' => 'second', 'short' => 'sec' )
 	);
 	
-	// adapted from http://api.drupal.org/api/function/format_interval/7
-	public static function formatInterval( $iTimestamp, $iGranularity = 2, $sFormat = 'short' ) {
-		
-		$iInterval = time() - $iTimestamp;
+	
+	// $iInterval is in seconds
+	public static function formatIntervalSecs( $iInterval, $iGranularity = 2, $sFormat = 'short' ) {
 		
 		$sOut = '';
 		
 		foreach ( self::$aIntervalUnits as $aUnit ) {
 			
-			$iValue = $aUnit['value'];
+			$iValue = $aUnit[ 'value' ];
 			$sUnit = $aUnit[ $sFormat ];
 			
 			if ( $iInterval >= $iValue ) {
 				
 				$iUnit = floor( $iInterval / $iValue );
 				
-				$sOut .= ( $sOut ? ' ' : '' ) . ( ( $iUnit == 1 ) ? '1 ' . $sUnit : $iUnit . ' ' . $sUnit . 's' );
+				$sOut .= ( $sOut ? ' ' : '' ) . ( ( $iUnit == 1 ) ? sprintf( '1 %s', $sUnit ) : sprintf( '%d %ss', $iUnit, $sUnit ) );
 				$iInterval %= $iValue;
 				$iGranularity--;
 			}
@@ -42,6 +41,15 @@ class Geko_Date
 		
 		return $sOut ? $sOut : '0 sec';
 	}
+	
+	
+	// adapted from http://api.drupal.org/api/function/format_interval/7
+	public static function formatInterval( $iTimestamp, $iGranularity = 2, $sFormat = 'short' ) {
+		
+		return self::formatIntervalSecs( time() - $iTimestamp );
+	}
+	
+	
 	
 }
 

@@ -3,11 +3,13 @@
 //
 class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 {
+	
 	private static $sManagementCapability = '';
 	private static $sManagementPageTitle = 'Access Log Reports';	
 	private static $sManagementMenuTitle = 'Logs';	
 	private static $bHasManagementCapability = FALSE;
 	private static $aLogInstances = array();
+	
 	
 	protected $_sTableSuffix = '';
 	protected $_sTableName = '';
@@ -15,12 +17,18 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 	protected $_sLogTitle = '';
 	protected $_bReportOnly = FALSE;
 	
-	protected $_bCalledInstall = FALSE;
 	protected $_bUseMetaTable = FALSE;
 	
 	protected $_sEntityClass;
 	protected $_sQueryClass;
 	protected $_sExportExcelHelperClass;
+	
+	protected $_bTrackSessionId = FALSE;
+	protected $_bAddMetaType = FALSE;
+	protected $_bTrackPostData = FALSE;
+	protected $_bTrackGetData = FALSE;
+	protected $_bTrackCookieData = FALSE;
+	protected $_bTrackServerData = FALSE;
 	
 	protected $_sExportCapability = '';
 	protected $_bHasExportCapability = FALSE;
@@ -32,6 +40,9 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 	
 	protected $_oPrimaryTable;
 	protected $_oMetaTable;
+	
+	
+	
 	
 	
 	//
@@ -54,6 +65,12 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 		if ( $this->_sTableSuffix ) {
 			self::$aLogInstances[ $this->_sTableSuffix ] = $this;
 		}
+		
+		// automatically use meta type if tracking any of the stuff below
+		if ( $this->_bTrackPostData || $this->_bTrackGetData || $this->_bTrackCookieData || $this->_bTrackServerData ) {
+			$this->_bAddMetaType = TRUE;
+		}
+		
 	}
 	
 	
@@ -90,6 +107,9 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 		
 		if ( !$this->_bReportOnly ) {
 			
+			
+			//// main log table
+			
 			$sTableName = $this->_sTableName;
 			Geko_Wp_Db::addPrefix( $sTableName );
 			
@@ -105,15 +125,23 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 				->option( 'engine', 'archive' )
 			;
 			
+			if ( $this->_bTrackSessionId ) {
+				$oSqlTable->fieldVarChar( 'session_id', array( 'size' => 32 ) );
+			}
+			
 			$this->_oPrimaryTable = $this->modifyPrimaryTable( $oSqlTable );
+			
+			
+			
+			//// meta data table
 			
 			if ( $this->_bUseMetaTable ) {
 				
 				$sMetaTableName = $this->_sMetaTableName;
 				Geko_Wp_Db::addPrefix( $this->_sMetaTableName );
 				
-				$oSqlTable = new Geko_Sql_Table();
-				$oSqlTable
+				$oSqlTable1 = new Geko_Sql_Table();
+				$oSqlTable1
 					->create( $wpdb->$sMetaTableName, 'lm' )
 					->fieldBigInt( 'log_id', array( 'unsgnd' ) )
 					->fieldSmallInt( 'mkey_id', array( 'unsgnd' ) )
@@ -121,7 +149,11 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 					->option( 'engine', 'archive' )
 				;
 				
-				$this->_oMetaTable = $this->modifyMetaTable( $oSqlTable );
+				if ( $this->_bAddMetaType ) {
+					$oSqlTable1->fieldSmallInt( 'type_id', array( 'unsgnd' ) );
+				}
+				
+				$this->_oMetaTable = $this->modifyMetaTable( $oSqlTable1 );
 				
 			}
 		
@@ -616,7 +648,7 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 			( $this->_sInstanceClass == $sCurPage ) && 
 			( 'export' == $sAction ) && 
 			( $this->_bHasExportCapability ) &&
-			( check_admin_referer( $this->_sInstanceClass . $sAction ) )
+			( check_admin_referer( sprintf( '%s%s', $this->_sInstanceClass, $sAction ) ) )
 		) {
 			
 			$aParams = array();
@@ -624,11 +656,11 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 			$aParams[ 'showposts' ] = -1;
 			
 			if ( $sMinDate = $_POST[ 'min_date' ] ) {
-				$aParams[ 'min_date' ] = str_replace( '/', '-', $sMinDate ) . ' 00:00:00';
+				$aParams[ 'min_date' ] = sprintf( '%s 00:00:00', str_replace( '/', '-', $sMinDate ) );
 			}
 
 			if ( $sMaxDate = $_POST[ 'max_date' ] ) {
-				$aParams[ 'max_date' ] = str_replace( '/', '-', $sMaxDate ) . ' 23:59:59';	
+				$aParams[ 'max_date' ] = sprintf( '%s 23:59:59', str_replace( '/', '-', $sMaxDate ) );	
 			}
 			
 			$aParams = $this->modifyExportParams( $aParams );
@@ -687,6 +719,10 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 			$aParams[ 'url' ] = strval( Geko_Uri::getGlobal() );
 			if ( $user_ID ) $aParams[ 'user_id' ] = $user_ID;
 			
+			if ( $this->_bTrackSessionId ) {
+				$aParams[ 'session_id' ] = $_COOKIE[ 'PHPSESSID' ];
+			}
+			
 			$aParams = $this->modifyParams( $aParams );
 			$aInsertData = $this->getInsertData( $aParams );
 			
@@ -700,25 +736,66 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 				$aInsertData[ 1 ]
 			);
 			
+			$iInsertId = $wpdb->insert_id;
+			
 			if ( $bRes && $this->_bUseMetaTable ) {
-				if ( is_array( $aParams[ 'meta' ] ) ) {
-					$iInsertId = $wpdb->insert_id;
+				
+				$aMeta = $aParams[ 'meta' ];
+				
+				if ( $this->_bTrackPostData || $this->_bTrackGetData || $this->_bTrackCookieData || $this->_bTrackServerData ) {
+					
+					if ( !is_array( $aMeta ) ) $aMeta = array();
+					
+					if ( $this->_bTrackPostData ) {
+						$aMeta = $this->loadRequestData( $aMeta, $_POST, 'post' );
+					}
+					
+					if ( $this->_bTrackGetData ) {
+						$aMeta = $this->loadRequestData( $aMeta, $_GET, 'get' );
+					}
+					
+					if ( $this->_bTrackCookieData ) {
+						$aMeta = $this->loadRequestData( $aMeta, $_COOKIE, 'cookie' );
+					}
+					
+					if ( $this->_bTrackServerData ) {
+						$aMeta = $this->loadRequestData( $aMeta, $_SERVER, 'server' );					
+					}
+				}
+				
+				if ( is_array( $aMeta ) ) {
+					
 					$sMTb = $this->_sMetaTableName;
-					foreach ( $aParams[ 'meta' ] as $sKey => $mValue ) {
+					
+					foreach ( $aMeta as $sKey => $mValue ) {
+						
 						$aParams = array(
 							'log_id' => $iInsertId,
-							'mkey_id' => Geko_Wp_Options_MetaKey::getId( $sKey ),
-							'meta_value' => $mValue
+							'mkey_id' => Geko_Wp_Options_MetaKey::getId( $sKey )
 						);
+						
+						if ( is_array( $mValue ) ) {
+							
+							$aParams[ 'type_id' ] = $mValue[ 0 ];
+							$aParams[ 'meta_value' ] = $mValue[ 1 ];
+						
+						} else {
+							
+							$aParams[ 'meta_value' ] = $mValue;
+						}
+						
 						$aInsertMetaData = $this->getInsertMetaData( $aParams );
+						
 						$bRes = $wpdb->insert(
 							$wpdb->$sMTb,
 							$aInsertMetaData[ 0 ],
 							$aInsertMetaData[ 1 ]
 						);
+						
 						if ( !$bRes ) break;
 					}
 				}
+				
 			}
 			
 			if ( $bRes ) {
@@ -801,6 +878,50 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 		
 		return array( $aValues, $aFormat );
 		
+	}
+	
+	
+	//// helpers
+	
+	//
+	protected function loadRequestData( $aMeta, $aData, $sType ) {
+		if ( is_array( $aData ) ) {
+			
+			$aCookieFilter = array( 'PHPSESSID', '__un', '__ut', 'wordpress_', 'wp-settings-', 'wp-user-' );
+			$aPassFilter = array( 'pass', 'pwd' );
+			
+			$aServerFilter = array( 'SERVER_SOFTWARE', 'REQUEST_URI', 'PATH', 'PP_CUSTOM_PHP_INI', 'FCGI_ROLE', 'HTTP_HOST', 'HTTP_COOKIE', 'HTTP_USER_AGENT', 'SERVER_SIGNATURE', 'SERVER_NAME', 'SERVER_ADDR', 'SERVER_PORT', 'REMOTE_ADDR', 'DOCUMENT_ROOT', 'SERVER_ADMIN', 'SCRIPT_FILENAME', 'REMOTE_PORT', 'GATEWAY_INTERFACE', 'SERVER_PROTOCOL', 'REQUEST_METHOD', 'QUERY_STRING', 'SCRIPT_NAME', 'PHP_SELF', 'REQUEST_TIME' );
+			
+			$iTypeId = Geko_Wp_Options_MetaKey::getId( $sType );
+			
+			foreach ( $aData as $sKey => $mValue ) {
+				
+				if ( ( ( 'cookie' != $sType ) && ( 'server' != $sType ) ) || (
+					( 'cookie' == $sType ) && 
+					( !Geko_Array::beginsWith( $sKey, $aCookieFilter ) )
+				) || (
+					( 'server' == $sType ) && 
+					( !in_array( $sKey, $aServerFilter ) )
+				) ) {
+					
+					$sKeyLcase = strtolower( $sKey );
+					
+					if ( Geko_Array::contains( $sKeyLcase, $aPassFilter ) ) {
+						// do not capture user passwords
+						$mValue = '********';
+					} elseif ( !is_scalar( $mValue ) ) {
+						$mValue = Zend_Json::encode( $mValue );
+					}
+					
+					// return meta value with type and value
+					$aMeta[ $sKey ] = array( $iTypeId, $mValue );
+				
+				}
+			
+			}
+		}
+		
+		return $aMeta;
 	}
 	
 	

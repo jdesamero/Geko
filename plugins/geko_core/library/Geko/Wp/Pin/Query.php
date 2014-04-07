@@ -20,12 +20,12 @@ class Geko_Wp_Pin_Query extends Geko_Wp_Entity_Query
 		
 		
 		// pin id
-		if ( $aParams[ 'pin_id' ] ) {
+		if ( isset( $aParams[ 'pin_id' ] ) ) {
 			$oQuery->where( 'p.pin_id = ?', $aParams[ 'pin_id' ] );
 		}
 		
-		// point event id
-		if ( $aParams[ 'pin' ] ) {
+		// pin itself (slug)
+		if ( isset( $aParams[ 'pin' ] ) ) {
 			$oQuery->where( 'p.pin = ?', $aParams[ 'pin' ] );
 		}
 		

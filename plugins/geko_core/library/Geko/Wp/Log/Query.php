@@ -68,6 +68,18 @@ class Geko_Wp_Log_Query extends Geko_Wp_Entity_Query
 		//// filters
 		
 		//
+		if ( $mRemoteIp = $aParams[ 'remote_ip' ] ) {
+			
+			if ( filter_var( $mRemoteIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
+				$iRemoteIp = ip2long( $mRemoteIp );
+			} else {
+				$iRemoteIp = intval( $mRemoteIp );
+			}
+			
+			$oQuery->where( 'l.remote_ip >= ?', $iRemoteIp );
+		}
+		
+		//
 		if ( $aParams[ 'min_date' ] ) {
 			$oQuery->where( 'l.date_created >= ?', $aParams[ 'min_date' ] );
 		}		

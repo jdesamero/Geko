@@ -38,6 +38,8 @@ class Geko_Wp_Pin_Manage extends Geko_Wp_Options_Manage
 			->fieldBigInt( 'pin_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldVarChar( 'pin', array( 'size' => 256, 'unq' ) )
 			->fieldBool( 'redeemed' )
+			->fieldBool( 'testing' )
+			->fieldBool( 'npn' )		// no purchase necessary
 			->fieldDateTime( 'date_created' )
 			->fieldDateTime( 'date_modified' )
 			->fieldDateTime( 'date_redeemed' )
@@ -75,6 +77,8 @@ class Geko_Wp_Pin_Manage extends Geko_Wp_Options_Manage
 	public function columnTitle() {
 		?>
 		<th scope="col" class="manage-column column-redeemed">Redeemed</th>
+		<th scope="col" class="manage-column column-testing">Testing Only</th>
+		<th scope="col" class="manage-column column-npn">No Purchase Necessary</th>
 		<th scope="col" class="manage-column column-date-created">Date Created</th>
 		<th scope="col" class="manage-column column-date-modified">Date Modified</th>
 		<th scope="col" class="manage-column column-date-redeemed">Date Redeemed</th>
@@ -86,6 +90,8 @@ class Geko_Wp_Pin_Manage extends Geko_Wp_Options_Manage
 	public function columnValue( $oEntity ) {
 		?>
 		<td class="column-redeemed"><?php $oEntity->echoBoolRedeemed(); ?></td>
+		<td class="column-testing"><?php $oEntity->echoBoolTesting(); ?></td>
+		<td class="column-npn"><?php $oEntity->echoBoolNpn(); ?></td>
 		<td class="date column-date-created"><abbr title="<?php $oEntity->echoDateTimeCreated( 'Y/m/d g:i A' ); ?>"><?php $oEntity->echoDateCreated( 'Y/m/d' ); ?></abbr></td>
 		<td class="date column-date-modified"><abbr title="<?php $oEntity->echoDateTimeModified( 'Y/m/d g:i A' ); ?>"><?php $oEntity->echoDateModified( 'Y/m/d' ); ?></abbr></td>
 		<td class="date column-date-redeemed"><abbr title="<?php $oEntity->echoDateRedeemed( 'Y/m/d g:i A' ); ?>"><?php $oEntity->echoDateRedeemed( 'Y/m/d' ); ?></abbr></td>
@@ -134,6 +140,18 @@ class Geko_Wp_Pin_Manage extends Geko_Wp_Options_Manage
 					<input id="pin_redeemed" name="pin_redeemed" type="checkbox" value="1" />
 				</td>
 			</tr>
+			<tr>
+				<th><label for="pin_testing">For Testing Only</label></th>
+				<td>
+					<input id="pin_testing" name="pin_testing" type="checkbox" value="1" />
+				</td>
+			</tr>
+			<tr>
+				<th><label for="pin_npn">No Purchase Necessary</label></th>
+				<td>
+					<input id="pin_npn" name="pin_npn" type="checkbox" value="1" />
+				</td>
+			</tr>
 			
 		</table>
 		<?php
@@ -157,10 +175,7 @@ class Geko_Wp_Pin_Manage extends Geko_Wp_Options_Manage
 		$aValues[ 'date_created' ] = $sDateTime;
 		$aValues[ 'date_modified' ] = $sDateTime;
 		
-		if ( !isset( $aValues[ 'redeemed' ] ) ) $aValues[ 'redeemed' ] = 0;
-		
 		return $aValues;
-		
 	}
 
 	
@@ -172,10 +187,7 @@ class Geko_Wp_Pin_Manage extends Geko_Wp_Options_Manage
 		$sDateTime = Geko_Db_Mysql::getTimestamp();
 		$aValues[ 'date_modified' ] = $sDateTime;
 		
-		if ( !isset( $aValues[ 'redeemed' ] ) ) $aValues[ 'redeemed' ] = 0;
-		
 		return $aValues;
-		
 	}
 	
 	

@@ -2285,9 +2285,24 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		
 		foreach ( $_POST as $sKey => $mValue ) {
 			if ( 0 === strpos( $sKey, $sPrefix ) ) {
-				$sShortKey = substr_replace( $sKey, '', 0, strlen( $sPrefix ) );
+				$sShortKey = substr( $sKey, strlen( $sPrefix ) );
 				$aValues[ $sShortKey ] = $mValue;
 			}
+		}
+		
+		// boolean values should be set
+		$aFields = $this->getPrimaryTableFields();
+		foreach ( $aFields as $oField ) {
+			
+			$sFieldName = $oField->getFieldName();
+			$sFieldType = $oField->getFieldType();
+			
+			if (
+				( 'bool' == $sFieldType ) && 
+				( !isset( $aValues[ $sFieldName ] ) )
+			) {
+				$aValues[ $sFieldName ] = 0;
+			}			
 		}
 		
 		return $aValues;
