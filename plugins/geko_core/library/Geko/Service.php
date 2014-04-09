@@ -102,7 +102,19 @@ class Geko_Service extends Geko_Singleton_Abstract
 	
 	//
 	public function getAction() {
-		return $_REQUEST[ 'subaction' ];
+		
+		if (
+			isset( $_REQUEST[ '_service' ] ) && 
+			isset( $_REQUEST[ '_action' ] )
+		) {
+			// new way of doing things
+			$sAction = $_REQUEST[ '_action' ];
+		} else {
+			// old way
+			$sAction = $_REQUEST[ 'subaction' ];
+		}
+		
+		return $sAction;
 	}
 	
 	// TO DO: HACKISH!!!!!!!!

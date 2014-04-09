@@ -111,10 +111,14 @@ class Geko_Browser
 		
 		$aRet[ 'ua' ] = $sUa;
 		
+		// TO DO:
+		// facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)
+		
 		if (
 			preg_match( '/bot/i', $sUa ) || 
 			preg_match( '/crawl/i', $sUa ) || 
-			preg_match( '/yahoo\!/i', $sUa )
+			preg_match( '/yahoo\!/i', $sUa ) || 
+			preg_match( '/facebookexternalhit/i', $sUa )
 		) {
 			
 			$aRet[ 'name' ] = 'Bot';
