@@ -76,7 +76,7 @@ class Geko_Wp_Log_Query extends Geko_Wp_Entity_Query
 				$iRemoteIp = intval( $mRemoteIp );
 			}
 			
-			$oQuery->where( 'l.remote_ip >= ?', $iRemoteIp );
+			$oQuery->where( 'l.remote_ip = ?', $iRemoteIp );
 		}
 		
 		//
