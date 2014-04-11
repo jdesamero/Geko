@@ -14,11 +14,11 @@
 		<file id="geko-cufon" src="##geko_core_uri##/external/js/cufon-yui.js" dependencies="jquery" />
 		<file id="geko-date_format" src="##geko_core_uri##/external/js/date_format.js" />
 		<file id="geko-event_helpers" src="##geko_core_uri##/external/js/EventHelpers.js" />
-		<file id="geko-facebook-connect" src="http://connect.facebook.net/en_US/all.js" />
+		<file id="geko-facebook-connect" src="//connect.facebook.net/en_US/all.js" />
 		<file id="geko-flash-loader" src="##geko_core_uri##/external/js/flash_loader.js" />
 		<file id="geko-get_scroll_xy" src="##geko_core_uri##/external/js/get_scroll_xy.js" />
-		<file id="geko-googlemaps" src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=##GOOGLEMAPS_API_KEY##" />
-		<file id="geko-sharethis" src="http://w.sharethis.com/button/buttons.js" />
+		<file id="geko-googlemaps" src="//maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=##GOOGLEMAPS_API_KEY##" />
+		<file id="geko-sharethis" src="//w.sharethis.com/button/buttons.js" />
 		<file id="geko-string_format" src="##geko_core_uri##/external/js/string_format.min.js" />
 		<file id="geko-swf-object" src="##geko_core_uri##/external/js/swfobject.js" />
 		<file id="geko-swipe" src="##geko_core_uri##/external/js/swipe.js" />
