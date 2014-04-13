@@ -12,6 +12,9 @@ class Geko_Wp_User_Manage extends Geko_Wp_Options_Manage
 	protected $_sEntityIdVarName = 'user_id';
 	protected $_sSubAction = 'user';
 	
+	protected $_bRunPreUserQuery = FALSE;
+	
+	
 	
 	//
 	protected function __construct() {
@@ -66,10 +69,17 @@ class Geko_Wp_User_Manage extends Geko_Wp_Options_Manage
 	
 		parent::addAdmin();
 		
-		//// custom columns
+		//// actions and filters
 		
+		// custom columns
 		add_action( 'manage_users_columns', array( $this, 'columnTitle' ) );
 		add_action( 'manage_users_custom_column', array( $this, 'columnValue' ), 10, 3 );
+		
+		
+		// filter controls
+		add_action( 'restrict_manage_users', array( $this, 'echoFilterSelects' ) );
+		add_action( 'pre_user_query', array( $this, 'userListingQuery' ) );
+		
 		
 		////
 		
@@ -80,7 +90,26 @@ class Geko_Wp_User_Manage extends Geko_Wp_Options_Manage
 		}
 		
 	}
+	
+	
+	
+	// $oUserQuery is an instance of WP_User_Query 
+	public function userListingQuery( $oUserQuery ) {
 
+		if ( !$this->_bRunPreUserQuery ) {
+			
+			$this->_bRunPreUserQuery = TRUE;			// prevents an infinite loop
+			
+			$aQueryVars = $oUserQuery->query_vars;
+			
+			$oUserQuery->query_vars = $this->modifyListingParams( $aQueryVars );
+				
+			$oUserQuery->prepare_query();				// re-run this
+		}
+		
+	}
+	
+	
 	//
 	public function isCurrentPage() {
 		

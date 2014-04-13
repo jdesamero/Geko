@@ -11,7 +11,7 @@ class Geko_Wp_Pin_Manage extends Geko_Wp_Options_Manage
 	protected $_sSubject = 'PIN';
 	protected $_sDescription = 'Manage PINs for use in contests/promos.';
 	protected $_sIconId = 'icon-users';
-	protected $_iEntitiesPerPage = 50;
+	protected $_iEntitiesPerPage = 500;
 	protected $_sType = 'pin';
 	
 	
@@ -71,6 +71,23 @@ class Geko_Wp_Pin_Manage extends Geko_Wp_Options_Manage
 	
 	
 	
+	// hook method
+	public function modifyListingParams( $aParams ) {
+		
+		$aMergeParams = array (
+			'redeemed' => $_GET[ 'redeemed' ],
+			'testing' => $_GET[ 'testing' ],
+			'npn' => $_GET[ 'npn' ]
+		);
+		
+		return array_merge( $aParams, $aMergeParams );
+	}
+
+	
+	
+	
+	
+	
 	//// front-end display methods
 		
 	//
@@ -98,6 +115,35 @@ class Geko_Wp_Pin_Manage extends Geko_Wp_Options_Manage
 		<td class="date column-date-completed"><abbr title="<?php $oEntity->echoDateCompleted( 'Y/m/d g:i A' ); ?>"><?php $oEntity->echoDateCompleted( 'Y/m/d' ); ?></abbr></td>
 		<?php
 	}
+	
+	
+	// hook method
+	public function getFilterSelects() {
+		
+		//
+		return array(
+			'redeemed' => array(
+				'' => 'Show Redeemed Any',
+				'yes' => 'Redeemed',
+				'no' => 'Not Redeemed'
+			),
+			'testing' => array(
+				'' => 'Show Testing Any',
+				'yes' => 'Testing Only',
+				'no' => 'Not Testing'
+			),
+			'npn' => array(
+				'' => 'Show NPN Any',
+				'yes' => 'NPN Only',
+				'no' => 'Not NPN'
+			)
+		);
+	}
+	
+	
+	
+	
+	
 	
 	
 	//

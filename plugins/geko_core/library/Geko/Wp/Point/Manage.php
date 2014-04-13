@@ -163,7 +163,7 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 		$aApprStatus = Geko_Wp_Enumeration_Query::getSet( 'geko-point-status' );
 		
 		$oEntity = $this->_oCurrentEntity;
-		$sAction = $this->_sActionPrefix . '_point_details';
+		$sAction = sprintf( '%s_point_details', $this->_sActionPrefix );
 		$sEventSlug = $oEntity->getEventSlug();
 		
 		?>
@@ -188,7 +188,7 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 					<td><?php $oEntity->echoValue(); ?></td>
 				</tr>
 			<?php endif; ?>
-			<?php do_action( $sAction . '_' . $sEventSlug, $oEntity, $sEventSlug ); ?>
+			<?php do_action( sprintf( '%s_%s', $sAction, $sEventSlug ), $oEntity, $sEventSlug ); ?>
 			<tr>
 				<th><label for="point_approve_status_id">Approval Status</label></th>
 				<td>

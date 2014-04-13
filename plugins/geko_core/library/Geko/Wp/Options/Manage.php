@@ -1027,7 +1027,9 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 				<?php echo Geko_String::sw( '<input type="hidden" name="page" value="%s">', $_GET[ 'page' ] ); ?>
 				
 				<div class="tablenav">
-					<?php $this->echoFilterSelects(); ?>
+					<div class="alignleft actions">
+						<?php $this->echoFilterSelects(); ?>
+					</div>
 					<?php echo Geko_String::sw( '<div class="tablenav-pages">%s</div>', $sPaginateLinks ); ?>
 					<br class="clear"/>
 				</div>
@@ -1363,36 +1365,40 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		$aSelects = $this->getFilterSelects();
 		
 		if ( count( $aSelects ) > 0 ):
-			?>
-			<div class="alignleft actions">
-				<?php foreach ( $aSelects as $sKey => $aSelect ):
-					
-					$aAtts = array( 'id' => $sKey, 'name' => $sKey );
-					if ( is_array( $aSelect[ 'select' ] ) ) {
-						if ( is_array( $aSelect[ 'atts' ] ) && ( count( $aSelect ) == 2 ) ) {
-							$aAtts = array_merge( $aAtts, $aSelect[ 'atts' ] );				
-						}
-						if ( !$aSelect[ 'atts' ] && ( count( $aSelect ) == 1 ) ) {
-							$aSelect = $aSelect[ 'select' ];
-						}
-					}
-					
-					$sName = $aAtts[ 'name' ];
-					
-					?>
-					<select <?php echo Geko_Html::formatAsAtts( $aAtts ); ?> >
-						<?php foreach ( $aSelect as $sValue => $sLabel ):
-							
-							$sSelected = ( $sValue == $_GET[ $sName ] ) ? 'selected="selected"' : '' ;
-							
-							?>
-							<option value="<?php echo $sValue; ?>" <?php echo $sSelected; ?> ><?php echo $sLabel; ?></option>
-						<?php endforeach; ?>
-					</select>
-				<?php endforeach; ?>
-				<input id="post-query-submit" class="button" type="submit" value="Filter" name="" />
-			</div>
+			
+			foreach ( $aSelects as $sKey => $aSelect ):
+				
+				$aAtts = array( 'id' => $sKey, 'name' => $sKey );
+				
+				if (
+					( is_array( $aSelect[ 'select' ] ) ) && 
+					( is_array( $aSelect[ 'atts' ] ) ) && 
+					( count( $aSelect ) == 2 )
+				) {
+					$aAtts = array_merge( $aAtts, $aSelect[ 'atts' ] );				
+					$aSelect = $aSelect[ 'select' ];
+				}
+				
+				$sName = $aAtts[ 'name' ];
+				
+				?>
+				<select <?php echo Geko_Html::formatAsAtts( $aAtts ); ?> >
+					<?php foreach ( $aSelect as $sValue => $sLabel ):
+						
+						$sSelected = ( $sValue == $_GET[ $sName ] ) ? 'selected="selected"' : '' ;
+						
+						?>
+						<option value="<?php echo $sValue; ?>" <?php echo $sSelected; ?> ><?php echo $sLabel; ?></option>
+					<?php endforeach; ?>
+				</select>
+				<?php
+			
+			endforeach; ?>
+			
+			<input id="post-query-submit" class="button" type="submit" value="Filter" name="" />
+			
 			<?php
+			
 		endif;
 	}
 	
