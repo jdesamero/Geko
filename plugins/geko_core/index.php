@@ -12,8 +12,15 @@ Author URI: http://geekoracle.com
 
 // path constants
 
+// needed for domain mirror
+$sPluginUrl = preg_replace(
+	'/(http|https):\/\/(.+)\/wp-content(.+)/',
+	sprintf( '%s/wp-content$3', get_bloginfo( 'wpurl' ) ),
+	plugins_url( '', __FILE__ )
+);
+
 define( 'GEKO_CORE_ROOT', realpath( dirname( __FILE__ ) ) );
-define( 'GEKO_CORE_URI', plugins_url( '', __FILE__ ) );
+define( 'GEKO_CORE_URI', $sPluginUrl );
 define( 'GEKO_CORE_EXTERNAL_LIB_ROOT', realpath( sprintf( '%s/external/libs', GEKO_CORE_ROOT ) ) );
 define( 'GEKO_LOG', realpath( sprintf( '%s/wp-content/logs/logs.txt', ABSPATH ) ) );
 define( 'GEKO_REGISTER_XML', realpath( sprintf( '%s/conf/register.xml', GEKO_CORE_ROOT ) ) );
@@ -72,9 +79,9 @@ Geko_Wp::registerExternalFiles( GEKO_REGISTER_XML );
 
 // register global urls to services
 Geko_Uri::setUrl( array(
-	'wp_admin' => sprintf( '%s/wp-admin/admin.php', get_bloginfo( 'url' ) ),
-	'wp_login' => sprintf( '%s/wp-login.php', get_bloginfo( 'url' ) ),
-	'wp_user_edit' => sprintf( '%s/wp-admin/user-edit.php', get_bloginfo( 'url' ) ),
+	'wp_admin' => sprintf( '%s/wp-admin/admin.php', Geko_Wp::getUrl() ),
+	'wp_login' => sprintf( '%s/wp-login.php', Geko_Wp::getUrl() ),
+	'wp_user_edit' => sprintf( '%s/wp-admin/user-edit.php', Geko_Wp::getUrl() ),
 	'geko_export' => sprintf( '%s/srv/export.php', GEKO_CORE_URI ),
 	'geko_pdf' => sprintf( '%s/srv/pdf.php', GEKO_CORE_URI ),
 	'geko_process' => sprintf( '%s/srv/process.php', GEKO_CORE_URI ),

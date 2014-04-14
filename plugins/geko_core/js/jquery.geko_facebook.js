@@ -40,7 +40,7 @@
 						}
 						opts.end( res );
 					},
-					{ perms: opts.perms }
+					{ scope: opts.perms }
 				);
 				
 			}
