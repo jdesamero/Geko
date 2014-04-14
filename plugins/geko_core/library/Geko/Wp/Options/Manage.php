@@ -2351,6 +2351,12 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		
 		global $wpdb;
 		
+		// Mega hackish!!!
+		// Force skip update if the var below is set
+		if ( $_REQUEST[ sprintf( '%s-__skip-update__', $this->_sType ) ] ) {
+			return FALSE;
+		}
+		
 		if ( $sQueryClass = $this->_sQueryClass ) {
 			
 			$aDataFmt = array();

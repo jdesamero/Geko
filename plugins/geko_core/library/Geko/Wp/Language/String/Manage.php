@@ -263,6 +263,7 @@ class Geko_Wp_Language_String_Manage extends Geko_Wp_Options_Manage
 							<li><?php echo htmlspecialchars( $sKey ); ?></li>
 						<?php endforeach; ?>						
 					</ul>
+					<input type="hidden" name="lang-str-__skip-update__" value="1" />
 				</td>
 			</tr>
 			
