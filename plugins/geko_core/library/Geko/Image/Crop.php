@@ -149,7 +149,7 @@ class Geko_Image_Crop extends Geko_Image_CachedAbstract
 			return $sMime;
 		} else {
 			// mime type not allowed
-			if ( self::$bLogging ) $this->logMessage( __METHOD__, 'Mime type not allowed: ' . $this->sImageSrc );
+			Geko_Debug::out( sprintf( 'Mime type not allowed: %s', $this->sImageSrc ), __METHOD__ );
 			return '';
 		}
 	}
@@ -162,7 +162,7 @@ class Geko_Image_Crop extends Geko_Image_CachedAbstract
 		// gd library
 		if ( FALSE == function_exists( 'imagecreatetruecolor' ) ) {
 			// gd library is not installed
-			if ( self::$bLogging ) $this->logMessage( __METHOD__, 'GD image library is not installed.' );
+			Geko_Debug::out( 'GD image library is not installed.', __METHOD__ );
 			return FALSE;
 		}
 		
@@ -172,7 +172,7 @@ class Geko_Image_Crop extends Geko_Image_CachedAbstract
 			return FALSE;
 		}
 		
-		if ( self::$bLogging ) $this->logMessage( __METHOD__, 'Attempting to create cropped file with mime type: ' . $sMimeType );
+		Geko_Debug::out( sprintf( 'Attempting to create cropped file with mime type: %s', $sMimeType ), __METHOD__ );
 		
 		// make sure cache directory exists
 		if ( FALSE == $this->assertCacheDir() ) {
@@ -180,8 +180,10 @@ class Geko_Image_Crop extends Geko_Image_CachedAbstract
 		}
 		
 		// create cache file
-		if ( FALSE == touch( $this->sCacheFilePath ) ) {
-			if ( self::$bLogging ) $this->logMessage( __METHOD__, 'Failed to create cache file.' . $this->sCacheFilePath );
+		$sCacheFilePath = $this->getCacheFilePath();
+		
+		if ( FALSE == touch( $sCacheFilePath ) ) {
+			Geko_Debug::out( sprintf( 'Failed to create cache file. %s', $sCacheFilePath ), __METHOD__ );
 			return FALSE;
 		}
 		
@@ -210,11 +212,11 @@ class Geko_Image_Crop extends Geko_Image_CachedAbstract
 		}
 		
 		if ( FALSE == $rImage ) {
-			if ( self::$bLogging ) $this->logMessage( __METHOD__, 'GD failed to open image: ' . $this->sImageSrc );
+			Geko_Debug::out( sprintf( 'GD failed to open image: %s', $this->sImageSrc ), __METHOD__ );
 			return FALSE;
 		}
 		
-		if ( self::$bLogging ) $this->logMessage( __METHOD__, 'Attempting to create cropped file from source: ' . $this->sImageSrc );		
+		Geko_Debug::out( sprintf( 'Attempting to create cropped file from source: %s', $this->sImageSrc ), __METHOD__ );
 		
 		// Get original width and height
 		$iCurWidth = imagesx( $rImage );
@@ -238,8 +240,8 @@ class Geko_Image_Crop extends Geko_Image_CachedAbstract
 			( $iXOffset < 0 ) || ( $iXOffset >= $iCurWidth ) || 
 			( $iYOffset < 0 ) || ( $iYOffset >= $iCurHeight )
 		) {
-			unlink( $this->sCacheFilePath );
-			throw new Exception( 'Offset values are out of bounds for: ' . __METHOD__ );
+			unlink( $sCacheFilePath );
+			throw new Exception( sprintf( 'Offset values are out of bounds for: %s', __METHOD__ ) );
 			return FALSE;
 		}
 		
@@ -250,15 +252,15 @@ class Geko_Image_Crop extends Geko_Image_CachedAbstract
 		
 		// write the image to file
 		if ( TRUE == stristr( $sMimeType, 'gif' ) ) {
-			imagegif( $rCanvas, $this->sCacheFilePath );
+			imagegif( $rCanvas, $sCacheFilePath );
 		} elseif( TRUE == stristr( $sMimeType, 'png' ) ) {
-			imagepng( $rCanvas, $this->sCacheFilePath, ceil( $this->iQuality / 10 ) );
+			imagepng( $rCanvas, $sCacheFilePath, ceil( $this->iQuality / 10 ) );
 		} else {
 			// jpeg is default
-			imagejpeg( $rCanvas, $this->sCacheFilePath, $this->iQuality );
+			imagejpeg( $rCanvas, $sCacheFilePath, $this->iQuality );
 		}
 		
-		if ( self::$bLogging ) $this->logMessage( __METHOD__, 'Cache image created: ' . $this->sCacheFilePath );
+		Geko_Debug::out( sprintf( 'Cache image created: %s', $sCacheFilePath ), __METHOD__ );
 		
 		// free up memory
 		imagedestroy( $rImage );
@@ -266,27 +268,31 @@ class Geko_Image_Crop extends Geko_Image_CachedAbstract
 		
 	}
 	
+	
+	
+	
 	//
 	public function getCacheFileKey() {
 		
 		if ( '' == $this->sImageSrc ) {
 			
 			// image source given is empty
-			if ( self::$bLogging ) $this->logMessage( __METHOD__, 'Image source given is empty.' );
+			Geko_Debug::out( 'Image source given is empty.', __METHOD__ );
 			return FALSE;
 			
 		} else {
 
 			// this should create a unique "signature" for the cached file
 			return md5(
-				$this->sImageSrc . '_' .
-				$this->iWidth . '_' .
-				$this->iHeight . '_' .
-				$this->iXOffset . '_' .
-				$this->iYOffset . '_' .
-				$this->sOffsetMethod . '_' .
-				$this->iQuality . '_' .
-				$this->iModifiedTimestamp . '_' .
+				'%s_%d_%d_%d_%d_%s_%d_%d_%d',
+				$this->sImageSrc,
+				$this->iWidth,
+				$this->iHeight,
+				$this->iXOffset,
+				$this->iYOffset,
+				$this->sOffsetMethod,
+				$this->iQuality,
+				$this->iModifiedTimestamp,
 				intval( $this->bIsRemote )
 			);
 			

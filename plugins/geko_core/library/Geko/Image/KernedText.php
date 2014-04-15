@@ -46,9 +46,9 @@ class Geko_Image_KernedText extends Geko_Image_CachedAbstract
 	//// accessors
 		
 	//
-	public static function setFontDir($sFontDir)
-	{
-		if (DIRECTORY_SEPARATOR != substr($sFontDir, strlen($sFontDir) - 1)) {
+	public static function setFontDir( $sFontDir ) {
+		
+		if ( DIRECTORY_SEPARATOR != substr( $sFontDir, strlen( $sFontDir ) - 1 ) ) {
 			// add a trailing '/'
 			$sFontDir .= DIRECTORY_SEPARATOR;
 		}
@@ -63,8 +63,8 @@ class Geko_Image_KernedText extends Geko_Image_CachedAbstract
 	////// methods
 	
 	// constructor
-	public function __construct( $aParams = array() )
-	{
+	public function __construct( $aParams = array() ) {
+		
 		$this
 			->arrSetText( $aParams, 't|txt|text' )
 			->arrSetFontSize( $aParams, 'sz|size' )
@@ -85,80 +85,79 @@ class Geko_Image_KernedText extends Geko_Image_CachedAbstract
 	//// accessors
 	
 	//
-	public function setText( $sText )
-	{
+	public function setText( $sText ) {
+		
 		$this->sText = $sText;
 		
 		return $this;
 	}
 
 	//
-	public function setFontSize( $iFontSize )
-	{
+	public function setFontSize( $iFontSize ) {
+		
 		$this->iFontSize = $iFontSize;
 
 		return $this;
 	}
 
 	//
-	public function setKerning( $iKerning )
-	{
+	public function setKerning( $iKerning ) {
+		
 		$this->iKerning = $iKerning;
 
 		return $this;
 	}
 	
 	//
-	public function setForegroundColor( $mForegroundColor )
-	{
+	public function setForegroundColor( $mForegroundColor ) {
+		
 		$this->mForegroundColor = $mForegroundColor;		
 		
 		return $this;
 	}
 
 	//
-	public function setBackgroundColor( $mBackgroundColor )
-	{
+	public function setBackgroundColor( $mBackgroundColor ) {
+		
 		$this->mBackgroundColor = $mBackgroundColor;		
 		
 		return $this;
 	}
 	
 	//
-	public function setFontFile( $sFontFile )
-	{
+	public function setFontFile( $sFontFile ) {
+		
 		$this->sFontFile = $sFontFile;
 
 		return $this;
 	}
 	
 	//
-	public function setMargin( $mMargin )
-	{
+	public function setMargin( $mMargin ) {
+		
 		$this->mMargin = $mMargin;
 
 		return $this;
 	}
 	
 	//
-	public function setResampleFactor( $iResampleFactor )
-	{
+	public function setResampleFactor( $iResampleFactor ) {
+		
 		$this->iResampleFactor = $iResampleFactor;
 
 		return $this;
 	}
 
 	//
-	public function setSharpen( $bSharpen )
-	{
+	public function setSharpen( $bSharpen ) {
 		$this->bSharpen = $bSharpen;
 
 		return $this;
 	}
 
 	//
-	public function setVerticalOffset( $fVerticalOffset )
-	{
+	public function setVerticalOffset( $fVerticalOffset ) {
+		
 		$this->fVerticalOffset = $fVerticalOffset;
 
 		return $this;
@@ -166,46 +165,53 @@ class Geko_Image_KernedText extends Geko_Image_CachedAbstract
 	
 	
 	//
-	public function getMimeType()
-	{
+	public function getMimeType() {
 		return 'image/png';
 	}
 	
 	//
-	protected function generateCacheFile()
-	{
+	protected function generateCacheFile() {
+		
 		//// do checks
 
 		// gd library
-		if (FALSE == function_exists('imagettfbbox')) {
+		if ( FALSE == function_exists( 'imagettfbbox' ) ) {
+			
 			// gd library is not installed
-			if (self::$bLogging) $this->logMessage(__METHOD__, 'GD image library with Freetype support is not installed.');
+			Geko_Debug::out( 'GD image library with Freetype support is not installed.', __METHOD__ );
 			return FALSE;
 		}
 		
 		// make sure font exists
-		if (FALSE == is_file(self::$sFontDir . $this->sFontFile)) {
+		
+		$sFontFile = sprintf( '%s%s', self::$sFontDir, $this->sFontFile );
+		
+		if ( FALSE == is_file( $sFontFile ) ) {
+			
 			// cannot find font file
-			if (self::$bLogging) $this->logMessage(__METHOD__, 'Cannot find font file.');
+			Geko_Debug::out( 'Cannot find font file.', __METHOD__ );
 			return FALSE;
+			
 		} else {
-			if ('ttf' != strtolower(pathinfo($this->sFontFile, PATHINFO_EXTENSION))) {
+			
+			if ( 'ttf' != strtolower( pathinfo( $this->sFontFile, PATHINFO_EXTENSION ) ) ) {
+				
 				// font specified is not a TrueType font
-				if (self::$bLogging) $this->logMessage(__METHOD__, 'Font file must be TrueType.');				
+				Geko_Debug::out( 'Font file must be TrueType.', __METHOD__ );
 				return FALSE;
-			} else {
-				$sFontFile = self::$sFontDir . $this->sFontFile;
 			}
 		}
 		
 		// make sure cache directory exists
-		if (FALSE == $this->assertCacheDir()) {
+		if ( FALSE == $this->assertCacheDir() ) {
 			return FALSE;
 		}
 		
 		// create cache file
-		if (FALSE == touch($this->sCacheFilePath)) {
-			if (self::$bLogging) $this->logMessage(__METHOD__, 'Failed to create cache file.' . $this->sCacheFilePath);
+		$sCacheFilePath = $this->getCacheFilePath();
+		
+		if ( FALSE == touch( $sCacheFilePath ) ) {
+			Geko_Debug::out( sprintf( 'Failed to create cache file. %s', $sCacheFilePath ), __METHOD__ );
 			return FALSE;
 		}
 		
@@ -229,109 +235,106 @@ class Geko_Image_KernedText extends Geko_Image_CachedAbstract
 		
 		
 		// getting bounding box 
-		$aBBox = imagettfbbox($iFontSize * $iResampleFactor, 0, $sFontFile, $sText);
-		$iBoundedHeight = abs($aBBox[7] - $aBBox[1]);
-		$iBoundedY = $iBoundedHeight - abs($aBBox[1]);
+		$aBBox = imagettfbbox( $iFontSize * $iResampleFactor, 0, $sFontFile, $sText );
+		$iBoundedHeight = abs( $aBBox[ 7 ] - $aBBox[ 1 ] );
+		$iBoundedY = $iBoundedHeight - abs( $aBBox[ 1 ] );
 		// imagettfbbox returns very strange results 
 		// so transforming them to plain width and height 
 		
-		$iWidth = abs($aBBox[2] - $aBBox[0]) + ($iKerningValue * (strlen($sText) - 1));
+		$iWidth = abs( $aBBox[ 2 ] - $aBBox[ 0 ] ) + ( $iKerningValue * ( strlen( $sText ) - 1 ) );
 		// width: right corner X - left corner X
 		//print ' ';
 		
-		$iHeight = abs($aBBox[7] - $aBBox[1]);
+		$iHeight = abs( $aBBox[ 7 ] - $aBBox[ 1 ] );
 		// height: top Y - bottom Y
 		
 		$iX = -abs($aBBox[0]);
 		$iY = $iHeight - abs($aBBox[1]);
 
-		if (self::$bLogging) $this->logMessage(__METHOD__,
-			'Info: $iFontSize: ' . $iFontSize . 
-			', $iHeight: ' . $iHeight .
-			', $iY: ' . $iY .
-			', $aBBox[1]: ' . $aBBox[1] .
-			', $sFontFile: ' . $sFontFile .
-			', $iResampleFactor: ' . $iResampleFactor .
-			', $aBBox: (' . implode(', ', $aBBox) . ')' . 
-		'');
+		Geko_Debug::out(
+			sprintf(
+				'Info: $iFontSize: %d, $iHeight: %d, $iY: %d, $aBBox[1]: %s, $sFontFile: %s, $iResampleFactor: %d, $aBBox: (%s)',
+				$iFontSize, $iHeight, $iY, $aBBox[ 1 ], $sFontFile, $iResampleFactor, implode( ', ', $aBBox )
+			),
+			__METHOD__
+		);
 		
 		// ---- CREATE CANVAS + PALETTE
-		$rCanvas = imagecreatetruecolor($iWidth, $iHeight);
+		$rCanvas = imagecreatetruecolor( $iWidth, $iHeight );
 		
-		$iBgColor = imagecolorallocate($rCanvas, $aBgColor['r'], $aBgColor['g'], $aBgColor['b']);
-		$iTextColor = imagecolorallocate($rCanvas, $aTextColor['r'], $aTextColor['g'], $aTextColor['b']);
+		$iBgColor = imagecolorallocate( $rCanvas, $aBgColor[ 'r' ], $aBgColor[ 'g' ], $aBgColor[ 'b' ] );
+		$iTextColor = imagecolorallocate( $rCanvas, $aTextColor[ 'r' ], $aTextColor[ 'g' ], $aTextColor[ 'b' ] );
 		
-		$iBlackColor = imagecolorallocate($rCanvas, 0, 0, 0);
-		$iWhiteColor = imagecolorallocate($rCanvas, 255, 255, 255);
+		$iBlackColor = imagecolorallocate( $rCanvas, 0, 0, 0 );
+		$iWhiteColor = imagecolorallocate( $rCanvas, 255, 255, 255 );
 		
-		imagefill($rCanvas, 0, 0, $iBgColor);
+		imagefill( $rCanvas, 0, 0, $iBgColor );
 		
 		// ---- DRAW
 		
-		$aChars = str_split($sText);
+		$aChars = str_split( $sText );
 		$iCharOffset = $iX;
 		
-		$iYVO = intval($iY * $this->fVerticalOffset);
+		$iYVO = intval( $iY * $this->fVerticalOffset );
 		
-		for ($i = 0; $i < count($aChars); $i++)
-		{
-			$aBBox = imagettftext($rCanvas, $iFontSize * $iResampleFactor, 0, $iCharOffset, $iYVO, $iTextColor, $sFontFile, $aChars[$i]);
-			$iCharOffset = $aBBox[2] + $iKerningValue;    
+		for ( $i = 0; $i < count( $aChars ); $i++ ) {
+			$aBBox = imagettftext( $rCanvas, $iFontSize * $iResampleFactor, 0, $iCharOffset, $iYVO, $iTextColor, $sFontFile, $aChars[ $i ] );
+			$iCharOffset = $aBBox[ 2 ] + $iKerningValue;    
 		}
 		
 		// ---- SAMPLE DOWN & OUTPUT
-		$iFinalWidth = ($iForceWidth) ? $iForceWidth : round(($iCharOffset - $iKerningValue) / $iResampleFactor) + ($aMargin[1] + $aMargin[3]);
-		$iFinalHeight = ($iForceHeight) ? $iForceHeight : round($iBoundedHeight / $iResampleFactor) + ($aMargin[0] + $aMargin[2]);
+		$iFinalWidth = ( $iForceWidth ) ? $iForceWidth : round( ( $iCharOffset - $iKerningValue ) / $iResampleFactor ) + ( $aMargin[ 1 ] + $aMargin[ 3 ] );
+		$iFinalHeight = ( $iForceHeight ) ? $iForceHeight : round( $iBoundedHeight / $iResampleFactor ) + ( $aMargin[ 0 ] + $aMargin[ 2 ] );
 		
-		$rFinal = imagecreatetruecolor($iFinalWidth, $iFinalHeight);
-		imagefill($rFinal, 0, 0, $iBgColor);
+		$rFinal = imagecreatetruecolor( $iFinalWidth, $iFinalHeight );
+		imagefill( $rFinal, 0, 0, $iBgColor );
 		
 		// calculate height of ascender
-		$iAscender = ($iY - $iBoundedY) / $iResampleFactor;
+		$iAscender = ( $iY - $iBoundedY ) / $iResampleFactor;
 		
-		imagecopyresampled($rFinal, $rCanvas, $aMargin[3], round($aMargin[0] - $iAscender), 0, 0, round($iWidth / $iResampleFactor), round($iHeight / $iResampleFactor), $iWidth, $iHeight);
+		imagecopyresampled( $rFinal, $rCanvas, $aMargin[ 3 ], round( $aMargin[ 0 ] - $iAscender ), 0, 0, round( $iWidth / $iResampleFactor ), round( $iHeight / $iResampleFactor ), $iWidth, $iHeight );
 		
 		if (
-			(TRUE == class_exists('Geko_Image_Sharpen')) &&
-			(TRUE == $this->bSharpen)
+			( TRUE == class_exists( 'Geko_Image_Sharpen' ) ) &&
+			( TRUE == $this->bSharpen )
 		) {
 			// apply sharpening
-			$rFinal = Geko_Image_Sharpen::unsharpMask($rFinal, 50, 0.5, 3);
+			$rFinal = Geko_Image_Sharpen::unsharpMask( $rFinal, 50, 0.5, 3 );
 		}
 		
-		imagepng($rFinal, $this->sCacheFilePath);
+		imagepng( $rFinal, $sCacheFilePath );
 		
-		if (self::$bLogging) $this->logMessage(__METHOD__, 'Cache image created: ' . $this->sCacheFilePath);
+		Geko_Debug::out( sprintf( 'Cache image created: %s', $sCacheFilePath ), __METHOD__ );
 		
 		// free up memory
-		imagedestroy($rCanvas);
-		imagedestroy($rFinal);
+		imagedestroy( $rCanvas );
+		imagedestroy( $rFinal );
 	}
 	
 	//
-	public function getCacheFileKey()
-	{
+	public function getCacheFileKey() {
 		// this should create a unique "signature" for the cached file
-		return md5(
-			$this->sText . '_' .
-			$this->iFontSize . '_' .
-			$this->iKerning . '_' .
-			implode( '_', Geko_Image_Color::getArray( $this->mForegroundColor ) ) . '_' .
-			implode( '_', Geko_Image_Color::getArray( $this->mBackgroundColor ) ) . '_' .
-			$this->sFontFile . '_' .
-			implode( '_', Geko_Image_Margin::getArray( $this->mMargin ) ) . '_' .
-			$this->iWidth . '_' .
-			$this->iHeight . '_' .
-			$this->iResampleFactor . '_' .
-			intval( $this->bSharpen ) . '_' .
+		return md5( sprintf(
+			'%s_%d_%d_%s_%s_%s_%s_%d_%d_%d_%d_%f',
+			$this->sText,
+			$this->iFontSize,
+			$this->iKerning,
+			implode( '_', Geko_Image_Color::getArray( $this->mForegroundColor ) ),
+			implode( '_', Geko_Image_Color::getArray( $this->mBackgroundColor ) ),
+			$this->sFontFile,
+			implode( '_', Geko_Image_Margin::getArray( $this->mMargin ) ),
+			$this->iWidth,
+			$this->iHeight,
+			$this->iResampleFactor,
+			intval( $this->bSharpen ),
 			$this->fVerticalOffset
-		);
+		) );
 	}
 	
 	
 	//
-	public function buildKernedTextUrl( $sKernedTextUrl, $bRetObj = FALSE )
-	{
+	public function buildKernedTextUrl( $sKernedTextUrl, $bRetObj = FALSE ) {
+		
 		$oUrl = new Geko_Uri( $sKernedTextUrl );
 		$oUrl
 			->setVar( 't', $this->sText, FALSE )
@@ -350,6 +353,7 @@ class Geko_Image_KernedText extends Geko_Image_CachedAbstract
 		
 		return ( $bRetObj ) ? $oUrl : strval( $oUrl );
 	}
+	
 	
 }
 

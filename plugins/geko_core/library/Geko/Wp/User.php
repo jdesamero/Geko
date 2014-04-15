@@ -194,10 +194,7 @@ class Geko_Wp_User extends Geko_Wp_Entity
 		
 		if ( $sPhoto = $this->getPhotoDoc( $aParams[ 'meta_key' ] ) ) {
 			
-			$aParams[ 'src' ] = urlencode( $sPhoto );
-			
-			$oThumb = new Geko_Image_Thumb( $aParams );
-			return $oThumb->buildThumbUrl( Geko_Uri::getUrl( 'geko_thumb' ) );
+			return $this->buildThumbUrl( $sPhoto, $aParams );
 		}
 		
 		if ( $aParams[ 'noplaceholder' ] ) return '';
@@ -218,13 +215,53 @@ class Geko_Wp_User extends Geko_Wp_Entity
 		
 		foreach ( $aPhotoDocs as $sPhoto ) {
 			
-			$aParams[ 'src' ] = urlencode( $sPhoto );
-			
-			$oThumb = new Geko_Image_Thumb( $aParams );
-			$aPhotos[] = $oThumb->buildThumbUrl( Geko_Uri::getUrl( 'geko_thumb' ) );
+			$aPhotos[] = $this->buildThumbUrl( $sPhoto, $aParams );
 		}
 		
 		return $aPhotos;
+	}
+	
+	
+	// helper
+	public function buildThumbUrl( $sPhoto, $aParams ) {
+		
+		$bPermalink = $aParams[ 'permalink' ];
+		
+		$aParams[ 'src' ] = ( $bPermalink ) ? $sPhoto : urlencode( $sPhoto ) ;
+		
+		$oThumb = new Geko_Image_Thumb( $aParams );
+		
+		if ( $bPermalink ) {
+			
+			$aThumbInfo = $oThumb->get();
+			
+			$aPath = pathinfo( $sPhoto );
+			
+			$sThumbFileName = sprintf(
+				'%s-%dx%d.%s',
+				$aPath[ 'filename' ],
+				$aThumbInfo[ 'width' ],
+				$aThumbInfo[ 'height' ],
+				$aPath[ 'extension' ]
+			);
+			
+			$sPermDoc = sprintf( '%s/%s', $aPath[ 'dirname' ], $sThumbFileName );
+			
+			if ( !is_file( $sPermDoc ) ) {
+				// attempt to save
+				$oThumb->savePermanentFile( $sPermDoc );
+			}
+			
+			if ( is_file( $sPermDoc ) ) {
+				
+				$sOrigUrl = $this->getPhotoUrl( $aParams[ 'meta_key' ] );
+				
+				return sprintf( '%s/%s', dirname( $sOrigUrl ), $sThumbFileName );
+			}
+			
+		}
+		
+		return $oThumb->buildThumbUrl( Geko_Uri::getUrl( 'geko_thumb' ) );
 	}
 	
 	

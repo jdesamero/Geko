@@ -15,10 +15,8 @@ abstract class Geko_Image_CachedAbstract
 	const BLANK_IMAGE_SIZE = 664;
 	/* */
 	
-	protected $sCacheFilePath;
 	
 	protected static $sCacheDir;
-	protected static $bLogging = FALSE;
 	
 	
 	
@@ -37,10 +35,6 @@ abstract class Geko_Image_CachedAbstract
 		self::$sCacheDir = $sCacheDir;
 	}
 	
-	//
-	public static function setLogging( $bLogging ) {
-		self::$bLogging = $bLogging;
-	}
 	
 	//// utility methods
 	
@@ -165,9 +159,12 @@ abstract class Geko_Image_CachedAbstract
 	//
 	protected function assertCacheDir() {
 		
-		if ( FALSE == is_dir( self::$sCacheDir ) ) {
+		if ( !is_dir( self::$sCacheDir ) ) {
+			
 			// attempt to create cache directory
-			if ( FALSE == mkdir( self::$sCacheDir, 0744 ) ) {
+			
+			if ( !mkdir( self::$sCacheDir, 0744 ) ) {
+				
 				// failed to create cache directory
 				return FALSE;			
 			}
@@ -176,8 +173,37 @@ abstract class Geko_Image_CachedAbstract
 		return TRUE;
 	}
 	
+	
 	//
-	abstract protected function generateCacheFile();	
+	protected function generateCacheFile() { }
+	
+	
+	//
+	public function savePermanentFile( $sFilePath ) {
+		
+		if ( $sFilePath = trim( $sFilePath ) ) {
+			
+			$sFile = basename( $sFilePath );
+			$sDir = dirname( $sFilePath );
+			
+			// check that directory exists
+			if ( is_dir( $sDir ) ) {
+				
+				$this->generateCacheFile();
+				
+				if ( !is_file( $sFilePath ) ) {
+					
+					return copy(
+						$this->getCacheFilePath(),
+						$sFilePath
+					);				
+				}
+				
+			}
+		}
+		
+		return FALSE;
+	}
 	
 	
 	
@@ -228,17 +254,33 @@ abstract class Geko_Image_CachedAbstract
 	
 	//
 	protected function showCachedImage() {
+		
+		$sCacheFilePath = $this->getCacheFilePath();
+		
 		// send headers then display image
-		header( 'Content-Type:' . $this->getMimeType() );
-		header( 'Last-Modified:' . gmdate( 'D, d M Y H:i:s', filemtime( $this->sCacheFilePath ) ) . 'GMT' );
-		header( 'Content-Length:' . filesize( $this->sCacheFilePath ) );
+		header( sprintf( 'Content-Type: %s', $this->getMimeType() ) );
+		header( sprintf( 'Last-Modified: %sGMT', gmdate( 'D, d M Y H:i:s', filemtime( $sCacheFilePath ) ) ) );
+		header( sprintf( 'Content-Length: %s', filesize( $sCacheFilePath ) ) );
 		header( 'Cache-Control: max-age=9999' );
-		header( 'Expires: ' . gmdate( 'D, d M Y H:i:s', time() + 99999 ) . 'GMT' ); 
-		readfile( $this->sCacheFilePath );
+		header( sprintf( 'Expires: %sGMT', gmdate( 'D, d M Y H:i:s', time() + 99999 ) ) ); 
+		
+		readfile( $sCacheFilePath );
 	}
 	
 	//
 	abstract public function getCacheFileKey();
+	
+	//
+	public function getCacheFilePath() {
+		
+		if ( $sCacheFileKey = $this->getCacheFileKey() ) {
+			return sprintf( '%s%s', self::$sCacheDir, $sCacheFileKey );
+		}
+		
+		return FALSE;
+	}
+	
+	
 	
 	// clear the output buffer
 	// output headers, cached file if possible, otherwise, show a blank gif
@@ -248,18 +290,16 @@ abstract class Geko_Image_CachedAbstract
 		// flush the output buffer
 		ob_end_clean();
 		
-		// generate a path to the cache file
-		$sCacheFileKey = $this->getCacheFileKey();
-		$this->sCacheFilePath = self::$sCacheDir . $sCacheFileKey;
+		$sCacheFilePath = $this->getCacheFilePath();
 		
-		if ( FALSE != $sCacheFileKey ) {
+		if ( $sCacheFilePath ) {
 			
-			if ( FALSE == is_file( $this->sCacheFilePath ) ) {
+			if ( FALSE == is_file( $sCacheFilePath ) ) {
 				// attempt to generate the cache file if it does not exist
 				$this->generateCacheFile();
 			}
 			
-			if ( TRUE == is_file( $this->sCacheFilePath ) ) {
+			if ( TRUE == is_file( $sCacheFilePath ) ) {
 				// show the cached image file
 				$this->showCachedImage();
 			} else {
@@ -283,26 +323,27 @@ abstract class Geko_Image_CachedAbstract
 	public function get() {
 		
 		// generate a path to the cache file
-		$sCacheFileKey = $this->getCacheFileKey();
-		$this->sCacheFilePath = self::$sCacheDir . $sCacheFileKey;
 		
-		if ( FALSE != $sCacheFileKey ) {
+		$sCacheFileKey = $this->getCacheFileKey();
+		$sCacheFilePath = $this->getCacheFilePath();
+		
+		if ( $sCacheFileKey ) {
 			
-			if ( FALSE == is_file( $this->sCacheFilePath ) ) {
+			if ( !is_file( $sCacheFilePath ) ) {
 				// attempt to generate the cache file if it does not exist
 				$this->generateCacheFile();
 			}
 			
-			if ( TRUE == is_file( $this->sCacheFilePath ) ) {
+			if ( is_file( $sCacheFilePath ) ) {
 				
-				$aSize = getimagesize( $this->sCacheFilePath );
+				$aSize = getimagesize( $sCacheFilePath );
 				
 				return array(
-					'fullpath' => $this->sCacheFilePath,
+					'fullpath' => $sCacheFilePath,
 					'cachekey' => $sCacheFileKey,
 					'width' => $aSize[ 0 ],
 					'height' => $aSize[ 1 ],
-					'mime' => $aSize['mime'],
+					'mime' => $aSize[ 'mime' ],
 					'size' => $aSize
 				);
 				
@@ -318,45 +359,6 @@ abstract class Geko_Image_CachedAbstract
 	}
 	
 	
-	
-	//// logging/debugging methods
-	
-	//
-	public function logMessage( $sMethod, $sMessage ) {
-		
-		// make sure cache dir exists
-		$this->assertCacheDir();
-		
-		// TO DO: make log file settable
-		$sLogFilePath = self::$sCacheDir . 'logs.txt';
-		
-		if ( FALSE == is_file( $sLogFilePath ) ) {
-			touch( $sLogFilePath );
-		}
-		
-		//
-		if ( TRUE == is_file( $sLogFilePath ) ) {
-			$sLogMessage = gmdate( 'D, d M Y H:i:s' ) . ': ' . $sMethod . ': ' . $sMessage . "\n";
-			file_put_contents( $sLogFilePath, $sLogMessage, FILE_APPEND );
-		} else {
-			echo $sLogMessage;
-		}
-	}
-	
-	
-	// 
-	public function debug() {
-		
-		echo '<pre>';
-		
-		print self::$sCacheDir . 'logs.txt';
-		$this->logMessage( __METHOD__, 'Test.' );
-		
-		print_r( $this );
-		var_dump( $this->getCacheFileKey() );
-		
-		echo '</pre>';
-	}
 	
 	
 	
@@ -400,7 +402,7 @@ abstract class Geko_Image_CachedAbstract
 			
 		}
 		
-		throw new Exception('Invalid method ' . get_class( $this ) . '::' . $sMethod . '() called.');
+		throw new Exception( sprintf( 'Invalid method %s::%s() called.', get_class( $this ), $sMethod ) );
 	}
 	
 	

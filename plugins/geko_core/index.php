@@ -26,6 +26,9 @@ define( 'GEKO_LOG', realpath( sprintf( '%s/wp-content/logs/logs.txt', ABSPATH ) 
 define( 'GEKO_REGISTER_XML', realpath( sprintf( '%s/conf/register.xml', GEKO_CORE_ROOT ) ) );
 define( 'GEKO_VIEW_HELPER_PATH', realpath( sprintf( '%s/library', GEKO_CORE_ROOT ) ) );
 
+define( 'GEKO_IMAGE_THUMB_CACHE_DIR', realpath( sprintf( '%s/wp-content/cache/', ABSPATH ) ) );
+define( 'GEKO_IMAGE_THUMB_CACHE_URI', sprintf( '%s/wp-content/cache/', get_bloginfo( 'wpurl' ) ) );
+
 
 
 // include path
@@ -93,6 +96,11 @@ Geko_Uri::setUrl( array(
 	'geko_ext_styles' => sprintf( '%s/external/styles', GEKO_CORE_URI ),
 	'geko_ext_swf' => sprintf( '%s/external/swf', GEKO_CORE_URI )
 ) );
+
+
+
+// image thumbnailer
+Geko_Image_Thumb::setCacheDir( GEKO_IMAGE_THUMB_CACHE_DIR );
 
 
 

@@ -7,54 +7,63 @@ class Geko_Image_ShowCached extends Geko_Image_CachedAbstract
 	
 	
 	//
-	public function __construct($sCacheFileKey)
-	{
-		$this->setCacheFileKey($sCacheFileKey);
+	public function __construct( $sCacheFileKey ) {
+		
+		$this->setCacheFileKey( $sCacheFileKey );
 	}
 	
 	//
-	public function setCacheFileKey($sCacheFileKey)
-	{
+	public function setCacheFileKey( $sCacheFileKey ) {
+		
 		$this->sCacheFileKey = $sCacheFileKey;
 	}
-
+	
+	
 	//
-	public function getCacheFileKey()
-	{
+	public function getCacheFileKey() {
+		
 		return $this->sCacheFileKey;
 	}
 	
-	//
-	protected function generateCacheFile()
-	{
-		// do nothing
-	}
+	
+	
 	
 	//
-	public function getMimeType()
-	{
-		if (TRUE == is_file($this->sCacheFilePath)) {
-			$aSize = getimagesize($this->sCacheFilePath);
-			return $aSize['mime'];
-		} else {
-			if (self::$bLogging) $this->logMessage(__METHOD__, 'Cache file does not exist: ' . $this->sCacheFilePath);
-			return '';
-		}	
+	public function getMimeType() {
+		
+		$sCacheFilePath = $this->getCacheFilePath();
+		
+		if ( is_file( $sCacheFilePath ) ) {
+			
+			$aSize = getimagesize( $sCacheFilePath );
+			
+			return $aSize[ 'mime' ];
+		
+		}
+		
+		Geko_Debug::out( sprintf( 'Cache file does not exist: %s', $sCacheFilePath ), __METHOD__ );
+		
+		return '';
 	}
+	
 	
 	// override
-	public function output()
-	{
+	public function output() {
+		
 		// flush the output buffer
 		ob_end_clean();
 		
 		// generate a path to the cache file
-		$this->sCacheFilePath = self::$sCacheDir . $this->sCacheFileKey;
+		$sCacheFilePath = $this->getCacheFilePath();
 		
-		if (TRUE == is_file($this->sCacheFilePath)) {
+		
+		if ( is_file( $sCacheFilePath ) ) {
+			
 			// show the cached image file
 			$this->showCachedImage();
+		
 		} else {
+			
 			// there were problems generating the cached image file
 			$this->showBlankImage();
 		}
@@ -63,23 +72,29 @@ class Geko_Image_ShowCached extends Geko_Image_CachedAbstract
 		die();
 	}
 	
+	
 	// override
-	public function get()
-	{
-		$this->sCacheFilePath = self::$sCacheDir . $this->$sCacheFileKey;
-
-		if (TRUE == is_file($this->sCacheFilePath)) {
+	public function get() {
+		
+		$sCacheFileKey = $this->getCacheFileKey();
+		$sCacheFilePath = $this->getCacheFilePath();
+		
+		if ( is_file( $sCacheFilePath ) ) {
+			
 			return array(
-				'fullpath' => $this->sCacheFilePath,
+				'fullpath' => $sCacheFilePath,
 				'cachekey' => $sCacheFileKey,
-				'size' => getimagesize($this->sCacheFilePath)
+				'size' => getimagesize( $sCacheFilePath )
 			);
+			
 		} else {
+			
 			// cached image does not exist
 			return FALSE;
 		}
 		
 	}
+	
 	
 	
 }
