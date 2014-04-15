@@ -44,10 +44,7 @@ Geko_Wp_Hooks::attachGekoHookFilters(
 	'admin_page_source'
 );
 
-$aRoleTypes = Geko_Wp_Role_Types::getInstance()
-	->register( 'Geko_Wp_User_RoleType' )
-;
-
+Geko_Wp_Role_Types::getInstance()->register( 'Geko_Wp_User_RoleType' );
 Geko_Wp_Role_Manage::getInstance()->init();
 
 Geko_Wp_User_Rewrite::getInstance()->init();
