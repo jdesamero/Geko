@@ -1,11 +1,11 @@
 <?php
 
 //
-class Geko_App extends Geko_Singleton_Abstract
+class Geko_App_Bootstrap extends Geko_Bootstrap
 {
 	
-	protected static $_aRegistry = array();
 	
+	//// properties
 	
 	protected $_aDeps = array(						// dependency tree for the various app components
 		'logger' => NULL,
@@ -22,8 +22,6 @@ class Geko_App extends Geko_Singleton_Abstract
 		'router.auth' => array( 'router', 'auth' ),
 	);
 	
-	protected $_aExtComponents = array();
-	
 	protected $_aConfig = array(					// config flags for desired modules
 		'logger' => TRUE,
 		'match' => TRUE,
@@ -32,145 +30,21 @@ class Geko_App extends Geko_Singleton_Abstract
 		'router.service' => TRUE
 	);
 	
-	protected $_aLoadedComponents = NULL;
-	
 	protected $_aPrefixes = array( 'Gloc_', 'Geko_App_', 'Geko_' );
 	
 	
 	
-	
-	//// static methods
-	
-	//
-	public static function set( $sKey, $mValue ) {
-		self::$_aRegistry[ $sKey ] = $mValue;
-	}
-	
-	//
-	public static function get( $sKey ) {
-		return self::$_aRegistry[ $sKey ];
-	}
-	
-	
-	
-	//// functionality
-	
-	//
-	public function start() {
-		
-		//
-		parent::start();
-		
-		//// do it!!!
-		
-		self::set( 'app', $this );		// reference to myself
-		
-		$this->doInitPre();
-		
-		//// run the requested components
-		
-		$aConfig = $this->resolveConfig();
-		
-		$this->_aLoadedComponents = $aConfig;
-		
-		// $mArgs, use if needed later
-		foreach ( $aConfig as $sComp => $mArgs ) {
-			
-			if ( $fComponent = $this->_aExtComponents[ $sComp ] ) {
-				
-				// call external component first
-				call_user_func( $fComponent, $mArgs );
-				
-			} else {
-				
-				// call internal, method-based component
-				
-				$aComp = explode( '.', $sComp );
-				array_walk( $aComp, array( 'Geko_Inflector', 'camelize' ) );
-				$sComp = implode( '_', $aComp );
-				
-				$sMethod = sprintf( 'comp%s', $sComp );
-				
-				if ( $bMethodExists = method_exists( $this, $sMethod ) ) {
-					$this->$sMethod( $mArgs );
-				}
-				
-				if ( $oLogger = self::get( 'logger' ) ) {
-					$sMsg = ( $bMethodExists ) ? 'found' : 'NOT found' ;
-					$oLogger->info( sprintf( '%s: Method %s() %s', get_class( $this ), $sMethod, $sMsg ) );
-				}
-				
-			}
-			
-		}
-		
-		$this->doInitPost();
-		
-	}
-		
-	// resolve any dependencies
-	public function resolveConfig( $aConfig = NULL ) {
-		
-		if ( NULL === $aConfig ) {
-			$aConfig = $this->_aConfig;
-		}
-		
-		foreach ( $aConfig as $sKey => $mArgs ) {
-			if ( $mArgs ) {
-				$aConfig[ $sKey ] = $mArgs;
-				$aConfig = $this->getDeps( $aConfig, $sKey );
-			}
-		}
-		
-		return $aConfig;
-	}
-	
-	// recursive function
-	public function getDeps( $aConfig, $sKey ) {
-		
-		if ( $aDeps = $this->_aDeps[ $sKey ] ) {
-			foreach ( $aDeps as $sDep ) {
-				$aConfig = array_merge( array( $sDep => TRUE ), $aConfig );
-				$aConfig = $this->getDeps( $aConfig, $sDep );
-			}
-		}
-		
-		return $aConfig;
-	}
-	
-	
-	//// accessors
-		
-	//
-	public function config( $aParams ) {
-		$this->_aConfig = array_merge( $this->_aConfig, $aParams );
-		return $this;
-	}
+	//// methods
 	
 	
 	//
-	public function getLoadedComponents() {
-		return $this->_aLoadedComponents;
+	public function doInitPre() {
+		
+		parent::doInitPre();
+		
+		$this->set( 'app', $this );		// reference to myself ???
+		
 	}
-	
-	//
-	public function registerComponent( $sKey, $fComponent = FALSE, $aDeps = NULL ) {
-		
-		$this->_aExtComponents[ $sKey ] = $fComponent;
-		
-		if ( is_array( $aDeps ) ) {
-			$this->_aDeps[ $sKey ] = $aDeps;
-		}
-		
-		return $this;
-	}
-
-	
-	// hook methods
-	public function doInitPre() { }
-	public function doInitPost() { }
-	
-	
 	
 	
 	
@@ -188,7 +62,7 @@ class Geko_App extends Geko_Singleton_Abstract
 		}
 		
 		if ( $oLogger ) {
-			self::set( 'logger', $oLogger );
+			$this->set( 'logger', $oLogger );
 		}
 	}
 	
@@ -209,7 +83,7 @@ class Geko_App extends Geko_Singleton_Abstract
 			) );
 		}
 		
-		self::set( 'db', $oDb );
+		$this->set( 'db', $oDb );
 	}
 	
 	
@@ -217,7 +91,7 @@ class Geko_App extends Geko_Singleton_Abstract
 	// depends on: "db"
 	public function compSess( $mArgs ) {
 		
-		$oDb = self::get( 'db' );
+		$oDb = $this->get( 'db' );
 		
 		$oSess = Geko_App_Session::getInstance()->setDb( $oDb )->init();
 		
@@ -225,7 +99,7 @@ class Geko_App extends Geko_Singleton_Abstract
 			$oSess->regenerateSessionKey();
 		}
 		
-		self::set( 'sess', $oSess );
+		$this->set( 'sess', $oSess );
 	}
 	
 	//
@@ -245,7 +119,7 @@ class Geko_App extends Geko_Singleton_Abstract
 		
 		call_user_func( array( $sClass, 'set' ), $oMatch );
 		
-		self::set( 'match', $oMatch );	
+		$this->set( 'match', $oMatch );	
 	}
 	
 	
@@ -258,7 +132,7 @@ class Geko_App extends Geko_Singleton_Abstract
 		
 		$oRouter = new $sRouterClass( GEKO_STANDALONE_URL );
 		
-		self::set( 'router', $oRouter );	
+		$this->set( 'router', $oRouter );	
 	}
 	
 	
@@ -268,14 +142,14 @@ class Geko_App extends Geko_Singleton_Abstract
 	// depends on: "router"
 	public function compRouter_File( $mArgs ) {
 		
-		$oRouter = self::get( 'router' );
+		$oRouter = $this->get( 'router' );
 		
 		$sRouteClass = $this->getBestMatch( 'Router_Route_File' );
 		
 		$oRoute = new $sRouteClass();
 		$oRouter->addRoute( $oRoute, 3000, 'file' );
 		
-		self::set( 'router.file', $oRoute );
+		$this->set( 'router.file', $oRoute );
 	}
 	
 	
@@ -285,14 +159,14 @@ class Geko_App extends Geko_Singleton_Abstract
 	// depends on: "router"
 	public function compRouter_Service( $mArgs ) {
 		
-		$oRouter = self::get( 'router' );
+		$oRouter = $this->get( 'router' );
 		
 		$sRouteClass = $this->getBestMatch( 'Router_Route_Service' );
 		
 		$oRoute = new $sRouteClass();
 		$oRouter->addRoute( $oRoute, 6000, 'service' );
 		
-		self::set( 'router.service', $oRoute );
+		$this->set( 'router.service', $oRoute );
 	}
 	
 	
@@ -301,21 +175,21 @@ class Geko_App extends Geko_Singleton_Abstract
 	// depends on: "router"
 	public function compRouter_Layout( $mArgs ) {
 		
-		$oRouter = self::get( 'router' );
+		$oRouter = $this->get( 'router' );
 		
 		$sRouteClass = $this->getBestMatch( 'Router_Route_Layout' );
 		
 		$oRoute = new $sRouteClass();
 		$oRouter->addRoute( $oRoute, 9000, 'layout' );
 		
-		if ( $oMatch = self::get( 'match' ) ) {
+		if ( $oMatch = $this->get( 'match' ) ) {
 			
 			$sMatchClass = $this->getBestMatch( 'Match_Rule_Route' );
 			
 			$oMatch->addRule( new $sMatchClass( $oRouter ) );		
 		}
 		
-		self::set( 'router.layout', $oRoute );
+		$this->set( 'router.layout', $oRoute );
 	}
 	
 	
@@ -325,8 +199,8 @@ class Geko_App extends Geko_Singleton_Abstract
 	// depends on: "db", "sess"; optional: "router"
 	public function compAuth( $mArgs ) {
 		
-		$oDb = self::get( 'db' );
-		$oSess = self::get( 'sess' );
+		$oDb = $this->get( 'db' );
+		$oSess = $this->get( 'sess' );
 		
 		$oAuth = Zend_Auth::getInstance();
 		
@@ -345,10 +219,13 @@ class Geko_App extends Geko_Singleton_Abstract
 			die();
 		}
 		
-		self::set( 'auth', $oAuth );
-		self::set( 'auth.adapter', $oAuthAdapter );	
-		self::set( 'auth.storage', $oAuthStorage );	
+		$this
+			->set( 'auth', $oAuth )
+			->set( 'auth.adapter', $oAuthAdapter )
+			->set( 'auth.storage', $oAuthStorage )
+		;
 	}
+	
 	
 	//
 	public function doLogout() {
@@ -360,54 +237,31 @@ class Geko_App extends Geko_Singleton_Abstract
 	// depends on: "router", "auth"
 	public function compRouter_Auth( $mArgs ) {
 		
-		$oRouter = self::get( 'router' );
-		$oAuth = self::get( 'auth' );
+		$oRouter = $this->get( 'router' );
+		$oAuth = $this->get( 'auth' );
 		
 		$sRouteClass = $this->getBestMatch( 'Router_Route_Auth' );
 		
 		$oRoute = new $sRouteClass( $oAuth );
 		$oRouter->addRoute( $oRoute, 1000, 'auth' );
 		
-		self::set( 'router.auth', $oRoute );
+		$this->set( 'router.auth', $oRoute );
 	}
+	
 	
 	
 	
 	//// run the app
 	
 	//
-	public function run() {
-		
-		$this->doRunPre();
-		$this->doRun();
-		$this->doRunPost();
-		
-		return $this;
-	}
-	
-	// hook methods
-	public function doRunPre() { }
-	public function doRunPost() { }
-	
-	//
 	public function doRun() {
-		self::get( 'router' )->run();
+		$this->get( 'router' )->run();
 	}
 	
-	
-	
-	//// helpers
-	
-	//
-	public function getBestMatch() {
-		$aSuffixes = func_get_args();
-		return Geko_Class::getBestMatch( $this->_aPrefixes, $aSuffixes );
-	}
 	
 	
 	
 }
-
 
 
 

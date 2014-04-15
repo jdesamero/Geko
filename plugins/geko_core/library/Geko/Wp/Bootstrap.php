@@ -1,8 +1,24 @@
 <?php
 
 //
-class Geko_Wp_Bootstrap extends Geko_Singleton_Abstract
+class Geko_Wp_Bootstrap extends Geko_Bootstrap
 {
+	
+	
+	//// properties
+	
+	
+	protected $_aDeps = array();
+	
+	protected $_aPrefixes = array( 'Gloc_', 'Geko_Wp_', 'Geko_' );
+	
+	protected $_aConfig = array();
+	
+	
+	
+	
+	
+	//// methods
 	
 	
 	//
