@@ -30,13 +30,16 @@ class Geko_Layout extends Geko_Singleton_Abstract
 	
 	//
 	public function init( $bUnshift = FALSE ) {
+		
 		$this->_bUnshift = $bUnshift;
+		
 		return parent::init();
 	}
 	
 	//
 	public function reInit( $bUnshift = FALSE ) {
-		return parent::reInit( $bUnshift );
+		
+		return parent::reInit();
 	}
 	
 	

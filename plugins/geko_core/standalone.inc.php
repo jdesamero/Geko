@@ -100,7 +100,7 @@ Geko_Uri::setUrl( array(
 	'geko_styles' => sprintf( '%s/styles', GEKO_CORE_URI ),
 	'geko_ext_styles' => sprintf( '%s/external/styles', GEKO_CORE_URI ),
 	'geko_ext_swf' => sprintf( '%s/external/swf', GEKO_CORE_URI ),
-	'geko_app_srv' => sprintf( '%s/srv', GEKO_CORE_URI )
+	'geko_app_srv' => sprintf( '%s/srv', GEKO_STANDALONE_URL )
 ) );
 
 

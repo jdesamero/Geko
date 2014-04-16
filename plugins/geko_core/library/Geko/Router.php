@@ -111,12 +111,12 @@ class Geko_Router
 		
 		// sort by priority before running
 		uasort( $this->_aRoutes, array( $this, 'sortByPriority' ) );
-				
+		
 		foreach ( $this->_aRoutes as $aRoute ) {
 			
 			$oRoute = $aRoute[ 'route' ];
 			
-			// echo sprintf( 'Running... %s<br />', get_class( $oRoute ) );
+			Geko_Debug::out( sprintf( 'Running... %s', get_class( $oRoute ) ), __METHOD__ );
 			
 			if ( $oRoute->isMatch() ) {
 				
@@ -160,7 +160,7 @@ class Geko_Router
 			$iPriority = $aRoute[ 'priority' ];
 			$iIdx = $aRoute[ 'idx' ];
 			
-			printf( '%s - %s - %d<br />', $sKey, $iPriority, $iIdx );
+			Geko_Debug::out( sprintf( '%s - %s - %d', $sKey, $iPriority, $iIdx ), __METHOD__ );
 		}
 			
 	}

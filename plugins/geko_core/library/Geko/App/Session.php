@@ -16,7 +16,6 @@ class Geko_App_Session extends Geko_Singleton_Abstract
 	protected $_aDbParams = array();
 	protected $_oDb;
 	
-	protected $_bCalledInit = FALSE;
 	protected $_bInitDb = FALSE;
 	protected $_bCalledSet = FALSE;
 	
@@ -26,18 +25,16 @@ class Geko_App_Session extends Geko_Singleton_Abstract
 	
 	
 	//
-	public function init() {
+	public function start() {
 		
-		if ( !$this->_bCalledInit ) {
-						
-			Zend_Session::start();
-						
-			$this->_sSessionKey = Zend_Session::getId();
+		parent::start();
 			
-			$this->initDb();
-			
-			$this->_bCalledInit = TRUE;
-		}
+		Zend_Session::start();
+					
+		$this->_sSessionKey = Zend_Session::getId();
+		
+		$this->initDb();
+		
 		
 		return $this;
 	}

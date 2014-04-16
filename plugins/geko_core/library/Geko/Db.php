@@ -12,7 +12,7 @@ class Geko_Db
 	protected $_sVendorClass;							// some Geko_Db_* class
 	
 	protected $_aDbVendorMapping = array(
-		'Zend_Db_Adapter_Pdo_Mysql ' => 'Mysql',
+		'Zend_Db_Adapter_Pdo_Mysql' => 'Mysql',
 		'Zend_Db_Adapter_Pdo_Sqlite' => 'Sqlite'
 	);
 	

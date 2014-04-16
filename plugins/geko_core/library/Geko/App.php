@@ -95,10 +95,11 @@ class Geko_App extends Geko_Singleton_Abstract
 					$this->$sMethod( $mArgs );
 				}
 				
-				if ( $oLogger = self::get( 'logger' ) ) {
-					$sMsg = ( $bMethodExists ) ? 'found' : 'NOT found' ;
-					$oLogger->info( sprintf( '%s: Method %s() %s', get_class( $this ), $sMethod, $sMsg ) );
-				}
+				
+				//// debugging
+				
+				$sMsg = ( $bMethodExists ) ? 'found' : 'NOT found' ;
+				Geko_Debug::out( sprintf( '%s: Method %s() %s', get_class( $this ), $sMethod, $sMsg ), __METHOD__ );
 				
 			}
 			
