@@ -11,6 +11,16 @@ abstract class Geko_Wp_Entity_ExportExcelHelper
 	
 	protected $_aParams = array();
 	
+	protected $_iWorkbookVersion = 8;
+	
+	
+	// http://www.php.net/manual/en/mbstring.supported-encodings.php
+	// Common values: Windows-1251, Windows-1252, UTF-8, ISO-8859-1
+	
+	protected $_sApplyEncoding = NULL;
+	
+	
+	
 	
 	
 	
@@ -128,6 +138,13 @@ abstract class Geko_Wp_Entity_ExportExcelHelper
 			$mValue = $mPassVal;
 		}
 		
+		
+		// apply encoding, if specified
+		if ( $this->_sApplyEncoding ) {
+			$mValue = mb_convert_encoding( $mValue, $this->_sApplyEncoding );
+		}
+		
+		
 		return $mValue;
 	}
 	
@@ -158,6 +175,7 @@ abstract class Geko_Wp_Entity_ExportExcelHelper
 		
 		// Creating a workbook
 		$oWorkbook = new Spreadsheet_Excel_Writer();
+		$oWorkbook->setVersion( $this->_iWorkbookVersion );
 		
 		// sending HTTP headers
 		$oWorkbook->send( $this->getExportedFileName() );
