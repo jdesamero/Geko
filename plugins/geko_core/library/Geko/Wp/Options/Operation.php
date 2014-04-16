@@ -176,9 +176,9 @@ class Geko_Wp_Options_Operation extends Geko_Wp_Options
 		$sButtonTitle = ( $aOperation[ 'button_title' ] ) ? $aOperation[ 'button_title' ] : $sHumanTitle ;
 		$aExtraButtons = $aOperation[ 'extra_buttons' ];
 		
-		$sFormFieldMethod = 'formFields' . Geko_Inflector::camelize( $sOperation );
+		$sFormFieldMethod = sprintf( 'formFields%s', Geko_Inflector::camelize( $sOperation ) );
 		
-		$sNonceField = $this->_sInstanceClass . $sOperation;
+		$sNonceField = sprintf( '%s%s', $this->_sInstanceClass, $sOperation );
 		
 		?>
 		<h3><?php echo $sSectionTitle; ?></h3>
@@ -192,7 +192,7 @@ class Geko_Wp_Options_Operation extends Geko_Wp_Options
 			<?php if ( method_exists( $this, $sFormFieldMethod ) ) $this->$sFormFieldMethod(); ?>
 			
 			<p class="submit">
-				<input type="submit" value="<?php echo $sButtonTitle; ?>" class="button-primary" />
+				<input type="submit" value="<?php echo htmlspecialchars( $sButtonTitle ); ?>" class="button-primary" />
 				<?php foreach ( $aExtraButtons as $sKey => $mExtraBtn ):
 					
 					if ( is_string( $mExtraBtn ) ) {
@@ -205,10 +205,10 @@ class Geko_Wp_Options_Operation extends Geko_Wp_Options
 					$sExtraBtnId = ( $aExtraBtn[ 'id' ] ) ? $aExtraBtn[ 'id' ] : $sKey ;
 					$sExtraBtnTitle = ( $aExtraBtn[ 'title' ] ) ? $aExtraBtn[ 'title' ] : Geko_Inflector::humanize( $sExtraBtnId ) ;
 					$sExtraBtnClass = 'button-primary';
-					if ( $aExtraBtn[ 'class' ] ) $sExtraBtnClass = $sExtraBtnClass . ' ' . trim( $aExtraBtn[ 'class' ] );
+					if ( $aExtraBtn[ 'class' ] ) $sExtraBtnClass = sprintf( '%s %s', $sExtraBtnClass, trim( $aExtraBtn[ 'class' ] ) );
 					
 					?>
-					<input type="button" id="<?php echo $sExtraBtnId; ?>" value="<?php echo $sExtraBtnTitle; ?>" class="<?php echo $sExtraBtnClass; ?>" />
+					<input type="button" id="<?php echo $sExtraBtnId; ?>" value="<?php echo htmlspecialchars( $sExtraBtnTitle ); ?>" class="<?php echo $sExtraBtnClass; ?>" />
 				<?php endforeach; ?>
 			</p>
 			
@@ -233,7 +233,7 @@ class Geko_Wp_Options_Operation extends Geko_Wp_Options
 		@session_start();
 		
 		$sOperation = $_REQUEST[ '__operation' ];
-		$sActionMethod = 'doAction' . Geko_Inflector::camelize( $sOperation );
+		$sActionMethod = sprintf( 'doAction%s', Geko_Inflector::camelize( $sOperation ) );
 		
 		$sNonceField = $this->_sInstanceClass . $sOperation;
 		
@@ -245,8 +245,8 @@ class Geko_Wp_Options_Operation extends Geko_Wp_Options
 		) {
 			
 			$this->$sActionMethod( $this->_aOperations[ $sOperation ] );
-
-			header( 'Location: ' . $_REQUEST[ '_wp_http_referer' ] );
+			
+			header( sprintf( 'Location: %s', $_REQUEST[ '_wp_http_referer' ] ) );
 			die();
 		}
 		

@@ -3,11 +3,18 @@
 abstract class Geko_Wp_Entity_ExportExcelHelper
 {
 	
+	//// properties
+	
 	protected $_sExportedFileName = 'worksheet_##date##.xls';
 	protected $_sWorksheetName = 'Worksheet';
 	protected $_aColumnMappings = array();
 	
 	protected $_aParams = array();
+	
+	
+	
+	
+	//// methods
 	
 	//
 	public function __construct( $aParams = array() ) {
@@ -70,22 +77,80 @@ abstract class Geko_Wp_Entity_ExportExcelHelper
 		return $aRet;
 	}
 	
+	
 	//
 	public function getValue( $oItem, $sKey, $mMapping ) {
 		
 		$mValue = '';
+		$mPassVal = $oItem->getEntityPropertyValue( $sKey );
+		
 		
 		if ( is_array( $mMapping ) ) {
-			if ( $sMethod = $mMapping[ 1 ] ) {
-				$sMethod = 'get' . ucfirst( $sMethod );
-				$mValue = $oItem->$sMethod();
+			
+			if ( $mMap = $mMapping[ 1 ] ) {
+				
+				if ( is_array( $mMap ) ) {
+					
+					$aMap = $mMap;
+					
+					if ( $sTransKey = $aMap[ 'trans' ] ) {
+						
+						$sMethodFmt = sprintf( 'trans%s', ucfirst( strtolower( $sTransKey ) ) );
+
+						if ( method_exists( $this, $sMethodFmt ) ) {
+						
+							$mValue = $this->$sMethodFmt( $mPassVal, $oItem, $sKey, $aMap );
+						}
+						
+					}
+					
+				} else {
+					
+					$sMethod = $mMap;
+					
+					$sMethodFmt = sprintf( 'get%s', ucfirst( strtolower( $sMethod ) ) );
+					
+					if ( method_exists( $this, $sMethodFmt ) ) {
+						
+						$mValue = $this->$sMethodFmt( $mPassVal, $oItem, $sKey );
+						
+					} else {
+						
+						$mValue = $oItem->$sMethodFmt();
+					}
+				
+				}
+				
 			}
+			
 		} else {
-			$mValue = $oItem->getEntityPropertyValue( $sKey );
+			
+			$mValue = $mPassVal;
 		}
 		
 		return $mValue;
 	}
+	
+	
+	
+	//// transformation modules/plugins
+	
+	//
+	public function transEnum( $mPassVal, $oItem, $sKey, $aParams ) {
+		
+		$sEnumKey = $aParams[ 'key' ];
+		$sDest = ( $aParams[ 'dest' ] ) ? strtolower( $aParams[ 'dest' ] ) : 'title' ;
+		$sSource = ( $aParams[ 'source' ] ) ? strtolower( $aParams[ 'source' ] ) : 'value' ;
+		
+		$aEnum = Geko_Wp_Enumeration_Query::getSet( $sEnumKey );
+		
+		$sMethod = sprintf( 'get%sFrom%s', ucfirst( $sDest ), ucfirst( $sSource ) );
+		
+		return $aEnum->getTitleFromValue( $mPassVal );
+
+	}
+	
+	
 	
 	// $aRes is an entity query object
 	// TO DO: add hooks
