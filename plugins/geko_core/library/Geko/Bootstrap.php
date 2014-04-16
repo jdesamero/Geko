@@ -31,7 +31,7 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 	}
 	
 	//
-	public static function get( $sKey ) {
+	public function get( $sKey ) {
 		return $this->_aRegistry[ $sKey ];
 	}
 	
