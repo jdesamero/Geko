@@ -8,29 +8,41 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 	//// properties
 	
 	protected $_aDeps = array(						// dependency tree for the various app components
+		
+		'error' => NULL,
+		'debug' => NULL,
 		'logger' => NULL,
 		'db' => NULL,
 		'match' => NULL,
+		
 		'router' => NULL,
 		'router.file' => array( 'router' ),
 		'router.service' => array( 'router' ),
 		'router.layout' => array( 'router' ),
+		
 		'sess' => array( 'db' ),
+		
 		'auth' => array( 'sess' ),
 		'auth.adapter' => array( 'auth' ),
 		'auth.storage' => array( 'auth' ),
-		'router.auth' => array( 'router', 'auth' ),
+		
+		'router.auth' => array( 'router', 'auth' )
+		
 	);
 	
 	protected $_aConfig = array(					// config flags for desired modules
-		'logger' => TRUE,
+		
+		'error' => TRUE,
 		'match' => TRUE,
+		
 		'router' => TRUE,
 		'router.layout' => TRUE,
 		'router.service' => TRUE
+		
 	);
 	
 	protected $_aPrefixes = array( 'Gloc_', 'Geko_App_', 'Geko_' );
+	
 	
 	
 	
@@ -42,6 +54,8 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 		
 		parent::doInitPre();
 		
+		Geko_App::init( $this );
+		
 		$this->set( 'app', $this );		// reference to myself ???
 		
 	}
@@ -49,6 +63,31 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 	
 	
 	//// default components
+	
+	
+	// error handler/reporting
+	public function compError( $mArgs ) {
+		
+		Geko_Error::start();
+				
+	}
+	
+	//
+	public function compDebug( $mArgs ) {
+		
+		Geko_Debug::setShowOut( TRUE );
+
+		if ( is_array( $mArgs ) ) {
+			
+			if ( $aEnable = $mArgs[ 'enable' ] ) {
+				
+				call_user_func_array( array( 'Geko_Debug', 'setOutEnable' ), $aEnable );	
+			}
+		}
+		
+	}
+	
+	
 	
 	
 	// logger/debugger

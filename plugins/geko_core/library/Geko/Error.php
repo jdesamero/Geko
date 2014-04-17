@@ -13,7 +13,7 @@ class Geko_Error
 			error_reporting( E_ALL );
 		} else {
 			ini_set( 'display_errors', 1 );
-			error_reporting( E_ALLÊ^ÊE_NOTICE );
+			error_reporting( E_ALL ^ E_NOTICE );
 		}
 		
 	}

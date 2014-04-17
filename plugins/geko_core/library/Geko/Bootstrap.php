@@ -45,11 +45,11 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 		//
 		parent::start();
 		
+		
+		
 		//// do it!!!
 		
-		
 		$this->doInitPre();
-		
 		
 		
 		//// run the requested components
@@ -130,8 +130,21 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 	//// accessors
 		
 	//
-	public function config( $aParams ) {
-		$this->_aConfig = array_merge( $this->_aConfig, $aParams );
+	public function config( $aParams = array() ) {
+		
+		$aParamsMerge = array();
+		
+		// force removal of unwanted default components
+		foreach ( $aParams as $sKey => $mValue ) {
+			if ( FALSE === $mValue ) {
+				unset( $this->_aConfig[ $sKey ] );
+			} else {
+				$aParamsMerge[ $sKey ] = $mValue;
+			}
+		}
+		
+		$this->_aConfig = array_merge( $this->_aConfig, $aParamsMerge );
+		
 		return $this;
 	}
 	
@@ -171,6 +184,11 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 		$this->doRunPre();
 		$this->doRun();
 		$this->doRunPost();
+		
+		Geko_Debug::out(
+			sprintf( 'Loaded components: %s', implode( ', ', array_keys( $this->_aLoadedComponents ) ) ),
+			__METHOD__
+		);
 		
 		return $this;
 	}
