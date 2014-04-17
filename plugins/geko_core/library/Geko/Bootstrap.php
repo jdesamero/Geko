@@ -7,11 +7,19 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 	protected $_aRegistry = array();
 	
 	
-	protected $_aDeps = array();					// dependency tree for the various app components
+	// dependency tree for the various bootstrap components
+	protected $_aDeps = array(
+		'error' => NULL,
+		'debug' => NULL,
+		'logger' => NULL
+	);
 	
 	protected $_aExtComponents = array();
 	
-	protected $_aConfig = array();					// config flags for desired modules
+	// config flags for desired modules
+	protected $_aConfig = array(
+		'error' => TRUE
+	);
 	
 	protected $_aLoadedComponents = NULL;
 	
@@ -128,8 +136,8 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 	
 	
 	//// accessors
-		
-	//
+	
+	// configure components to be run
 	public function config( $aParams = array() ) {
 		
 		$aParamsMerge = array();
@@ -165,7 +173,25 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 		
 		return $this;
 	}
-
+	
+	
+	// to be used by sub-classes
+	
+	// add dependencies
+	public function mergeDeps( $aDeps ) {
+		
+		$this->_aDeps = array_merge( $this->_aDeps, $aDeps );
+		return $this;
+	}
+	
+	// modify default config
+	public function mergeConfig( $aConfig ) {
+		
+		$this->_aConfig = array_merge( $this->_aConfig, $aConfig );
+		return $this;
+	}
+	
+	
 	
 	// hook methods
 	public function doInitPre() { }
@@ -174,9 +200,60 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 	
 	
 	
+	//// components
+	
+	// error handler/reporting
+	public function compError( $mArgs ) {
+		
+		Geko_Error::start();
+				
+	}
+	
+	//
+	public function compDebug( $mArgs ) {
+		
+		Geko_Debug::setShowOut( TRUE );
+
+		if ( is_array( $mArgs ) ) {
+			
+			if ( $mEnable = $mArgs[ 'enable' ] ) {
+				
+				$aEnable = Geko_Array::wrap( $mEnable );
+				call_user_func_array( array( 'Geko_Debug', 'setOutEnable' ), $aEnable );	
+			}
+			
+			if ( $mDisable = $mArgs[ 'disable' ] ) {
+				
+				$aDisable = Geko_Array::wrap( $mDisable );
+				call_user_func_array( array( 'Geko_Debug', 'setOutDisable' ), $aDisable );	
+			}
+			
+			
+		}
+		
+	}
+	
+	// logger/debugger
+	// independent
+	public function compLogger( $mArgs ) {
+		
+		$oLogger = Zend_Registry::get( 'logger' );
+		
+		if ( !$oLogger && is_array( $mArgs ) ) {
+			$oLogger = new Geko_Log( $mArgs[ 0 ], $mArgs[ 1 ] );
+		}
+		
+		if ( $oLogger ) {
+			$this->set( 'logger', $oLogger );
+		}
+	}
 	
 	
-	//// run the app
+	
+	
+	
+	
+	//// run the bootstrap
 	
 	//
 	public function run() {

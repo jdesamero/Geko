@@ -10,11 +10,32 @@ class Geko_Array
 	}
 	
 	//
-	public static function in( $sKey, $aSubject ) {
+	public static function in( $sValue, $aSubject ) {
 		if ( !is_array( $aSubject ) ) return FALSE;
-		return in_array( $sKey, $aSubject );
+		return in_array( $sValue, $aSubject );
 	}
-
+	
+	//
+	public static function inPreg( $sValue, $aPatterns ) {
+		
+		foreach ( $aPatterns as $sPattern ) {
+			
+			if ( 0 === strpos( $sPattern, '/' ) ) {
+				
+				// regex pattern
+				if ( preg_match( $sPattern, $sValue ) ) return TRUE;
+				
+			} else {
+				
+				// regular string
+				if ( $sValue == $sPattern ) return TRUE;
+			}
+		}
+		
+		return FALSE;
+	}
+	
+	
 	//
 	public static function implode( $sDelim, $aSubject ) {
 		if ( !is_array( $aSubject ) ) return '';

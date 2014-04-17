@@ -728,10 +728,10 @@ class Geko_Debug
 			if (
 				(
 					( is_array( self::$aOutEnable ) ) && 
-					( in_array( $sGroup, self::$aOutEnable ) )
+					( Geko_Array::inPreg( $sGroup, self::$aOutEnable ) )
 				) || (
 					( is_array( self::$aOutDisable ) ) && 
-					( !in_array( $sGroup, self::$aOutDisable ) )				
+					( !Geko_Array::inPreg( $sGroup, self::$aOutDisable ) )				
 				) || (
 					( NULL === self::$aOutEnable ) && 
 					( NULL === self::$aOutDisable )					
@@ -746,6 +746,8 @@ class Geko_Debug
 			
 		}
 	}
+	
+	
 	
 	
 }
