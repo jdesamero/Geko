@@ -7,14 +7,12 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 	
 	//// properties
 	
-	
 	protected $_aPrefixes = array( 'Gloc_', 'Geko_App_', 'Geko_' );
 	
 	
 	
 	
 	//// methods
-	
 	
 	//
 	public function doInitPre() {

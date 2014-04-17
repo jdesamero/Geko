@@ -3,21 +3,51 @@
 //
 class Gloc_Bootstrap extends Geko_Wp_Bootstrap
 {
-
-	//
-	public function start() {
-		
-		parent::start();
-		
-		// Gloc_User_Manage::getInstance()->init();
-		Gloc_Post_Meta::getInstance()->init();
-		Gloc_Page_Meta::getInstance()->init();
-		
-	}
-
+	
+	
+	
 }
 
 
-Gloc_Bootstrap::getInstance()->init();
+
+$aDebug = FALSE;
+// $aDebug = TRUE;
+
+/* /
+$aDebug = array(
+	// 'enable' => '/::start/'
+	// 'enable' => '/^Geko_Bootstrap::run/'
+	// 'enable' => '/_Bootstrap/'
+);
+/* */
+
+
+
+
+$oBoot = Gloc_Bootstrap::getInstance();
+
+$oBoot->config( array(
+	
+	// 'error' => FALSE,
+	'debug' => $aDebug,
+	
+	'role.mng' => TRUE,
+	
+	'emsg.mng' => TRUE,
+	
+	// 'user.mng' => TRUE,
+	'user.rewrite' => TRUE,
+	'user.photo' => TRUE,
+	'user.security' => TRUE,
+	
+	'cat.alias' => TRUE,
+	'cat.tmpl' => TRUE,
+	'cat.posttmpl' => TRUE,
+	
+	'post.meta' => TRUE,
+	'page.meta' => TRUE
+	
+) )->init()->run();
+
 
 

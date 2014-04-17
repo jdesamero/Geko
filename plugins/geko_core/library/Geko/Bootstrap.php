@@ -25,6 +25,7 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 	
 	protected $_aPrefixes = array( 'Geko_' );
 	
+	protected $_aAbbrMap = array();
 	
 	
 	
@@ -69,35 +70,48 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 		// $mArgs, use if needed later
 		foreach ( $aConfig as $sComp => $mArgs ) {
 			
+			$sDebugMsg = '';
+			
 			if ( $fComponent = $this->_aExtComponents[ $sComp ] ) {
 				
 				// call external component first
 				call_user_func( $fComponent, $mArgs );
+				
+				$sDebugMsg = 'Handled by external component';
 				
 			} else {
 				
 				
 				// call internal, method-based component
 				
-				$aComp = explode( '.', $sComp );
-				array_walk( $aComp, array( 'Geko_Inflector', 'camelize' ) );
-				$sComp = implode( '_', $aComp );
+				$aComp = $aCompFmt = explode( '.', $sComp );
 				
-				$sMethod = sprintf( 'comp%s', $sComp );
+				array_walk( $aCompFmt, array( 'Geko_Inflector', 'camelize' ) );
+				$sCompFmt = implode( '_', $aCompFmt );
 				
+				$sMethod = sprintf( 'comp%s', $sCompFmt );
+				
+				// check first if method is defined
 				if ( $bMethodExists = method_exists( $this, $sMethod ) ) {
+					
 					$this->$sMethod( $mArgs );
+					$sDebugMsg = sprintf( 'Method %s() found', $sMethod );
+					
+				} else {
+					
+					// pass through "magic" handler
+					if ( $this->handleComponent( $sComp, $aComp ) ) {
+						$sDebugMsg = sprintf( 'Handled component %s', $sComp );
+					} else {
+						$sDebugMsg = sprintf( 'Unable to handle component %s', $sComp );
+					}
+					
 				}
-				
-				
-				
-				// debugging
-				
-				$sMsg = ( $bMethodExists ) ? 'found' : 'NOT found' ;
-				Geko_Debug::out( sprintf( '%s: Method %s() %s', get_class( $this ), $sMethod, $sMsg ), __METHOD__ );
 				
 			}
 			
+			Geko_Debug::out( sprintf( '%s: %s', $this->_sInstanceClass, $sDebugMsg ), __METHOD__ );
+
 		}
 		
 		$this->doInitPost();
@@ -191,6 +205,13 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 		return $this;
 	}
 	
+	// abbreviations
+	public function mergeAbbrMap( $aAbbrMap ) {
+		
+		$this->_aAbbrMap = array_merge( $this->_aAbbrMap, $aAbbrMap );
+		return $this;
+	}
+	
 	
 	
 	// hook methods
@@ -250,6 +271,46 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 	
 	
 	
+	//// component handler
+	
+	//
+	public function handleComponent( $sKey, $aCompParts ) {
+		
+		$aTrans = array();
+		
+		foreach ( $aCompParts as $sPart ) {
+			
+			if ( !( $sFull = $this->_aAbbrMap[ $sPart ] ) ) {
+				$sFull = ucfirst( strtolower( $sPart ) );
+			}
+			
+			$aTrans[] = $sFull;
+		}
+		
+		foreach ( $this->_aPrefixes as $sPrefix ) {
+			
+			$sClass = sprintf( '%s%s', $sPrefix, implode( '_', $aTrans ) );
+			
+			Geko_Debug::out( sprintf( 'Attempting to resolve class: %s', $sClass ), __METHOD__ );
+			
+			if ( class_exists( $sClass ) ) {
+				
+				Geko_Debug::out( sprintf( 'Class found: %s', $sClass ), __METHOD__ );
+				
+				$oSingleton = Geko_Singleton_Abstract::getInstance( $sClass );
+				$oSingleton->init();
+				
+				$this->set( $sKey, $oSingleton );
+				
+				return TRUE;
+			}
+		
+		}
+		
+		return FALSE;
+	}
+	
+	
 	
 	
 	
@@ -264,6 +325,11 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 		
 		Geko_Debug::out(
 			sprintf( 'Loaded components: %s', implode( ', ', array_keys( $this->_aLoadedComponents ) ) ),
+			__METHOD__
+		);
+
+		Geko_Debug::out(
+			sprintf( 'Registered modules: %s', implode( ', ', array_keys( $this->_aRegistry ) ) ),
 			__METHOD__
 		);
 		
