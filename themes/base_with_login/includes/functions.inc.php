@@ -40,9 +40,9 @@ $oBoot->config( array(
 	'user.photo' => TRUE,
 	'user.security' => TRUE,
 	
-	'cat.alias' => TRUE,
-	'cat.tmpl' => TRUE,
-	'cat.posttmpl' => TRUE,
+	// 'cat.alias' => TRUE,
+	// 'cat.tmpl' => TRUE,
+	// 'cat.posttmpl' => TRUE,
 	
 	'post.meta' => TRUE,
 	'page.meta' => TRUE

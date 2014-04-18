@@ -15,9 +15,9 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 	//// methods
 	
 	//
-	public function doInitPre() {
+	protected function __construct() {
 		
-		parent::doInitPre();
+		parent::__construct();
 		
 		Geko_App::init( $this );
 		

@@ -16,9 +16,9 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	//// methods
 	
 	//
-	public function doInitPre() {
+	public function __construct() {
 		
-		parent::doInitPre();
+		parent::__construct();
 		
 		$this
 			
@@ -34,17 +34,30 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 				
 				'emsg.mng' => NULL,
 				
+				'loc.mng' => NULL,
+				
+				'lang.mng' => NULL,
+				'lang.rslv' => array( 'lang.mng' ),
+				
+				'navmng.lang' => array( 'lang.rslv' ),
+				
 				'user.mng' => NULL,
 				'user.rewrite' => NULL,
 				'user.photo' => NULL,
 				'user.security' => NULL,
+				'user.op' => NULL,
 				
 				'cat.alias' => NULL,
 				'cat.tmpl' => NULL,
 				'cat.posttmpl' => NULL,
 				
 				'post.meta' => NULL,
-				'page.meta' => NULL
+				'page.meta' => NULL,
+				
+				'pin.mng' => NULL,
+				'pin.log.mng' => array( 'pin.mng' ),
+				
+				'custhks' => NULL
 				
 			) )
 			
@@ -58,11 +71,19 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 			) )
 			
 			->mergeAbbrMap( array(
+				
 				'emsg' => 'EmailMessage',
 				'cat' => 'Category',
+				'custhks' => 'CustomHooks',
+				'lang' => 'Language',
+				'loc' => 'Location',
 				'mng' => 'Manage',
+				'navmng' => 'NavigationManagement',
+				'op' => 'Operation',
 				'posttmpl' => 'PostTemplate',
+				'rslv' => 'Resolver',
 				'tmpl' => 'Template'
+				
 			) )
 			
 		;
@@ -111,6 +132,8 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 		// adds the filters: admin_page_source
 		Geko_Wp_Admin_Hooks::init();
 		
+		Geko_Wp_Hooks::setFixHttps();		// !!!!!!!!!!!!!  ****
+		
 		Geko_Wp_Hooks::init();
 		
 		Geko_Wp_Hooks::attachGekoHookActions(
@@ -130,9 +153,13 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	}
 	
 	
-	//// role
 	
-	//
+	
+	
+	//// components
+	
+	
+	// role type
 	public function compRole_Type( $mArgs ) {
 		
 		$oRoleTypes = Geko_Wp_Role_Types::getInstance();
@@ -142,8 +169,65 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	}
 	
 	
-	
+	// location manage
+	public function compLoc_Mng( $mArgs ) {
 		
+		$oLocMng = Geko_Wp_Location_Manage::getInstance();
+		
+		$oLocMng->init()
+			/* /
+			->install()
+			->populateContinentTable( array( 'NA' ) )	
+			->populateCountryTable( array( 'CA' ) )
+			->populateProvinceTable()
+			/* */
+		;
+		
+		$this->set( 'loc.mng', $oLocMng );
+	}
+	
+	
+	// navigation management language
+	public function compNavmng_Lang( $mArgs ) {
+	
+		if ( class_exists( 'Geko_Wp_NavigationManagement_Language' ) ) {
+			
+			$oNavmngLang = Geko_Wp_NavigationManagement_Language::getInstance();
+			
+			$aPlugins = array( 'Uri', 'Page', 'Category', 'Post', 'Role' );
+			
+			call_user_func_array( array( $oNavmngLang, 'registerPlugins' ), $aPlugins );
+			
+			$this->set( 'navmng.lang', $oNavmngLang );
+		}
+		
+	}
+	
+	
+	// language manage
+	public function compLang_Mng( $mArgs ) {
+		
+		// hard-code for now
+		$aPlugins = array( 'Post', 'Category' );
+		
+		if ( class_exists( 'Geko_Wp_NavigationManagement_Language' ) ) {
+			$aPlugins[] = 'Geko_Wp_NavigationManagement_Language';
+		}
+		
+		$oLangMng = Geko_Wp_Language_Manage::getInstance();
+		
+		$oLangMng->init();
+		
+		call_user_func_array( array( $oLangMng, 'registerPlugins' ), $aPlugins );
+		
+		$this->set( 'lang.mng', $oLangMng );
+	}
+	
+	
+	
+	
+	
+	
 	
 	
 	

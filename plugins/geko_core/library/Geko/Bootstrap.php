@@ -51,6 +51,7 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 	//
 	public function start() {
 		
+		
 		//
 		parent::start();
 		
@@ -68,7 +69,13 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 		$this->_aLoadedComponents = $aConfig;
 		
 		// $mArgs, use if needed later
+		$i = 0;
+		
+		
 		foreach ( $aConfig as $sComp => $mArgs ) {
+			
+			Geko_Debug::out( sprintf( '%d: %s', $i, $sComp ), sprintf( '%s::order', __METHOD__ ) );
+			$i++;
 			
 			$sDebugMsg = '';
 			
@@ -80,7 +87,6 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 				$sDebugMsg = 'Handled by external component';
 				
 			} else {
-				
 				
 				// call internal, method-based component
 				
@@ -117,7 +123,11 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 		$this->doInitPost();
 		
 	}
-		
+	
+	
+	
+	
+	
 	// resolve any dependencies
 	public function resolveConfig( $aConfig = NULL ) {
 		
@@ -125,28 +135,38 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 			$aConfig = $this->_aConfig;
 		}
 		
+		$aRes = array();
+		
 		foreach ( $aConfig as $sKey => $mArgs ) {
 			if ( $mArgs ) {
-				$aConfig[ $sKey ] = $mArgs;
-				$aConfig = $this->getDeps( $aConfig, $sKey );
+				$aRes[ $sKey ] = $mArgs;
+				$aRes = $this->getDeps( $aRes, $sKey );
+			}
+		}
+		
+		return $aRes;
+	}
+	
+	// recursive function
+	public function getDeps( $aConfig, $sKey ) {
+		
+		if ( is_array( $aDeps = $this->_aDeps[ $sKey ] ) ) {
+			foreach ( $aDeps as $sDep ) {
+				
+				if ( !$aConfig[ $sDep ] ) {
+					
+					$aConfig = Geko_Array::insertBeforeKey( $aConfig, $sKey, $sDep, TRUE );
+					$aConfig = $this->getDeps( $aConfig, $sDep );
+					
+				}
 			}
 		}
 		
 		return $aConfig;
 	}
 	
-	// recursive function
-	public function getDeps( $aConfig, $sKey ) {
 		
-		if ( $aDeps = $this->_aDeps[ $sKey ] ) {
-			foreach ( $aDeps as $sDep ) {
-				$aConfig = array_merge( array( $sDep => TRUE ), $aConfig );
-				$aConfig = $this->getDeps( $aConfig, $sDep );
-			}
-		}
-		
-		return $aConfig;
-	}
+	
 	
 	
 	//// accessors
@@ -166,6 +186,15 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 		}
 		
 		$this->_aConfig = array_merge( $this->_aConfig, $aParamsMerge );
+		
+		// special
+		
+		if ( $mArgs = $this->_aConfig[ 'debug' ] ) {
+			
+			// run debug immediately
+			$this->compDebug( $mArgs );
+			unset( $this->_aConfig[ 'debug' ] );
+		}
 		
 		return $this;
 	}
