@@ -396,6 +396,30 @@ class Geko_Array
 	}
 	
 	
+	// insert the given key/value pair before matchKey
+	// if no match was found, then append to the end
+	public static function insertBeforeKey( $aSubject, $sMatchKey, $sKey, $mValue = NULL ) {
+		
+		$aRes = array();
+		$bMatch = FALSE;
+		
+		foreach ( $aSubject as $sMyKey => $mMyValue ) {
+			
+			if ( $sMyKey == $sMatchKey ) {
+				$aRes[ $sKey ] = $mValue;
+				$bMatch = TRUE;
+			}
+			
+			$aRes[ $sMyKey ] = $mMyValue;
+		}
+		
+		if ( !$bMatch ) $aRes[ $sKey ] = $mValue;
+		
+		return $aRes;		
+	}
+	
+	
+	
 }
 
 
