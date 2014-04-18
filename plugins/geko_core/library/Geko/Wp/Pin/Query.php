@@ -7,6 +7,19 @@ class Geko_Wp_Pin_Query extends Geko_Wp_Entity_Query
 	protected $_bUseManageQuery = TRUE;
 	
 	
+	//
+	public function modifyParams( $aParams ) {
+		
+		$aParams = parent::modifyParams( $aParams );
+		
+		if ( $aParams[ 'kwsearch' ] ) {
+			$aParams[ 'kwsearch_fields' ] = array( 'p.pin' );
+		}
+		
+		return $aParams;
+	}
+
+	
 	
 	//
 	public function modifyQuery( $oQuery, $aParams ) {

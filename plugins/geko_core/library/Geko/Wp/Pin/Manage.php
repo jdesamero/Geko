@@ -13,6 +13,7 @@ class Geko_Wp_Pin_Manage extends Geko_Wp_Options_Manage
 	protected $_sIconId = 'icon-users';
 	protected $_iEntitiesPerPage = 500;
 	protected $_sType = 'pin';
+	protected $_bHasKeywordSearch = TRUE;
 	
 	
 	
@@ -75,6 +76,7 @@ class Geko_Wp_Pin_Manage extends Geko_Wp_Options_Manage
 	public function modifyListingParams( $aParams ) {
 		
 		$aMergeParams = array (
+			'kwsearch' => $_GET[ 's' ],
 			'redeemed' => $_GET[ 'redeemed' ],
 			'testing' => $_GET[ 'testing' ],
 			'npn' => $_GET[ 'npn' ]
