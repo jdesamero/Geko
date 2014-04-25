@@ -49,13 +49,13 @@ class Geko_Array
 	}
 	
 	// return TRUE if value begins with any of the subjects
-	public static function beginsWith( $sValue, $aSubject ) {
+	public static function beginsWith( $sValue, $aSubject, $bRetSubj = FALSE ) {
 		
 		if ( !is_array( $aSubject ) ) return FALSE;
 		
 		foreach ( $aSubject as $sSubject ) {
 			if ( 0 === strpos( $sValue, $sSubject ) ) {
-				return TRUE;
+				return ( $bRetSubj ) ? $sSubject : TRUE ;
 			}
 		}
 		
