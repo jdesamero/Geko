@@ -63,11 +63,14 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 	
 	// database connection
 	// independent
-	public function compDb( $mArgs ) {
+	public function compDb( $aArgs ) {
 		
-		if ( is_array( $mArgs ) ) {
-			$oDb = Geko_Db::factory( $mArgs[ 0 ], $mArgs[ 1 ] );
+		if ( is_string( $aArgs[ 0 ] ) ) {
+			
+			$oDb = Geko_Db::factory( $aArgs[ 0 ], $aArgs[ 1 ] );
+		
 		} else {
+			
 			$oDb = Geko_Db::factory( 'Pdo_Mysql', array(
 				'host' => GEKO_DB_HOST,
 				'username' => GEKO_DB_USER,
@@ -83,7 +86,7 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 	
 	// session handler
 	// depends on: "db"
-	public function compSess( $mArgs ) {
+	public function compSess( $aArgs ) {
 		
 		$oDb = $this->get( 'db' );
 		
@@ -105,7 +108,7 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 	
 	// matcher
 	// independent
-	public function compMatch( $mArgs ) {
+	public function compMatch( $aArgs ) {
 		
 		$sClass = $this->getBestMatch( 'Match' );
 		
@@ -120,7 +123,7 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 	
 	// router
 	// independent; optional: "match"
-	public function compRouter( $mArgs ) {
+	public function compRouter( $aArgs ) {
 		
 		$sRouterClass = $this->getBestMatch( 'Router' );
 		
@@ -134,7 +137,7 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 	
 	// router.file
 	// depends on: "router"
-	public function compRouter_File( $mArgs ) {
+	public function compRouter_File( $aArgs ) {
 		
 		$oRouter = $this->get( 'router' );
 		
@@ -151,7 +154,7 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 	
 	// router.service
 	// depends on: "router"
-	public function compRouter_Service( $mArgs ) {
+	public function compRouter_Service( $aArgs ) {
 		
 		$oRouter = $this->get( 'router' );
 		
@@ -167,7 +170,7 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 	
 	// router.layout
 	// depends on: "router"
-	public function compRouter_Layout( $mArgs ) {
+	public function compRouter_Layout( $aArgs ) {
 		
 		$oRouter = $this->get( 'router' );
 		
@@ -191,7 +194,7 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 	
 	// auth
 	// depends on: "db", "sess"; optional: "router"
-	public function compAuth( $mArgs ) {
+	public function compAuth( $aArgs ) {
 		
 		$oDb = $this->get( 'db' );
 		$oSess = $this->get( 'sess' );
@@ -229,7 +232,7 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 	
 	// router.auth
 	// depends on: "router", "auth"
-	public function compRouter_Auth( $mArgs ) {
+	public function compRouter_Auth( $aArgs ) {
 		
 		$oRouter = $this->get( 'router' );
 		$oAuth = $this->get( 'auth' );

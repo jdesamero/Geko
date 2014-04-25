@@ -74,6 +74,8 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 		
 		foreach ( $aConfig as $sComp => $mArgs ) {
 			
+			$aArgs = Geko_Array::wrap( $mArgs );
+			
 			Geko_Debug::out( sprintf( '%d: %s', $i, $sComp ), sprintf( '%s::order', __METHOD__ ) );
 			$i++;
 			
@@ -82,7 +84,7 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 			if ( $fComponent = $this->_aExtComponents[ $sComp ] ) {
 				
 				// call external component first
-				call_user_func( $fComponent, $mArgs );
+				call_user_func( $fComponent, $aArgs );
 				
 				$sDebugMsg = 'Handled by external component';
 				
@@ -100,13 +102,13 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 				// check first if method is defined
 				if ( $bMethodExists = method_exists( $this, $sMethod ) ) {
 					
-					$this->$sMethod( $mArgs );
+					$this->$sMethod( $aArgs );
 					$sDebugMsg = sprintf( 'Method %s() found', $sMethod );
 					
 				} else {
 					
 					// pass through "magic" handler
-					if ( $this->handleComponent( $sComp, $aComp ) ) {
+					if ( $this->handleComponent( $sComp, $aComp, $aArgs ) ) {
 						$sDebugMsg = sprintf( 'Handled component %s', $sComp );
 					} else {
 						$sDebugMsg = sprintf( 'Unable to handle component %s', $sComp );
@@ -303,7 +305,7 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 	//// component handler
 	
 	//
-	public function handleComponent( $sKey, $aCompParts ) {
+	public function handleComponent( $sKey, $aCompParts, $aArgs ) {
 		
 		$aTrans = array();
 		

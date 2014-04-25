@@ -96,7 +96,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	//// components
 	
 	// constants
-	public function compConsts( $mArgs ) {
+	public function compConsts( $aArgs ) {
 		
 		define( 'ABS_WP_URL_ROOT', str_replace( sprintf( 'http://%s', $_SERVER[ 'SERVER_NAME' ] ), '', Geko_Wp::getUrl() ) );
 		
@@ -104,7 +104,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 
 
 	// form transform
-	public function compFrmtrns( $mArgs ) {
+	public function compFrmtrns( $aArgs ) {
 		
 		// form transformation hooks
 		
@@ -118,7 +118,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 
 	
 	// external files
-	public function compExtfiles( $mArgs ) {
+	public function compExtfiles( $aArgs ) {
 		
 		Geko_Wp::registerExternalFiles( sprintf( '%s/etc/register.xml', TEMPLATEPATH ) );
 		
@@ -126,13 +126,15 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	
 	
 	// hooks
-	public function compHooks( $mArgs ) {
+	public function compHooks( $aArgs ) {
 		
 		// adds the hooks: admin_head, admin_body_header, admin_body_footer
 		// adds the filters: admin_page_source
 		Geko_Wp_Admin_Hooks::init();
 		
-		Geko_Wp_Hooks::setFixHttps();		// !!!!!!!!!!!!!  ****
+		if ( $aArgs[ 'fix_https' ] ) {
+			Geko_Wp_Hooks::setFixHttps();
+		}
 		
 		Geko_Wp_Hooks::init();
 		
@@ -160,7 +162,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	
 	
 	// role type
-	public function compRole_Type( $mArgs ) {
+	public function compRole_Type( $aArgs ) {
 		
 		$oRoleTypes = Geko_Wp_Role_Types::getInstance();
 		$oRoleTypes->register( 'Geko_Wp_User_RoleType' );
@@ -170,7 +172,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	
 	
 	// location manage
-	public function compLoc_Mng( $mArgs ) {
+	public function compLoc_Mng( $aArgs ) {
 		
 		$oLocMng = Geko_Wp_Location_Manage::getInstance();
 		
@@ -188,7 +190,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	
 	
 	// navigation management language
-	public function compNavmng_Lang( $mArgs ) {
+	public function compNavmng_Lang( $aArgs ) {
 	
 		if ( class_exists( 'Geko_Wp_NavigationManagement_Language' ) ) {
 			
@@ -205,7 +207,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	
 	
 	// language manage
-	public function compLang_Mng( $mArgs ) {
+	public function compLang_Mng( $aArgs ) {
 		
 		// hard-code for now
 		$aPlugins = array( 'Post', 'Category' );
@@ -277,3 +279,5 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	
 	
 }
+
+
