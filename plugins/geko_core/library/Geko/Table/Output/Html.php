@@ -32,7 +32,7 @@ class Geko_Table_Output_Html extends Geko_Table_Output_Default
 	}
 	
 	//
-	public function echoBeginRow() {
+	public function echoBeginRow( $iRow ) {
 		?>
 		<tr>
 		<?php
@@ -40,7 +40,7 @@ class Geko_Table_Output_Html extends Geko_Table_Output_Default
 	}
 	
 	//
-	public function echoField( $aCol, $mRow ) {
+	public function echoField( $aCol, $mRow, $iRow, $iCol ) {
 		?>
 		<td><?php echo trim( $this->getFieldVal( $aCol, $mRow ) ); ?></td>
 		<?php
@@ -48,7 +48,7 @@ class Geko_Table_Output_Html extends Geko_Table_Output_Default
 	}
 	
 	//
-	public function echoEndRow() {
+	public function echoEndRow( $iRow ) {
 		?>
 		</tr>
 		<?php

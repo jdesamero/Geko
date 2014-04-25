@@ -3,10 +3,13 @@
 class Geko_Table_Output_Csv extends Geko_Table_Output_Default
 {
 	
+	protected $_sFilename;
+	
+	
 	
 	//
 	public function setFilename( $sFileName ) {
-		$this->sFileName = $sFileName;
+		$this->_sFileName = $sFileName;
 		return $this;
 	}
 	
@@ -18,7 +21,7 @@ class Geko_Table_Output_Csv extends Geko_Table_Output_Default
 	//
 	public function echoTitle( $aParams ) {
 		header( 'Content-Type: text/x-csv' );
-		header( 'Content-Disposition: attachment; filename="' . $this->sFileName . '"' );
+		header( sprintf( 'Content-Disposition: attachment; filename="%s"', $this->_sFileName ) );
 		return $this;
 	}
 	
@@ -31,25 +34,25 @@ class Geko_Table_Output_Csv extends Geko_Table_Output_Default
 	public function echoHeadings( $aMeta ) {
 		foreach ( $aMeta as $i => $aCol ) {
 			if ( $i > 0 ) echo ',';
-			echo '"' . $this->csvEscape( trim( $aCol[ 'title' ] ) ) . '"';
+			printf( '"%s"', $this->csvEscape( trim( $aCol[ 'title' ] ) ) );
 		}
 		echo "\n";
 		return $this;
 	}
 	
 	//
-	public function echoBeginRow() {
+	public function echoBeginRow( $iRow ) {
 		return $this;	
 	}
 	
 	//
-	public function echoField( $aCol, $mRow ) {
-		echo '"' . $this->csvEscape( trim( $this->getFieldVal( $aCol, $mRow ) ) ) . '",';
+	public function echoField( $aCol, $mRow, $iRow, $iCol ) {
+		printf( '"%s",', $this->csvEscape( trim( $this->getFieldVal( $aCol, $mRow ) ) ) );
 		return $this;	
 	}
 	
 	//
-	public function echoEndRow() {
+	public function echoEndRow( $iRow ) {
 		echo "\n";
 		return $this;	
 	}
@@ -57,8 +60,8 @@ class Geko_Table_Output_Csv extends Geko_Table_Output_Default
 	//
 	public function echoEndTable() {
 		die();
-		return $this;	
 	}
 	
 }
+
 

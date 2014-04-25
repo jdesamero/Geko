@@ -72,13 +72,23 @@ class Geko_Table_Output_Default extends Geko_Singleton_Abstract
 		
 		$this->echoHeadings( $aMeta );
 		
+		$iRow = 0;
+		$iCol = 0;
+		
 		foreach ( $aData as $mRow ) {
+			
 			$mRow = $oTable->getTheRow( $mRow );		// !!!
-			$this->echoBeginRow();
+			$this->echoBeginRow( $iRow );
+			
+			$iCol = 0;
 			foreach ( $aMeta as $aCol ) {
-				$this->echoField( $aCol, $mRow );
+				$this->echoField( $aCol, $mRow, $iRow, $iCol );
+				$iCol++;
 			}
-			$this->echoEndRow();
+			
+			$this->echoEndRow( $iRow );
+			
+			$iRow++;
 		}
 
 		$this->echoEndTable();

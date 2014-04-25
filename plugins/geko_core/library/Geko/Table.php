@@ -3,17 +3,26 @@
 class Geko_Table
 {
 	
-	private $aData = array();
-	private $aMeta = array();
-	private $aParams = array();
+	protected $_aData = array();
+	protected $_aMeta = array();
+	protected $_aParams = array();
 	
-	private $oOutput;
+	protected $_oOutput;
 	
 	//
 	public function __construct( $aData, $aMeta, $aParams = array(), $oOutput = NULL ) {
 		
 		if ( !$oOutput ) {
-			$oOutput = Geko_Table_Output_Default::getInstance();
+			
+			$sOutputType = ( $aParams[ 'output' ] ) ? $aParams[ 'output' ] : 'Default' ;
+			
+			$sClass = sprintf( 'Geko_Table_Output_%s', $sOutputType );
+			
+			if ( !class_exists( $sClass ) ) {
+				$sClass = 'Geko_Table_Output_Default';
+			}
+			
+			$oOutput = Geko_Singleton_Abstract::getInstance( $sClass );
 		}
 		
 		$this
@@ -30,46 +39,46 @@ class Geko_Table
 	
 	//
 	public function setData( $aData ) {
-		$this->aData = $aData;
+		$this->_aData = $aData;
 		return $this;
 	}
 	
 	//
 	public function getData() {
-		return $this->aData;
+		return $this->_aData;
 	}
 	
 	//
 	public function setMeta( $aMeta ) {
-		$this->aMeta = $aMeta;
+		$this->_aMeta = $aMeta;
 		return $this;
 	}
 	
 	//
 	public function getMeta() {
-		return $this->aMeta;
+		return $this->_aMeta;
 	}
 	
 	//
 	public function setParams( $aParams ) {
-		$this->aParams = array_merge( $this->aParams, $aParams );	
+		$this->_aParams = array_merge( $this->_aParams, $aParams );	
 		return $this;
 	}
 	
 	//
 	public function getParams() {
-		return $this->aParams;
+		return $this->_aParams;
 	}
 	
 	//
 	public function setOutput( $oOutput ) {
-		$this->oOutput = $oOutput;
+		$this->_oOutput = $oOutput;
 		return $this;
 	}
 	
 	//
 	public function getOutput() {
-		return $this->oOutput;
+		return $this->_oOutput;
 	}
 	
 	
@@ -86,7 +95,7 @@ class Geko_Table
 	
 	//
 	public function output() {
-		$this->oOutput->output( $this );	
+		$this->_oOutput->output( $this );	
 		return $this;
 	}
 	
