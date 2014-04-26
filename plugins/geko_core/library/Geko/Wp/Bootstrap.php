@@ -24,6 +24,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 			
 			->mergeDeps( array(
 				
+				'sess' => NULL,
 				'consts' => NULL,
 				'frmtrns' => NULL,				// form transform
 				'extfiles' => NULL,
@@ -94,6 +95,15 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	
 	
 	//// components
+	
+	
+	// session handler
+	public function compSess( $aArgs ) {
+		
+		@session_start();
+		
+	}
+	
 	
 	// constants
 	public function compConsts( $aArgs ) {
