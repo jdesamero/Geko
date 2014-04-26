@@ -14,7 +14,7 @@ class Gloc_Layout_Template extends Gloc_Layout
 	
 	//
 	public function echoEnqueue() {
-		$this->enqueueStyle( 'base_with_login-pagination' );
+		$this->enqueueStyle( 'gloc-pagination' );
 	}
 	
 	

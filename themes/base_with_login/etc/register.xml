@@ -10,8 +10,8 @@
 	<!-- css -->
 	<styles>
 		
-		<file id="base_with_login-gallery" src="##__bloginfo_stylesheet_directory##/styles/gallery.css" />
-		<file id="base_with_login-pagination" src="##__bloginfo_stylesheet_directory##/styles/pagination.css" />
+		<file id="gloc-gallery" src="##__bloginfo_stylesheet_directory##/styles/gallery.css" />
+		<file id="gloc-pagination" src="##__bloginfo_stylesheet_directory##/styles/pagination.css" />
 		
 	</styles>
 	
