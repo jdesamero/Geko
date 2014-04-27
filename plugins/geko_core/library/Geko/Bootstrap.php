@@ -463,6 +463,12 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 		return Geko_Class::getBestMatch( $this->_aPrefixes, $aSuffixes );
 	}
 	
+	//
+	public function isLiveServer() {
+		return FALSE;
+	}
+	
+	
 	
 	
 }

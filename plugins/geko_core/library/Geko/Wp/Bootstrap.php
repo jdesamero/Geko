@@ -292,11 +292,6 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 		
 	}
 	
-	//
-	public function isLiveServer() {
-		return FALSE;
-	}
-	
 	
 	
 }
