@@ -26,7 +26,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 				
 				'sess' => NULL,
 				'consts' => NULL,
-				'frmtrns' => NULL,				// form transform
+				'setup' => NULL,
 				'extfiles' => NULL,
 				'hooks' => NULL,
 				
@@ -65,7 +65,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 			->mergeConfig( array(
 
 				'consts' => TRUE,
-				'frmtrns' => TRUE,
+				'setup' => TRUE,
 				'extfiles' => TRUE,
 				'hooks' => TRUE
 				
@@ -114,7 +114,13 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 
 
 	// form transform
-	public function compFrmtrns( $aArgs ) {
+	public function compSetup( $aArgs ) {
+		
+		if ( $aArgs[ 'force_https' ] ) {
+			
+			// force https
+			Geko_Uri::forceHttps();	
+		}
 		
 		// form transformation hooks
 		
@@ -284,6 +290,11 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 		Geko_Singleton_Abstract::getInstance( $oResolve->getClass( 'Renderer' ) )->render();
 		
 		
+	}
+	
+	//
+	public function isLiveServer() {
+		return FALSE;
 	}
 	
 	

@@ -19,8 +19,6 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 		
 		parent::__construct();
 		
-		Geko_App::init( $this );
-		
 		$this
 			->mergeDeps( array(
 				
@@ -50,7 +48,6 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 				'router.service' => TRUE
 			
 			) )
-			->set( 'app', $this )				// reference to myself ???
 		;
 		
 	}

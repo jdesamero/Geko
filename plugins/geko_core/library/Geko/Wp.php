@@ -1,15 +1,15 @@
 <?php
 
 // static class container for WP functions for Geek Oracle themes
-class Geko_Wp
+class Geko_Wp extends Geko
 {	
 	
-	private static $bUseIsHome = TRUE;
-	private static $aStandardPlaceholders = FALSE;
-	private static $bInitLoader = FALSE;
+	protected static $bUseIsHome = TRUE;
+	protected static $aStandardPlaceholders = FALSE;
+	protected static $bInitLoader = FALSE;
 	
-	private static $sUrl = '';
-	private static $sDefaultUrl = '';
+	protected static $sUrl = '';
+	protected static $sDefaultUrl = '';
 	
 	
 	
@@ -20,10 +20,12 @@ class Geko_Wp
 	
 	//
 	public static function slugify( $sValue ) {
+		
 		$sValue = trim( $sValue );
 		$sValue = self::htmlDecode( $sValue );
 		$sValue = str_replace( "'", '', $sValue );
 		$sValue = str_replace( array( '&', '-' ), ' ', $sValue );
+		
 		return strtolower( preg_replace( '/[\s]+/', '-', $sValue ) );
 	}
 	
@@ -35,7 +37,7 @@ class Geko_Wp
 	//
 	public static function getTitleTag( $sTitle ) {
 		
-		$sRet = ( $sTitle ? $sTitle : get_bloginfo( 'name' ) ) . ' | ';
+		$sRet = sprintf( '%s | ', ( $sTitle ? $sTitle : get_bloginfo( 'name' ) ) );
 		
 		if ( self::isHome() ) {
 			$sRet .= get_bloginfo( 'description' );
@@ -43,19 +45,19 @@ class Geko_Wp
 			$sRet .= 'Search Results';
 		} elseif ( is_author() ) {
 			$oAuthor = new Geko_Wp_Author();
-			$sRet .= 'Author Archives | ' . $oAuthor->getFullName();
+			$sRet .= sprintf( 'Author Archives | %s', $oAuthor->getFullName() );
 		} elseif ( is_single() || is_page() ) {
-			$sRet .= wp_title('', FALSE);
+			$sRet .= wp_title( '', FALSE );
 		} elseif ( is_category() ) {
 			$oCat = new Geko_Wp_Category();
-			$sRet .= 'Category Archives | ' . $oCat->getTitle();
+			$sRet .= sprintf( 'Category Archives | %s', $oCat->getTitle() );
 		} elseif ( is_month() ) {
-			$sRet .= 'Monthly Archives | ' . get_the_time( 'F Y' );
+			$sRet .= sprintf( 'Monthly Archives | %s', get_the_time( 'F Y' ) );
 		} elseif ( is_year() ) {
-			$sRet .= 'Yearly Archives | ' . get_the_time( 'Y' );
+			$sRet .= sprintf( 'Yearly Archives | %s', get_the_time( 'Y' ) );
 		} elseif ( ( function_exists( 'is_tag' ) ) && ( is_tag() ) ) {
 			$oTag = new Geko_Wp_Tag();
-			$sRet .= 'Tag Archives | ' . $oTag->getTitle();
+			$sRet .= sprintf( 'Tag Archives | %s', $oTag->getTitle() );
 		} elseif ( is_404() ) {
 			$sRet .= 'Not Found';
 		}
@@ -83,9 +85,9 @@ class Geko_Wp
 			} elseif ( is_single() ) {
 				$sRet .= 'single';
 			} elseif ( is_page() ) {
-				$sRet .= 'page ' . self::slugify( wp_title('', FALSE) );
+				$sRet .= 'page ' . self::slugify( wp_title( '', FALSE ) );
 			} elseif ( is_category() ) {
-				$sRet .= 'category ' . self::slugify( single_cat_title('', FALSE) );
+				$sRet .= sprintf( 'category %s', self::slugify( single_cat_title( '', FALSE ) ) );
 			} elseif ( is_month() ) {
 				$sRet .= 'month';
 			} elseif ( is_year() ) {
@@ -212,7 +214,7 @@ class Geko_Wp
 		if ( !$sPath ) {
 			$sPath = '/';
 		} else {
-			$sPath = '/' . trim( $sPath, '/' ) . '/';
+			$sPath = sprintf( '/%s/', trim( $sPath, '/' ) );
 		}
 		
 		return $sPath;
@@ -270,7 +272,7 @@ class Geko_Wp
 	
 	//
 	public static function getHomepageUrl( $sInvokerClass = NULL ) {
-		return apply_filters( __METHOD__, self::getUrl() . '/', $sInvokerClass );
+		return apply_filters( __METHOD__, sprintf( '%s/', self::getUrl() ), $sInvokerClass );
 	}
 	
 	// ensures get_query_var( 'paged' ) is set correctly when in the homepage
@@ -283,7 +285,7 @@ class Geko_Wp
 			$aRegs = array();
 			
 			if ( preg_match( '/page\/([0-9]+)/', $sUrl, $aRegs ) ) {
-				set_query_var( 'paged', $aRegs[1] );
+				set_query_var( 'paged', $aRegs[ 1 ] );
 			}
 			
 		}
@@ -303,7 +305,7 @@ class Geko_Wp
 			$sImageFileName = trim( $aParams[ 'image_file_name' ] );
 			$sImageSrcDir = trim( $aParams[ 'image_src_dir' ] );
 			if ( $sImageFileName ) {
-				$sImageFullPath = $sImageSrcDir . basename( $sImageFileName );			
+				$sImageFullPath = sprintf( '%s%s', $sImageSrcDir, basename( $sImageFileName ) );
 			}
 		}
 		
@@ -386,7 +388,7 @@ class Geko_Wp
 			);
 			
 			foreach ( $aBloginfo as $sBloginfo ) {
-				$aRet[ '__bloginfo_' . $sBloginfo ] = get_bloginfo( $sBloginfo );
+				$aRet[ sprintf( '__bloginfo_%s', $sBloginfo ) ] = get_bloginfo( $sBloginfo );
 			}
 			
 			$aRet[ '__bloginfo_server' ] = parse_url( self::getUrl(), PHP_URL_HOST );
@@ -436,7 +438,7 @@ class Geko_Wp
 			
 			if ( !self::$sDefaultUrl ) {
 				global $wpdb;
-				self::$sDefaultUrl = $wpdb->get_var( "SELECT option_value FROM $wpdb->options WHERE option_name = 'siteurl'" );
+				self::$sDefaultUrl = $wpdb->get_var( sprintf( "SELECT option_value FROM %s WHERE option_name = 'siteurl'", $wpdb->options ) );
 			}
 			
 			return self::$sDefaultUrl;

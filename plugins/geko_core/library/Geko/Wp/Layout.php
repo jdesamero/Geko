@@ -4,9 +4,9 @@
 class Geko_Wp_Layout extends Geko_Layout
 {
 	
-	const URL = 1;
-	const REPLACE = 2;							// replacement pattern is stripped if in the default language
-	const FORCE_REPLACE = 3;					// replacement pattern is set always
+	const LANG_URL = 1;
+	const LANG_REPLACE = 2;							// replacement pattern is stripped if in the default language
+	const LANG_FORCE_REPLACE = 3;					// replacement pattern is set always
 	
 	
 	
@@ -16,6 +16,7 @@ class Geko_Wp_Layout extends Geko_Layout
 	protected $_aUnprefixedFilters = array( 'body_class', 'post_class' );
 	
 	protected $_sRenderer = 'Geko_Wp_Layout_Renderer';
+	protected $_aPrefixes = array( 'Gloc_', 'Geko_Wp_', 'Geko_' );
 	
 	protected $_aTranslatedValues = array();
 	
@@ -47,10 +48,6 @@ class Geko_Wp_Layout extends Geko_Layout
 	
 	//// helpers
 	
-	//
-	public function resolveClass( $sClass ) {
-		return Geko_Class::existsCoalesce( $sClass, sprintf( 'Gloc_%s', $sClass ), sprintf( 'Geko_Wp_%s', $sClass ) );
-	}
 	
 	//
 	public function escapeHtml( $sValue ) {
@@ -72,13 +69,13 @@ class Geko_Wp_Layout extends Geko_Layout
 			$sCurLang = $oResolver->getCurLang();
 		}
 		
-		if ( ( self::REPLACE == $iFlag ) || ( self::FORCE_REPLACE == $iFlag ) ) {
+		if ( ( self::LANG_REPLACE == $iFlag ) || ( self::LANG_FORCE_REPLACE == $iFlag ) ) {
 			
 			// look for replacement pattern
 			$aRegs = array();
 			if ( preg_match( '/##(.+)##/', $sValue, $aRegs ) ) {
 				
-				if ( self::FORCE_REPLACE == $iFlag ) {
+				if ( self::LANG_FORCE_REPLACE == $iFlag ) {
 					// force lang code value if current language is empty
 					if ( !$sCurLang ) $sCurLang = $oLangMgmt->getDefLangCode();
 				} else {
@@ -87,7 +84,7 @@ class Geko_Wp_Layout extends Geko_Layout
 				}
 				
 				$sToReplace = $aRegs[ 0 ];
-				$sReplaceWith = ( $sCurLang ) ? str_replace( '[lang]', $sCurLang, $aRegs[ 1 ] ) : '';
+				$sReplaceWith = ( $sCurLang ) ? str_replace( '[lang]', $sCurLang, $aRegs[ 1 ] ) : '' ;
 				return str_replace( $sToReplace, $sReplaceWith, $sValue );
 			}
 			
@@ -95,7 +92,7 @@ class Geko_Wp_Layout extends Geko_Layout
 		
 		if ( $sCurLang ) {
 			
-			if ( self::URL == $iFlag ) {
+			if ( self::LANG_URL == $iFlag ) {
 				
 				$oUrl = new Geko_Uri( $sValue );
 				$oUrl->setVar( 'lang', $sCurLang );

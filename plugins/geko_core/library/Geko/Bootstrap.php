@@ -21,11 +21,21 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 		'error' => TRUE
 	);
 	
+	// config values to be used, if any
+	protected $_aValues = array(
+		'live' => array(),
+		'dev' => array(),
+		'any' => array()
+	);
+	
 	protected $_aLoadedComponents = NULL;
 	
 	protected $_aPrefixes = array( 'Geko_' );
+	protected $_sRootClass = NULL;
 	
 	protected $_aAbbrMap = array();
+	
+	
 	
 	
 	
@@ -43,6 +53,76 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 	public function get( $sKey ) {
 		return $this->_aRegistry[ $sKey ];
 	}
+	
+	
+	//
+	public function setVal( $sKey, $mValue ) {
+		return $this->set( sprintf( 'val:%s', $sKey ), $mValue );
+	}
+	
+	//
+	public function getVal( $sKey ) {
+		return $this->get( sprintf( 'val:%s', $sKey ) );
+	}
+	
+	
+	
+	
+	
+	
+	//// methods
+	
+	//
+	protected function __construct() {
+		
+		parent::__construct();
+		
+		
+		
+		//// init best match static root class
+		
+		foreach ( $this->_aPrefixes as $sPrefix ) {
+			
+			$sClass = rtrim( $sPrefix, '_' );
+			
+			if ( class_exists( $sClass ) ) {
+				
+				call_user_func( array( $sClass, 'init' ), $this );
+				$this->_sRootClass = $sClass;
+				
+				break;
+			}
+		}
+		
+		
+		
+		//// set values
+		
+		$aValues = $this->_aValues[ 'any' ];
+		if ( !is_array( $aValues ) ) $aValues = array();
+		
+		if ( $this->isLiveServer() ) {
+			if ( is_array( $this->_aValues[ 'live' ] ) ) {
+				$aValues = array_merge( $aValues, $this->_aValues[ 'live' ] );
+			}
+		} else {
+			if ( is_array( $this->_aValues[ 'dev' ] ) ) {
+				$aValues = array_merge( $aValues, $this->_aValues[ 'dev' ] );
+			}
+		}
+		
+		foreach ( $aValues as $sKey => $mVal ) {
+			$this->setVal( $sKey, $mVal );
+		}
+		
+		
+		
+		//// set reference to me
+		
+		$this->set( 'boot', $this );
+		
+	}
+
 	
 	
 	

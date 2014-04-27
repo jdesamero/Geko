@@ -4,6 +4,8 @@
 class Geko_Layout extends Geko_Singleton_Abstract
 {
 	protected $_sRenderer = 'Geko_Layout_Renderer';
+	protected $_aPrefixes = array( 'Geko_' );
+	
 	protected $_aParams = array();
 	
 	protected $_bUnshift = FALSE;
@@ -28,10 +30,30 @@ class Geko_Layout extends Geko_Singleton_Abstract
 	
 	
 	
+	
 	//
 	public function init( $bUnshift = FALSE ) {
 		
 		$this->_bUnshift = $bUnshift;
+		
+		
+		// init best match static root class
+		
+		foreach ( $this->_aPrefixes as $sPrefix ) {
+			
+			$sClass = rtrim( $sPrefix, '_' );
+			
+			if ( class_exists( $sClass ) ) {
+				
+				$this->_aMapMethods = array_merge( $this->_aMapMethods, array(
+					'regGet' => array( $sClass, 'get' ),
+					'regVal' => array( $sClass, 'getVal' )
+				) );
+				
+				break;
+			}
+		}
+		
 		
 		return parent::init();
 	}
@@ -120,7 +142,14 @@ class Geko_Layout extends Geko_Singleton_Abstract
 	
 	//
 	public function resolveClass( $sClass ) {
-		return Geko_Class::existsCoalesce( $sClass, sprintf( 'Geko_%s', $sClass ) );
+		
+		$aClass = array( $sClass );
+		
+		foreach ( $this->_aPrefixes as $sPrefix ) {
+			$aClass[] = sprintf( '%s%s', $sPrefix, $sClass );
+		}
+		
+		return call_user_func_array( array( 'Geko_Class', 'existsCoalesce' ), $aClass );
 	}
 	
 	//
