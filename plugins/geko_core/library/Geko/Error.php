@@ -18,7 +18,13 @@ class Geko_Error
 			
 			ini_set( 'display_errors', 1 );
 			
-			error_reporting( E_ALL ^ E_NOTICE ^ E_WARNING );
+			$iReportingLevel = E_ALL ^ E_NOTICE ^ E_WARNING ^ E_STRICT;
+			
+			if ( defined( 'E_DEPRECATED' ) ) {
+				$iReportingLevel = $iReportingLevel ^ E_DEPRECATED;
+			}
+			
+			error_reporting( $iReportingLevel );
 		}
 		
 	}
