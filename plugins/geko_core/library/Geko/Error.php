@@ -5,26 +5,28 @@ class Geko_Error
 {
 	
 	//
-	public static function start() {
+	public static function start( $iDefaultLevel = NULL, $iScreamLevel = NULL ) {
 		
 		if ( $_REQUEST[ '__enable_error_reporting' ] ) {
 			
 			ini_set( 'display_errors', 1 );
 			ini_set( 'scream.enabled', 1 );
+
+			if ( NULL === $iScreamLevel ) {
+				$iScreamLevel = E_ALL;
+			}
 			
-			error_reporting( E_ALL );
+			error_reporting( $iScreamLevel );
 		
 		} else {
 			
-			ini_set( 'display_errors', 1 );
+			ini_set( 'display_errors', 0 );
 			
-			$iReportingLevel = E_ALL ^ E_NOTICE ^ E_WARNING ^ E_STRICT;
-			
-			if ( defined( 'E_DEPRECATED' ) ) {
-				$iReportingLevel = $iReportingLevel ^ E_DEPRECATED;
+			if ( NULL === $iDefaultLevel ) {
+				$iDefaultLevel = E_ALL ^ E_NOTICE;
 			}
 			
-			error_reporting( $iReportingLevel );
+			error_reporting( $iDefaultLevel );
 		}
 		
 	}

@@ -381,6 +381,8 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 	
 	public function addAdminHead() {
 		
+		parent::addAdminHead();
+		
 		Geko_Once::run( sprintf( '%s::js', __METHOD__ ), array( $this, 'adminHeadJs' ) );
 		
 	}

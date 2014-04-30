@@ -335,44 +335,39 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 	//// components
 	
 	// error handler/reporting
-	public function compError( $mArgs ) {
+	public function compError( $aArgs ) {
 		
 		Geko_Error::start();
 				
 	}
 	
 	//
-	public function compDebug( $mArgs ) {
+	public function compDebug( $aArgs ) {
 		
 		Geko_Debug::setShowOut( TRUE );
-
-		if ( is_array( $mArgs ) ) {
+		
+		if ( $mEnable = $aArgs[ 'enable' ] ) {
 			
-			if ( $mEnable = $mArgs[ 'enable' ] ) {
-				
-				$aEnable = Geko_Array::wrap( $mEnable );
-				call_user_func_array( array( 'Geko_Debug', 'setOutEnable' ), $aEnable );	
-			}
+			$aEnable = Geko_Array::wrap( $mEnable );
+			call_user_func_array( array( 'Geko_Debug', 'setOutEnable' ), $aEnable );	
+		}
+		
+		if ( $mDisable = $aArgs[ 'disable' ] ) {
 			
-			if ( $mDisable = $mArgs[ 'disable' ] ) {
-				
-				$aDisable = Geko_Array::wrap( $mDisable );
-				call_user_func_array( array( 'Geko_Debug', 'setOutDisable' ), $aDisable );	
-			}
-			
-			
+			$aDisable = Geko_Array::wrap( $mDisable );
+			call_user_func_array( array( 'Geko_Debug', 'setOutDisable' ), $aDisable );	
 		}
 		
 	}
 	
 	// logger/debugger
 	// independent
-	public function compLogger( $mArgs ) {
+	public function compLogger( $aArgs ) {
 		
 		$oLogger = Zend_Registry::get( 'logger' );
 		
-		if ( !$oLogger && is_array( $mArgs ) ) {
-			$oLogger = new Geko_Log( $mArgs[ 0 ], $mArgs[ 1 ] );
+		if ( !$oLogger ) {
+			$oLogger = new Geko_Log( $aArgs[ 0 ], $aArgs[ 1 ] );
 		}
 		
 		if ( $oLogger ) {
