@@ -74,7 +74,7 @@ class Geko_Wp extends Geko
 			
 		} else {
 			
-			$sRet = ( $sClass ? $sClass . ' ' : '' );
+			$sRet = ( $sClass ? sprintf( '%s ', $sClass ) : '' );
 			
 			if ( self::isHome() ) {
 				$sRet .= 'home';
@@ -85,7 +85,7 @@ class Geko_Wp extends Geko
 			} elseif ( is_single() ) {
 				$sRet .= 'single';
 			} elseif ( is_page() ) {
-				$sRet .= 'page ' . self::slugify( wp_title( '', FALSE ) );
+				$sRet .= sprintf( 'page %s', self::slugify( wp_title( '', FALSE ) ) );
 			} elseif ( is_category() ) {
 				$sRet .= sprintf( 'category %s', self::slugify( single_cat_title( '', FALSE ) ) );
 			} elseif ( is_month() ) {
@@ -109,7 +109,7 @@ class Geko_Wp extends Geko
 		if ( function_exists( 'get_post_class' ) ) {
 			$sRet = implode( ' ', get_post_class( $sClass ) );
 		} else {
-			$sRet = ( $sClass ? $sClass . ' ' : '' );
+			$sRet = ( $sClass ? sprintf( '%s ', $sClass ) : '' );
 		}
 		
 		return $sRet;

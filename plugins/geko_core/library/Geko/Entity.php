@@ -40,6 +40,8 @@ abstract class Geko_Entity
 	protected $_sFileBaseDir = '';
 	protected $_aFileSubdirMap = array();
 	
+	protected $_aDelegates = array();
+	
 	
 	
 	
@@ -242,6 +244,18 @@ abstract class Geko_Entity
 	public function getData( $sKey ) {
 		return $this->_aData[ $sKey ];
 	}
+	
+	
+	
+	
+	//
+	public function addDelegate( $sClassName ) {
+		
+		$this->_aDelegates[] = Geko_Delegate::create( $sClassName, $this );
+		
+		return $this;
+	}
+	
 	
 	
 	
@@ -729,6 +743,16 @@ abstract class Geko_Entity
 	
 	//
 	public function __call( $sMethod, $aArgs ) {
+		
+		
+		
+		// go through delegates
+		
+		if ( $fDelegate = Geko_Delegate::findMatch( $this->_aDelegates, $sMethod ) ) {
+			return call_user_func_array( $fDelegate, $aArgs );
+		}
+		
+		
 		
 		// check if __call is being invoked directly, to prevent possible infinite loops
 		$bDirect = FALSE;

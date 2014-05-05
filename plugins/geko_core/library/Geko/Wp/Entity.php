@@ -98,7 +98,7 @@ abstract class Geko_Wp_Entity extends Geko_Entity
 	public function dateTimeFormat( $sSqlDateTime, $sFormat ) {
 		$sFormat = Geko_String::coalesce(
 			$sFormat,
-			get_option( 'date_format' ) . ' ' . get_option( 'time_format' )
+			sprintf( '%s %s', get_option( 'date_format' ), get_option( 'time_format' ) )
 		);
 		return $this->mysql2Date( $sSqlDateTime, $sFormat );
 	}
@@ -128,7 +128,7 @@ abstract class Geko_Wp_Entity extends Geko_Entity
 		$sSrcUrl = Geko_PhpQuery_FormTransform_Plugin_File::getDefaultFileUrlRoot();
 		
 		$sImgPath = str_replace( $sSrcUrl, '', $sImgUrl );
-		$sImgPath = $sSrcDir . '/' . trim( $sImgPath, '/' );
+		$sImgPath = sprintf( '%s/%s', $sSrcDir, trim( $sImgPath, '/' ) );
 		
 		$aParams[ 'src' ] = urlencode( $sImgPath );
 		
@@ -269,13 +269,13 @@ abstract class Geko_Wp_Entity extends Geko_Entity
 			if ( !$mRes = parent::__call( $sMethod, $aArgs ) ) {
 				$aRegs = array();
 				if ( preg_match( '/getThe([a-zA-Z0-9]+)Url/', $sMethod, $aRegs ) ) {
-					$sCall = 'theimageurl' . $aRegs[ 1 ];
+					$sCall = sprintf( 'theimageurl%s', $aRegs[ 1 ] );
 					$mRes = $this->__call( $sCall, $aArgs );
 				}
 			}
 			
 			$aFilterArgs = array_merge(
-				array( get_class( $this ) . '::' . $sMethod, $mRes, $this ),
+				array( sprintf( '%s::%s', get_class( $this ), $sMethod ), $mRes, $this ),
 				$aArgs
 			);
 			
@@ -288,12 +288,15 @@ abstract class Geko_Wp_Entity extends Geko_Entity
 			// return the full URL, assuming entity property corresponds to a file
 			$sCall = substr_replace( $sMethod, 'thisget', 0, 11 );
 			$sProp = substr_replace( $sMethod, '', 0, 11 );
+			
 			return $this->_getTheImageUrl( $this->__call( $sCall, $aArgs ), $sProp, $aArgs );
 			
 		} elseif ( 0 === strpos( $sMethod, 'thisget' ) ) {
 			
 			if ( preg_match( '/thisgetThe([a-zA-Z0-9]+)Url/', $sMethod, $aRegs ) ) {
-				$sCall = 'getThe' . $aRegs[ 1 ] . 'Url';
+				
+				$sCall = sprintf( 'getThe%sUrl', $aRegs[ 1 ] );
+				
 				if ( !method_exists( $this, $sCall ) ) {
 					return $this->__call( $sCall, $aArgs );
 				}
