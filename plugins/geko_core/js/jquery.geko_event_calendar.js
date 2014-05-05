@@ -1,230 +1,302 @@
-;(function ($) {
+;( function( $ ) {
 	
 	$.fn.gekoEventCalendar = function( options ) {
 		
 		var opts = $.extend( {
-			cal_loading_class: 'cal_loading'
+			
+			cal_loading_class: 'cal_loading',
+			success_status: 1,
+			
+			get_month_cb: null,
+			tooltip_cb: null,
+			click_day_cb: null,
+			event_list_cb: null
+			
 		}, options );
 		
 		
-		var calMon = $( this );
-		
-		
-		
-		//// month stuff
-		
-		// tooltip for event
-		var callQtip = function( mons, dp ) {
+		//
+		var fSetMonth = function( eCal, iYr, iMon ) {
 			
-			var countDays = 0;
+			var oTrack = eCal.data( 'track' );
+			var sTrackIdx = '%d-%d'.printf( iYr, iMon );
 			
-			if ( mons.length ) {
+			var oTrackMon = oTrack[ sTrackIdx ];
 			
-				calMon.find( 'tbody td a.ui-state-enabled' ).each(function() {
-					
-					var day = parseInt( $( this ).html() );
-					var date = new Date( dp.selectedYear, dp.selectedMonth, day );
-					
-					$( this ).qtip( {
-						content: {
-							title: {
-								text: date.format( 'mediumDate' ),
-								button: 'Close'
-							},
-							prerender: true,
-							url: opts.service_url,
-							data: {
-								year: dp.selectedYear,
-								mon: dp.selectedMonth,
-								day: day
-							},
-							method: 'get'
-						},
-						show: 'click',
-						hide: 'unfocus',
-						style: {
-							tip: 'topRight',
-							border: {
-								width: 3,
-								radius: 8
-							}
-						},
-						position: {
-							corner: {
-								target: 'bottomLeft',
-								tooltip: 'topRight'
-							}
-						},
-						api: {
-							beforeContentUpdate: function ( ret ) {
-								if ( $.trim( ret ) ) {
-									
-									// assemble output string
-									var parsed = $.parseJSON( ret );
-									
-									if ( parsed.vars ) parsed = parsed.vars;
-									
-									var output = '';
-									
-									$.each( parsed , function() {
-										output += '<div class="cal-event"><p class="title"><a href="' + this.url + '">' + this.title + '<\/a><\/p>'
-										if ( this.range ) output += '<p class="date">' + this.range + '<\/p>';
-										output += '<p>' + this.excerpt + '<\/p>';
-										
-										var cats = '';
-										
-										$.each( this.cats , function() {
-											if ( '' != cats ) cats += ', ';
-											cats += '<a href="' + this.url + '">' + this.title + '<\/a>';
-										} );
-										
-										output += '<p><strong>Categories:<\/strong> ' + cats + '<\/p><\/div>';
-										
-									} );
-									
-									// hide the "loading..." if needed
-									countDays++;
-									if ( countDays == mons.length ) {
-										calendarMonthLoaded();
-									}
-									
-									return output;
-									
-								} else {
-									return false;
-								}
-							},
-							onPositionUpdate: function() {
-								$( 'div.qtip' ).hide();
-							}
-						}
-					} );
-				} );
+			var aEvents = oTrackMon.events;
+			var aData = oTrackMon.data;
 			
-			}
 			
-		}
-		
-		// prepare the months
-		var prepMons = function( mons, dp ) {
-					
-			calMon.find( 'tbody td a.ui-state-default' ).each( function() {
+			var sCalMonSel = 'td[data-month="%d"]'.printf( parseInt( iMon - 1 ) );
+			
+			eCal.find( sCalMonSel ).each( function() {
 				
-				var day = parseInt( $( this ).html() );
-				var par = $( this ).parent();
+				var eTd = $( this );
+				var eA = eTd.find( 'a' );
 				
-				if ( -1 == $.inArray( day, $.makeArray( mons ) ) ) {
-					par.addClass( 'ui-state-disabled ui-datepicker-unselectable' );
-					$( this ).addClass( 'ui-state-disabled' );
-				} else {
-					$( this ).addClass( 'ui-state-enabled' );					
-				}
-			} );
-			
-			// there are days to be clicked
-			if ( mons.length ) {
-				
-				// HACK!!!: remove the onclick from the calendar td
-				calMon.find( 'tbody td' ).each( function() {
-					$( this ).removeAttr( 'onclick' );
-				} );
-				
-				calMon.find( 'tbody td a.ui-state-default' ).click( function() {
+				// disable default behaviour				
+				eA.click( function( e ) {
+					e.stopPropagation();
 					return false;
 				} );
 				
-				//
-				setTimeout( function () {
-					callQtip( mons, dp );
-				}, 10 );
+				eTd.attr( 'data-day', eA.text() );
 				
-				// $.sygerDebug( 'days', aDays );
-			} else {
+			} );
+			
+			$.each( aEvents, function( iDay, aEvt ) {
 				
-				calendarMonthLoaded();
+				var sCalDaySel = 'td[data-day="%d"]'.printf( iDay );
 				
+				eCal.find( sCalDaySel ).each( function() {
+					
+					var eTd = $( this );
+					var eA = eTd.find( 'a' );
+					
+					eTd.addClass( 'has-event' );
+					eA.addClass( 'has-event' );
+					
+					eA.data( 'events', aEvt );
+					eA.data( 'data', aData );
+					
+					
+					// tooltips
+					if ( opts.tooltip_cb ) {
+						
+						var sOut = '';
+						
+						$.each( aEvt, function( i, v ) {
+							var d = aData[ v ];
+							sOut += opts.tooltip_cb.call( eCal, d );
+						} );
+						
+						
+						if ( $.fn.qtip ) {
+							
+							var oDate = new Date( iYr, parseInt( iMon - 1 ), iDay );
+							
+							eA.qtip( {
+								content: {
+									title: {
+										text: oDate.format( 'mediumDate' ),
+										button: 'Close'
+									},
+									text: sOut
+								},
+								show: 'click',
+								hide: 'unfocus',
+								style: {
+									tip: 'topRight',
+									border: {
+										width: 3,
+										radius: 8
+									}
+								},
+								position: {
+									corner: {
+										target: 'bottomLeft',
+										tooltip: 'topRight'
+									}
+								},
+								api: {
+									onPositionUpdate: function() {
+										$( 'div.qtip' ).hide();
+									}
+								}
+							} );
+						
+						} else if ( $.fn.tooltip ) {
+									
+							eTd.tooltip( {
+								
+								items: 'a',
+								content: function() {
+									return sOut;
+								}
+								
+							} );
+							
+						}
+						
+					}
+						
+					
+					//
+					if ( opts.click_day_cb ) {
+						opts.click_day_cb.cal( eCal, eA, iYr, iMon, iDay );
+					}
+					
+				} );
+				
+			} );
+			
+			
+			// callbacks
+			
+			if ( opts.event_list_cb ) {
+				
+				var eEvtList = $( '.event-list' );
+				
+				eEvtList.find( '.evt_item' ).remove();
+				
+				var eTmpl = eEvtList.find( '.evt_tmpl' );
+				var eNone = eEvtList.find( '.evt_none' );
+				
+				eNone.hide();
+				
+				if ( aData.length ) {
+					
+					$.each( aData, function( i, v ) {
+						
+						var eEvtItem = eTmpl.clone();
+						
+						eEvtItem.removeClass( 'evt_tmpl' );
+						eEvtItem.addClass( 'evt_item' );
+						
+						
+						opts.event_list_cb.call( eCal, eEvtList, eEvtItem, v );
+						
+						
+						eEvtList.append( eEvtItem );
+						
+					} );
+					
+				} else {
+					
+					eNone.show();
+					
+				}
+								
 			}
 			
-		};
-		
-		//
-		var calendarMonthLoaded = function() {
+			if ( opts.get_month_cb ) {
+				opts.get_month_cb.call( eCal, iYr, iMon, aEvents, aData );
+			}
 			
-			calMon.find( 'tbody td a.ui-state-default' ).each( function() {
-				var par = $( this ).parent();
-				par.addClass( 'ui-state-loaded' );
-				$( this ).addClass( 'ui-state-loaded' );
-			} );
-			
-			calMon.find( 'tbody td span.ui-state-default' ).each( function() {
-				$( this ).addClass( 'ui-state-loaded' );
-			} );
-			
-			calMon.find( '.' + opts.cal_loading_class ).hide();
-		
 		}
 		
 		
-		// load the date picker
-		$.getJSON(
-			opts.service_url,
-			function( bounds ) {
+		// get month data via ajax if not already cached
+		var fGetMonth = function( eCal, iYr, iMon ) {
+			
+			var oTrack;
+			
+			if ( eCal.data( 'track' ) ) {
+				oTrack = eCal.data( 'track' );
+			} else {
+				oTrack = {};
+				eCal.data( 'track', oTrack );
+			}
+			
+			var sTrackIdx = '%d-%d'.printf( iYr, iMon );
+
+			var sCalLoadSel = '.%s'.printf( opts.cal_loading_class );
+			var eLoad = eCal.find( sCalLoadSel );
+			
+			eLoad.show();
+			
+			if ( !oTrack[ sTrackIdx ] ) {
 				
-				if ( bounds.vars ) bounds = bounds.vars;
-				
-				calMon.datepicker( {
-					minDate: new Date( bounds.min.year, bounds.min.mon, bounds.min.day ),
-					maxDate: new Date( bounds.max.year, bounds.max.mon, bounds.max.day ),
-					nextText: '>>',
-					prevText: '<<',
-					dayNamesMin: [ 'S', 'M', 'T', 'W', 'T', 'F', 'S' ],
-					onChangeMonthYear: function (year, mon, dp) {
+				$.get(
+					opts.service_url,
+					{
+						yr: iYr,
+						mon: iMon
+					},
+					function( oRes ) {
 						
-						if ( !calMon.find( '.' + opts.cal_loading_class ).length ) {
-							calMon.prepend( '<div class="' + opts.cal_loading_class + '"><\/div>' );
-						} else {
-							calMon.find( '.' + opts.cal_loading_class ).show();
+						if ( opts.success_status == oRes.status ) {
+							
+							oTrack[ sTrackIdx ] = {
+								events: oRes.events,
+								data: oRes.data
+							};
+							
+							eCal.data( 'track', oTrack );
+							
+							fSetMonth( eCal, iYr, iMon );
+							
 						}
 						
-						$.getJSON(
-							opts.service_url,
-							{
-								year: dp.selectedYear,
-								mon: dp.selectedMonth
-							},
-							function( mons ) {
-								
-								if ( mons.vars ) mons = mons.vars;
-								
-								// $.sygerDebug( 'data', data, '   ', 2 );
-								// $.sygerDebug( 'dp', dp );
-								prepMons( mons, dp );		// activate tooltips again
-							}
-						);
-						
-					}
-				} );
+						eLoad.hide();
+					},
+					'json'
+				);
 				
-				// trigger onChangeMonthYear event to populate datepicker
-				$.datepicker._notifyChange( calMon.data( 'datepicker' ) );
+			} else {
+				
+				setTimeout( function() {
+
+					fSetMonth( eCal, iYr, iMon );
+					eLoad.hide();
+					
+				}, 10 );
 				
 			}
-		);
-		
-		
-		//// testing
-		
-		$( '#foo_test' ).click( function() {
 			
-			alert(
-				$( '.ui-datepicker-calendar' ).innerWidth() + ' ' + 
-				$( '.ui-datepicker-calendar' ).width() + ' ' + 
-				$( '.ui-datepicker-calendar' ).outerWidth()
+
+			
+		};
+		
+		
+		//
+		return this.each( function() {
+			
+			var eCalendar = $( this );
+			
+			var sCalLoadSel = '.%s'.printf( opts.cal_loading_class );
+			var eLoad = eCalendar.find( sCalLoadSel );
+			
+			if ( !eLoad.length ) {
+				eCalendar.prepend( '<div class="%s"><\/div>'.printf( opts.cal_loading_class ) );
+			}
+			
+			
+			$.get(
+				opts.service_url,
+				function( oRes ) {
+					
+					if ( opts.success_status == oRes.status ) {
+						
+						var aMin = oRes.range.min;
+						var aMax = oRes.range.max;
+						
+						eCalendar.datepicker( {
+							
+							dateFormat: 'yy-mm-dd',
+							
+							minDate: new Date( aMin.year, aMin.mon, aMin.day ),
+							maxDate: new Date( aMax.year, aMax.mon, aMax.day ),
+							
+							onChangeMonthYear: function( iYr, iMon ) {
+								// console.log( 'Making changes... : %d - %d'.printf( iYr, iMon ) );
+								fGetMonth( eCalendar, iYr, iMon );
+							},
+							
+							onSelect: function( sDate ) {
+								
+								var aDate = sDate.split( '-' );
+								fGetMonth( eCalendar, parseInt( aDate[ 0 ] ), parseInt( aDate[ 1 ] ) );
+								
+							}
+							
+						} );
+						
+						// init
+						// console.log( eCalendar.datepicker( 'getDate' ) );
+						oDate = eCalendar.datepicker( 'getDate' );
+						fGetMonth( eCalendar, oDate.getFullYear(), oDate.getMonth() + 1 );
+						
+						
+					}
+					
+				},
+				'json'
 			);
 			
+			
 		} );
-				
-		return this;		
+		
 	};
 	
 } )( jQuery );

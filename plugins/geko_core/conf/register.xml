@@ -72,7 +72,7 @@
 			<file id="geko-jquery-ui-tabs" src="##geko_core_uri##/external/js/ui-1.3.2/legacy/ui.tabs.js" dependencies="geko-jquery-ui-core" jquery-ui-version="1.3.2" />
 			
 			<!--  Geek Oracle jQuery plugins -->
-			<file id="geko-jquery-geko_event_calendar" src="##geko_core_uri##/js/jquery.geko_event_calendar-1.3.2.js" dependencies="geko-date_format geko-jquery-qtip geko-jquery-geko_util geko-jquery-ui-datepicker" jquery-ui-version="1.3.2" />
+			<file id="geko-jquery-geko_event_calendar" src="##geko_core_uri##/js/jquery.geko_event_calendar-1.x.js" dependencies="geko-date_format geko-jquery-qtip geko-jquery-geko_util geko-jquery-ui-datepicker" jquery-ui-version="1.3.2" />
 			
 			<!-- third-party jquery plugins -->
 			<file id="geko-jquery-qtip" src="##geko_core_uri##/external/js/legacy/jquery.qtip-1.0.0-rc3.min.js" dependencies="jquery" jquery-ui-version="1.3.2" />
@@ -120,7 +120,7 @@
 			<file id="geko-jquery-ui-tabs" src="##geko_core_uri##/external/js/ui-1.4.2/legacy/jquery.ui.tabs.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget" jquery-ui-version="1.4.2" />
 			
 			<!-- Geek Oracle jQuery plugins -->
-			<file id="geko-jquery-geko_event_calendar" src="##geko_core_uri##/js/jquery.geko_event_calendar.js" dependencies="geko-date_format geko-jquery-qtip geko-jquery-geko_util geko-jquery-ui-datepicker" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-geko_event_calendar" src="##geko_core_uri##/js/jquery.geko_event_calendar-2.x.js" dependencies="geko-date_format geko-jquery-qtip geko-jquery-geko_util geko-jquery-ui-datepicker" jquery-ui-version="1.4.2" />
 			
 			<!-- third-party jquery plugins -->
 			<file id="geko-jquery-qtip" src="##geko_core_uri##/external/js/jquery.qtip-1.0-rev55.min.js" dependencies="jquery" jquery-ui-version="1.4.2" />
@@ -172,7 +172,8 @@
 			<file id="geko-jquery-ui-tooltip" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.tooltip.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget geko-jquery-ui-position geko-jquery-fx-core" jquery-ui-version="1.9.2" />
 			
 			<!-- Geek Oracle jQuery plugins -->
-			<file id="geko-jquery-geko_event_calendar" src="##geko_core_uri##/js/jquery.geko_event_calendar.js" dependencies="geko-date_format geko-jquery-qtip geko-jquery-geko_util geko-jquery-ui-datepicker" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-geko_event_calendar" src="##geko_core_uri##/js/jquery.geko_event_calendar.js" dependencies="geko-date_format geko-jquery-ui-tooltip geko-jquery-geko_util geko-jquery-ui-datepicker" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-geko_event_calendar_qtip" src="##geko_core_uri##/js/jquery.geko_event_calendar.js" dependencies="geko-date_format geko-jquery-qtip geko-jquery-geko_util geko-jquery-ui-datepicker" jquery-ui-version="1.9.2" />
 			
 			<!-- third-party jquery plugins -->
 			<file id="geko-jquery-qtip" src="##geko_core_uri##/external/js/jquery.qtip-1.0-rev55.min.js" dependencies="jquery" jquery-ui-version="1.9.2" />
