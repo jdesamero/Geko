@@ -18,7 +18,8 @@ class Geko_Wp_Service_EventCalendar extends Geko_Wp_Service
 		
 		$aParams = array(
 			'cat' => $aCalCats->implode( array( '##Id##', ',' ) ),
-			'add_expiry_date_field' => 1
+			'add_start_date_field' => TRUE,
+			'add_expiry_date_field' => TRUE
 		);
 		
 		
@@ -39,10 +40,15 @@ class Geko_Wp_Service_EventCalendar extends Geko_Wp_Service
 			$sMaxDate = sprintf( '%s-%s', $sMonthPart, $iMaxMonthDay );
 			
 			
+			
 			$aParams[ 'where_min_date' ] = $sMinDate;
 			$aParams[ 'where_max_date' ] = $sMaxDate;
 			$aParams[ 'add_min_date_field' ] = 1;
 			$aParams[ 'add_max_date_field' ] = 1;
+			
+			$aParams[ 'orderby' ] = 'start_date';
+			$aParams[ 'order' ] = 'ASC';
+			
 			
 			
 			$aEvents = array();
@@ -108,7 +114,7 @@ class Geko_Wp_Service_EventCalendar extends Geko_Wp_Service
 				'day' => $oPost->getDateTimeExpired( 'j' ),
 				'mon' => $oPost->getDateTimeExpired( 'n' ) - 1,		// compensate for javascript
 				'year' => $oPost->getDateTimeExpired( 'Y' )
-			);			
+			);
 			
 			
 			$aParams[ 'order' ] = 'ASC';
