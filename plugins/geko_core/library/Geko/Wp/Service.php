@@ -151,7 +151,7 @@ class Geko_Wp_Service extends Geko_Service
 	
 	//
 	public function updateUserLocation( $iUserId, $aValues, $sManageClass = NULL ) {
-
+		
 		if ( $oMng = $this->resolveClassInstance( 'User_Location_Manage', $sManageClass ) ) {
 
 			return $oMng->save(

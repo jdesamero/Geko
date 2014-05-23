@@ -83,14 +83,14 @@ class Geko_Wp_EmailMessage_Recipient_Manage extends Geko_Wp_Options_Manage
 			$oUrl = new Geko_Uri();
 			$sThisUrl = strval( $oUrl );
 			
-			$sTheAction = 'edit' . $this->_sType;
+			$sTheAction = sprintf( 'edit%s', $this->_sType );
 			$oUrl
 				->setVar( 'action', $sTheAction )
 				->setVar( 'send_test', 1 )
 			;
 			
 			$sSendTestLink = strval( $oUrl );
-			$sSendTestLink = htmlspecialchars_decode( wp_nonce_url( $sSendTestLink,  $this->_sActionTarget . $sTheAction ) );
+			$sSendTestLink = htmlspecialchars_decode( wp_nonce_url( $sSendTestLink, sprintf( '%s%s', $this->_sActionTarget, $sTheAction ) ) );
 			
 			$aParams = array(
 				'test_link' => $sSendTestLink,

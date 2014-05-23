@@ -4,10 +4,6 @@
 class Geko_Wp_Layout extends Geko_Layout
 {
 	
-	const LANG_URL = 1;
-	const LANG_REPLACE = 2;							// replacement pattern is stripped if in the default language
-	const LANG_FORCE_REPLACE = 3;					// replacement pattern is set always
-	
 	
 	
 	protected $_aUnprefixedActions = array(
@@ -17,8 +13,6 @@ class Geko_Wp_Layout extends Geko_Layout
 	
 	protected $_sRenderer = 'Geko_Wp_Layout_Renderer';
 	protected $_aPrefixes = array( 'Gloc_', 'Geko_Wp_', 'Geko_' );
-	
-	protected $_aTranslatedValues = array();
 	
 	protected $_aLinks = array();
 	
@@ -31,6 +25,8 @@ class Geko_Wp_Layout extends Geko_Layout
 		
 		parent::start();
 		
+		$oTrans = Geko_Wp_Language_Translate::getInstance();
+		
 		$this->_aMapMethods = array_merge( $this->_aMapMethods, array(
 			
 			'is' => array( 'Geko_Wp', 'is' ),
@@ -39,7 +35,10 @@ class Geko_Wp_Layout extends Geko_Layout
 			'listArchives' => 'wp_get_archives',
 			'listAuthors' => 'wp_list_authors',
 			'listBookmarks' => 'wp_list_bookmarks',
-			'tagCloud' => 'wp_tag_cloud'
+			'tagCloud' => 'wp_tag_cloud',
+			
+			'_t' => array( $oTrans, 'getValue' ),
+			'_e' => array( $oTrans, 'echoValue' )
 			
 		) );
 		
@@ -55,87 +54,6 @@ class Geko_Wp_Layout extends Geko_Layout
 	}
 	
 	
-	//// language translation handling
-	
-	//
-	public function _t( $sValue = '', $iFlag = NULL, $sCurLang = NULL ) {
-		
-		$oResolver = Geko_Wp_Language_Resolver::getInstance();
-		$oLangMgmt = Geko_Wp_Language_Manage::getInstance();
-		
-		if ( !$sValue ) return $oResolver->getCurLang( FALSE );
-		
-		if ( NULL === $sCurLang ) {
-			$sCurLang = $oResolver->getCurLang();
-		}
-		
-		if ( ( self::LANG_REPLACE == $iFlag ) || ( self::LANG_FORCE_REPLACE == $iFlag ) ) {
-			
-			// look for replacement pattern
-			$aRegs = array();
-			if ( preg_match( '/##(.+)##/', $sValue, $aRegs ) ) {
-				
-				if ( self::LANG_FORCE_REPLACE == $iFlag ) {
-					// force lang code value if current language is empty
-					if ( !$sCurLang ) $sCurLang = $oLangMgmt->getDefLangCode();
-				} else {
-					// if lang code is default then make it empty
-					if ( $sCurLang && ( $sCurLang == $oLangMgmt->getDefLangCode() ) ) $sCurLang = '';				
-				}
-				
-				$sToReplace = $aRegs[ 0 ];
-				$sReplaceWith = ( $sCurLang ) ? str_replace( '[lang]', $sCurLang, $aRegs[ 1 ] ) : '' ;
-				return str_replace( $sToReplace, $sReplaceWith, $sValue );
-			}
-			
-		}
-		
-		if ( $sCurLang ) {
-			
-			if ( self::LANG_URL == $iFlag ) {
-				
-				$oUrl = new Geko_Uri( $sValue );
-				$oUrl->setVar( 'lang', $sCurLang );
-				return strval( $oUrl );
-				
-			} else {
-			
-				if ( !$this->_aTranslatedValues[ $iLangId ] ) {
-					
-					$this->_aTranslatedValues[ $iLangId ] = array();
-					
-					$iLangId = $oLangMgmt->getLanguage( $sCurLang )->getId();
-					$aStrings = new Geko_Wp_Language_String_Query( array( 'lang_id' => $iLangId ) );
-					
-					foreach ( $aStrings as $oString ) {
-						$this->_aTranslatedValues[ $iLangId ][ $oString->getKeyId() ] = $oString->getContent();
-					}
-					
-				}
-				
-				$oStrMgmt = Geko_Wp_Language_String_Manage::getInstance()->init();
-				$iKeyId = $oStrMgmt->getTransId( $sValue );
-				
-				if ( $this->_aTranslatedValues[ $iLangId ][ $iKeyId ] ) {
-					return $this->_aTranslatedValues[ $iLangId ][ $iKeyId ];
-				}
-			
-			}
-			
-		}
-		
-		return $sValue;
-	}
-	
-	//
-	public function _e( $sValue = '', $iFlag = NULL, $sCurLang = NULL ) {
-		echo $this->_t( $sValue, $iFlag, $sCurLang );
-	}
-	
-	//
-	public function getTranslatedValues() {
-		return $this->_aTranslatedValues;
-	}
 	
 	// translate labels
 	public function _getLabel() {

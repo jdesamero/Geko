@@ -46,6 +46,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	protected $_bExtraForms = FALSE;
 	protected $_sEditFormId = 'editform';
 	protected $_bHideAddUpdateButton = FALSE;
+	protected $_bDisableDeleteBtn = FALSE;
 	
 	protected $_aCustomActions = array();
 	protected $_aNormalizedCustomActions = array();
@@ -109,9 +110,9 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 			
 			$aActionNormalized = array();
 			
-			$aActionNormalized[ 'mode' ] = ( $aAction[ 'mode' ] ) ? $aAction[ 'mode' ] : 'edit' ;
-			$aActionNormalized[ 'req_key' ] = ( $aAction[ 'req_key' ] ) ? $aAction[ 'req_key' ] : $sKey ;
-			$aActionNormalized[ 'method' ] = ( $aAction[ 'method' ] ) ? $aAction[ 'method' ] : ( 'do' . Geko_Inflector::camelize( $sKey ) . 'Action' ) ;
+			$aActionNormalized[ 'mode' ] = Geko_String::coalesce( $aAction[ 'mode' ], 'edit' );
+			$aActionNormalized[ 'req_key' ] = Geko_String::coalesce( $aAction[ 'req_key' ], $sKey );
+			$aActionNormalized[ 'method' ] = Geko_String::coalesce( $aAction[ 'method' ], sprintf( 'do%sAction', Geko_Inflector::camelize( $sKey ) ) );
 			
 			//// hidden_field: name, value
 			
@@ -194,16 +195,16 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 				
 				foreach ( $aParams as $sItemKey => $aItmPrms ) {
 					
-					$sGroupName = ( $aItmPrms[ 'group_name' ] ) ? $aItmPrms[ 'group_name' ] : $sItemKey;
+					$sGroupName = Geko_String::coalesce( $aItmPrms[ 'group_name' ], $sItemKey );
 					
 					$aItem = array(
-						'group_sel' => ( $aItmPrms[ 'group_sel' ] ) ? $aItmPrms[ 'group_sel' ] : '#editform td.multi_row.' . $sGroupName,
+						'group_sel' => Geko_String::coalesce( $aItmPrms[ 'group_sel' ], sprintf( '#editform td.multi_row.%s', $sGroupName ) ),
 						'group_name' => $sGroupName,
-						'row_container_sel' => ( $aItmPrms[ 'row_container_sel' ] ) ? $aItmPrms[ 'row_container_sel' ] : '> table',
-						'row_sel' => ( $aItmPrms[ 'row_sel' ] ) ? $aItmPrms[ 'row_sel' ] : '> tbody > tr.row',
-						'row_template_sel' => ( $aItmPrms[ 'row_template_sel' ] ) ? $aItmPrms[ 'row_template_sel' ] : '> tbody > tr._row_template',
-						'add_row_sel' => ( $aItmPrms[ 'add_row_sel' ] ) ? $aItmPrms[ 'add_row_sel' ] : '> p > input.add_row',
-						'del_row_sel' => ( $aItmPrms[ 'del_row_sel' ] ) ? $aItmPrms[ 'del_row_sel' ] : '> tbody > tr.row > td > a.del_row'					
+						'row_container_sel' => Geko_String::coalesce( $aItmPrms[ 'row_container_sel' ], '> table' ),
+						'row_sel' => Geko_String::coalesce( $aItmPrms[ 'row_sel' ], '> tbody > tr.row' ),
+						'row_template_sel' => Geko_String::coalesce( $aItmPrms[ 'row_template_sel' ], '> tbody > tr._row_template' ),
+						'add_row_sel' => Geko_String::coalesce( $aItmPrms[ 'add_row_sel' ], '> p > input.add_row' ),
+						'del_row_sel' => Geko_String::coalesce( $aItmPrms[ 'del_row_sel' ], '> tbody > tr.row > td > a.del_row' )
 					);
 					
 					if ( isset( $aItmPrms[ 'sortable' ] ) ) {
@@ -212,12 +213,12 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 						
 						$aSrtPrms = $aItmPrms[ 'sortable' ];
 						$aSortable = array(
-							'sort_sel' => ( $aSrtPrms[ 'sort_sel' ] ) ? $aSrtPrms[ 'sort_sel' ] : 'table > tbody',
-							'rank_sel' => ( $aSrtPrms[ 'rank_sel' ] ) ? $aSrtPrms[ 'rank_sel' ] : '.' . $sGroupName . '_rank',
-							'col_sel' => ( $aSrtPrms[ 'col_sel' ] ) ? $aSrtPrms[ 'col_sel' ] : 'table > thead > tr > th.sort',
-							'col_class' => ( $aSrtPrms[ 'col_class' ] ) ? $aSrtPrms[ 'col_class' ] : 'sort',
-							'col_pfx' => ( $aSrtPrms[ 'col_pfx' ] ) ? $aSrtPrms[ 'col_pfx' ] : $sGroupName . '-col_',
-							'fld_pfx' => ( $aSrtPrms[ 'fld_pfx' ] ) ? $aSrtPrms[ 'fld_pfx' ] : $sGroupName . '_'
+							'sort_sel' => Geko_String::coalesce( $aSrtPrms[ 'sort_sel' ], 'table > tbody' ),
+							'rank_sel' => Geko_String::coalesce( $aSrtPrms[ 'rank_sel' ], sprintf( '.%s_rank', $sGroupName ) ),
+							'col_sel' => Geko_String::coalesce( $aSrtPrms[ 'col_sel' ], 'table > thead > tr > th.sort' ),
+							'col_class' => Geko_String::coalesce( $aSrtPrms[ 'col_class' ], 'sort' ),
+							'col_pfx' => Geko_String::coalesce( $aSrtPrms[ 'col_pfx' ], sprintf( '%s-col_', $sGroupName ) ),
+							'fld_pfx' => Geko_String::coalesce( $aSrtPrms[ 'fld_pfx' ], sprintf( '%s_', $sGroupName ) )
 						);
 						$aItem[ 'sortable' ] = $aSortable;
 					}
@@ -225,9 +226,9 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 					if ( isset( $aItmPrms[ 'toggle_column' ] ) ) {
 						$aTgCol = $aItmPrms[ 'toggle_column' ];
 						$aToggleColumn = array(
-							'btn_sel' => ( $aTgCol[ 'btn_sel' ] ) ? $aTgCol[ 'btn_sel' ] : '.' . $sGroupName . '_toggle_column',
-							'id_pfx' => ( $aTgCol[ 'id_pfx' ] ) ? $aTgCol[ 'id_pfx' ] : $sGroupName . '-tc_',
-							'col_pfx' => ( $aTgCol[ 'col_pfx' ] ) ? $aTgCol[ 'col_pfx' ] : $sGroupName . '-col_'
+							'btn_sel' => Geko_String::coalesce( $aTgCol[ 'btn_sel' ], sprintf( '.%s_toggle_column', $sGroupName ) ),
+							'id_pfx' => Geko_String::coalesce( $aTgCol[ 'id_pfx' ], sprintf( '%s-tc_', $sGroupName ) ),
+							'col_pfx' => Geko_String::coalesce( $aTgCol[ 'col_pfx' ], sprintf( '%s-col_', $sGroupName ) )
 						);
 						$aItem[ 'toggle_column' ] = $aToggleColumn;
 					}
@@ -240,18 +241,18 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 				foreach ( $aParams as $sItemKey => $aItmPrms ) {
 					
 					$aItem = array(
-						'widget_id' => ( $aItmPrms[ 'widget_id' ] ) ? $aItmPrms[ 'widget_id' ] : $sItemKey,
-						'widget_cont_sel' => ( $aItmPrms[ 'widget_cont_sel' ] ) ? $aItmPrms[ 'widget_cont_sel' ] : 'td',		// widget container selector
-						'group_sel' => ( $aItmPrms[ 'group_sel' ] ) ? $aItmPrms[ 'group_sel' ] : '#editform',
-						'cond_sel' => ( $aItmPrms[ 'cond_sel' ] ) ? $aItmPrms[ 'cond_sel' ] : '.cond',
-						'desc_sel' => ( $aItmPrms[ 'desc_sel' ] ) ? $aItmPrms[ 'desc_sel' ] : 'span.description'
+						'widget_id' => Geko_String::coalesce( $aItmPrms[ 'widget_id' ], $sItemKey ),
+						'widget_cont_sel' => Geko_String::coalesce( $aItmPrms[ 'widget_cont_sel' ], 'td' ),		// widget container selector
+						'group_sel' => Geko_String::coalesce( $aItmPrms[ 'group_sel' ], '#editform' ),
+						'cond_sel' => Geko_String::coalesce( $aItmPrms[ 'cond_sel' ], '.cond' ),
+						'desc_sel' => Geko_String::coalesce( $aItmPrms[ 'desc_sel' ], 'span.description' )
 					);
 					
 					$aConds = array();
 					
 					if ( $sEnumKey = $aItmPrms[ 'enum' ] ) {
 						
-						$sSlugPfx = ( $aItmPrms[ 'slug_pfx' ] ) ? $aItmPrms[ 'slug_pfx' ] : sprintf( '%s-', $sEnumKey );
+						$sSlugPfx = Geko_String::coalesce( $aItmPrms[ 'slug_pfx' ], sprintf( '%s-', $sEnumKey ) );
 						
 						$aEnum = Geko_Wp_Enumeration_Query::getSet( $sEnumKey );
 						
@@ -262,7 +263,6 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 								'desc' => $oEnum->getContent()
 							);
 						}
-						
 					}
 					
 					$aItem[ 'conditions' ] = $aConds;
@@ -287,9 +287,9 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		global $current_user;
 		
 		//		
-		$this->_sSlug = $this->_sSlug ? $this->_sSlug : sanitize_title( $this->_sSubject );
-		$this->_sSubjectPlural = $this->_sSubjectPlural ? $this->_sSubjectPlural : Geko_Inflector::pluralize( $this->_sSubject );
-		$this->_sManagementCapability = 'manage_' . str_replace( '-', '_', strtolower( $this->_sEntityClass ) );
+		$this->_sSlug = Geko_String::coalesce( $this->_sSlug, sanitize_title( $this->_sSubject ) );
+		$this->_sSubjectPlural = Geko_String::coalesce( $this->_sSubjectPlural, Geko_Inflector::pluralize( $this->_sSubject ) );
+		$this->_sManagementCapability = sprintf( 'manage_%s', str_replace( '-', '_', strtolower( $this->_sEntityClass ) ) );
 		
 		// see if the current user has management capabilities and store it
 		if (
@@ -358,13 +358,13 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		add_action( 'admin_init', array( $this, 'doActions' ) );
 		
 		//
-		$this->_sPageTitle = $this->_sPageTitle ? $this->_sPageTitle : $this->_sSubjectPlural;
-		$this->_sMenuTitle = $this->_sMenuTitle ? $this->_sMenuTitle : $this->_sSubjectPlural;
-		$this->_sListingTitle = $this->_sListingTitle ? $this->_sListingTitle : $this->_sSubject;
+		$this->_sPageTitle = Geko_String::coalesce( $this->_sPageTitle, $this->_sSubjectPlural );
+		$this->_sMenuTitle = Geko_String::coalesce( $this->_sMenuTitle, $this->_sSubjectPlural );
+		$this->_sListingTitle = Geko_String::coalesce( $this->_sListingTitle, $this->_sSubject );
 		
-		$this->_sAddAction = $this->_sAddAction ? $this->_sAddAction : sprintf( 'add%s', $this->_sType );
-		$this->_sEditAction = $this->_sEditAction ? $this->_sEditAction : sprintf( 'edit%s', $this->_sType );
-		$this->_sDelAction = $this->_sDelAction ? $this->_sDelAction : sprintf( 'delete%s', $this->_sType );
+		$this->_sAddAction = Geko_String::coalesce( $this->_sAddAction, sprintf( 'add%s', $this->_sType ) );
+		$this->_sEditAction = Geko_String::coalesce( $this->_sEditAction, sprintf( 'edit%s', $this->_sType ) );
+		$this->_sDelAction = Geko_String::coalesce( $this->_sDelAction, sprintf( 'delete%s', $this->_sType ) );
 		
 		
 		// list mode is default
@@ -445,7 +445,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 			$oWpRole->add_cap( $this->_sManagementCapability );
 		}
 		
-		// $oWpRole->remove_cap( 'manage_' . str_replace( '-', '_', strtolower( $this->_sInstanceClass ) ) );
+		// $oWpRole->remove_cap( sprintf( 'manage_%s', str_replace( '-', '_', strtolower( $this->_sInstanceClass ) ) ) );
 		// $oWpRole->remove_cap( '' );
 		
 		
@@ -564,7 +564,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 				// add as sub-items of tab group
 				$sSubmenuHandle = Geko_Wp_Admin_Menu::getTabParent( $this->_sInstanceClass );
 				add_submenu_page( $sSubmenuHandle, $this->_sPageTitle, $this->_sMenuTitle, $this->_sManagementCapability, $this->_sInstanceClass, array( $this, 'displayPage' ) );
-				add_submenu_page( $sSubmenuHandle, '', '', $this->_sManagementCapability, $this->_sInstanceClass . $this->_sAddModeSuffix, array( $this, 'detailsPage' ) );
+				add_submenu_page( $sSubmenuHandle, '', '', $this->_sManagementCapability, sprintf( '%s%s', $this->_sInstanceClass, $this->_sAddModeSuffix ), array( $this, 'detailsPage' ) );
 				
 			} else {
 			
@@ -597,7 +597,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 				}
 				
 				add_submenu_page( $sSubmenuHandle, $this->_sPageTitle, $sEditTitle, $this->_sManagementCapability, $this->_sInstanceClass, array( $this, 'displayPage' ) );
-				add_submenu_page( $sSubmenuHandle, $this->_sPageTitle, $sAddTitle, $this->_sManagementCapability, $this->_sInstanceClass . $this->_sAddModeSuffix, array( $this, 'detailsPage' ) );
+				add_submenu_page( $sSubmenuHandle, $this->_sPageTitle, $sAddTitle, $this->_sManagementCapability, sprintf( '%s%s', $this->_sInstanceClass, $this->_sAddModeSuffix ), array( $this, 'detailsPage' ) );
 			}
 			
 		}
@@ -884,6 +884,12 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		return $this->_sMenuTitle;
 	}
 		
+	// hook method
+	public function getEntityEditLink( $oEntity ) {
+		return FALSE;
+	}
+	
+	
 	
 	
 	
@@ -1052,43 +1058,67 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 						</tr>
 					</tfoot>
 					
+					<tbody>
 					<?php
-					
-					foreach ( $aEntities as $oEntity ):
-
-						$oUrl
-							->setVar( $this->_sEntityIdVarName, $oEntity->getId() )
-							->unsetVar( 'action' )
-						;
-						$sEditLink = strval( $oUrl );
 						
-						$oUrl->setVar( 'action', $this->_sDelAction );
-						$sDeleteLink = strval( $oUrl );
-						
-						if ( function_exists( 'wp_nonce_url' ) ) {
-							$sDeleteLink = wp_nonce_url( $sDeleteLink,  $this->_sInstanceClass . $this->_sDelAction );
-							$sDeleteLink .= '&_wp_http_referer=' . urlencode( $sThisUrl );
-						}
-						
-						?><tbody>
+						foreach ( $aEntities as $oEntity ):
+							
+							
+							if ( !$sEditLink = $this->getEntityEditLink( $oEntity ) ) {
+								
+								$oUrl
+									->setVar( $this->_sEntityIdVarName, $oEntity->getId() )
+									->unsetVar( 'action' )
+								;
+								
+								$sEditLink = strval( $oUrl );
+							}
+							
+							
+							
+							$oUrl->setVar( 'action', $this->_sDelAction );
+							$sDeleteLink = strval( $oUrl );
+							
+							if ( function_exists( 'wp_nonce_url' ) ) {
+								$sDeleteLink = wp_nonce_url( $sDeleteLink, sprintf( '%s%s', $this->_sInstanceClass, $this->_sDelAction ) );
+								$sDeleteLink .= sprintf( '&_wp_http_referer=%s', urlencode( $sThisUrl ) );
+							}
+							
+							?>
 							<tr id="<?php echo $this->_sType; ?>-<?php $oEntity->echoId(); ?>" class='alternate author-self status-publish iedit' valign="top">
 								<th scope="row" class="check-column"><input type="checkbox" name="<?php echo $this->_sType; ?>[]" value="<?php $oEntity->echoId(); ?>" /></th>
 								<td class="<?php echo $this->_sType; ?>-title column-title">
 									<strong><a class="row-title" href="<?php echo $sEditLink; ?>" title="<?php echo htmlspecialchars( $oEntity->getTitle() ); ?>"><?php echo htmlspecialchars( $oEntity->getTitle() ); ?></a></strong><br />
 									<div class="row-actions">
 										<span class="edit"><a href="<?php echo $sEditLink; ?>">Edit</a></span>
-										<!-- TO DO: implement delete restrictions -->
-										<?php if ( TRUE ): ?>
+										<?php if ( !$this->_bDisableDeleteBtn ): ?>
+											<!-- TO DO: implement extra delete restrictions -->
 											<span class="delete"> | <a class="delete:the-list:<?php echo $this->_sType; ?>-<?php $oEntity->echoId(); ?> submitdelete" href="<?php echo $sDeleteLink; ?>">Delete</a></span>
 										<?php endif; ?>
 									</div>
 								</td>
-								<?php $this->columnValue( $oEntity ); ?>
+								<?php
+									
+									if ( is_array( $aColInject = $this->columnInject( $oEntity ) ) ) {
+										
+										$sColVal = Geko_String::fromOb( array( $this, 'columnValue' ), array( $oEntity ) );
+										
+										$oDoc = Geko_Html::populateForm( sprintf( '<tr>%s</tr>', $sColVal ), $aColInject, TRUE );
+										
+										echo $oDoc->find( 'tr' )->html();
+										
+									} else {
+										
+										$this->columnValue( $oEntity );
+									}
+									
+								?>
 							</tr>
-						</tbody><?php
-					endforeach;
-					
+							<?php
+						endforeach;
+						
 					?>
+					</tbody>
 					
 				</table>
 
@@ -1143,8 +1173,8 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 			$sSubmit = 'Update';
 		}
 		
-		$sAction = $sOp . $this->_sType;
-		$sNonceField = $this->_sInstanceClass . $sAction;
+		$sAction = sprintf( '%s%s', $sOp, $this->_sType );
+		$sNonceField = sprintf( '%s%s', $this->_sInstanceClass, $sAction );
 		
 		
 		
@@ -1171,9 +1201,9 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 					
 					$this->outputForm();
 					
-					$sAction = $this->_sActionPrefix . '_extra_fields';
+					$sAction = sprintf( '%s_extra_fields', $this->_sActionPrefix );
 					do_action( $sAction, $oEntity, 'extra' );
-					if ( $this->_sSlug ) do_action( $sAction . '_' . $this->_sSlug, $oEntity, 'extra', $this->_sSlug );
+					if ( $this->_sSlug ) do_action( sprintf( '%s_%s', $sAction, $this->_sSlug ), $oEntity, 'extra', $this->_sSlug );
 				
 				?>
 				
@@ -1190,7 +1220,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 			</form>
 			
 			<?php
-				$sAction = $this->_sActionPrefix . '_extra_forms';
+				$sAction = sprintf( '%s_extra_forms', $this->_sActionPrefix );
 				do_action( $sAction, $oEntity );
 			?>
 			
@@ -1201,6 +1231,11 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	// to be implemented by subclass
 	protected function columnTitle() { }
 	protected function columnValue( $oEntity ) { }
+	
+	protected function columnInject( $oEntity ) {
+		return NULL;
+	}
+	
 	
 	//
 	public function displayPage() {
@@ -1233,7 +1268,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		<?php if ( $this->_sParentEntityClass || Geko_Wp_Admin_Menu::inTabGroup( $this->_sInstanceClass ) ):
 			
 			$oUrl = new Geko_Uri();
-			$oUrl->setVar( 'page', $oUrl->getVar( 'page' ) . '_Create' );
+			$oUrl->setVar( 'page', sprintf( '%s_Create', $oUrl->getVar( 'page' ) ) );
 			
 			?>
 			<input type="button" class="button-primary" value="Add <?php echo $this->_sSubject; ?>" onclick="window.location='<?php echo strval( $oUrl ); ?>'" />
@@ -1259,9 +1294,9 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		else: ?>
 			<h2><?php
 				if ( $this->_oCurrentEntity ) {
-					echo 'Edit ' . $this->_sSubject;
+					printf( 'Edit %s', $this->_sSubject );
 				} else {
-					echo $this->isDisplayMode( 'add' ) ? 'Add ' . $this->_sSubject : $this->_sPageTitle;
+					echo $this->isDisplayMode( 'add' ) ? sprintf( 'Add %s', $this->_sSubject ) : $this->_sPageTitle;
 				}
 			?></h2>		
 		<?php endif;
@@ -1281,7 +1316,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	// TO DO: Override Check!!!!!!
 	public function outputFormSubmit( $sSubmit ) {
 		
-		$sSubmitLabel = $sSubmit . ' ' . $this->_sSubject;
+		$sSubmitLabel = sprintf( '%s %s', $sSubmit, $this->_sSubject );
 		
 		$this->outputBeforeSubmitDefault();
 		$this->outputBeforeSubmit();
@@ -1415,7 +1450,11 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		) );
 		
 		if ( $sPaginateLinks && $this->_bShowTotalItems ) {
-			$sPaginateLinks = sprintf( '<span class="displaying-num">' . __( 'Displaying %s&#8211;%s of %s' ) . '</span>%s',
+			
+			$sPaginateLinks = sprintf( '<span class="displaying-num">%s</span>%%s', __( 'Displaying %s&#8211;%s of %s' ) );
+			
+			$sPaginateLinks = sprintf(
+				$sPaginateLinks,
 				number_format_i18n( ( $this->getPageNum() - 1 ) * $this->_iEntitiesPerPage + 1 ),
 				number_format_i18n( min( $this->getPageNum() * $this->_iEntitiesPerPage, $iTotalRows ) ),
 				number_format_i18n( $iTotalRows ),
@@ -1479,8 +1518,8 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 			$sSubmit = 'Update';
 		}
 		
-		$sAction = $sOp . $this->_sType;
-		$sNonceField = $this->_sInstanceClass . $sAction;
+		$sAction = sprintf( '%s%s', $sOp, $this->_sType );
+		$sNonceField = sprintf( '%s%s', $this->_sInstanceClass, $sAction );
 		
 		
 		
@@ -1598,7 +1637,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 				
 				if (
 					( $this->_sAddAction == $sAction ) &&
-					( check_admin_referer( $sActionTarget . $this->_sAddAction ) )
+					( check_admin_referer( sprintf( '%s%s', $sActionTarget, $this->_sAddAction ) ) )
 				) {
 					
 					if ( !$mRes = $this->doCustomActions( 'add', $aParams ) ) {
@@ -1613,7 +1652,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 					
 				} elseif (
 					( $this->_sEditAction == $sAction ) &&
-					( check_admin_referer( $sActionTarget . $this->_sEditAction ) ) && 
+					( check_admin_referer( sprintf( '%s%s', $sActionTarget, $this->_sEditAction ) ) ) && 
 					( $aParams[ 'entity_id' ] )
 				) {
 					

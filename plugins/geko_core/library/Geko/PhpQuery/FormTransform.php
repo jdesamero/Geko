@@ -13,7 +13,7 @@ class Geko_PhpQuery_FormTransform
 		if (
 			( !self::$aPlugins[ $sPluginClass ] ) && 
 			( @class_exists( $sPluginClass ) ) && 
-			( is_subclass_of( $sPluginClass, __CLASS__ . '_Plugin_Abstract' ) )
+			( is_subclass_of( $sPluginClass, sprintf( '%s_Plugin_Abstract', __CLASS__ ) ) )
 		) {
 			self::$aPlugins[ $sPluginClass ] = 1;
 		}
@@ -35,6 +35,8 @@ class Geko_PhpQuery_FormTransform
 		return array( $oDoc, $aOptions );
 	}
 	
+	
+	
 	// group the form elements together as needed
 	public static function getGroupedFormElems( $oPqFormElems, $sPrefix = '' ) {
 		
@@ -52,7 +54,7 @@ class Geko_PhpQuery_FormTransform
 			if ( 'input' == $sType ) {
 				
 				$sInputType = $oPqElem->attr( 'type' );
-				$sType .= ':' . ( ( '' == $sInputType ) ? 'text' : $sInputType );
+				$sType .= sprintf( ':%s', ( ( '' == $sInputType ) ? 'text' : $sInputType ) );
 				$sSubType = $sInputType;
 				
 			} elseif ( 'select' == $sType ) {
@@ -67,7 +69,7 @@ class Geko_PhpQuery_FormTransform
 				
 				// don't bother to do anything id $sUnprefixedFor is empty
 				if ( $sUnprefixedFor = $oPqElem->attr( 'for' ) ) {
-					if ( $sPrefixedFor = trim( $sPrefix . $sUnprefixedFor ) ) {
+					if ( $sPrefixedFor = trim( sprintf( '%s%s', $sPrefix, $sUnprefixedFor ) ) ) {
 						$oPqElem->attr( 'for', $sPrefixedFor );
 					}
 				}
@@ -82,21 +84,21 @@ class Geko_PhpQuery_FormTransform
 				$sUnprefixedName = $oPqElem->attr( 'name' );
 				
 				// don't bother to do anything if $sPrefixedId is empty
-				if ( $sPrefixedId = trim( $sPrefix . $sUnprefixedId ) ) {
+				if ( $sPrefixedId = trim( sprintf( '%s%s', $sPrefix, $sUnprefixedId ) ) ) {
 					$oPqElem->attr( 'id', $sPrefixedId );
 				}
 				
 				if ( '' == $sUnprefixedName ) $sUnprefixedName = $sUnprefixedId;
 				
 				// don't bother to do anything if $sPrefixedName is empty
-				if ( $sPrefixedName = trim( $sPrefix . $sUnprefixedName ) ) {
+				if ( $sPrefixedName = trim( sprintf( '%s%s', $sPrefix, $sUnprefixedName ) ) ) {
 					
 					// name the element group
 					if ( 'select:multiple' == $sType ) {
-						$oPqElem->attr( 'name', $sPrefixedName . '[]' );
+						$oPqElem->attr( 'name', sprintf( '%s[]', $sPrefixedName ) );
 					} elseif ( 'input:checkbox' == $sType ) {
 						if ( $sUnprefixedId != $sUnprefixedName ) {
-							$oPqElem->attr( 'name', $sPrefixedName . '[]' );		// group of checkboxes
+							$oPqElem->attr( 'name', sprintf( '%s[]', $sPrefixedName ) );		// group of checkboxes
 						} else {
 							$oPqElem->attr( 'name', $sPrefixedName );				// singleton checkbox
 						}
@@ -104,23 +106,17 @@ class Geko_PhpQuery_FormTransform
 						$oPqElem->attr( 'name', $sPrefixedName );
 					}
 					
-					// group together
-					$aElemsGroup[ $sPrefixedName ][ 'type' ] = $sType;
-					$aElemsGroup[ $sPrefixedName ][ 'nodename' ] = $sNodeName;
-					$aElemsGroup[ $sPrefixedName ][ 'subtype' ] = $sSubType;
-					$aElemsGroup[ $sPrefixedName ][ 'name' ] = $sUnprefixedName;
-					$aElemsGroup[ $sPrefixedName ][ 'prefixed_name' ] = $sPrefixedName;
-					
-					if ( ( 'input:radio' == $sType ) || ( 'input:checkbox' == $sType ) ) {
-						$aElemsGroup[ $sPrefixedName ][ 'elem' ][] = $oPqElem;
-					} else {
-						$aElemsGroup[ $sPrefixedName ][ 'elem' ] = $oPqElem;
-					}
-					
-					// printf('%s - %s - %s<br />', $sType, $sPrefixedId, $sPrefixedName);
+					$aElemsGroup = self::formatElemsGroup( $aElemsGroup, $oPqElem, $sNodeName, $sType, $sSubType, $sPrefixedName, $sUnprefixedName );
 				}
 			
 			}
+			
+			
+			if ( $sRowFld = $oPqElem->attr( 'data-row-fld' ) ) {
+				
+				$aElemsGroup = self::formatElemsGroup( $aElemsGroup, $oPqElem, $sNodeName, $sType, $sSubType, $sRowFld );				
+			}
+			
 			
 		}
 		
@@ -145,6 +141,34 @@ class Geko_PhpQuery_FormTransform
 		
 		return $aElemsGroup;
 	}
+	
+	//
+	public static function formatElemsGroup( $aElemsGroup, $oPqElem, $sNodeName, $sType, $sSubType, $sPrefixedName, $sUnprefixedName = NULL ) {
+		
+		if ( NULL === $sUnprefixedName ) {
+			$sUnprefixedName = $sPrefixedName;
+		}
+		
+		// group together
+		$aElemsGroup[ $sPrefixedName ][ 'type' ] = $sType;
+		$aElemsGroup[ $sPrefixedName ][ 'nodename' ] = $sNodeName;
+		$aElemsGroup[ $sPrefixedName ][ 'subtype' ] = $sSubType;
+		$aElemsGroup[ $sPrefixedName ][ 'name' ] = $sUnprefixedName;
+		$aElemsGroup[ $sPrefixedName ][ 'prefixed_name' ] = $sPrefixedName;
+		
+		if ( ( 'input:radio' == $sType ) || ( 'input:checkbox' == $sType ) ) {
+			$aElemsGroup[ $sPrefixedName ][ 'elem' ][] = $oPqElem;
+		} else {
+			$aElemsGroup[ $sPrefixedName ][ 'elem' ] = $oPqElem;
+		}
+		
+		// printf('%s - %s - %s<br />', $sType, $sPrefixedId, $sPrefixedName);
+		
+		return $aElemsGroup;
+	}
+	
+	
+	
 	
 	
 	

@@ -84,7 +84,7 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 		$this->_sCurrentDisplayMode = Geko_Wp_Admin_Hooks::getDisplayMode();
 		
 		$this->_sCurrentPage = Geko_String::coalesce( self::$sCurrentPage, $_REQUEST[ 'page' ] );
-
+		
 		if ( count( $this->_aTabGroup ) > 0 ) {
 			array_unshift( $this->_aTabGroup, $this->_sInstanceClass );
 		}
@@ -98,7 +98,9 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 			
 			// head
 			$sHeadHook = sprintf( 'admin_head_%s::%s', $this->_sSubAction, $sTargetClass );
-						
+			
+			add_action( 'admin_menu', array( $this, 'attachSubPage' ) );
+			
 		} else {
 			
 			//// will trigger doAdmin*() actions for current page
@@ -135,6 +137,16 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 		
 		return $this;
 	}
+	
+	
+	//
+	public function attachSubPage() {
+		
+		if ( $this->_sSubMenuPage ) {
+			add_submenu_page( $this->_sSubMenuPage, $this->_sPageTitle, $this->_sMenuTitle, $this->_sManagementCapability, $this->_sInstanceClass, array( $this, 'displayPage' ) );
+		}
+	}
+	
 	
 	//
 	public function addAdminHead( $oPlugin = NULL ) {

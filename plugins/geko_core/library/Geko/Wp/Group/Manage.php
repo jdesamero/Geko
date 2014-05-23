@@ -134,7 +134,7 @@ class Geko_Wp_Group_Manage extends Geko_Wp_Options_Manage
 	//
 	public function columnValue( $oEntity ) {
 		?>
-		<td class="column-title"><?php $oEntity->echoType(); ?></td>
+		<td class="column-type"><?php $oEntity->echoType(); ?></td>
 		<td class="column-title"><?php $oEntity->echoRoleTitle(); ?></td>
 		<td class="date column-date-created"><abbr title="<?php $oEntity->echoDateTimeCreated( 'Y/m/d g:i A' ); ?>"><?php $oEntity->echoDateCreated( 'Y/m/d' ); ?></abbr></td>
 		<td class="date column-date-modified"><abbr title="<?php $oEntity->echoDateTimeModified( 'Y/m/d g:i A' ); ?>"><?php $oEntity->echoDateModified( 'Y/m/d' ); ?></abbr></td>

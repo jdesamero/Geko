@@ -92,28 +92,6 @@ class Geko_Wp_Language_String_Manage extends Geko_Wp_Options_Manage
 		
 		if ( !is_array( $mRet ) ) $mRet = array(); 
 		
-		/* /
-		// DEPRACATED: Wp_Layout::getTranslatedValues()
-		if ( is_array( $aRes = $oLayout->getTranslatedValues() ) ) {
-			foreach ( $aRes as $sKey => $b ) {
-				if ( $sKey = trim( $sKey ) ) {
-					$mRet[ Geko_Wp_Options_MetaKey::getId( $sKey ) ] = $sKey;
-				}
-			}
-		}
-		/* */
-		
-		/* /
-		if ( is_array( $aRes = $oLayout->_getLabels() ) ) {
-			foreach ( $aRes as $sValue ) {
-				if ( $sValue = trim( $sValue ) ) {
-					$mRet[ Geko_Wp_Options_MetaKey::getId( $sValue ) ] = $sValue;
-				}
-			}
-		}
-		/* */
-		
-		
 		
 		if ( is_array( $aRes = $oLayout->_getLabels() ) ) {
 			

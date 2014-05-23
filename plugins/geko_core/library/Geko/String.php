@@ -35,7 +35,7 @@ class Geko_String
 		// is $sBreak present between $iLimit and the end of the string?
 		if ( FALSE !== ( $iBreakpoint = strpos( $sSubject, $sBreak, $iLimit ) ) ) {
 			if ( $iBreakpoint < ( strlen( $sSubject ) - 1 ) ) {
-				$sSubject = rtrim( substr( $sSubject, 0, $iBreakpoint ), ',.!? ' ) . $sPad;
+				$sSubject = sprintf( '%s%s', rtrim( substr( $sSubject, 0, $iBreakpoint ), ',.!? ' ), $sPad );
 			}
 		}
 		
@@ -222,7 +222,7 @@ class Geko_String
 				);
 				
 				if ( is_array( $aChunks[ $i ] ) ) {
-					$aChunks[ $i ][ 0 ] = $sStartDelim . $aChunks[ $i ][ 0 ] . $sEndDelim;		// re-introduce the delimiter
+					$aChunks[ $i ][ 0 ] = sprintf( '%s%s%s', $sStartDelim, $aChunks[ $i ][ 0 ], $sEndDelim );		// re-introduce the delimiter
 				} else {
 					$aChunks[ $i ] = $sChunk;												// no change
 				}
@@ -368,7 +368,7 @@ class Geko_String
 	public static function replacePlaceholders( $aPlaceholders, $sContent ) {
 
 		foreach ( $aPlaceholders as $sKey => $mValue ) {
-			$sPhValue = '##' . $sKey . '##';
+			$sPhValue = sprintf( '##%s##', $sKey );
 			if ( FALSE !== strpos( $sContent, $sPhValue ) ) {
 				$mValue = ( is_array( $mValue ) ) ? implode( ', ', $mValue ) : $mValue ;
 				$sContent = str_replace( $sPhValue, $mValue, $sContent );
