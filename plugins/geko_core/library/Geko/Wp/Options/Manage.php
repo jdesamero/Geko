@@ -1451,10 +1451,10 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		
 		if ( $sPaginateLinks && $this->_bShowTotalItems ) {
 			
-			$sPaginateLinks = sprintf( '<span class="displaying-num">%s</span>%%s', __( 'Displaying %s&#8211;%s of %s' ) );
+			$sPaginateWrap = sprintf( '<span class="displaying-num">%s</span>%%s', __( 'Displaying %s&#8211;%s of %s' ) );
 			
 			$sPaginateLinks = sprintf(
-				$sPaginateLinks,
+				$sPaginateWrap,
 				number_format_i18n( ( $this->getPageNum() - 1 ) * $this->_iEntitiesPerPage + 1 ),
 				number_format_i18n( min( $this->getPageNum() * $this->_iEntitiesPerPage, $iTotalRows ) ),
 				number_format_i18n( $iTotalRows ),
