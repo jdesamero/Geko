@@ -97,11 +97,12 @@ class Geko_Wp_Language_Translate extends Geko_Singleton_Abstract
 				
 			} else {
 				
+				$iLangId = $oLangMgmt->getLanguage( $sCurLang )->getId();
+				
 				if ( !is_array( $this->_aTranslatedValues[ $iLangId ] ) ) {
 					
 					$this->_aTranslatedValues[ $iLangId ] = array();
 					
-					$iLangId = $oLangMgmt->getLanguage( $sCurLang )->getId();
 					$aStrings = new Geko_Wp_Language_String_Query( array( 'lang_id' => $iLangId ) );
 					
 					foreach ( $aStrings as $oString ) {
