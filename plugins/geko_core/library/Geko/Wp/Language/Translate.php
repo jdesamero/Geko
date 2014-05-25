@@ -96,8 +96,8 @@ class Geko_Wp_Language_Translate extends Geko_Singleton_Abstract
 				return strval( $oUrl );
 				
 			} else {
-			
-				if ( !$this->_aTranslatedValues[ $iLangId ] ) {
+				
+				if ( !is_array( $this->_aTranslatedValues[ $iLangId ] ) ) {
 					
 					$this->_aTranslatedValues[ $iLangId ] = array();
 					
