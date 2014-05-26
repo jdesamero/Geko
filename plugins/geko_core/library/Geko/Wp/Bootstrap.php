@@ -48,6 +48,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 				'user.security' => NULL,
 				'user.op' => NULL,
 				
+				'cat.meta' => NULL,
 				'cat.alias' => NULL,
 				'cat.tmpl' => NULL,
 				'cat.posttmpl' => NULL,
@@ -202,6 +203,19 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 		;
 		
 		$this->set( 'loc.mng', $oLocMng );
+	}
+	
+	
+	//
+	public function compCat_Meta( $aArgs ) {
+		
+		$oCatMeta = Geko_Wp_Category_Meta::getInstance();
+		
+		if ( isset( $aArgs[ 'use_term_tx' ] ) ) {
+			Geko_Wp_Category_Meta::setUseTermTaxonomy( $aArgs[ 'use_term_tx' ] );
+		}
+		
+		$this->set( 'cat.meta', $oCatMeta );
 	}
 	
 	
