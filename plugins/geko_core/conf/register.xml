@@ -191,7 +191,10 @@
 		<file id="geko-jquery-fixboxmodel" src="##geko_core_uri##/external/js/jquery.fixBoxModel.js" dependencies="jquery" />
 		<file id="geko-jquery-form" src="##geko_core_uri##/external/js/jquery.form.js" dependencies="jquery" />
 		<file id="geko-jquery-googlemaps" src="##geko_core_uri##/external/js/jquery.googlemaps-1.01.1.js" dependencies="geko-googlemaps jquery" />
+		<file id="geko-jquery-greensock" src="##geko_core_uri##/external/js/greensock.js" dependencies="jquery" />
 		<file id="geko-jquery-hammer" src="##geko_core_uri##/external/js/jquery.hammer.js" dependencies="jquery" />
+		<file id="geko-jquery-layerslider" src="##geko_core_uri##/external/js/layerslider.kreaturamedia.jquery.js" dependencies="geko-jquery-layerslider-transitions" />
+		<file id="geko-jquery-layerslider-transitions" src="##geko_core_uri##/external/js/layerslider.transitions.js" dependencies="jquery" />
 		<file id="geko-jquery-jcarousel-2006" src="##geko_core_uri##/external/js/jquery.jcarousel-2006.js" dependencies="jquery" />
 		<file id="geko-jquery-jcarousel" src="##geko_core_uri##/external/js/jquery.jcarousel.min.js" dependencies="jquery" />
 		<file id="geko-jquery-jcarousel-simple" src="##geko_core_uri##/external/js/jquery.jcarousel-simple.js" dependencies="jquery" />
@@ -319,9 +322,10 @@
 		
 		<file id="geko-swipe" src="##geko_core_uri##/external/styles/swipe/style.css" />
 		
-		<file id="geko-jquery-jcarousel" src="##geko_core_uri##/external/styles/jquery.jcarousel.css" />
+		<file id="geko-jquery-jcarousel" src="##geko_core_uri##/external/styles/jcarousel/style.css" />
+		<file id="geko-jquery-jcarousel-2006" src="##geko_core_uri##/external/styles/jcarousel/style-2006.css" />
 		<file id="geko-jquery-jscrollbar" src="##geko_core_uri##/external/styles/jScrollbar/style.css" />
-		<file id="geko-jquery-jscrollpane" src="##geko_core_uri##/external/styles/jquery.jscrollpane.css" />
+		<file id="geko-jquery-jscrollpane" src="##geko_core_uri##/external/styles/jscrollpane/style.css" />
 		<file id="geko-jquery-mobilymap" src="##geko_core_uri##/external/styles/mobilymap/style.css" />
 		<file id="geko-jquery-prettyphoto" src="##geko_core_uri##/external/styles/prettyPhoto/style.css" />
 		<file id="geko-jquery-scrollpath" src="##geko_core_uri##/external/styles/scrollpath/style.css" />
