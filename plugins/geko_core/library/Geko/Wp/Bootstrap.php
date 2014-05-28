@@ -33,7 +33,11 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 				'role.types' => NULL,
 				'role.mng' => array( 'role.types' ),
 				
+				'form.mng' => NULL,
+				
 				'emsg.mng' => NULL,
+
+				'cont.mng' => NULL,
 				
 				'loc.mng' => NULL,
 				
@@ -54,6 +58,8 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 				'cat.posttmpl' => NULL,
 				
 				'post.meta' => NULL,
+				'post.defcat' => NULL,
+				
 				'page.meta' => NULL,
 				
 				'pin.mng' => NULL,
@@ -74,14 +80,17 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 			
 			->mergeAbbrMap( array(
 				
-				'emsg' => 'EmailMessage',
 				'cat' => 'Category',
+				'cont' => 'Contact',
 				'custhks' => 'CustomHooks',
+				'defcat' => 'DefaultCategory',
+				'emsg' => 'EmailMessage',
 				'lang' => 'Language',
 				'loc' => 'Location',
 				'mng' => 'Manage',
 				'navmng' => 'NavigationManagement',
 				'op' => 'Operation',
+				'pnt' => 'Point',
 				'posttmpl' => 'PostTemplate',
 				'rslv' => 'Resolver',
 				'tmpl' => 'Template'
@@ -256,7 +265,19 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	}
 	
 	
-	
+	// point manage
+	public function compPnt_Mng( $aArgs ) {
+		
+		$oPntMng = Geko_Wp_Point_Manage::getInstance();
+		
+		if ( $sPaEmsg = $aArgs[ 'points_approval_emsg' ] ) {
+			$oPntMng->setPointsApprovalEmsg( $sPaEmsg );
+		}
+		
+		$oPntMng->init();
+		
+		$this->set( 'pnt.mng', $oPntMng );
+	}
 	
 	
 	
