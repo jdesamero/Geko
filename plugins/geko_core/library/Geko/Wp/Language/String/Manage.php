@@ -45,7 +45,7 @@ class Geko_Wp_Language_String_Manage extends Geko_Wp_Options_Manage
 			->fieldBigInt( 'str_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldLongtext( 'val' )
 			->fieldBigInt( 'trans_str_id', array( 'unsgnd' ) )
-			->fieldChar( 'trans_key', array( 'key' ) )
+			->fieldChar( 'trans_key', array( 'key', 'size' => 32 ) )
 			->fieldSmallInt( 'lang_id', array( 'unsgnd' ) )
 		;
 		
@@ -79,6 +79,7 @@ class Geko_Wp_Language_String_Manage extends Geko_Wp_Options_Manage
 	public function getTranslateKeys() {
 		
 		$oTmpl = Geko_Wp_Template::getInstance();
+		
 		return $oTmpl->getTemplateValues( array(
 			'prefix' => sprintf( '%s-translate_keys', $this->getPrefix() ),
 			'callback' => array( $oTmpl, 'introspectTemplateValuesCallback' ),
@@ -201,7 +202,7 @@ class Geko_Wp_Language_String_Manage extends Geko_Wp_Options_Manage
 		$aTranslateKeys = $this->getTranslateKeys();
 		natcasesort( $aTranslateKeys );
 		// print_r( $aTranslateKeys );
-
+		
 		if ( $oEntity->getId() != $oMng->getLangId() ): ?>
 			
 			<tr>

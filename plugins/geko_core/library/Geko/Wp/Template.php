@@ -133,7 +133,7 @@ class Geko_Wp_Template extends Geko_Singleton_Abstract
 		
 		$sName = '';
 		
-		if ( preg_match( '|' . $sAttributeName . ':(.*)$|mi', $sTemplateFileContents, $sName ) ) {
+		if ( preg_match( sprintf( '|%s:(.*)$|mi', $sAttributeName ), $sTemplateFileContents, $sName ) ) {
 			$sName = _cleanup_header_comment( $sName[ 1 ] );
 		}
 		
@@ -162,10 +162,10 @@ class Geko_Wp_Template extends Geko_Singleton_Abstract
 				if ( 'Gloc_Layout_Template' == $sClass ) {
 					
 					// not unique					
-					$sClass .= '_' . $iIdx;		// make it unique
+					$sClass .= sprintf( '_%s', $iIdx );		// make it unique
 					
 					$sPhpCode = preg_replace( '/<\?php/si', '', $sPhpCode, 1 );
-					$sPhpCode = preg_replace( '/class\sGloc_Layout_Template/si', 'class ' . $sClass, $sPhpCode );
+					$sPhpCode = preg_replace( '/class\sGloc_Layout_Template/si', sprintf( 'class %s', $sClass ), $sPhpCode );
 					$sPhpCode = preg_replace( '/geko_render_template\(\);/si', '', $sPhpCode );
 					
 					eval( $sPhpCode );

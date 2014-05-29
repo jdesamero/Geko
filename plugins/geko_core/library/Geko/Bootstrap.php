@@ -387,7 +387,7 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 		foreach ( $aCompParts as $sPart ) {
 			
 			if ( !( $sFull = $this->_aAbbrMap[ $sPart ] ) ) {
-				$sFull = ucfirst( strtolower( $sPart ) );
+				$sFull = Geko_Inflector::camelize( strtolower( $sPart ) );
 			}
 			
 			$aTrans[] = $sFull;

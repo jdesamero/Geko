@@ -21,9 +21,9 @@ class Geko_Wp_Layout extends Geko_Layout
 	
 	
 	//
-	public function start() {
+	protected function __construct() {
 		
-		parent::start();
+		parent::__construct();
 		
 		$oTrans = Geko_Wp_Language_Translate::getInstance();
 		

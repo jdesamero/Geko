@@ -86,6 +86,7 @@ Geko_Uri::setUrl( array(
 	'wp_login' => sprintf( '%s/wp-login.php', Geko_Wp::getUrl() ),
 	'wp_user_edit' => sprintf( '%s/wp-admin/user-edit.php', Geko_Wp::getUrl() ),
 	'geko_export' => sprintf( '%s/srv/export.php', GEKO_CORE_URI ),
+	'geko_gmap_overlay' => sprintf( '%s/srv/gmap_overlay.php', GEKO_CORE_URI ),
 	'geko_pdf' => sprintf( '%s/srv/pdf.php', GEKO_CORE_URI ),
 	'geko_process' => sprintf( '%s/srv/process.php', GEKO_CORE_URI ),
 	'geko_thumb' => sprintf( '%s/srv/thumb.php', GEKO_CORE_URI ),
