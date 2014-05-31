@@ -75,7 +75,7 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 				
 				// set-up vars
 				
-				$sActivationKey = md5( $sEmail . $sPassword . $sFirstName . $sLastName . rand() . time() );
+				$sActivationKey = md5( sprintf( '%s%s%s%s%s%s', $sEmail, $sPassword, $sFirstName, $sLastName, rand(), time() ) );
 				
 				// create user
 				
@@ -101,10 +101,10 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 					
 					$this->deliverMail( 'activate-account-notification', array(
 						'recipients' => array(
-							array( $sEmail, $sFirstName . ' ' . $sLastName )
+							array( $sEmail, sprintf( '%s %s', $sFirstName, $sLastName ) )
 						),
 						'merge_params' => array(
-							'activation_link' => Geko_Wp::getUrl() . '/login/activate-account/?key=' . $sActivationKey
+							'activation_link' => sprintf( '%s/login/activate-account/?key=%s', Geko_Wp::getUrl(), $sActivationKey )
 						)
 					) )->send();
 					
@@ -226,7 +226,7 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 						array( 'ID' => $iUserId )
 					);
 
-					$sActivationKey = md5( $sEmail . $sPassword . $sFirstName . $sLastName . rand() . time() );
+					$sActivationKey = md5( sprintf( '%s%s%s%s%s%s', $sEmail, $sPassword, $sFirstName, $sLastName, rand(), time() ) );
 					update_usermeta( $iUserId, 'geko_activation_key', $sActivationKey );
 					
 					// send notification
@@ -234,10 +234,10 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 						
 						$this->deliverMail( 'activate-account-notification', array(
 							'recipients' => array(
-								array( $sEmail, $sFirstName . ' ' . $sLastName )
+								array( $sEmail, sprintf( '%s %s', $sFirstName, $sLastName ) )
 							),
 							'merge_params' => array(
-								'activation_link' => Geko_Wp::getUrl() . '/login/activate-account/?key=' . $sActivationKey
+								'activation_link' => sprintf( '%s/login/activate-account/?key=%s', Geko_Wp::getUrl(), $sActivationKey )
 							)
 						) )->send();
 						
@@ -282,7 +282,7 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 			$oUser = new Gloc_User( $sEmail );
 			$iUserId = $oUser->getId();
 			
-			$sKey = md5( $oUser->getFullName() . time() . rand() );
+			$sKey = md5( sprintf( '%s%s%s', $oUser->getFullName(), time(), rand() ) );
 			
 			update_usermeta( $iUserId, 'geko_password_reset_key', $sKey );
 			
@@ -295,7 +295,7 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 						array( $oUser->getEmail(), $oUser->getFullName() )
 					),
 					'merge_params' => array(
-						'password_reset_link' => Geko_Wp::getUrl() . '/login/set-password/?key=' . $sKey
+						'password_reset_link' => sprintf( '%s/login/set-password/?key=%s', Geko_Wp::getUrl(), $sKey )
 					)
 				) )->send();
 				
