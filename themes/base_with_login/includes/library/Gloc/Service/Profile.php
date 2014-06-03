@@ -28,6 +28,11 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 	
 	
 	
+	protected $_sManageClassPrefix = 'Gloc_';
+	
+	
+	
+	
 	
 	//
 	public function processLogin() {
@@ -79,21 +84,20 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 				
 				// create user
 				
-				$iUserId = wp_create_user( $sEmail, $sPassword, $sEmail );
+				$iUserId = $this->createUser( $sEmail, $sPassword, $sEmail );
 				
-				// set user role
 				
-				$oWpUser = new WP_User( $iUserId );
-				$oWpUser->set_role( 'subscriber' );
-				
-				Geko_Wp_User_RoleType::getInstance()->reconcileAssigned();
-
 				// set meta-data
+				$this->insertUserMeta( $iUserId, array(
+					
+					'!first_name' => $sFirstName,
+					'!last_name' => $sLastName,
+					'!show_admin_bar_front' => 'false',
+					'!geko_activation_key' => $sActivationKey,
+					'!role' => 'subscriber'
+					
+				) );
 				
-				update_usermeta( $iUserId, 'first_name', $sFirstName );
-				update_usermeta( $iUserId, 'last_name', $sLastName );
-				update_usermeta( $iUserId, 'show_admin_bar_front', 'false' );
-				update_usermeta( $iUserId, 'geko_activation_key', $sActivationKey );
 				
 				// send notification
 				
@@ -130,8 +134,10 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 			$oUser = Gloc_User::getOne( array( 'geko_activation_key' => $sKey ), FALSE );
 			
 			if ( $oUser->isValid() ) {
-
-				update_usermeta( $oUser->getId(), 'geko_activation_key', '' );
+				
+				$iUserId = $oUser->getId();
+				
+				$this->updateUserMeta( $iUserId, array( '!geko_activation_key' => '' ) );
 				
 				// send notification
 		
@@ -204,30 +210,30 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 			
 			// proceed if checks are okay
 			if ( !$this->hasStatus() ) {
-			
-				update_usermeta( $iUserId, 'first_name', $sFirstName );
-				update_usermeta( $iUserId, 'last_name', $sLastName );
+				
+				$this->updateUserMeta( $iUserId, array(
+					'!first_name' => $sFirstName,
+					'!last_name' => $sLastName
+				) );
 				
 				// email was changed
 				if ( $bNewEmail ) {
 
 					// change email and generate activation key
 					
-					wp_update_user( array(
-						'ID' => $iUserId,
-						'user_nicename' => sanitize_title( $sEmail ),
-						'user_email' => $sEmail,
-						'display_name' => $sEmail
-					) );
-					
-					$wpdb->update(
-						$wpdb->users,
-						array( 'user_login' => $sEmail ),
-						array( 'ID' => $iUserId )
-					);
-
 					$sActivationKey = md5( sprintf( '%s%s%s%s%s%s', $sEmail, $sPassword, $sFirstName, $sLastName, rand(), time() ) );
-					update_usermeta( $iUserId, 'geko_activation_key', $sActivationKey );
+
+					$this->updateUserMeta( $iUserId, array(
+						
+						'!user_login' => $sEmail,
+						
+						'!user_nicename' => sanitize_title( $sEmail ),
+						'!user_email' => $sEmail,
+						'!display_name' => $sEmail,
+						
+						'!geko_activation_key' => $sActivationKey
+						
+					) );
 					
 					// send notification
 					try {
@@ -284,7 +290,7 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 			
 			$sKey = md5( sprintf( '%s%s%s', $oUser->getFullName(), time(), rand() ) );
 			
-			update_usermeta( $iUserId, 'geko_password_reset_key', $sKey );
+			$this->updateUserMeta( $iUserId, array( '!geko_password_reset_key' => $sKey ) );
 			
 			// send notification
 			
@@ -324,10 +330,11 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 			
 			$iUserId = $oUser->getId();
 			
-			update_usermeta( $iUserId, 'geko_password_reset_key', '' );
+			$this->updateUserMeta( $iUserId, array(
+				'!geko_password_reset_key' => '',
+				'!password' => $sPassword
+			) );
 			
-			wp_set_password( $sPassword, $iUserId );
-
 			// send notification
 			
 			try {

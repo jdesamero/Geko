@@ -59,6 +59,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 				
 				'post.meta' => NULL,
 				'post.defcat' => NULL,
+				'post.expdate' => NULL,
 				
 				'page.meta' => NULL,
 				
@@ -84,6 +85,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 				'cont' => 'Contact',
 				'custhks' => 'CustomHooks',
 				'defcat' => 'DefaultCategory',
+				'expdate' => 'ExpirationDate',
 				'emsg' => 'EmailMessage',
 				'lang' => 'Language',
 				'loc' => 'Location',
