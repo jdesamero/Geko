@@ -107,6 +107,26 @@ class Geko_Class
 	}
 	
 	
+	//
+	public static function getConstants( $mCheck ) {
+		
+		$sClass = '';
+		
+		if ( is_object( $mCheck ) ) {
+			$sClass = get_class( $mCheck );
+		} elseif ( class_exists( $mCheck ) ) {
+			$sClass = $mCheck;
+		}
+		
+		if ( $sClass ) {
+			$oReflect = new ReflectionClass( $mCheck );
+			return $oReflect->getConstants();
+		}
+		
+		return NULL;
+	}
+
+	
 	
 }
 

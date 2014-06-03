@@ -198,6 +198,21 @@ class Geko_Service extends Geko_Singleton_Abstract
 	}
 	
 	
+	//
+	public function getStatusValues() {
+		
+		$aConsts = Geko_Class::getConstants( $this->_sInstanceClass );
+		$aValues = array();
+		
+		foreach ( $aConsts as $sKey => $mValue ) {
+			
+			if ( 0 === strpos( $sKey, 'STAT_' ) ) {
+				$aValues[ strtolower( substr( $sKey, 5 ) ) ] = $mValue;
+			}
+		}
+		
+		return $aValues;
+	}
 	
 	
 	

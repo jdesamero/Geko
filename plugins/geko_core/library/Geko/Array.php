@@ -214,7 +214,7 @@ class Geko_Array
 		if ( '' == $sParentKey ) {
 			return $sKey;
 		} else {
-			return $sParentKey . '[' . $sKey . ']';
+			return sprintf( '%s[%s]', $sParentKey, $sKey );
 		}
 	}
 	
@@ -286,7 +286,7 @@ class Geko_Array
 			
 			$fTrimFunc = create_function(
 				'$sSubject',
-				'return trim( $sSubject, "' . $sTrimChars . '" );'
+				sprintf( 'return trim( $sSubject, "%s" );', $sTrimChars )
 			);
 		}
 		
