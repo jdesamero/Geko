@@ -218,13 +218,11 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	//
 	public function compCat_Meta( $aArgs ) {
 		
-		$oCatMeta = Geko_Wp_Category_Meta::getInstance();
-		
 		if ( isset( $aArgs[ 'use_term_tx' ] ) ) {
 			Geko_Wp_Category_Meta::setUseTermTaxonomy( $aArgs[ 'use_term_tx' ] );
 		}
 		
-		$this->set( 'cat.meta', $oCatMeta );
+		$this->handleComponent( 'cat.meta', NULL, $aArgs );
 	}
 	
 	

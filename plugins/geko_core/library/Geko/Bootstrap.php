@@ -382,6 +382,10 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 	//
 	public function handleComponent( $sKey, $aCompParts, $aArgs ) {
 		
+		if ( NULL === $aCompParts ) {
+			$aCompParts = explode( '.', $sKey );
+		}
+		
 		$aTrans = array();
 		
 		foreach ( $aCompParts as $sPart ) {
