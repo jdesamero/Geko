@@ -97,11 +97,33 @@ class Geko_Wp_Ext_Cart66 extends Geko_Singleton_Abstract
 				add_action( 'admin_cart66_settings_notifications_form_pq', array( $this, 'doNotificationsTab' ) );
 				
 				add_action( 'admin_cart66_settings_gateways_form_pq', array( $oBsGw, 'settingsForm' ) );
-				add_action( 'admin_cart66_settings_gateways_script_pq', array( $oBsGw, 'settingsForm' ) );
+				add_action( 'admin_cart66_settings_gateways_script_pq', array( $oBsGw, 'settingsScript' ) );
 				
 			}
 			
 		}
+		
+		//// overrides
+		
+		$sPage = $_GET[ 'page' ];
+		
+		if ( is_admin() && ( 0 === strpos( $sPage, 'cart66' ) ) ) {
+			add_action( 'admin_head', array( $this, 'adminHead' ) );
+		}
+		
+	}
+	
+	//
+	public function adminHead() {
+		?>
+		<style type="text/css">
+			
+			#mijireh_notice {
+				display: none;
+			}
+			
+		</style>
+		<?php
 	}
 	
 	
@@ -735,7 +757,7 @@ class Geko_Wp_Ext_Cart66 extends Geko_Singleton_Abstract
 				
 				$oCalculation->setLocation( $sState );				
 				
-				$oCalculation = apply_filters( get_class( $this ) . '::ajaxTriggerCheck::calculate_tax', $oCalculation, $this );
+				$oCalculation = apply_filters( sprintf( '%s::ajaxTriggerCheck::calculate_tax', get_class( $this ) ), $oCalculation, $this );
 				
 				$oCalculation->calculate();
 				

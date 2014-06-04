@@ -39,7 +39,7 @@ class Geko_Wp_Ext_Cart66_Gateway extends Cart66GatewayAbstract
 		
 		// set default prefix
 		if ( NULL === $this->_sPrefix ) {
-			$this->_sPrefix = $this->_sSlug . '_';
+			$this->_sPrefix = sprintf( '%s_', $this->_sSlug );
 		}
 		
 		$this->_sInstanceClass = get_class( $this );
@@ -163,7 +163,7 @@ class Geko_Wp_Ext_Cart66_Gateway extends Cart66GatewayAbstract
 		$p = $this->getPayment();
 		
 		$billTo = array(
-			'Name' => $b[ 'firstName' ] . ' ' . $b[ 'lastName' ],
+			'Name' => sprintf( '%s %s', $b[ 'firstName' ], $b[ 'lastName' ] ),
 			'Address' => array(
 				'Street' => $b[ 'address' ],
 				'City' => $b[ 'city' ],
@@ -201,12 +201,12 @@ class Geko_Wp_Ext_Cart66_Gateway extends Cart66GatewayAbstract
 			
 			if ( $standalone ) header( 'content-type:text/xml;charset=utf-8' );
 			if ( !isset( $output ) ) { $output = ''; }
-			if ( $standalone ) $output .= '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+			if ( $standalone ) $output .= sprintf( '<?xml version="1.0" encoding="UTF-8"?>%s', "\n" );
 			
 			if ( !empty( $space ) ) {
-				$output .= '<' . $name . ' xmlns="' . $space . '">' . "\n";
+				$output .= sprintf( '<%s xmlns="%s">%s', $name, $space, "\n" );
 			} elseif( $name ) {
-				$output .= '<' . $name . '>' . "\n";
+				$output .= sprintf( '<%s>%s', $name, "\n" );
 			}
 			
 			$nested = 0;
@@ -219,29 +219,34 @@ class Geko_Wp_Ext_Cart66_Gateway extends Cart66GatewayAbstract
 			
 			if ( is_array( $child ) ) {
 				
-				$output .= str_repeat( ' ', ( 2 * $nested ) ) . '  <' . ( is_string( $root ) ? $root : $ArrayNumberPrefix . $root ) . '>' . "\n";
+				$sRootElem = ( is_string( $root ) ? $root : sprintf( '%s%s', $ArrayNumberPrefix, $root ) );
+				
+				$output .= sprintf( '%s  <%s>%s', str_repeat( ' ', ( 2 * $nested ) ), $sRootElem, "\n" );
 				$nested++;
 				$output .= self::arrayToXml( $child, NULL, NULL, NULL, FALSE, $nested );
 				$nested--;
-				$tag = is_string( $root ) ? $root : $ArrayNumberPrefix . $root;
+				$tag = is_string( $root ) ? $root : sprintf( '%s%s', $ArrayNumberPrefix, $root );
 				$ex = explode( ' ', $tag );
 				$tag = array_shift( $ex );
-				$output .= str_repeat( ' ', ( 2 * $nested ) ) . '  </' . $tag . '>' . "\n";
+				$output .= sprintf( '%s  </%s>%s', str_repeat( ' ', ( 2 * $nested ) ), $tag, "\n" );
 			
 			} else {
 				
 				if ( !isset( $output ) ) { $output = ''; }
-				$tag = is_string( $root ) ? $root : $ArrayNumberPrefix . $root;
+				$tag = is_string( $root ) ? $root : sprintf( '%s%s', $ArrayNumberPrefix, $root );
 				$ex = explode( ' ', $tag );
 				$tag = array_shift( $ex );
-				$output .= str_repeat( ' ', ( 2 * $nested ) ) . '  <' . ( is_string( $root ) ? $root : $ArrayNumberPrefix . $root ) . '>' . $child . '</' . $tag . '>' . "\n";
+				
+				$sRootElem = ( is_string( $root ) ? $root : sprintf( '%s%s', $ArrayNumberPrefix, $root ) );
+				
+				$output .= sprintf( '%s  <%s>%s</%s>%s', str_repeat( ' ', ( 2 * $nested ) ), $sRootElem, $child, $tag, "\n" );
 				
 			}
 		}
 		
 		$ex = explode( ' ', $name );
 		$name = array_shift( $ex );
-		if ( $beginning && $name ) $output .= '</' . $name . '>';
+		if ( $beginning && $name ) $output .= sprintf( '</%s>', $name );
 		
 		return $output;
 	}
@@ -362,7 +367,7 @@ class Geko_Wp_Ext_Cart66_Gateway extends Cart66GatewayAbstract
 		$aValues = array();
 		
 		foreach ( $aKeys as $sKey ) {
-			$sPfKey = $this->_sPrefix . $sKey;
+			$sPfKey = sprintf( '%s%s', $this->_sPrefix, $sKey );
 			$aValues[ $sPfKey ] = $this->getSettingValue( $sKey );
 		}
 		
@@ -371,7 +376,7 @@ class Geko_Wp_Ext_Cart66_Gateway extends Cart66GatewayAbstract
 	
 	//
 	public function getSettingValue( $sKey ) {
-		return Cart66Setting::getValue( $this->_sPrefix . $sKey );
+		return Cart66Setting::getValue( sprintf( '%s%s', $this->_sPrefix, $sKey ) );
 	}
 	
 	

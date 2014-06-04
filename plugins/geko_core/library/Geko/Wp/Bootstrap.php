@@ -156,9 +156,16 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	// hooks
 	public function compHooks( $aArgs ) {
 		
+		// plugins for Geko_Wp_Admin_Hooks
+		
+		$aPlugins = $aArgs[ 'plugins' ];
+		if ( !is_array( $aPlugins ) ) {
+			$aPlugins = array();
+		}
+		
 		// adds the hooks: admin_head, admin_body_header, admin_body_footer
 		// adds the filters: admin_page_source
-		Geko_Wp_Admin_Hooks::init();
+		Geko_Wp_Admin_Hooks::init( $aPlugins );
 		
 		if ( $aArgs[ 'fix_https' ] ) {
 			Geko_Wp_Hooks::setFixHttps();

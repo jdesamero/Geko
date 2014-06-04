@@ -55,7 +55,7 @@ class Geko_Wp_Ext_Cart66_Gateway_Beanstream extends Geko_Wp_Ext_Cart66_Gateway
 		
 		$sComments = '';
 		
-		Cart66Common::log( 'Payment info for checkout: ' . print_r( $p, true ) );
+		Cart66Common::log( sprintf( 'Payment info for checkout: %s', print_r( $p, TRUE ) ) );
 		
 		// $extData = $this->generateExtendedData();
 	
@@ -113,10 +113,10 @@ class Geko_Wp_Ext_Cart66_Gateway_Beanstream extends Geko_Wp_Ext_Cart66_Gateway
 				$idx = $i + 1;
 				$sProdTitle = sprintf( '%s - %s', $item->getFullDisplayName(), $item->getProductPriceDescription() );
 				
-				$this->addField( 'prod_id_' . $idx, $item->getItemNumber() );
-				$this->addField( 'prod_name_' . $idx, $sProdTitle );
-				$this->addField( 'prod_quantity_' . $idx, $item->getQuantity() );
-				$this->addField( 'prod_cost_' . $idx, $item->getProductPrice() );
+				$this->addField( sprintf( 'prod_id_%d', $idx ), $item->getItemNumber() );
+				$this->addField( sprintf( 'prod_name_%d', $idx ), $sProdTitle );
+				$this->addField( sprintf( 'prod_quantity_%d', $idx ), $item->getQuantity() );
+				$this->addField( sprintf( 'prod_cost_%d', $idx ), $item->getProductPrice() );
 			}
 		}
 		
@@ -137,7 +137,7 @@ class Geko_Wp_Ext_Cart66_Gateway_Beanstream extends Geko_Wp_Ext_Cart66_Gateway
 		}
 		
 		//
-		$this->addField( 'ExpDate', $expMonth . $expYear );
+		$this->addField( 'ExpDate', sprintf( '%s%s', $expMonth, $expYear ) );
 		$this->addField( 'trnCardCvd', $p[ 'securityId' ] );
 		
 	}
@@ -197,7 +197,7 @@ class Geko_Wp_Ext_Cart66_Gateway_Beanstream extends Geko_Wp_Ext_Cart66_Gateway
 		} else {
 			
 			// Process free orders without sending to the Auth.net gateway
-			$this->response[ 'Transaction ID' ] = 'MT-' . Cart66Common::getRandString();
+			$this->response[ 'Transaction ID' ] = sprintf( 'MT-%s', Cart66Common::getRandString() );
 			$sale = $this->response[ 'Transaction ID' ];
 			
 		}
@@ -303,14 +303,14 @@ class Geko_Wp_Ext_Cart66_Gateway_Beanstream extends Geko_Wp_Ext_Cart66_Gateway
 		
 		$sFind = 'function setGatewayDisplay() {';
 		
-		$sReplace = $sFind . sprintf( "
+		$sReplace = sprintf( "%s
 			
 			\$jq( '.%s_row' ).hide();
 			if ( \$jq( '#auth_url :selected' ).attr( 'id' ) == '%s_url' ) {
 				\$jq( '.%s_row' ).show();
 			}
 			
-		", $this->_sSlug, $this->_sSlug, $this->_sSlug );
+		", $sFind, $this->_sSlug, $this->_sSlug, $this->_sSlug );
 		
 		$oFirst->text( str_replace( $sFind, $sReplace, $sJs ) );
 		
