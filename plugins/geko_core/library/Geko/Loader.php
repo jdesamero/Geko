@@ -15,7 +15,7 @@ class Geko_Loader extends Zend_Loader
 		// call once
 		if ( !self::$bInit ) {
 			
-			require_once( dirname( __FILE__ ) . '/functions.inc.php' );
+			require_once( sprintf( '%s/functions.inc.php', dirname( __FILE__ ) ) );
 			
 			$oAutoloader = Zend_Loader_Autoloader::getInstance();
 			$oAutoloader->pushAutoloader( array( __CLASS__, 'autoloadNsLevelClass' ) );
@@ -30,15 +30,20 @@ class Geko_Loader extends Zend_Loader
 		$oAutoloader = Zend_Loader_Autoloader::getInstance();
 		$aNs = $oAutoloader->getRegisteredNamespaces();
 				
-		if ( in_array( $sClass . '_', $aNs ) ) {
+		if ( in_array( sprintf( '%s_', $sClass ), $aNs ) ) {
+			
 			$aDirs = explode( PATH_SEPARATOR, get_include_path() );
+			
 			foreach ( $aDirs as $sDir ) {
-				$sFile = $sDir . DIRECTORY_SEPARATOR . $sClass . '.php';
-				if ( is_file( $sFile ) ) {
+				
+				$sFile = sprintf( '%s%s%s.php', $sDir, DIRECTORY_SEPARATOR, $sClass );
+				
+				if ( @is_file( $sFile ) ) {
 					require_once $sFile;
 					break;
 				}
 			}
+			
 		}
 	}
 	
@@ -46,8 +51,11 @@ class Geko_Loader extends Zend_Loader
 	
 	// add the specified dirs to ini.include_path
 	public static function addIncludePaths() {
+		
 		$aDirs = func_get_args();
-		$sIncludePath = ini_get( 'include_path' ) . self::appendPaths( $aDirs );		
+		
+		$sIncludePath = sprintf( '%s%s', ini_get( 'include_path' ), self::appendPaths( $aDirs ) );
+		
 		ini_set( 'include_path', $sIncludePath );
 	}
 	
@@ -63,10 +71,10 @@ class Geko_Loader extends Zend_Loader
 		
 		$aDirs = array();
 		foreach ( $aPaths as $sPath ) {
-			$aDirs[] = realpath( self::$sLibRoot . $sPath );
+			$aDirs[] = realpath( sprintf( '%s%s', self::$sLibRoot, $sPath ) );
 		}
 		
-		$sIncludePath = ini_get( 'include_path' ) . self::appendPaths( $aDirs );		
+		$sIncludePath = sprintf( '%s%s', ini_get( 'include_path' ), self::appendPaths( $aDirs ) );
 		ini_set( 'include_path', $sIncludePath );
 	}
 		
@@ -81,7 +89,7 @@ class Geko_Loader extends Zend_Loader
 				// append to include path, with PATH_SEPARATOR delimiter
 				$sIncludePath .= self::appendPaths( $mElem );
 			} elseif ( '' != ( $mElem = realpath( $mElem ) ) ) {
-				$sIncludePath .= PATH_SEPARATOR . $mElem;
+				$sIncludePath .= sprintf( '%s%s', PATH_SEPARATOR, $mElem );
 			}
 		}
 		
