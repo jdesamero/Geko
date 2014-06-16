@@ -24,7 +24,7 @@ class Geko_Log
 	public function __construct( $iWriter = NULL, $aParams = array() ) {
 		
 		// instantiate type
-		if ( self::WRITER_FILE == $iWriter ) {
+		if ( self::WRITER_STREAM == $iWriter ) {
 		
 			$sStream = $aParams[ 'stream' ];
 			
