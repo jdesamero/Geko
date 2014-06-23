@@ -6,9 +6,12 @@ class Geko_Sysomos
 	
 	protected static $aValues = array(
 		'url.heartbeat' => '%s://api.sysomos.com/v1/heartbeat',
-		'url.heartbeat_proxy' => '%s://%s/sysomosproxy/v1/heartbeat',		
+		'url.heartbeat_proxy' => '%s://%s/sysomosproxy/v1/heartbeat',
+		'url.heartbeat_dummy' => NULL,
 		'api_key' => NULL,
-		'url_base' => NULL
+		'url_base' => NULL,
+		'resolve_twitter' => TRUE,
+		'ignore_content_filter' => FALSE
 	);
 	
 	
@@ -53,12 +56,17 @@ class Geko_Sysomos
 	
 	//
 	public static function setValue( $sKey, $sValue ) {
-		return self::_setVal( $sKey, $sValue );
+		self::_setVal( $sKey, $sValue );
 	}
 	
 	//
 	public static function getValue( $sKey ) {
 		return self::_getVal( $sKey );
+	}
+
+	//
+	public static function setUrl( $sKey, $sValue ) {
+		self::_setVal( $sKey, $sValue, 'url' );
 	}
 	
 	//

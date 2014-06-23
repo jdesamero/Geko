@@ -13,7 +13,8 @@ class Geko_Google_Map
 			$sVersion = 'V2';
 		}
 		
-		$sClass = 'Geko_Google_Map_Query_' . $sVersion;
+		$sClass = sprintf( 'Geko_Google_Map_Query_%s', $sVersion );
+		
 		if ( class_exists( $sClass ) ) {
 			$this->_oGquery = new $sClass( $aParams );
 		}

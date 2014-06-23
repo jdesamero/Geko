@@ -147,13 +147,16 @@ class Geko_Sysomos_Heartbeat
 		
 		$oClient->resetParameters();
 		
-		$oUrl = new Geko_Uri( sprintf( '%s/%s', Geko_Sysomos::getUrl( 'heartbeat' ), $sPage ) );
-		$oUrl->setVars( array_merge( array(
-			'apiKey' => Geko_Sysomos::getValue( 'api_key' ),
-			'hid' => $this->_iHbId
-		), $aParams ) );
-		
-		$sUrl = strval( $oUrl );
+		if ( !$sUrl = Geko_Sysomos::getUrl( 'heartbeat_dummy' ) ) {
+
+			$oUrl = new Geko_Uri( sprintf( '%s/%s', Geko_Sysomos::getUrl( 'heartbeat' ), $sPage ) );
+			$oUrl->setVars( array_merge( array(
+				'apiKey' => Geko_Sysomos::getValue( 'api_key' ),
+				'hid' => $this->_iHbId
+			), $aParams ) );
+			
+			$sUrl = strval( $oUrl );
+		}
 		
 		$oClient->setUri( $sUrl );
 		
@@ -427,12 +430,15 @@ class Geko_Sysomos_Heartbeat
 		//// do stuff
 		
 		list( $aRes, $oXml ) = $this->_getResult( 'rsscontent', $aParams );
-		
+				
 		$aOptions = array_merge( array(
 			'truncate_length' => 120
 		), $aOptions );
 		
 		if ( $oXml ) {
+			
+			$bResolveTwitter = Geko_Sysomos::getValue( 'resolve_twitter' );
+			$bIgnoreContentFilter = Geko_Sysomos::getValue( 'ignore_content_filter' );
 			
 			$iTruncLen = intval( $aOptions[ 'truncate_length' ] );
 			
@@ -449,10 +455,15 @@ class Geko_Sysomos_Heartbeat
 				$sContent = strip_tags( strval( $oBeat->content ) );
 				$sType = strtolower( strval( $oBeat->mediaType ) );
 				
-				if ( 'twitter' == $sType ) {
+				$oLoc = $oBeat->location[ 0 ];
+				
+				$sCountry = strtolower( strval( $oLoc->country ) );
+				$sLocation = strval( $oLoc->locationString );
+				
+				if ( $bResolveTwitter && ( 'twitter' == $sType ) ) {
 					$sTwtJsonUrl = strval( $oBeat->tweetJsonLink );
 					if ( $aTwtJson = $this->getTwtResponse( $sTwtJsonUrl ) ) {
-						$sTitle = '@' . $aTwtJson[ 'user' ][ 'screen_name' ];
+						$sTitle = sprintf( '@%s', $aTwtJson[ 'user' ][ 'screen_name' ] );
 						$sContent = $aTwtJson[ 'text' ];				
 					} else {
 						$sTitle = '';
@@ -467,9 +478,12 @@ class Geko_Sysomos_Heartbeat
 				$sContent = str_replace( '-- -', '--', $sContent );
 				$sContent = str_replace( ' .', '.', $sContent );
 				
-				if ( $this->okayContent( $sContent ) ) {
+				if (
+					( $bIgnoreContentFilter ) || 
+					( !$bIgnoreContentFilter && $this->okayContent( $sContent ) )
+				) {
 					$aFeed[] = array(
-						'id' => strval( 'doc-' . ( str_replace( ':', '-', $sDocId ) ) ),
+						'id' => strval( sprintf( 'doc-%s', ( str_replace( ':', '-', $sDocId ) ) ) ),
 						'seq' => intval( $aSeq[ 1 ] ),
 						'time' => $sTime,
 						'ts' => strtotime( $sTime ),
@@ -477,7 +491,9 @@ class Geko_Sysomos_Heartbeat
 						'title' => $sTitle,
 						'content' => $sContent,
 						'excerpt' => strval( Geko_String::truncate( $sContent, $iTruncLen ) ),
-						'sentiment' => strtolower( strval( $oBeat->sentiment ) )
+						'sentiment' => strtolower( strval( $oBeat->sentiment ) ),
+						'country' => $sCountry,
+						'location' => $sLocation
 					);
 				}
 			}
@@ -526,7 +542,7 @@ class Geko_Sysomos_Heartbeat
 		
 		$sJson = $this->_getResponseBody();
 		
-		// echo $sJsonUrl . '<br />';
+		// echo sprintf( '%s<br />', $sJsonUrl );
 		
 		/* /
 		$sHash = md5( $sJsonUrl );
