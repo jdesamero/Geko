@@ -111,7 +111,7 @@ class Geko_Wp_Page_Alias extends Geko_Wp_Page_Meta
 
 	// get the actual page, if one is specified
 	public function getPageId( $iPageId ) {
-		return $this->getMeta( $iPageId, $this->getPrefixWithSep() . 'page_alias' );
+		return $this->getMeta( $iPageId, sprintf( '%spage_alias', $this->getPrefixWithSep() ) );
 	}
 	
 	// actual
@@ -160,7 +160,25 @@ class Geko_Wp_Page_Alias extends Geko_Wp_Page_Meta
 			NULL
 		;
 	}
-
+	
+	
+	//
+	public function resolveOriginal( $oPage ) {
+		
+		if ( $oPage instanceof Geko_Wp_Page ) {
+			
+			if ( $iOrigPageId = $this->getPageId( $oPage->getId() ) ) {
+				
+				// ensure actual class is the same
+				$sClass = get_class( $oPage );
+				
+				return new $sClass( $iOrigPageId );
+			}	
+		}
+		
+		return $oPage;
+	}
+	
 	
 	
 	//// front-end display methods
@@ -219,12 +237,12 @@ class Geko_Wp_Page_Alias extends Geko_Wp_Page_Meta
 		if ( $post ) {
 			$oPq[ '.inside > *' ]->addClass( '__not_page_alias' );
 			$oPq[ '.inside > p:first-child, .inside > label[for=parent_id], .inside > #parent_id' ]->removeClass( '__not_page_alias' );
-			$oPq[ '.inside' ]->append('
+			$oPq[ '.inside' ]->append( sprintf( '
 				<h5>Alias</h5>
 				<label for="menu_order" class="screen-reader-text">Page Alias</label>
-				' . $this->inject() . '
+				%s
 				<p>Choosing a page alias makes this page behave like the alias. Useful if a page has to appear in different parts of a navigation tree, which can cause an undesired "on" state for multiple items.</p>
-			');
+			', $this->inject() ) );
 		}
 		
 		return $oPq;
