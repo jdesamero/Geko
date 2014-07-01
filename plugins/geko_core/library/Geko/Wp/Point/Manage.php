@@ -588,6 +588,7 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 				->field( 'COUNT(*)' )
 				->from( $wpdb->geko_point, 'p' )
 				->where( 'p.remote_ip = ?', $iRemoteIp )
+				->where( 'p.pntevt_id = ?', $iPointEventId )
 				->where( "DATE_FORMAT( p.date_created, '%Y-%m-%d' ) = ?", date( 'Y-m-d' ) )
 			;
 			
