@@ -64,6 +64,7 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 			->fieldLongText( 'transaction_code' )
 			->fieldLongText( 'extra' )
 			->fieldLongText( 'comments' )
+			->fieldInt( 'remote_ip', array( 'unsgnd' ) )
 			->fieldDateTime( 'date_created' )
 			->fieldDateTime( 'date_modified' )
 		;
@@ -112,7 +113,8 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 				array( 'title' => 'Max point events exceeded', 'slug' => 'geko-point-awerr-max-events-exceeded', 'value' => -5, 'rank' => 4, 'description' => 'The number of allowable point events have been exceeded.' ),
 				array( 'title' => 'Duplicate point already awarded', 'slug' => 'geko-point-awerr-duplicate', 'value' => -6, 'rank' => 5, 'description' => 'Trying to a award a duplicate point.' ),
 				array( 'title' => 'Zero (0) points awarded', 'slug' => 'geko-point-awerr-zero-points', 'value' => -7, 'rank' => 6, 'description' => 'Trying to award zero (0) points.' ),
-				array( 'title' => 'Unknown error', 'slug' => 'geko-point-awerr-unknown-error', 'value' => -999, 'rank' => 7, 'description' => 'An unknown error occured.' )
+				array( 'title' => 'Daily IP Limit Reached', 'slug' => 'geko-point-awerr-ip-limit', 'value' => -8, 'rank' => 7, 'description' => 'Daily sending limit from same IP address has been reached.' ),
+				array( 'title' => 'Unknown error', 'slug' => 'geko-point-awerr-unknown-error', 'value' => -999, 'rank' => 8, 'description' => 'An unknown error occured.' )
 			)
 		) );
 		
@@ -291,6 +293,7 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 		$iPointValue = intval( $aValues[ 'point_value' ] );
 		$aMetaValues = ( is_array( $aValues[ 'meta' ] ) ) ? $aValues[ 'meta' ] : array() ;
 		$sComments = trim( $aValues[ 'comments' ] );
+		$iRemoteIp = ip2long( $_SERVER[ 'REMOTE_ADDR' ] );
 		$bTestingOnly = trim( $aValues[ 'testing_only' ] );
 		
 		//// do checks
@@ -343,11 +346,12 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 			'approve_status_id' => $iApprovalStatusId,
 			'transaction_code' => $sPointEventSlug,
 			'comments' => $sComments,
+			'remote_ip' => $iRemoteIp,
 			'date_created' => $sDateTime,
 			'date_modified' => $sDateTime
 		);
 		
-		$aFormat = array( '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s' );
+		$aFormat = array( '%d', '%d', '%d', '%d', '%s', '%s', '%d', '%s', '%s' );
 		
 		
 		// meta data
@@ -407,9 +411,13 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 	// will return boolean value (TRUE | FALSE) on an affirmative check
 	public function hasPoints( $aValues, &$iErrorCode = NULL ) {
 		
+		global $wpdb;
+		
 		$iUserId = trim( $aValues[ 'user_id' ] );
 		$sEmail = trim( $aValues[ 'email' ] );
 		$bValidEmail = FALSE;
+		$iRemoteIp = ip2long( $_SERVER[ 'REMOTE_ADDR' ] );
+		
 		$sPointEventSlug = trim( $aValues[ 'point_event_slug' ] );
 		$aMetaValues = ( is_array( $aValues[ 'meta' ] ) ) ? $aValues[ 'meta' ] : array() ;
 		
@@ -446,6 +454,7 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 		if ( !$oPointEvent = $aPointEvents[ $sPointEventSlug ] ) {
 			return Geko_Wp_Point::getErrorCode( 'invalid-slug' );
 		}
+		
 		
 		// get user's existing points for the current points event
 		$iPointEventId = $oPointEvent->getId();
@@ -541,10 +550,10 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 					$iNumMons = ( floor( ( ( ( $iCurYear - $iStartYear - 1 ) * 12 ) + $iCurMon ) / $iTimeLimit ) * $iTimeLimit );
 					$iPeriodYear = floor( $iNumMons / 12 ) + $iStartYear;
 					$iPeriodMon = $iNumMons % 12;				// remainder months
-					$iCurPeriodTs = strtotime( $iPeriodYear . '-' . $iPeriodMon );
+					$iCurPeriodTs = strtotime( sprintf( '%d-%d', $iPeriodYear, $iPeriodMon ) );
 				} elseif ( 'yr' == $sUnit ) {
 					$iPeriodYear = ( floor( ( $iCurYear - $iStartYear ) / $iTimeLimit ) * $iTimeLimit ) + $iStartYear;
-					$iCurPeriodTs = strtotime( $iPeriodYear . '-1' );
+					$iCurPeriodTs = strtotime( sprintf( '%d-1', $iPeriodYear ) );
 				}
 			}
 			
@@ -569,7 +578,28 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 				return TRUE;
 			}
 		}
-				
+		
+		
+		// check daily IP limit, if enforced
+		if ( $iIpLimit = intval( $oPointEvent->getIpLimit() ) ) {
+			
+			$oIpChkQuery = new Geko_Sql_Select();
+			$oIpChkQuery
+				->field( 'COUNT(*)' )
+				->from( $wpdb->geko_point, 'p' )
+				->where( 'p.remote_ip = ?', $iRemoteIp )
+				->where( "DATE_FORMAT( p.date_created, '%Y-%m-%d' ) = ?", date( 'Y-m-d' ) )
+			;
+			
+			$iIpDayCount = intval( $wpdb->get_var( strval( $oIpChkQuery ) ) );
+			
+			if ( $iIpDayCount >= $iIpLimit ) {
+				$iErrorCode = Geko_Wp_Point::getErrorCode( 'ip-limit' );
+				return TRUE;
+			}
+		}
+		
+		
 		// point has not been awarded to user
 		return FALSE;
 	}

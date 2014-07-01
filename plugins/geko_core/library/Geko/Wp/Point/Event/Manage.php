@@ -57,6 +57,7 @@ class Geko_Wp_Point_Event_Manage extends Geko_Wp_Options_Manage
 			->fieldBool( 'deduct_points' )
 			->fieldInt( 'time_limit' )
 			->fieldInt( 'time_limit_units' )
+			->fieldInt( 'ip_limit' )
 			->fieldDateTime( 'date_created' )
 			->fieldDateTime( 'date_modified' )
 		;
@@ -241,6 +242,10 @@ class Geko_Wp_Point_Event_Manage extends Geko_Wp_Options_Manage
 						<?php endforeach; ?>
 					</select>
 				</td>
+			</tr>
+			<tr>
+				<th><label for="pntevt_ip_limit">Daily IP Limit</label></th>
+				<td><input id="pntevt_ip_limit" name="pntevt_ip_limit" type="text" class="regular-text short" value="" /></td>
 			</tr>
 			<tr>
 				<th><label for="pntevt_arbitrary_points">Arbitrary Points</label></th>
