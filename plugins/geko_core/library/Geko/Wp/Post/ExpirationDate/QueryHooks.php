@@ -53,11 +53,11 @@ class Geko_Wp_Post_ExpirationDate_QueryHooks extends Geko_Wp_Query_Hooks_Abstrac
 		if ( self::$bJoin ) {
 		
 			if ( $aQueryVars[ 'hide_expired' ] ) {
-				$where .= sprintf( " AND ( COALESCE(%s.expiry_date, %s.post_date) > NOW() ) ", $sJoinKey, $wpdb->posts );		
+				$where .= sprintf( " AND ( COALESCE(%s.expiry_date, %s.post_date) > '%s' ) ", $sJoinKey, $wpdb->posts, current_time( 'mysql' ) );		
 			}
 	
 			if ( $aQueryVars[ 'hide_unexpired' ] ) {
-				$where .= sprintf( " AND ( COALESCE(%s.expiry_date, %s.post_date) <= NOW() ) ", $sJoinKey, $wpdb->posts );
+				$where .= sprintf( " AND ( COALESCE(%s.expiry_date, %s.post_date) <= '%s' ) ", $sJoinKey, $wpdb->posts, current_time( 'mysql' ) );
 			}
 			
 			
