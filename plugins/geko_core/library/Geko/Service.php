@@ -174,7 +174,13 @@ class Geko_Service extends Geko_Singleton_Abstract
 		//    Use static::STAT_ERROR instead
 		
 		if ( defined( 'static::STAT_ERROR' ) ) {
-			return static::STAT_ERROR;
+			return constant( 'static::STAT_ERROR' );
+		} else {
+			// PHP 5.2.x backwards compatibility
+			$sConst = sprintf( '%s::STAT_ERROR', get_class( $this ) );
+			if ( defined( $sConst ) ) {
+				return constant( $sConst );
+			}
 		}
 		
 		return NULL;
