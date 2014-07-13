@@ -52,12 +52,18 @@ class Geko_Google_Map_Query_V1 extends Geko_Google_Map_Query
 			'raw_result' => $aRes
 		);
 		
-		if ( $aCoords = $aRes[ 'Placemark' ][ 0 ][ 'Point' ][ 'coordinates' ] ) {
+		if (
+			( is_array( $aRes[ 'Placemark' ] ) ) && 
+			( $aCoords = $aRes[ 'Placemark' ][ 0 ][ 'Point' ][ 'coordinates' ] )
+		) {
+			
 			$aResFmt = array_merge( $aResFmt, array(
 				'lat' => $aCoords[ 1 ],
 				'lng' => $aCoords[ 0 ],
-				'zoom' => $aCoords[ 2 ]
+				'zoom' => $aCoords[ 2 ],
+				'matches' => count( $aRes[ 'Placemark' ] )
 			) );
+			
 		}
 		
 		return $aResFmt;

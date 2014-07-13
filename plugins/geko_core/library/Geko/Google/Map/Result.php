@@ -31,8 +31,41 @@ class Geko_Google_Map_Result
 	}
 	
 	
+	//
+	public function getStatus() {
+		$aResult = $this->_aResult;
+		return $aResult[ 'status' ];	
+	}
+	
+	//
+	public function getMatches() {
+		$aResult = $this->_aResult;
+		return $aResult[ 'matches' ];	
+	}
+	
+	
+	//
+	public function getStatusId() {
+		
+		$sStatus = $this->getStatus();
+		
+		$aStatIds = array(
+			'ok' => 1,
+			'zero_results' => 2,
+			'over_query_limit' => 3,
+			'request_denied' => 4,
+			'invalid_request' => 5,
+			'unknown_error' => 6
+		);
+		
+		if ( !$iStatId = $aStatIds[ $sStatus ] ) {
+			$iStatId = 999;
+		}
+		
+		return $iStatId;
+	}
+	
+	
 }
-
-
 
 

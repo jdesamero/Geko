@@ -21,16 +21,24 @@ class Geko_Google_Map_Query_V2 extends Geko_Google_Map_Query
 	public function normalizeResult( $aRes ) {
 		
 		$aResFmt = array(
-			'raw_result' => $aRes
+			'raw_result' => $aRes,
+			'status' => strtolower( $aRes[ 'status' ] )
 		);
 		
-		if ( $aCoords = $aRes[ 'results' ][ 0 ][ 'geometry' ][ 'location' ] ) {
+		if (
+			( is_array( $aRes[ 'results' ] ) ) && 
+			( $aCoords = $aRes[ 'results' ][ 0 ][ 'geometry' ][ 'location' ] )
+		) {
+			
 			$aResFmt = array_merge( $aResFmt, array(
 				'lat' => $aCoords[ 'lat' ],
 				'lng' => $aCoords[ 'lng' ],
-				'zoom' => NULL
+				'zoom' => NULL,
+				'matches' => count( $aRes[ 'results' ] )
 			) );
+			
 		}
+		
 		
 		return $aResFmt;
 	}
@@ -212,6 +220,15 @@ Array
 
     [status] => OK
 )
+
+
+"OK" indicates that no errors occurred; the address was successfully parsed and at least one geocode was returned.
+"ZERO_RESULTS" indicates that the geocode was successful but returned no results. This may occur if the geocoder was passed a non-existent address.
+"OVER_QUERY_LIMIT" indicates that you are over your quota.
+"REQUEST_DENIED" indicates that your request was denied.
+"INVALID_REQUEST" generally indicates that the query (address, components or latlng) is missing.
+"UNKNOWN_ERROR" indicates that the request could not be processed due to a server error. The request may succeed if you try again.
+
 
 */
 
