@@ -26,21 +26,23 @@ class Geko_Google_Map_Result
 	
 	//
 	public function getZoomLevel() {
-		$aResult = $this->_aResult;
-		return $aResult[ 'zoom' ];
+		return $this->_aResult[ 'zoom' ];
 	}
 	
 	
 	//
 	public function getStatus() {
-		$aResult = $this->_aResult;
-		return $aResult[ 'status' ];	
+		return $this->_aResult[ 'status' ];	
 	}
 	
 	//
 	public function getMatches() {
-		$aResult = $this->_aResult;
-		return $aResult[ 'matches' ];	
+		return $this->_aResult[ 'matches' ];	
+	}
+	
+	//
+	public function getDetails() {
+		return $this->_aResult[ 'details' ];
 	}
 	
 	

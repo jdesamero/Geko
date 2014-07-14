@@ -161,6 +161,11 @@ class Geko_Sql_Select
 	}
 	
 	//
+	public function joinOuter( $mValue, $sKey = NULL ) {
+		return $this->join( $mValue, $sKey, 'OUTER JOIN' );
+	}
+	
+	//
 	public function joinStraight( $mValue, $sKey = NULL ) {
 		return $this->join( $mValue, $sKey, 'STRAIGHT_JOIN' );
 	}
@@ -302,6 +307,11 @@ class Geko_Sql_Select
 	//
 	public function joinInnerKvp( $mValue, $sKey = NULL ) {
 		return $this->joinKvp( $mValue, $sKey, 'INNER JOIN' );
+	}
+	
+	//
+	public function joinOuterKvp( $mValue, $sKey = NULL ) {
+		return $this->joinKvp( $mValue, $sKey, 'OUTER JOIN' );
 	}
 	
 	//

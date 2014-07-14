@@ -15,8 +15,12 @@ class Geko_App_Sysomos_Poll
 	protected $_sHbPollDeltaTable = 'hb_poll_delta';
 	protected $_sHbMapFeedTable = 'hb_map_feed';
 	
+	protected $_sGeoContinentTable = 'geo_continent';
 	protected $_sGeoCountryTable = 'geo_country';
 	protected $_sGeoLocationTable = 'geo_location';
+	protected $_sGeoCoordsTable = 'geo_coords';
+	protected $_sGeoLocCoordsRelTable = 'geo_loc_coords_rel';
+	
 	
 	protected $_iHbTagTableId = 1;
 	protected $_iHbCountryTableId = 2;
@@ -29,7 +33,7 @@ class Geko_App_Sysomos_Poll
 	
 	
 	//
-	public function __construct( $mHbId, $oDb = NULL ) {
+	public function __construct( $mHbId = NULL, $oDb = NULL ) {
 		
 		// set this first, $oDb needed by getNextToPoll()
 		
@@ -306,38 +310,132 @@ class Geko_App_Sysomos_Poll
 		$fLat = floatval( $aInfo[ 'lat' ] );
 		$fLon = floatval( $aInfo[ 'lon' ] );
 		$bLocChanged = $aInfo[ 'loc_changed' ];
-		$sKey = $aInfo[ 'key' ];
+		$sHash = $aInfo[ 'key' ];
 
 		
 		$iLocId = $oDb->fetchOne( sprintf(
 			"SELECT id FROM %s WHERE hash = '%s'",
 			$this->_sGeoLocationTable,
-			$sKey
+			$sHash
 		) );
 		
 		if ( FALSE === $iLocId ) {
 			
 			$aValues = array(
-				'hash' => $sKey,
+				'hash' => $sHash,
 				'location' => $sNormLocation,
 				'country_id' => $this->getCountryId( $sCountryAbbr )
 			);
 			
 			if ( $fLat && $fLon ) {
-				$aValues[ 'latitude' ] = $fLat;
-				$aValues[ 'longitude' ] = $fLon;				
+				$aValues[ 'status' ] = Geko_App_Sysomos_Geo_Location::STAT_ALREADY_COORDS;
 			}
+			
 			
 			// insert
 			$oDb->insert( $this->_sGeoLocationTable, $aValues );
 			
 			$iLocId = $oDb->lastInsertId();
+			
+			
+			if ( $fLat && $fLon ) {
+				
+				$aCoord = array(
+					'address' => $sNormLocation,
+					'hash' => $sHash,
+					'lat' => $fLat,
+					'lng' => $fLng,
+					'type' => '__coords',
+					'country_id' => $iCountryId
+				);
+				
+				$this->assignCoords( $iLocId, array( $aCoord ) );
+			}
+			
 		}
 		
 		return $iLocId;
 	}
 	
 	
+	//
+	public function getCoordId( $aCoord ) {
+		
+		$oDb = $this->_oDb;
+		
+		$sAddress = $aCoord[ 'address' ];
+		
+		if ( !$sHash = $aCoord[ 'hash' ] ) {
+			$sHash = md5( $sAddress );
+		}
+		
+		$iCoordId = $oDb->fetchOne( sprintf(
+			"SELECT id FROM %s WHERE hash = '%s'",
+			$this->_sGeoCoordsTable,
+			$sHash
+		) );
+		
+		
+		if ( FALSE === $iCoordId ) {
+			
+			if ( !$iCountryId = $aCoord[ 'country_id' ] ) {
+				$iCountryId = $this->getCountryId( $aCoord[ 'country' ] );
+			}
+			
+			$aValues = array(
+				'address' => $sAddress,
+				'hash' => $sHash,
+				'type' => $aCoord[ 'type' ],
+				'lat' => $aCoord[ 'lat' ],
+				'lng' => $aCoord[ 'lng' ],
+				'ne_lat' => $aCoord[ 'ne_lat' ],
+				'ne_lng' => $aCoord[ 'ne_lng' ],
+				'sw_lat' => $aCoord[ 'sw_lat' ],
+				'sw_lng' => $aCoord[ 'sw_lng' ],
+				'country_id' => $iCountryId
+			);
+			
+			
+			// insert
+			$oDb->insert( $this->_sGeoCoordsTable, $aValues );
+			
+			$iCoordId = $oDb->lastInsertId();
+			
+		}
+		
+		
+		return $iCoordId;
+	}
+	
+	
+	//
+	public function assignCoords( $iLocId, $aCoords ) {
+		
+		$oDb = $this->_oDb;
+		
+		$i = 0;
+		
+		foreach ( $aCoords as $aCoord ) {
+			
+			$i++;
+			
+			$iCoordId = $this->getCoordId( $aCoord );
+			
+			$oDb->insert( $this->_sGeoLocCoordsRelTable, array(
+				'loc_id' => $iLocId,
+				'coord_id' => $iCoordId,
+				'idx' => $i
+			) );
+			
+		}
+		
+		return $this;
+	}
+	
+	
+	
+	
+	//// deltas
 	
 	//
 	public function trackDelta( $iTableId, $iMeasureId, $iCurMentions, $iPrevMentions, $sPrevDate ) {
@@ -401,15 +499,18 @@ class Geko_App_Sysomos_Poll
 			)
 		);
 		
+		/* /
+		
+		//// TO DO: THIS IS BROKEN NOW!!!
+		
 		$oDb->delete(
 			$this->_sGeoLocationTable,
 			array(
 				'match_count IS NULL',
-				'latitude IS NULL',
-				'longitude IS NULL',
 				'( country_id = "" ) OR ( country_id IS NULL ) OR ( country_id = 0 )'
 			)
 		);
+		/* */
 		
 		/* /
 		$oDb->delete(

@@ -25,9 +25,11 @@ class Geko_Google_Map_Query_V2 extends Geko_Google_Map_Query
 			'status' => strtolower( $aRes[ 'status' ] )
 		);
 		
+		$aResults = $aRes[ 'results' ];
+		
 		if (
-			( is_array( $aRes[ 'results' ] ) ) && 
-			( $aCoords = $aRes[ 'results' ][ 0 ][ 'geometry' ][ 'location' ] )
+			( is_array( $aResults ) ) && 
+			( $aCoords = $aResults[ 0 ][ 'geometry' ][ 'location' ] )
 		) {
 			
 			$aResFmt = array_merge( $aResFmt, array(
@@ -37,6 +39,52 @@ class Geko_Google_Map_Query_V2 extends Geko_Google_Map_Query
 				'matches' => count( $aRes[ 'results' ] )
 			) );
 			
+			//
+			$aDetails = array();
+			
+			foreach ( $aResults as $aLocInfo ) {
+				
+				$aGeo = $aLocInfo[ 'geometry' ];
+				
+				$aCenCoords = $aGeo[ 'location' ];
+				$aNeCoords = $aGeo[ 'bounds' ][ 'northeast' ];
+				$aSwCoords = $aGeo[ 'bounds' ][ 'southwest' ];
+				
+				$aTypes = array( strtolower( $aGeo[ 'location_type' ] ) );
+				
+				$aDetRow = array(
+					'address' => $aLocInfo[ 'formatted_address' ],
+					'lat' => $aCenCoords[ 'lat' ],
+					'lng' => $aCenCoords[ 'lng' ],
+					'ne_lat' => $aNeCoords[ 'lat' ],
+					'ne_lng' => $aNeCoords[ 'lng' ],
+					'sw_lat' => $aSwCoords[ 'lat' ],
+					'sw_lng' => $aSwCoords[ 'lng' ]
+				);
+				
+				// find country
+				$aComps = $aLocInfo[ 'address_components' ];
+				
+				if ( is_array( $aComps ) ) {
+					foreach ( $aComps as $aComp ) {
+						$aCompType = $aComp[ 'types' ];
+						if ( is_array( $aCompType ) && in_array( 'country', $aCompType ) ) {
+							$aDetRow[ 'country' ] = $aComp[ 'short_name' ];
+						}
+					}
+				}
+				
+				$aCompTypes = $aLocInfo[ 'types' ];
+				if ( is_array( $aCompTypes ) ) {
+					$aTypes = array_merge( $aTypes, $aCompTypes );
+				}
+				
+				$aDetRow[ 'type' ] = implode( ', ', $aTypes );
+				
+				$aDetails[] = $aDetRow;
+			}
+			
+			$aResFmt[ 'details' ] = $aDetails;
 		}
 		
 		
