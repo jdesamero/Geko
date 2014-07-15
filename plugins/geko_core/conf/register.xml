@@ -19,7 +19,6 @@
 		<file id="geko-flash-loader" src="##geko_core_uri##/external/js/flash_loader.js" />
 		<file id="geko-get_scroll_xy" src="##geko_core_uri##/external/js/get_scroll_xy.js" />
 		<file id="geko-googlemaps" src="//maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=##GOOGLEMAPS_API_KEY##" />
-		<file id="geko-modernizr" src="##geko_core_uri##/external/js/modernizr.js" />
 		<file id="geko-sharethis" src="//w.sharethis.com/button/buttons.js" />
 		<file id="geko-string_format" src="##geko_core_uri##/external/js/string_format.min.js" />
 		<file id="geko-swf-object" src="##geko_core_uri##/external/js/swfobject.js" />
@@ -257,6 +256,7 @@
 		<file id="geko-jquery-geko_slideshow" src="##geko_core_uri##/js/jquery.geko_slideshow.js" dependencies="jquery" />
 		<file id="geko-jquery-geko_sysomos_aggregator" src="##geko_core_uri##/js/jquery.geko_sysomos_aggregator.js" dependencies="geko-jquery-geko_sysomos_service" />
 		<file id="geko-jquery-geko_sysomos_feed" src="##geko_core_uri##/js/jquery.geko_sysomos_feed.js" dependencies="geko-jquery-geko_sysomos_service" />
+		<file id="geko-jquery-geko_sysomos_mapfeed" src="##geko_core_uri##/js/jquery.geko_sysomos_mapfeed.js" dependencies="geko-jquery-geko_sysomos_service geko-jquery-geko_map_projection geko-jquery-fx-pulsate geko-jquery-fx-scale geko-jquery-geko_geo_coords" />
 		<file id="geko-jquery-geko_sysomos_service" src="##geko_core_uri##/js/jquery.geko_sysomos_service.js" dependencies="geko-jquery-geko_util" />
 		<file id="geko-jquery-geko_sysomos_top_ten" src="##geko_core_uri##/js/jquery.geko_sysomos_top_ten.js" dependencies="geko-jquery-geko_sysomos_service geko-jquery-tinysort_charorder" />
 		<file id="geko-jquery-geko_update" src="##geko_core_uri##/js/jquery.geko_update.js" dependencies="jquery" />
@@ -299,29 +299,6 @@
 		<file id="geko-jquery-geko_geo_coords" src="##geko_core_uri##/testing/js/jquery.geko_geo_coords.js" dependencies="geko-array jquery" />
 		
 		
-		<!-- foundation -->
-		<file id="geko-foundation" src="##geko_core_uri##/external/js/foundation.min.js" dependencies="jquery geko-modernizr" />
-
-
-		<file id="geko-foundation-abide" src="##geko_core_uri##/external/js/foundation/foundation.abide.js" dependencies="geko-foundation" />
-		<file id="geko-foundation-accordion" src="##geko_core_uri##/external/js/foundation/foundation.accordion.js" dependencies="geko-foundation" />
-		<file id="geko-foundation-alert" src="##geko_core_uri##/external/js/foundation/foundation.alert.js" dependencies="geko-foundation" />
-		<file id="geko-foundation-clearing" src="##geko_core_uri##/external/js/foundation/foundation.clearing.js" dependencies="geko-foundation" />
-		<file id="geko-foundation-dropdown" src="##geko_core_uri##/external/js/foundation/foundation.dropdown.js" dependencies="geko-foundation" />
-		<file id="geko-foundation-equalizer" src="##geko_core_uri##/external/js/foundation/foundation.equalizer.js" dependencies="geko-foundation" />
-		<file id="geko-foundation-interchange" src="##geko_core_uri##/external/js/foundation/foundation.interchange.js" dependencies="geko-foundation" />
-		<file id="geko-foundation-joyride" src="##geko_core_uri##/external/js/foundation/foundation.joyride.js" dependencies="geko-foundation" />
-		<file id="geko-foundation-magellan" src="##geko_core_uri##/external/js/foundation/foundation.magellan.js" dependencies="geko-foundation" />
-		<file id="geko-foundation-offcanvas" src="##geko_core_uri##/external/js/foundation/foundation.offcanvas.js" dependencies="geko-foundation" />
-		<file id="geko-foundation-orbit" src="##geko_core_uri##/external/js/foundation/foundation.orbit.js" dependencies="geko-foundation" />
-		<file id="geko-foundation-reveal" src="##geko_core_uri##/external/js/foundation/foundation.reveal.js" dependencies="geko-foundation" />
-		<file id="geko-foundation-slider" src="##geko_core_uri##/external/js/foundation/foundation.slider.js" dependencies="geko-foundation" />
-		<file id="geko-foundation-tab" src="##geko_core_uri##/external/js/foundation/foundation.tab.js" dependencies="geko-foundation" />
-		<file id="geko-foundation-tooltip" src="##geko_core_uri##/external/js/foundation/foundation.tooltip.js" dependencies="geko-foundation" />
-		<file id="geko-foundation-topbar" src="##geko_core_uri##/external/js/foundation/foundation.topbar.js" dependencies="geko-foundation" />
-		
-		
-		
 	</scripts>
 	
 	
@@ -352,9 +329,6 @@
 		<!-- version independent styles -->
 		
 		<file id="geko-swipe" src="##geko_core_uri##/external/styles/swipe/style.css" />
-		
-		<file id="geko-foundation" src="##geko_core_uri##/external/styles/foundation/style.css" dependencies="geko-normalize" />
-		<file id="geko-normalize" src="##geko_core_uri##/external/styles/normalize/style.css" />
 		
 		<file id="geko-jquery-jcarousel" src="##geko_core_uri##/external/styles/jcarousel/style.css" />
 		<file id="geko-jquery-jcarousel-2006" src="##geko_core_uri##/external/styles/jcarousel/style-2006.css" />
