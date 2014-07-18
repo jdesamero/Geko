@@ -3,7 +3,15 @@
 //
 class Geko_Sysomos_Heartbeat
 {
-		
+	
+	const ERROR_REQUEST_EXCEPTION_THROWN = 101;
+	const ERROR_BAD_RESPONSE = 102;
+	const ERROR_BAD_XML = 103;
+	const ERROR_QUERY = 104;
+	const ERROR_UNKNOWN = 199;
+	
+	
+	
 	protected static $_aContentFilter = array(
 		'http://hb.sysomos.com/hb2/sidebar', 'fuck', 'bitch', 'niga', 'nigga', 'gangbang',
 		'gang bang', 'pussy', 'eat ass'
@@ -88,24 +96,44 @@ class Geko_Sysomos_Heartbeat
 	
 	//
 	protected function _getResponseBody() {
-
+		
+		$sBody = NULL;
+		
+		$aError = $this->formatError(
+			self::ERROR_UNKNOWN,
+			sprintf( 'Error with: %s', __METHOD__ )
+		);
+		
+		
 		try {
 			
 			$oClient = $this->_getClient();
 			
 			$oResponse = $oClient->request();
 			
-			if ( 200 == intval( $oResponse->getStatus() ) ) {
-				if ( $sBody = $oResponse->getBody() ) {
-					return $sBody;
-				}
+			$iRespStatus = intval( $oResponse->getStatus() );
+			
+			if ( 200 == $iRespStatus ) {
+				$sBody = $oResponse->getBody();
+			} else {
+				
+				$aError = $this->formatError(
+					self::ERROR_BAD_RESPONSE,
+					sprintf( 'Bad response status: %d', $iRespStatus )
+				);
+				
 			}
 			
 		} catch( Exception $e ) {
-		
+			
+			$aError = $this->formatError(
+				self::ERROR_REQUEST_EXCEPTION_THROWN,
+				sprintf( 'Request exception message: %d', $e->getMessage() )
+			);
+			
 		}
 		
-		return FALSE;
+		return ( $sBody ) ? $sBody : $aError ;
 	}
 	
 	
@@ -163,11 +191,70 @@ class Geko_Sysomos_Heartbeat
 		
 		$aRes = array( '_uri' => $sUrl );
 		
-		if ( $sBody = $this->_getResponseBody() ) {
-			return array( $aRes, new SimpleXMLElement( $sBody ) );
+		$mResBody = $this->_getResponseBody();
+		
+		$aError = NULL;
+		$oXml = NULL;
+		
+		if ( is_string( $mResBody ) ) {
+			
+			try {
+				
+				$oXml = new SimpleXMLElement( $mResBody );
+				
+				$oError = NULL;
+				
+				// check for <errors>...</errors>
+				if ( $aErrors = $oXml->errors ) {
+					$oError = $aErrors[ 0 ];
+				}
+				
+				// check for <error>...</error>
+				if ( !$oError && ( $aErrors = $oXml->error ) ) {
+					$oError = $aErrors[ 0 ];			
+				}
+				
+				if ( $oError ) {
+					
+					$aError = $this->formatError(
+						self::ERROR_QUERY,
+						sprintf( 'Sysomos query error: %s', strval( $oError->errorMessage ) )
+					);
+					
+					// don't bother returning this
+					$oXml = NULL;
+				}
+			
+			} catch ( Exception $e ) {
+				
+				$aError = $this->formatError(
+					self::ERROR_BAD_XML,
+					sprintf( 'XML parse exception message: %d', $e->getMessage() )
+				);
+				
+			}
+			
+		} elseif ( is_array( $mResBody ) ) {
+			
+			$aError = $mResBody;
+			
+		} else {
+			
+			// this should not happen
+			$aError = $this->formatError(
+				self::ERROR_UNKNOWN,
+				sprintf( 'Error with: %s', __METHOD__ )
+			);
+			
 		}
 		
-		return NULL;
+		// set error
+		if ( is_array( $aError ) ) {
+			$aRes = array_merge( $aRes, $aError );
+		}
+		
+		
+		return array( $aRes, $oXml );
 	}
 	
 	
@@ -355,10 +442,21 @@ class Geko_Sysomos_Heartbeat
 			foreach ( $aTags as $oTag ) {
 				$aTagsFmt[ strval( $oTag->name ) ] = strval( $oTag->displayName );
 			}
+
+			$aRes = array_merge( $aRes, array(
+				'name' => strval( $oResponse->name ),
+				'tags' => $aTagsFmt,
+				'count' => count( $aTagsFmt )
+			) );
+						
+		} else {
 			
-			$aRes[ 'name' ] = strval( $oResponse->name );
-			$aRes[ 'tags' ] = $aTagsFmt;
-			$aRes[ 'count' ] = count( $aTagsFmt );
+			$aRes = array_merge( $aRes, array(
+				'name' => '',
+				'tags' => array(),
+				'count' => 0
+			) );
+			
 		}
 		
 		return $aRes;
@@ -416,7 +514,16 @@ class Geko_Sysomos_Heartbeat
 				}
 			}
 			
-			$aRes[ 'tags' ] = $aTags;	
+			$aRes = array_merge( $aRes, array(
+				'tags' => $aTags
+			) );
+		
+		} else {
+			
+			$aRes = array_merge( $aRes, array(
+				'tags' => array()
+			) );
+			
 		}
 		
 		return $aRes;
@@ -436,7 +543,7 @@ class Geko_Sysomos_Heartbeat
 		), $aOptions );
 		
 		if ( $oXml ) {
-			
+		
 			$bResolveTwitter = Geko_Sysomos::getValue( 'resolve_twitter' );
 			$bIgnoreContentFilter = Geko_Sysomos::getValue( 'ignore_content_filter' );
 			
@@ -500,9 +607,19 @@ class Geko_Sysomos_Heartbeat
 				
 			usort( $aFeed, 'sortFeed' );
 			
-			$aRes[ 'feed' ] = $aFeed;
-			$aRes[ 'filtered_count' ] = count( $aFeed );
-			$aRes[ 'unfiltered_count' ] = count( $aBeats );
+			$aRes = array_merge( $aRes, array(
+				'feed' => $aFeed,
+				'filtered_count' => count( $aFeed ),
+				'unfiltered_count' => count( $aBeats )
+			) );
+						
+		} else {
+
+			$aRes = array_merge( $aRes, array(
+				'feed' => array(),
+				'filtered_count' => 0,
+				'unfiltered_count' => 0
+			) );
 			
 		}
 		
@@ -601,6 +718,15 @@ class Geko_Sysomos_Heartbeat
 		return $aJson;
 	}
 
+	
+	//// helpers
+	
+	public function formatError( $iErrorCode, $sMsg ) {
+		return array(
+			'error_code' => $iErrorCode,
+			'error_msg' => $sMsg
+		);
+	}
 	
 	
 }
