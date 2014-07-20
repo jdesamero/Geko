@@ -1,14 +1,10 @@
 <?php
 
 //
-class Geko_Sysomos_Heartbeat
+class Geko_Sysomos_Heartbeat extends Geko_Http
 {
 	
-	const ERROR_REQUEST_EXCEPTION_THROWN = 101;
-	const ERROR_BAD_RESPONSE = 102;
-	const ERROR_BAD_XML = 103;
-	const ERROR_QUERY = 104;
-	const ERROR_UNKNOWN = 199;
+	const ERROR_QUERY = 201;
 	
 	
 	
@@ -20,8 +16,6 @@ class Geko_Sysomos_Heartbeat
 	
 	
 	protected $_iHbId;
-	
-	protected $_oClient = NULL;
 	
 	protected $_aDefaultParams = array(
 		'measure' => array(
@@ -76,69 +70,9 @@ class Geko_Sysomos_Heartbeat
 	
 	//// functional stuff
 	
-	//
-	protected function _getClient() {
-		
-		if ( !$this->_oClient ) {
-			
-			$oClient = new Zend_Http_Client();
-			$oClient->setConfig( array(
-				'timeout' => 240,
-				'keepalive' => TRUE
-			) );
-			
-			$this->_oClient = $oClient;
-		}
-		
-		return $this->_oClient;
-	}
-	
 	
 	//
-	protected function _getResponseBody() {
-		
-		$sBody = NULL;
-		
-		$aError = $this->formatError(
-			self::ERROR_UNKNOWN,
-			sprintf( 'Error with: %s', __METHOD__ )
-		);
-		
-		
-		try {
-			
-			$oClient = $this->_getClient();
-			
-			$oResponse = $oClient->request();
-			
-			$iRespStatus = intval( $oResponse->getStatus() );
-			
-			if ( 200 == $iRespStatus ) {
-				$sBody = $oResponse->getBody();
-			} else {
-				
-				$aError = $this->formatError(
-					self::ERROR_BAD_RESPONSE,
-					sprintf( 'Bad response status: %d', $iRespStatus )
-				);
-				
-			}
-			
-		} catch( Exception $e ) {
-			
-			$aError = $this->formatError(
-				self::ERROR_REQUEST_EXCEPTION_THROWN,
-				sprintf( 'Request exception message: %d', $e->getMessage() )
-			);
-			
-		}
-		
-		return ( $sBody ) ? $sBody : $aError ;
-	}
-	
-	
-	//
-	public function _getResult( $sPage, $aParams = array() ) {
+	public function getResult( $sPage, $aParams = array() ) {
 		
 		$aDefParams = $this->_aDefaultParams[ $sPage ];
 		
@@ -171,91 +105,64 @@ class Geko_Sysomos_Heartbeat
 		
 		//// end fixes
 		
-		$oClient = $this->_getClient();
-		
-		$oClient->resetParameters();
-		
 		if ( !$sUrl = Geko_Sysomos::getUrl( 'heartbeat_dummy' ) ) {
-
-			$oUrl = new Geko_Uri( sprintf( '%s/%s', Geko_Sysomos::getUrl( 'heartbeat' ), $sPage ) );
-			$oUrl->setVars( array_merge( array(
+			
+			$sUrl = sprintf( '%s/%s', Geko_Sysomos::getUrl( 'heartbeat' ), $sPage );
+			
+			$aParams = array_merge( array(
 				'apiKey' => Geko_Sysomos::getValue( 'api_key' ),
 				'hid' => $this->_iHbId
-			), $aParams ) );
-			
-			$sUrl = strval( $oUrl );
+			), $aParams );
 		}
 		
-		$oClient->setUri( $sUrl );
 		
 		
-		$aRes = array( '_uri' => $sUrl );
-		
-		$mResBody = $this->_getResponseBody();
-		
-		$aError = NULL;
 		$oXml = NULL;
 		
-		if ( is_string( $mResBody ) ) {
-			
-			try {
-				
-				$oXml = new SimpleXMLElement( $mResBody );
-				
-				$oError = NULL;
-				
-				// check for <errors>...</errors>
-				if ( $aErrors = $oXml->errors ) {
-					$oError = $aErrors[ 0 ];
-				}
-				
-				// check for <error>...</error>
-				if ( !$oError && ( $aErrors = $oXml->error ) ) {
-					$oError = $aErrors[ 0 ];			
-				}
-				
-				if ( $oError ) {
-					
-					$aError = $this->formatError(
-						self::ERROR_QUERY,
-						sprintf( 'Sysomos query error: %s', strval( $oError->errorMessage ) )
-					);
-					
-					// don't bother returning this
-					$oXml = NULL;
-				}
-			
-			} catch ( Exception $e ) {
-				
-				$aError = $this->formatError(
-					self::ERROR_BAD_XML,
-					sprintf( 'XML parse exception message: %d', $e->getMessage() )
-				);
-				
-			}
-			
-		} elseif ( is_array( $mResBody ) ) {
-			
-			$aError = $mResBody;
-			
-		} else {
-			
-			// this should not happen
-			$aError = $this->formatError(
-				self::ERROR_UNKNOWN,
-				sprintf( 'Error with: %s', __METHOD__ )
-			);
-			
-		}
+		$aRes = $this
+			->_setClientUrl( $sUrl, $aParams )
+			->_getParsedResponseBody( 'xml' )
+		;
 		
-		// set error
-		if ( is_array( $aError ) ) {
-			$aRes = array_merge( $aRes, $aError );
+		
+		$aRes[ '_uri' ] = $sUrl;
+		
+		if ( $oXml = $aRes[ 'parsed_xml' ] ) {
+			unset( $aRes[ 'parsed_xml' ] );
 		}
 		
 		
 		return array( $aRes, $oXml );
 	}
+	
+	
+	//
+	public function _getXmlError( $oXml ) {
+		
+		$aError = NULL;
+		
+		// check for <errors>...</errors>
+		if ( $aErrors = $oXml->errors ) {
+			$oError = $aErrors[ 0 ];
+		}
+		
+		// check for <error>...</error>
+		if ( !$oError && ( $aErrors = $oXml->error ) ) {
+			$oError = $aErrors[ 0 ];			
+		}
+		
+		if ( $oError ) {
+			
+			$aError = $this->_formatError(
+				self::ERROR_QUERY,
+				sprintf( 'Sysomos query error: %s', strval( $oError->errorMessage ) )
+			);
+			
+		}
+		
+		return $aError;
+	}
+
 	
 	
 	
@@ -430,7 +337,7 @@ class Geko_Sysomos_Heartbeat
 	//
 	public function getInfo( $aParams = array(), $aOptions = array() ) {
 		
-		list( $aRes, $oXml ) = $this->_getResult( 'info', $aParams );
+		list( $aRes, $oXml ) = $this->getResult( 'info', $aParams );
 		
 		if ( $oXml ) {
 			
@@ -468,7 +375,7 @@ class Geko_Sysomos_Heartbeat
 		
 		//// do stuff
 		
-		list( $aRes, $oXml ) = $this->_getResult( 'measure', $aParams );
+		list( $aRes, $oXml ) = $this->getResult( 'measure', $aParams );
 		
 		if ( $oXml ) {
 			
@@ -536,7 +443,7 @@ class Geko_Sysomos_Heartbeat
 		
 		//// do stuff
 		
-		list( $aRes, $oXml ) = $this->_getResult( 'rsscontent', $aParams );
+		list( $aRes, $oXml ) = $this->getResult( 'rsscontent', $aParams );
 				
 		$aOptions = array_merge( array(
 			'truncate_length' => 120
@@ -718,15 +625,6 @@ class Geko_Sysomos_Heartbeat
 		return $aJson;
 	}
 
-	
-	//// helpers
-	
-	public function formatError( $iErrorCode, $sMsg ) {
-		return array(
-			'error_code' => $iErrorCode,
-			'error_msg' => $sMsg
-		);
-	}
 	
 	
 }

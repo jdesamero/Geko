@@ -8,56 +8,53 @@ class Geko_Wp_Query
 	
 	
 	// no constructor
-	private function __construct()
-	{
+	private function __construct() {
 	
 	}
 	
 	
 	
 	// set the $wp_query object to work on
-	public static function set(&$oWpQuery)
-	{
+	public static function set( &$oWpQuery ) {
 		self::$oWpQuery =& $oWpQuery;
 	}
 	
 	
 	
 	// get the global $wp_query object if self::set() was not called
-	public static function get()
-	{
+	public static function get() {
+		
 		global $wp_query;
 		
-		if (NULL == self::$oWpQuery) {
+		if ( NULL == self::$oWpQuery ) {
 			return $wp_query;
 		} else {
 			return self::$oWpQuery;
 		}
+		
 	}
 	
 	
 	
 	// reset self::$oWpQuery
-	public static function reset()
-	{
+	public static function reset() {
 		self::$oWpQuery = NULL;
 	}
 	
 	
 	
 	// get query vars as a string
-	public static function get_query_vars_as_str()
-	{
+	public static function get_query_vars_as_str() {
+		
 		global $wp_query;
 		
-		if (is_array($wp_query->query)) {
+		if ( is_array( $wp_query->query ) ) {
 			
 			$sOut = '';
 			
-			foreach ($wp_query->query as $sKey => $sValue)
-			{
-				if ('' != $sOut) $sOut .= '&';
-				$sOut .= $sKey . '=' . urlencode($sValue);
+			foreach ( $wp_query->query as $sKey => $sValue ) {
+				if ( '' != $sOut ) $sOut .= '&';
+				$sOut .= sprintf( '%s=%s', $sKey urlencode( $sValue ) );
 			}
 			
 			return $sOut;
@@ -66,6 +63,7 @@ class Geko_Wp_Query
 			return $wp_query->query;
 		}
 	}
+	
 	
 }
 

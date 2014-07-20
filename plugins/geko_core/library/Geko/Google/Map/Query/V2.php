@@ -50,6 +50,14 @@ class Geko_Google_Map_Query_V2 extends Geko_Google_Map_Query
 				$aNeCoords = $aGeo[ 'bounds' ][ 'northeast' ];
 				$aSwCoords = $aGeo[ 'bounds' ][ 'southwest' ];
 				
+				if ( !$aNeCoords ) {
+					$aNeCoords = $aGeo[ 'viewport' ][ 'northeast' ];
+				}
+
+				if ( !$aSwCoords ) {
+					$aSwCoords = $aGeo[ 'viewport' ][ 'northeast' ];
+				}
+				
 				$aTypes = array( strtolower( $aGeo[ 'location_type' ] ) );
 				
 				$aDetRow = array(

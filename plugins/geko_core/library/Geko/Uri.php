@@ -239,9 +239,10 @@ class Geko_Uri
 		$aFlatVars = Geko_Array::flatten( $this->_aParsed[ 'vars' ] );
 		foreach ( $aFlatVars as $sKey => $sValue ) {
 			$sOut .= sprintf(
-				'<input type="hidden" name="%s" value="%s" />' . "\n",
+				'<input type="hidden" name="%s" value="%s" />%s',
 				$sKey,
-				htmlspecialchars( $sValue )
+				htmlspecialchars( $sValue ),
+				"\n"
 			);
 		}
 		
@@ -258,10 +259,10 @@ class Geko_Uri
 		$a = $this->_aParsed;
 		
 		$sOut =  
-			( ( $a[ 'scheme' ] ) ? $a[ 'scheme' ] . '://' : '' ) .
-			( ( $a[ 'user' ] ) ? $a[ 'user' ] . ':' . $a[ 'pass' ] . '@' : '' ) .
+			( ( $a[ 'scheme' ] ) ? sprintf( '%s://', $a[ 'scheme' ] ) : '' ) .
+			( ( $a[ 'user' ] ) ? sprintf( '%s:%s@', $a[ 'user' ], $a[ 'pass' ] ) : '' ) .
 			$a[ 'host' ] .
-			( ( $a[ 'port' ] ) ? ':' . $a[ 'port' ] : '' )
+			( ( $a[ 'port' ] ) ? sprintf( ':%d', $a[ 'port' ] ) : '' )
 		;
 		
 		return $sOut;	
@@ -276,19 +277,16 @@ class Geko_Uri
 		$aFlatVars = Geko_Array::flatten( $a[ 'vars' ] );
 		$aGather = array();
 		foreach ( $aFlatVars as $sKey => $sValue ) {
-			$aGather[] = $sKey . '=' . $sValue;
+			$aGather[] = sprintf( '%s=%s', $sKey, urlencode( $sValue ) );
 		}
 				
-		$sFlatVars = implode( '&', $aGather);
+		$sFlatVars = implode( '&', $aGather );
 		
 		$sOut =  
-			( ( $a[ 'scheme' ] ) ? $a[ 'scheme' ] . '://' : '' ) .
-			( ( $a[ 'user' ] ) ? $a[ 'user' ] . ':' . $a[ 'pass' ] . '@' : '' ) .
-			$a[ 'host' ] .
-			( ( $a[ 'port' ] ) ? ':' . $a[ 'port' ] : '' ) .
+			$this->getServer() .
 			$a[ 'path' ] .
-			( ( $sFlatVars ) ? '?' . $sFlatVars : '' ) .
-			( ( $a[ 'fragment' ] ) ? '#' . $a[ 'fragment' ] : '' )
+			( ( $sFlatVars ) ? sprintf( '?%s', $sFlatVars ) : '' ) .
+			( ( $a[ 'fragment' ] ) ? sprintf( '#%s', $a[ 'fragment' ] ) : '' )
 		;
 		
 		return $sOut;
@@ -352,7 +350,7 @@ class Geko_Uri
 			$sPath .= '?';
 		}
 		
-		return '/^' . $sPath . '$/si';
+		return sprintf( '/^%s$/si', $sPath );
 	}
 	
 	
@@ -371,7 +369,7 @@ class Geko_Uri
 			
 			if ( 'on' == $_SERVER[ 'HTTPS' ] ) $sProtocol = 'https';
 			
-			$sPath .= $sProtocol . '://';
+			$sPath .= sprintf( '%s://', $sProtocol );
 			
 			// Server name
 			$sPath .= $_SERVER[ 'SERVER_NAME' ];
@@ -381,7 +379,7 @@ class Geko_Uri
 				( ( 'https' == $sProtocol ) && ( $_SERVER[ 'SERVER_PORT' ] != '443' ) ) ||
 				( ( 'http' == $sProtocol ) && ( $_SERVER[ 'SERVER_PORT' ] != '80' ) )
 			) {
-				$sPath .= ':' . $_SERVER[ 'SERVER_PORT' ];
+				$sPath .= sprintf( ':%d', $_SERVER[ 'SERVER_PORT' ] );
 			}
 			
 		}
