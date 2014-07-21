@@ -149,6 +149,8 @@ class Geko_Wp_Template extends Geko_Singleton_Abstract
 	//
 	public function introspectTemplateValuesCallback( $mRet, $iIdx, $sTemplateFile, $aParams ) {
 		
+		// TO DO: Gloc_Layout is hard-coded, do something about this
+		
 		if ( $fIntrospectCallback = $aParams[ 'introspect_callback' ] ) {
 			
 			$sPhpCode = file_get_contents( $sTemplateFile );
@@ -157,24 +159,12 @@ class Geko_Wp_Template extends Geko_Singleton_Abstract
 			if ( preg_match( '/class\s([a-zA-Z0-1_]+)\sextends\sGloc_Layout/si', $sPhpCode, $aRegs ) ) {
 				
 				// we have a layout class
-				$sClass = $aRegs[1];
+				$sClass = $aRegs[ 1 ];
 				
-				if ( 'Gloc_Layout_Template' == $sClass ) {
+				if ( 0 === strpos( $sClass, 'Gloc_Layout' ) ) {
 					
-					// not unique					
-					$sClass .= sprintf( '_%s', $iIdx );		// make it unique
-					
-					$sPhpCode = preg_replace( '/<\?php/si', '', $sPhpCode, 1 );
-					$sPhpCode = preg_replace( '/class\sGloc_Layout_Template/si', sprintf( 'class %s', $sClass ), $sPhpCode );
-					$sPhpCode = preg_replace( '/geko_render_template\(\);/si', '', $sPhpCode );
-					
-					eval( $sPhpCode );
-					
-				} else {
-					
-					// unique, so we can load this directly
+					// load the class so it can be introspected
 					require_once( $sTemplateFile );
-					
 				}
 				
 				if (
