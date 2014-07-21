@@ -13,8 +13,8 @@ class Geko_Wp_Role extends Geko_Wp_Entity
 	protected $_oRoleType;
 	
 	//
-	public function init()
-	{
+	public function init() {
+		
 		parent::init();
 		
 		$this
@@ -27,8 +27,8 @@ class Geko_Wp_Role extends Geko_Wp_Entity
 	}
 	
 	//
-	public function constructEnd()
-	{
+	public function constructEnd() {
+		
 		$this->_oRoleType = Geko_Wp_Role_Types::getInstance()
 			->getRoleTypeObject( $this->getTypeCode() )
 		;
@@ -38,8 +38,8 @@ class Geko_Wp_Role extends Geko_Wp_Entity
 	
 	
 	//
-	public function formatEntity( $mEntity )
-	{
+	public function formatEntity( $mEntity ) {
+		
 		// check for the all pseudo type
 		$aRegs = array();
 		
@@ -56,30 +56,26 @@ class Geko_Wp_Role extends Geko_Wp_Entity
 	
 	
 	//
-	public function getType()
-	{
+	public function getType() {
 		return $this->getEntityPropertyValue('type');
 	}
 	
 	//
-	public function getTypeCode()
-	{
+	public function getTypeCode() {
 		return sanitize_title( $this->getType() );
 	}
 	
 	
 	
 	//
-	public function getTheTitle()
-	{
+	public function getTheTitle() {
 		return Geko_Inflector::pluralize( $this->getTitle() );
 	}
 	
 	
 	
 	////
-	public function isAll()
-	{
+	public function isAll() {
 		return $this->getEntityPropertyValue('is_all');
 	}
 	
@@ -87,14 +83,12 @@ class Geko_Wp_Role extends Geko_Wp_Entity
 	//// relating to the role type object
 	
 	//
-	public function hasRoleTypeObject()
-	{
+	public function hasRoleTypeObject() {
 		return ( $this->_oRoleType ) ? TRUE : FALSE;
 	}
 
 	//
-	public function getRoleTypeObject()
-	{
+	public function getRoleTypeObject() {
 		return $this->_oRoleType;
 	}
 	
@@ -102,8 +96,8 @@ class Geko_Wp_Role extends Geko_Wp_Entity
 	//// methods that use the role type object
 	
 	//
-	public function getAssignedCount()
-	{
+	public function getAssignedCount() {
+		
 		if ( $this->_oRoleType ) {
 			return $this->_oRoleType->getRoleAssignedCount( $this->getId() );
 		}
@@ -112,8 +106,8 @@ class Geko_Wp_Role extends Geko_Wp_Entity
 	}
 
 	//
-	public function getAssignedCountUrl()
-	{
+	public function getAssignedCountUrl() {
+		
 		if ( $this->_oRoleType ) {
 			return $this->_oRoleType->getRoleAssignedCountUrl( $this );
 		}
@@ -122,11 +116,12 @@ class Geko_Wp_Role extends Geko_Wp_Entity
 	}
 	
 	//
-	public function getAssignedCountLink()
-	{
+	public function getAssignedCountLink() {
+		
 		$iCount = $this->getAssignedCount();
+		
 		if ( $iCount ) {
-			return '<a href="' . $this->getAssignedCountUrl() . '">' . $iCount . '</a>';
+			return sprintf( '<a href="%s">%d</a>', $this->getAssignedCountUrl(), $iCount );
 		} else {
 			return 0;
 		}
@@ -134,8 +129,8 @@ class Geko_Wp_Role extends Geko_Wp_Entity
 	
 	// get capabilities associated with the role
 	// defer to the $this->_oRoleType object if it's there
-	public function getCapabilities()
-	{
+	public function getCapabilities() {
+		
 		if ( $this->_oRoleType ) {
 			return $this->_oRoleType->getRoleCapabilities( $this );
 		}
@@ -145,8 +140,8 @@ class Geko_Wp_Role extends Geko_Wp_Entity
 	
 	// get level associated with the role
 	// defer to the $this->_oRoleType object if it's there
-	public function getLevel()
-	{
+	public function getLevel() {
+		
 		if ( $this->_oRoleType ) {
 			return $this->_oRoleType->getRoleLevel( $this );
 		}
@@ -155,20 +150,20 @@ class Geko_Wp_Role extends Geko_Wp_Entity
 	}
 	
 	//
-	public function getPermalink()
-	{
+	public function getPermalink() {
+		
 		$sPermalink = $this->_oRoleType->getRolePermalink( $this );
 		
 		if ( $this->isAll() ) {
-			$sPermalink = str_replace( 'all-' . $this->getTypeCode(), 'all', $sPermalink );
+			$sPermalink = str_replace( sprintf( 'all-%s', $this->getTypeCode() ), 'all', $sPermalink );
 		}
 		
 		return $sPermalink;
 	}
 	
 	// if $bFormat is set to true, then manipulate the slug output as required
-	public function getSlug( $bFormat = FALSE )
-	{
+	public function getSlug( $bFormat = FALSE ) {
+		
 		$sSlug = parent::getSlug();
 		if ( $this->isAll() && $bFormat ) $sSlug = 'all';
 		
@@ -178,20 +173,17 @@ class Geko_Wp_Role extends Geko_Wp_Entity
 	
 	// need to establish the role type
 	// potentially on the best matching rule
-	public function getDefaultEntityValue()
-	{
+	public function getDefaultEntityValue() {
 		return Geko_Wp_Role_Types::getInstance()->getCurrentType();
 	}
 	
 	//
-	public function getRewrite()
-	{
+	public function getRewrite() {
 		return $this->_oRoleType->getRoleRewrite( $this );
 	}
 	
 	//
-	public function getEntityClass()
-	{
+	public function getEntityClass() {
 		return $this->_oRoleType->getRoleEntityClass( $this );
 	}
 	
@@ -199,8 +191,8 @@ class Geko_Wp_Role extends Geko_Wp_Entity
 	
 	////
 
-	public static function createPseudoAllEntity( $sRoleType )
-	{
+	public static function createPseudoAllEntity( $sRoleType ) {
+		
 		$oEntity = new StdClass;
 		
 		$sItem = strtolower( str_replace( array( '-', '_') , ' ', $sRoleType ) );
@@ -212,10 +204,10 @@ class Geko_Wp_Role extends Geko_Wp_Entity
 			sanitize_title( $sRoleType )
 		);
 		
-		$oEntity->title = 'All ' . $sItem;
+		$oEntity->title = sprintf( 'All %s', $sItem );
 		$oEntity->slug = $oEntity->role_id;		// same as the pseudo role id
 		$oEntity->type = $sRoleType;
-		$oEntity->description = 'Represents all ' . strtolower( $sItemPlural );
+		$oEntity->description = sprintf( 'Represents all %s', strtolower( $sItemPlural ) );
 		$oEntity->is_all = TRUE;
 		
 		return $oEntity;
@@ -223,9 +215,10 @@ class Geko_Wp_Role extends Geko_Wp_Entity
 	
 	// create a pseudo-role object meant to represent items
 	// beloning to a type
-	public static function createPseudoAll( $sRoleType )
-	{
+	public static function createPseudoAll( $sRoleType ) {
+		
 		$sClass = get_called_class();
+		
 		return new $sClass(
 			call_user_func( array( $sClass, 'createPseudoAllEntity' ), $sRoleType )
 		);
@@ -234,5 +227,6 @@ class Geko_Wp_Role extends Geko_Wp_Entity
 	
 	
 }
+
 
 

@@ -197,7 +197,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	
 	
 	// role type
-	public function compRole_Type( $aArgs ) {
+	public function compRole_Types( $aArgs ) {
 		
 		$oRoleTypes = Geko_Wp_Role_Types::getInstance();
 		$oRoleTypes->register( 'Geko_Wp_User_RoleType' );

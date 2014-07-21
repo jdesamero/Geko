@@ -403,6 +403,7 @@ abstract class Geko_Entity_Query
 		$oQuery = NULL;
 		
 		if ( $this->_bUseManageQuery && $this->_sManageClass ) {
+			
 			$oMng = Geko_Singleton_Abstract::getInstance( $this->_sManageClass );
 			
 			Geko_Debug::out( $this->_sManageClass, __METHOD__ );
