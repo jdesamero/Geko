@@ -227,7 +227,7 @@ class Geko_Wp_User extends Geko_Wp_Entity
 		
 		$bPermalink = $aParams[ 'permalink' ];
 		
-		$aParams[ 'src' ] = ( $bPermalink ) ? $sPhoto : urlencode( $sPhoto ) ;
+		$aParams[ 'src' ] = $sPhoto;
 		
 		$oThumb = new Geko_Image_Thumb( $aParams );
 		

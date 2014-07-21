@@ -40,9 +40,18 @@ class Geko_Wp_User_Photo extends Geko_Wp_User_Meta
 		}
 		
 		if ( $sFile = $this->getPhotoDoc( $iUserId ) ) {
+			
 			$oDoc = phpQuery::newDocument( $sAvatarSrc );
-			$sThumbUrl = sprintf( '%s?src=%s&w=%d&h=%d&zc=1', Geko_Uri::getUrl( 'geko_thumb' ), urlencode( $sFile ), $iSize, $iSize );
+			
+			$sThumbUrl = Geko_Wp::getThumbUrl( array(
+				'src' => $sFile,
+				'w' => $iSize,
+				'h' => $iSize,
+				'zc' => 1
+			) );
+			
 			$oDoc[ 'img' ]->attr( 'src', $sThumbUrl );
+			
 			$sAvatarSrc = strval( $oDoc );
 		}
 		

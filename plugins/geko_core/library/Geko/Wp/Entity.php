@@ -130,7 +130,7 @@ abstract class Geko_Wp_Entity extends Geko_Entity
 		$sImgPath = str_replace( $sSrcUrl, '', $sImgUrl );
 		$sImgPath = sprintf( '%s/%s', $sSrcDir, trim( $sImgPath, '/' ) );
 		
-		$aParams[ 'src' ] = urlencode( $sImgPath );
+		$aParams[ 'src' ] = $sImgPath;
 		
 		$oThumb = new Geko_Image_Thumb( $aParams );
 		return $oThumb->buildThumbUrl( Geko_Uri::getUrl( 'geko_thumb' ) );

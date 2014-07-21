@@ -1,9 +1,21 @@
 <?php
 
-// constants
-
+// wordpress specific
 if ( defined( 'ABSPATH' ) ) {
+
+	// constants
 	define( 'GEKO_WP_ABSPATH', substr_replace( ABSPATH, '', strlen( ABSPATH ) - 1, strlen( ABSPATH ) ) );
+	
+	// rendering function
+	function geko_render_template() {
+		
+		// only render if not in admin mode
+		if ( !is_admin() ) {
+			$sBootClass = Geko_Class::existsCoalesce( 'Gloc_Bootstrap', 'Geko_Wp_Bootstrap' );
+			Geko_Singleton_Abstract::getInstance( $sBootClass )->renderTemplate();
+		}
+	}
+	
 }
 
 // adds support for newer native functions in PHP
@@ -101,5 +113,7 @@ function _ge( $sElem, $aAtts = array(), $mContent = NULL ) {
 function _gw( $sWidget, $aAtts, $mValue, $aParams ) {
 	return Geko_Html_Widget::create( $sWidget, $aAtts, $mValue, $aParams );
 }
+
+
 
 

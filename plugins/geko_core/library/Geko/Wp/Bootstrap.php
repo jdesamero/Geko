@@ -306,18 +306,25 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 		//
 		Geko_Debug::out( $sTemplate, __METHOD__ );
 		
+		$aClassFileMapping = array(
+			'Main' => sprintf( '%s/layout_main.php', TEMPLATEPATH ),
+			'Widgets' => sprintf( '%s/layout_widgets.php', TEMPLATEPATH ),
+			$sCurTmpSuffix => $sTemplate
+		);
 		
 		$oResolve = new Geko_Wp_Resolver();
-		$oResolve
-			->setClassFileMapping( array(
-				'Main' => sprintf( '%s/layout_main.php', TEMPLATEPATH ),
-				'Widgets' => sprintf( '%s/layout_widgets.php', TEMPLATEPATH ),
-				$sCurTmpSuffix => $sTemplate
-			) )
-			->addPath( 'default', new Geko_Wp_Resolver_Path_Default() )
-			->run()
-		;
 		
+		// init
+		$oResolve = $this->modifyResolverInit( $oResolve );		
+		$oResolve->setClassFileMapping( $aClassFileMapping );
+		
+		// before add path
+		$oResolve = $this->modifyResolverBeforeAddPath( $oResolve );
+		$oResolve->addPath( 'default', new Geko_Wp_Resolver_Path_Default() );
+		
+		// before run
+		$oResolve = $this->modifyResolverBeforeRun( $oResolve );		
+		$oResolve->run();
 		
 		
 		// initialize the various layout classes
@@ -337,6 +344,27 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 		
 	}
 	
+	// hook methods
+	
+	//
+	public function modifyClassFileMapping( $aClassFileMapping ) {
+		return $aClassFileMapping;
+	}
+
+	//
+	public function modifyResolverInit( $oResolve ) {
+		return $oResolve;
+	}
+	
+	//
+	public function modifyResolverBeforeAddPath( $oResolve ) {
+		return $oResolve;
+	}
+	
+	//
+	public function modifyResolverBeforeRun( $oResolve ) {
+		return $oResolve;
+	}
 	
 	
 }

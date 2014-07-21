@@ -316,7 +316,7 @@ class Geko_Wp extends Geko
 			
 			if ( is_file( $sImageFullPath ) ) {
 				
-				$aParams[ 'src' ] = urlencode( $sImageFullPath );
+				$aParams[ 'src' ] = $sImageFullPath;
 				$oThumb = new Geko_Image_Thumb( $aParams );
 				
 				return $oThumb->buildThumbUrl( Geko_Uri::getUrl( 'geko_thumb' ) );

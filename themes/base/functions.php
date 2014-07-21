@@ -4,16 +4,6 @@ if ( class_exists( 'Geko_Loader' ) ) {
 	
 	Geko_Loader::addIncludePaths( sprintf( '%s/includes/library', TEMPLATEPATH ) );
 	
-	// rendering function
-	function geko_render_template() {
-		
-		// only render if not in admin mode
-		if ( !is_admin() ) {
-			$sBootClass = Geko_Class::existsCoalesce( 'Gloc_Bootstrap', 'Geko_Wp_Bootstrap' );
-			Geko_Singleton_Abstract::getInstance( $sBootClass )->renderTemplate();
-		}
-	}
-	
 	// load theme specific customizations
 	require_once( sprintf( '%s/includes/functions.inc.php', TEMPLATEPATH ) );
 	
