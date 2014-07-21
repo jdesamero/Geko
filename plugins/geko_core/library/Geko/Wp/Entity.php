@@ -318,33 +318,30 @@ abstract class Geko_Wp_Entity extends Geko_Entity
 	
 	
 	
-	// $sImgUrl is http://some.domain.com/some_image.jpg (?)
-	public function getThumbUrl( $sImgUrl, $aParams ) {
-		
-		// remove the http:// portion of the image path
-		$sSrcDir = Geko_PhpQuery_FormTransform_Plugin_File::getDefaultFileDocRoot();
-		$sSrcUrl = Geko_PhpQuery_FormTransform_Plugin_File::getDefaultFileUrlRoot();
-		
-		$sImgPath = str_replace( $sSrcUrl, '', $sImgUrl );
-		$sImgPath = sprintf( '%s/%s', $sSrcDir, trim( $sImgPath, '/' ) );
-		
-		$aParams[ 'src' ] = $sImgPath;
-		
-		$oThumb = new Geko_Image_Thumb( $aParams );
-		return $oThumb->buildThumbUrl( Geko_Uri::getUrl( 'geko_thumb' ) );
-	}
-	
-	
 	// helper
 	public function buildThumbUrl( $sPhoto, $aParams ) {
 		
 		$bPermalink = $aParams[ 'permalink' ];
+		$sMetaKey = $aParams[ 'meta_key' ];
+		
+		// resolve url to path, if we can
+		$sSrcUrl = Geko_PhpQuery_FormTransform_Plugin_File::getDefaultFileUrlRoot();
+		
+		if ( 0 === strpos( $sPhoto, $sSrcUrl ) ) {
+			
+			// get root dir
+			$sSrcDir = Geko_PhpQuery_FormTransform_Plugin_File::getDefaultFileDocRoot();
+			
+			$sPhoto = str_replace( $sSrcUrl, '', $sPhoto );
+			$sPhoto = sprintf( '%s/%s', $sSrcDir, trim( $sPhoto, '/' ) );
+		}
+		
 		
 		$aParams[ 'src' ] = $sPhoto;
 		
 		$oThumb = new Geko_Image_Thumb( $aParams );
 		
-		if ( $bPermalink ) {
+		if ( $bPermalink && $sMetaKey ) {
 			
 			$aThumbInfo = $oThumb->get();
 			
@@ -367,7 +364,7 @@ abstract class Geko_Wp_Entity extends Geko_Entity
 			
 			if ( is_file( $sPermDoc ) ) {
 				
-				$sOrigUrl = $this->getPhotoUrl( $aParams[ 'meta_key' ] );
+				$sOrigUrl = $this->getPhotoUrl( $sMetaKey );
 				
 				return sprintf( '%s/%s', dirname( $sOrigUrl ), $sThumbFileName );
 			}
@@ -375,6 +372,12 @@ abstract class Geko_Wp_Entity extends Geko_Entity
 		}
 		
 		return $oThumb->buildThumbUrl( Geko_Uri::getUrl( 'geko_thumb' ) );
+	}
+	
+	
+	// alias of buildThumbUrl()
+	public function getThumbUrl( $sImgUrl, $aParams ) {
+		return $this->buildThumbUrl( $sImgUrl, $aParams );
 	}
 	
 	
