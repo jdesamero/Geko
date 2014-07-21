@@ -4,7 +4,7 @@ Template Name: Login - Forgot Password
 */
 
 //
-class Gloc_Layout_Template extends Gloc_Layout
+class Gloc_Layout_PageLoginForgotPassword extends Gloc_Layout
 {
 	
 	protected $_aLabels = array(

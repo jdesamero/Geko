@@ -4,7 +4,7 @@ Template Name: Login - Unsubscribe
 */
 
 //
-class Gloc_Layout_Template extends Gloc_Layout
+class Gloc_Layout_PageLoginUnsubscribe extends Gloc_Layout
 {
 	
 	protected $_aLabels = array(

@@ -4,7 +4,7 @@ Template Name: No Sidebar
 */
 
 //
-class Gloc_Layout_Template extends Gloc_Layout
+class Gloc_Layout_Nosidebar extends Gloc_Layout
 {
 	//
 	public function echoContent() {		

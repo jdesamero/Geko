@@ -4,7 +4,7 @@ Template Name: Homepage
 */
 
 //
-class Gloc_Layout_Template extends Gloc_Layout
+class Gloc_Layout_Homepage extends Gloc_Layout
 {
 	
 	protected $_aLabels = array(

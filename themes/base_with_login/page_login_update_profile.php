@@ -4,7 +4,7 @@ Template Name: Login - Update Profile
 */
 
 //
-class Gloc_Layout_Template extends Gloc_Layout
+class Gloc_Layout_PageLoginUpdateProfile extends Gloc_Layout
 {
 	
 	protected $_aLabels = array(

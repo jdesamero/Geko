@@ -4,7 +4,7 @@ Template Name: Form
 */
 
 //
-class Gloc_Layout_Template extends Gloc_Layout
+class Gloc_Layout_PageForm extends Gloc_Layout
 {
 	
 	protected $oPage = NULL;

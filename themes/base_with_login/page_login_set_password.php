@@ -4,7 +4,7 @@ Template Name: Login - Set Password
 */
 
 //
-class Gloc_Layout_Template extends Gloc_Layout
+class Gloc_Layout_PageLoginSetPassword extends Gloc_Layout
 {
 	
 	private $oUser = NULL;

@@ -4,7 +4,7 @@ Template Name: Login - Activate Account
 */
 
 //
-class Gloc_Layout_Template extends Gloc_Layout
+class Gloc_Layout_PageLoginActivateAccount extends Gloc_Layout
 {
 	
 	private $oUser = NULL;

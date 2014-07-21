@@ -296,9 +296,12 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	//
 	public function renderTemplate() {
 		
+		// determine the wordpress template file that was called
 		
 		$aBt = debug_backtrace();
 		$sTemplate = $aBt[ 1 ][ 'file' ];
+		
+		$sCurTmpSuffix = Geko_Inflector::camelize( pathinfo( $sTemplate, PATHINFO_FILENAME ) );
 		
 		//
 		Geko_Debug::out( $sTemplate, __METHOD__ );
@@ -309,7 +312,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 			->setClassFileMapping( array(
 				'Main' => sprintf( '%s/layout_main.php', TEMPLATEPATH ),
 				'Widgets' => sprintf( '%s/layout_widgets.php', TEMPLATEPATH ),
-				'Template' => $sTemplate
+				$sCurTmpSuffix => $sTemplate
 			) )
 			->addPath( 'default', new Geko_Wp_Resolver_Path_Default() )
 			->run()

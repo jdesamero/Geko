@@ -4,7 +4,7 @@ Template Name: Ajax
 */
 
 //
-class Gloc_Layout_Template extends Gloc_Layout
+class Gloc_Layout_PageAjax extends Gloc_Layout
 {
 		
 	// .../ajax-content/?section=blog

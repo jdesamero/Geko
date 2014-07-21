@@ -4,7 +4,7 @@ Template Name: Archives Page
 */
 
 //
-class Gloc_Layout_Template extends Gloc_Layout
+class Gloc_Layout_Archives extends Gloc_Layout
 {
 	
 	protected $_aLabels = array(

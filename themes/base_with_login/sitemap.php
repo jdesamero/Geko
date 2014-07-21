@@ -4,7 +4,7 @@ Template Name: Sitemap
 */
 
 //
-class Gloc_Layout_Template extends Gloc_Layout
+class Gloc_Layout_Sitemap extends Gloc_Layout
 {
 	public function echoContent() {		
 		

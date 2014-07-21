@@ -4,7 +4,7 @@ Template Name: Links Page
 */
 
 //
-class Gloc_Layout_Template extends Gloc_Layout
+class Gloc_Layout_Links extends Gloc_Layout
 {
 	//
 	public function echoContent() {		

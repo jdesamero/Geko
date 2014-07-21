@@ -1,7 +1,7 @@
 <?php
 
 //
-class Gloc_Layout_Template extends Gloc_Layout
+class Gloc_Layout_Category extends Gloc_Layout
 {
 	
 	protected $_aLabels = array(

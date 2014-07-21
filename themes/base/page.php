@@ -1,7 +1,7 @@
 <?php
 
 //
-class Gloc_Layout_Template extends Gloc_Layout
+class Gloc_Layout_Page extends Gloc_Layout
 {
 	//
 	public function echoContent() {		
