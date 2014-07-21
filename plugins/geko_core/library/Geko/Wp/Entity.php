@@ -120,22 +120,6 @@ abstract class Geko_Wp_Entity extends Geko_Entity
 		return mysql2date( $sFormat, $sSqlDateTime );	
 	}
 	
-	//
-	public function getThumbUrl( $sImgUrl, $aParams ) {
-		
-		// remove the http:// portion of the image path
-		$sSrcDir = Geko_PhpQuery_FormTransform_Plugin_File::getDefaultFileDocRoot();
-		$sSrcUrl = Geko_PhpQuery_FormTransform_Plugin_File::getDefaultFileUrlRoot();
-		
-		$sImgPath = str_replace( $sSrcUrl, '', $sImgUrl );
-		$sImgPath = sprintf( '%s/%s', $sSrcDir, trim( $sImgPath, '/' ) );
-		
-		$aParams[ 'src' ] = $sImgPath;
-		
-		$oThumb = new Geko_Image_Thumb( $aParams );
-		return $oThumb->buildThumbUrl( Geko_Uri::getUrl( 'geko_thumb' ) );
-	}
-	
 	
 	//
 	public function getProperyTranslation( $aParams ) {
@@ -216,6 +200,12 @@ abstract class Geko_Wp_Entity extends Geko_Entity
 		return $mRes;
 	}
 	
+	
+	
+	
+	//// image handling methods
+	
+	
 	//
 	public function _getBaseUrl() {
 		return Geko_Wp::getUrl();
@@ -240,7 +230,155 @@ abstract class Geko_Wp_Entity extends Geko_Entity
 		}
 		return '';	
 	}
+	
+	
+	
+	// convenience methods for extracting image urls
+	
+	// get one
+	public function getPhotoPath( $sMetaKey, $sMethod = 'getPhotoUrl' ) {
+		foreach ( $this->_aMetaHandlers as $oMeta ) {
+			if (
+				( $oMeta instanceof Geko_Wp_Options_Meta ) && 
+				( $oMeta->getHasFileUpload() ) && 
+				( $sPhotoUrl = $oMeta->$sMethod( $this->getId(), $sMetaKey ) )
+			) {
+				return $sPhotoUrl;
+			}
+		}
+	}
+	
+	// get all
+	public function getPhotoPaths( $sMethod = 'getPhotoUrls' ) {
+		$aRes = array();
+		foreach ( $this->_aMetaHandlers as $oMeta ) {
+			if (
+				( $oMeta instanceof Geko_Wp_Options_Meta ) && 
+				( $oMeta->getHasFileUpload() )
+			) {
+				$aRes = array_merge( $aRes, $oMeta->$sMethod( $this->getId() ) );
+			}
+		}
+		return $aRes;
+	}
+	
+	//
+	public function getPhotoUrl( $sMetaKey = '' ) {
+		return $this->getPhotoPath( $sMetaKey );
+	}
+	
+	//
+	public function getPhotoUrls() {
+		return $this->getPhotoPaths();	
+	}
 
+	//
+	public function getPhotoDoc( $sMetaKey = '' ) {
+		return $this->getPhotoPath( $sMetaKey, 'getPhotoDoc' );	
+	}
+	
+	//
+	public function getPhotoDocs() {
+		return $this->getPhotoPaths( 'getPhotoDocs' );	
+	}
+	
+	
+	
+	//
+	public function getThePhotoUrl( $aParams ) {
+		
+		if ( $sPhoto = $this->getPhotoDoc( $aParams[ 'meta_key' ] ) ) {
+			
+			return $this->buildThumbUrl( $sPhoto, $aParams );
+		}
+		
+		if ( $aParams[ 'noplaceholder' ] ) return '';
+		
+		$sPlaceholderImage = ( $aParams[ 'placeholder' ] ) ? $aParams[ 'placeholder' ] : '##tmpl_dir##/images/placeholder.gif';
+		$sPlaceholderImage = str_replace( array( '##tmpl_dir##', '##template_directory##' ), get_bloginfo( 'template_directory' ), $sPlaceholderImage );
+		
+		return $sPlaceholderImage;
+	}
+	
+	
+	//
+	public function getThePhotoUrls( $aParams ) {
+		
+		$aPhotos = array();
+		
+		$aPhotoDocs = $this->getPhotoDocs();
+		
+		foreach ( $aPhotoDocs as $sPhoto ) {
+			
+			$aPhotos[] = $this->buildThumbUrl( $sPhoto, $aParams );
+		}
+		
+		return $aPhotos;
+	}
+	
+	
+	
+	// $sImgUrl is http://some.domain.com/some_image.jpg (?)
+	public function getThumbUrl( $sImgUrl, $aParams ) {
+		
+		// remove the http:// portion of the image path
+		$sSrcDir = Geko_PhpQuery_FormTransform_Plugin_File::getDefaultFileDocRoot();
+		$sSrcUrl = Geko_PhpQuery_FormTransform_Plugin_File::getDefaultFileUrlRoot();
+		
+		$sImgPath = str_replace( $sSrcUrl, '', $sImgUrl );
+		$sImgPath = sprintf( '%s/%s', $sSrcDir, trim( $sImgPath, '/' ) );
+		
+		$aParams[ 'src' ] = $sImgPath;
+		
+		$oThumb = new Geko_Image_Thumb( $aParams );
+		return $oThumb->buildThumbUrl( Geko_Uri::getUrl( 'geko_thumb' ) );
+	}
+	
+	
+	// helper
+	public function buildThumbUrl( $sPhoto, $aParams ) {
+		
+		$bPermalink = $aParams[ 'permalink' ];
+		
+		$aParams[ 'src' ] = $sPhoto;
+		
+		$oThumb = new Geko_Image_Thumb( $aParams );
+		
+		if ( $bPermalink ) {
+			
+			$aThumbInfo = $oThumb->get();
+			
+			$aPath = pathinfo( $sPhoto );
+			
+			$sThumbFileName = sprintf(
+				'%s-%dx%d.%s',
+				$aPath[ 'filename' ],
+				$aThumbInfo[ 'width' ],
+				$aThumbInfo[ 'height' ],
+				$aPath[ 'extension' ]
+			);
+			
+			$sPermDoc = sprintf( '%s/%s', $aPath[ 'dirname' ], $sThumbFileName );
+			
+			if ( !is_file( $sPermDoc ) ) {
+				// attempt to save
+				$oThumb->savePermanentFile( $sPermDoc );
+			}
+			
+			if ( is_file( $sPermDoc ) ) {
+				
+				$sOrigUrl = $this->getPhotoUrl( $aParams[ 'meta_key' ] );
+				
+				return sprintf( '%s/%s', dirname( $sOrigUrl ), $sThumbFileName );
+			}
+			
+		}
+		
+		return $oThumb->buildThumbUrl( Geko_Uri::getUrl( 'geko_thumb' ) );
+	}
+	
+	
+	
 	
 	
 	//// formatting helper methods

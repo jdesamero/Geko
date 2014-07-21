@@ -8,6 +8,19 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 	protected $_sParentFieldName = '';
 	
 	
+	// handling file uploads
+	
+	protected $_bHasFileUpload = FALSE;
+	protected $_aUploadPaths = array();
+	protected $_aUpKeys = array();
+	
+	protected $_sUploadDir = '';
+	protected $_sFullDocRoot = '';
+	protected $_sFullUrlRoot = '';
+	
+	
+	
+	
 	//
 	protected function __construct() {
 		
@@ -23,7 +36,49 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 	public function add() {
 		
 		parent::add();
-
+		
+		
+		
+		//// file upload stuff
+		
+		if ( $this->_bHasFileUpload ) {
+						
+			if ( count( $this->_aUploadPaths ) > 0 ) {
+				
+				// consolidate upload paths into central array
+				foreach ( $this->_aUploadPaths as $sPath => $aPathDetails ) {
+					
+					if ( $aPathDetails[ 'auto_resolve' ] ) {
+						
+						$sFullDocRoot = sprintf( '%s%s', Geko_PhpQuery_FormTransform_Plugin_File::getDefaultFileDocRoot(), $sPath );
+						$sFullUrlRoot = sprintf( '%s%s', Geko_PhpQuery_FormTransform_Plugin_File::getDefaultFileUrlRoot(), $sPath );
+						
+						$this->_aUploadPaths[ $sPath ][ 'full_doc_root' ] = $sFullDocRoot;
+						$this->_aUploadPaths[ $sPath ][ 'full_url_root' ] = $sFullUrlRoot;
+					
+					} else {
+						
+						$this->_aUploadPaths[ $sPath ][ 'full_doc_root' ] = $sFullDocRoot = $sPath;
+						$sFullUrlRoot = $aPathDetails[ 'full_url_root' ];
+					}
+					
+					$this->uploadPathsCallback( $aPathDetails, $sFullDocRoot, $sFullUrlRoot );
+				}
+				
+				// track the keys numerically
+				$this->_aUpKeys = array_keys( $this->_aUploadPaths );
+				
+			}
+			
+			$this->_sUploadDir = $this->getUploadPath();
+			$this->_sFullDocRoot = $this->getFullDocRoot( $this->_sUploadDir );
+			$this->_sFullUrlRoot = $this->getFullUrlRoot( $this->_sUploadDir );
+			
+		}
+		
+		
+		
+		//
 		if ( $oSubMng = $this->_oSubOptionParent ) {
 			
 			$sSubAction = $oSubMng->getActionPrefix();
@@ -48,6 +103,14 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 		
 		return $this;
 	}
+	
+	// hook methods
+	
+	//
+	public function uploadPathsCallback( $aPathDetails, $sFullDocRoot, $sFullUrlRoot ) {
+	
+	}
+	
 	
 	
 	
@@ -187,8 +250,8 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 					$aFileVals[ $sKey ] = $_FILES[ $sRealKey ];
 					if ( !$aDataVals[ $sKey ] ) {
 						$aDataVals[ $sKey ] = $_POST[ $sRealKey ];
-						if ( $mDel = $_POST[ 'del-' . $sRealKey ] ) {
-							$aDataVals[ 'del-' . $sKey ] = $mDel;
+						if ( $mDel = $_POST[ sprintf( 'del-%s', $sRealKey ) ] ) {
+							$aDataVals[ sprintf( 'del-%s', $sKey ) ] = $mDel;
 						}
 					}
 				}
@@ -302,10 +365,13 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 		if ( count( $aSubEntities ) > 0 ) {
 			
 			// clean-up existing
-			$wpdb->query( "
-				DELETE FROM				$sMetaMemberTable
-				WHERE					" . Geko_Wp_Db::prepare( ' ( ' . $sMetaIdFieldName . ' ##d## ) ', array_keys( $aSubEntities ) ) . "
-			" );
+			$wpdb->query( sprintf( '
+					DELETE FROM			%s
+					WHERE				%s
+				',
+				$sMetaMemberTable,
+				Geko_Wp_Db::prepare( sprintf( ' ( %s ##d## ) ', $sMetaIdFieldName ), array_keys( $aSubEntities ) )
+			) );
 			
 			// re-insert
 			foreach ( $aSubEntities as $iSubEntityId => $aSubVals ) {
@@ -369,7 +435,7 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 					$sPfKey = substr_replace( $sKey, $sPrefix, 4, 0 );
 				} else {
 					// varname becomes prefix-varname
-					$sPfKey = $sPrefix . $sKey;
+					$sPfKey = sprintf( '%s%s', $sPrefix, $sKey );
 				}
 				$aPrefixed[ $sPfKey ] = $mVal;
 			}
@@ -392,7 +458,7 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 			$aPrefixed = array();
 			
 			foreach ( $aFileVals as $sKey => $mVal ) {
-				$aPrefixed[ $sPrefix . $sKey ] = $mVal;
+				$aPrefixed[ sprintf( '%s%s', $sPrefix, $sKey ) ] = $mVal;
 			}
 			
 			return $aPrefixed;
@@ -412,12 +478,12 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 		$sValue = $sDbValue;										// set return value to current DB value
 		
 		// if delete flag was set, then delete file
-		if ( $aDataVals[ 'del-' . $sMetaKey ] ) {
+		if ( $aDataVals[ sprintf( 'del-%s', $sMetaKey ) ] ) {
 			
 			// delete existing file
 			if (
 				$sDbValue && 
-				is_file( $sFile = $sUploadDir . '/' . $sDbValue )
+				is_file( $sFile = sprintf( '%s/%s', $sUploadDir, $sDbValue ) )
 			) {
 				unlink( $sFile );
 			}
@@ -442,7 +508,7 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 				// delete existing file because it is being replaced
 				if (
 					$sDbValue && 
-					is_file( $sFile = $sUploadDir . '/' . $sDbValue )
+					is_file( $sFile = sprintf( '%s/%s', $sUploadDir, $sDbValue ) )
 				) {
 					unlink( $sFile );
 				}
@@ -453,12 +519,12 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 				// move uploaded file
 				$sTmpFile = $aFileVals[ $sMetaKey ][ 'tmp_name' ];
 				if ( is_uploaded_file( $sTmpFile ) ) {
-					if ( move_uploaded_file( $sTmpFile, $sUploadDir . '/' . $sSavefile ) ) {
+					if ( move_uploaded_file( $sTmpFile, sprintf( '%s/%s', $sUploadDir, $sSavefile ) ) ) {
 						$sValue = $sSavefile;						// file name has been potentially changed
 					}
 				} else {
 					// allow spoofing of $_FILES array
-					if ( rename( $sTmpFile, $sUploadDir . '/' . $sSavefile ) ) {
+					if ( rename( $sTmpFile, sprintf( '%s/%s', $sUploadDir, $sSavefile ) ) ) {
 						$sValue = $sSavefile;
 					}
 				}
@@ -501,10 +567,125 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 		
 		// cleanup files with whatever was left over from $aFiles (since these do not exist in the db)
 		foreach ( $aFiles as $sFile ) {
-			unlink( $sFileDir . $sFile );
+			unlink( sprintf( '%s%s', $sFileDir, $sFile ) );
 		}
 		
 	}
+	
+	
+	
+	
+	//// image handling
+	
+	// helper accessors for $this->_aUploadPaths
+	
+	//
+	public function getHasFileUpload() {
+		return $this->_bHasFileUpload;
+	}
+	
+	//
+	public function getUploadDir() {
+		return $this->_sUploadDir;
+	}
+	
+	//
+	public function getUploadPath( $iIdx = 0 ) {
+		return $this->_aUpKeys[ $iIdx ];
+	}
+	
+	//
+	public function getFullDocRoot( $sPath ) {
+		return $this->_aUploadPaths[ $sPath ][ 'full_doc_root' ];
+	}
+
+	//
+	public function getFullUrlRoot( $sPath ) {
+		return $this->_aUploadPaths[ $sPath ][ 'full_url_root' ];
+	}
+	
+	
+	
+	
+	//// image display helpers
+	
+	//
+	public function getPhotoPath( $iItemId, $sMetaKey = '', $sPathType = 'full_url_root' ) {
+		
+		$sFullPathRoot = '';
+		
+		if ( !$sMetaKey ) {
+			
+			// use the first meta key of the first upload path as default
+			foreach ( $this->_aUploadPaths as $aPath ) {
+				if ( $sMetaKey = $aPath[ 'meta_keys' ][ 0 ] ) {
+					$sFullPathRoot = $aPath[ $sPathType ];
+					break;
+				}
+			}
+			
+		} else {
+			
+			foreach ( $this->_aUploadPaths as $aPath ) {
+				foreach ( $aPath[ 'meta_keys' ] as $sMk ) {
+					if ( $sMetaKey == $sMk ) {
+						$sFullPathRoot = $aPath[ $sPathType ];
+						break;					
+					}
+				}
+			}
+			
+		}
+		
+		if ( !$sMetaKey || !$sFullPathRoot ) return '';
+		
+		if ( $sFile = $this->getMeta( $iItemId, $sMetaKey, TRUE ) ) {
+			return sprintf( '%s/%s', $sFullPathRoot, $sFile );
+		}
+		
+		return '';
+	}
+	
+	//
+	public function getPhotoPaths( $iItemId, $sPathType = 'full_url_root' ) {
+		
+		$aPaths = array();
+		
+		foreach ( $this->_aUploadPaths as $aPath ) {
+			foreach( $aPath[ 'meta_keys' ] as $sKey ) {
+				if ( $sFile = $this->getMeta( $iItemId, $sKey, TRUE ) ) {
+					$aPaths[] = sprintf( '%s/%s', $aPath[ $sPathType ], $sFile );
+				}
+			}
+		}
+		
+		return $aPaths;
+	}
+	
+	//
+	public function getPhotoUrl( $iItemId, $sMetaKey = '' ) {
+		return $this->getPhotoPath( $iItemId, $sMetaKey );
+	}
+	
+	//
+	public function getPhotoUrls( $iItemId ) {
+		return $this->getPhotoPaths( $iItemId );
+	}
+	
+	//
+	public function getPhotoDoc( $iItemId, $sMetaKey = '' ) {
+		return $this->getPhotoPath( $iItemId, $sMetaKey, 'full_doc_root' );
+	}
+	
+	//
+	public function getPhotoDocs( $iItemId ) {
+		return $this->getPhotoPaths( $iItemId, 'full_doc_root' );
+	}	
+	
+	
+	
+	
+	
 	
 	
 	

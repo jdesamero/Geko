@@ -5,23 +5,13 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 {
 	private static $_bHasFileUploadAdded = FALSE;
 	private static $_aAllUploadPaths = array();
+	
 	protected static $aMetaCache = array();
 	
 	protected $_sPrefixSeparator = '_';
 	protected $_bHasDisplayMode = TRUE;
 	protected $_iUserId = NULL;
-	
-	// handling file uploads
-	
-	protected $_bHasFileUpload = FALSE;
-	protected $_aUploadPaths = array();
-	protected $_aUpKeys = array();
-	
-	protected $_sUploadDir = '';
-	protected $_sFullDocRoot = '';
-	protected $_sFullUrlRoot = '';
-	
-	
+		
 	
 	
 	//// init
@@ -33,48 +23,6 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 		
 		parent::add();
 		
-		
-		//// file upload stuff
-		
-		if ( $this->_bHasFileUpload ) {
-						
-			if ( count( $this->_aUploadPaths ) > 0 ) {
-				
-				// consolidate upload paths into central array
-				foreach ( $this->_aUploadPaths as $sPath => $aPathDetails ) {
-					
-					if ( $aPathDetails[ 'auto_resolve' ] ) {
-						$sFullDocRoot = Geko_PhpQuery_FormTransform_Plugin_File::getDefaultFileDocRoot() . $sPath;
-						$sFullUrlRoot = Geko_PhpQuery_FormTransform_Plugin_File::getDefaultFileUrlRoot() . $sPath;
-						$this->_aUploadPaths[ $sPath ][ 'full_doc_root' ] = $sFullDocRoot;
-						$this->_aUploadPaths[ $sPath ][ 'full_url_root' ] = $sFullUrlRoot;
-					} else {
-						$this->_aUploadPaths[ $sPath ][ 'full_doc_root' ] = $sFullDocRoot = $sPath;
-						$sFullUrlRoot = $aPathDetails[ 'full_url_root' ];
-					}
-					
-					if ( !self::$_aAllUploadPaths[ $sFullDocRoot ] ) {
-						self::$_aAllUploadPaths[ $sFullDocRoot ][ 'full_url_root' ] = $sFullUrlRoot;
-						self::$_aAllUploadPaths[ $sFullDocRoot ][ 'meta_keys' ] = array();
-					}
-					
-					self::$_aAllUploadPaths[ $sFullDocRoot ][ 'meta_keys' ] = array_merge(
-						self::$_aAllUploadPaths[ $sFullDocRoot ][ 'meta_keys' ],
-						$aPathDetails[ 'meta_keys' ]
-					);
-					
-				}
-				
-				// track the keys numerically
-				$this->_aUpKeys = array_keys( $this->_aUploadPaths );
-				
-			}
-			
-			$this->_sUploadDir = $this->getUploadPath();
-			$this->_sFullDocRoot = $this->getFullDocRoot( $this->_sUploadDir );
-			$this->_sFullUrlRoot = $this->getFullUrlRoot( $this->_sUploadDir );
-			
-		}
 		
 		
 		//// database stuff
@@ -97,6 +45,23 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 		return $this;
 	}
 	
+	
+	//
+	public function uploadPathsCallback( $aPathDetails, $sFullDocRoot, $sFullUrlRoot ) {
+
+		if ( !self::$_aAllUploadPaths[ $sFullDocRoot ] ) {
+			self::$_aAllUploadPaths[ $sFullDocRoot ][ 'full_url_root' ] = $sFullUrlRoot;
+			self::$_aAllUploadPaths[ $sFullDocRoot ][ 'meta_keys' ] = array();
+		}
+		
+		self::$_aAllUploadPaths[ $sFullDocRoot ][ 'meta_keys' ] = array_merge(
+			self::$_aAllUploadPaths[ $sFullDocRoot ][ 'meta_keys' ],
+			$aPathDetails[ 'meta_keys' ]
+		);
+		
+	}
+	
+	
 	//
 	public function install() {
 		
@@ -107,36 +72,7 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 		return $this;
 	}
 	
-	
-	
-	
-	// helper accessors for $this->_aUploadPaths
-	
-	//
-	public function getHasFileUpload() {
-		return $this->_bHasFileUpload;
-	}
-	
-	//
-	public function getUploadDir() {
-		return $this->_sUploadDir;
-	}
-	
-	//
-	public function getUploadPath( $iIdx = 0 ) {
-		return $this->_aUpKeys[ $iIdx ];
-	}
-	
-	//
-	public function getFullDocRoot( $sPath ) {
-		return $this->_aUploadPaths[ $sPath ][ 'full_doc_root' ];
-	}
-
-	//
-	public function getFullUrlRoot( $sPath ) {
-		return $this->_aUploadPaths[ $sPath ][ 'full_url_root' ];
-	}
-	
+		
 	
 	
 	//
@@ -215,81 +151,6 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 	
 	
 	
-	//// image display helpers
-	
-	//
-	public function getPhotoPath( $iUserId, $sMetaKey = '', $sPathType = 'full_url_root' ) {
-		
-		$sFullPathRoot = '';
-		
-		if ( !$sMetaKey ) {
-			// use the first meta key of the first upload path as default
-			foreach ( $this->_aUploadPaths as $aPath ) {
-				if ( $sMetaKey = $aPath[ 'meta_keys' ][ 0 ] ) {
-					$sFullPathRoot = $aPath[ $sPathType ];
-					break;
-				}
-			}
-		} else {
-			foreach ( $this->_aUploadPaths as $aPath ) {
-				foreach ( $aPath[ 'meta_keys' ] as $sMk ) {
-					if ( $sMetaKey == $sMk ) {
-						$sFullPathRoot = $aPath[ $sPathType ];
-						break;					
-					}
-				}
-			}		
-		}
-		
-		if ( !$sMetaKey || !$sFullPathRoot ) return '';
-		
-		if ( $sFile = $this->getMeta( $iUserId, $sMetaKey, TRUE ) ) {
-			return sprintf( '%s/%s', $sFullPathRoot, $sFile );
-		}
-		
-		return '';
-	}
-	
-	//
-	public function getPhotoPaths( $iUserId, $sPathType = 'full_url_root' ) {
-		
-		$aPaths = array();
-		
-		foreach ( $this->_aUploadPaths as $aPath ) {
-			foreach( $aPath[ 'meta_keys' ] as $sKey ) {
-				if ( $sFile = $this->getMeta( $iUserId, $sKey, TRUE ) ) {
-					$aPaths[] = sprintf( '%s/%s', $aPath[ $sPathType ], $sFile );
-				}
-			}
-		}
-		
-		return $aPaths;
-	}
-	
-	//
-	public function getPhotoUrl( $iUserId, $sMetaKey = '' ) {
-		return $this->getPhotoPath( $iUserId, $sMetaKey );
-	}
-	
-	//
-	public function getPhotoUrls( $iUserId ) {
-		return $this->getPhotoPaths( $iUserId );
-	}
-	
-	//
-	public function getPhotoDoc( $iUserId, $sMetaKey = '' ) {
-		return $this->getPhotoPath( $iUserId, $sMetaKey, 'full_doc_root' );
-	}
-	
-	//
-	public function getPhotoDocs( $iUserId ) {
-		return $this->getPhotoPaths( $iUserId, 'full_doc_root' );
-	}	
-	
-	
-	
-	
-	
 	//// cache helpers
 	
 	//
@@ -349,17 +210,22 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 		
 		$iUserId = $this->resolveUserId( $iUserId );
 		
-		/* /
+		$sMetaWithPfx = '';
 		if ( $sMetaKey ) {
+			$sMetaWithPfx = sprintf( '%s%s', $this->getPrefixWithSep(), $sMetaKey );
+		}
+		
+		/* /
+		if ( $sMetaWithPfx ) {
 			// native WP function
-			return get_usermeta( $iUserId, $this->getPrefixWithSep() . $sMetaKey );
+			return get_usermeta( $iUserId, $sMetaWithPfx );
 		}
 		/* */
 		
 		$this->setMetaCache( $iUserId );
 		
-		if ( $sMetaKey ) {
-			if ( $bAddPrefix ) $sMetaKey = $this->getPrefixWithSep() . $sMetaKey;
+		if ( $sMetaWithPfx ) {
+			if ( $bAddPrefix ) $sMetaKey = $sMetaWithPfx;
 			return self::$aMetaCache[ $iUserId ][ $sMetaKey ][ $iRowIdx ];
 		} else {
 			
@@ -414,19 +280,16 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 		
 		foreach ( $aParts as $aPart ) {
 			
-			$sLabel = ( $aPart[ 'label' ] ) ? '<label for="' . $aPart[ 'name' ] . '">' . $aPart[ 'label' ] . '</label>' : '';
+			$sLabel = ( $aPart[ 'label' ] ) ? sprintf( '<label for="%s">%s</label>', $aPart[ 'name' ], $aPart[ 'label' ] ) : '' ;
 			$sFieldGroup = $aPart[ 'field_group' ];
-			$sDescription = ( $aPart[ 'description' ] ) ? '<span class="description">' . $aPart[ 'description' ] . '</span>' : '';
+			$sDescription = ( $aPart[ 'description' ] ) ? sprintf( '<span class="description">%s</span>', $aPart[ 'description' ] ) : '' ;
 			
-			$sFields .= '
+			$sFields .= sprintf( '
 				<tr>
-					<th>' . $sLabel . '</th>
-					<td>
-						' . $sFieldGroup . '<br />
-						' . $sDescription . '
-					</td>
+					<th>%s</th>
+					<td>%s<br />%s</td>
 				</tr>
-			';
+			', $sLabel, $sFieldGroup, $sDescription );
 		}
 		
 		return $sFields;
@@ -474,7 +337,7 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 		if ( 'update' == $sMode ) {
 			$aMeta = Geko_Wp_Db::getResultsHash(
 				$wpdb->prepare(
-					"SELECT * FROM $wpdb->usermeta WHERE user_id = %d",
+					sprintf( 'SELECT * FROM %s WHERE user_id = %%d', $wpdb->usermeta ),
 					$iUserId
 				),
 				'meta_key'
@@ -510,13 +373,13 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 		$iUserId = $this->resolveUserId( $iUserId );
 		
 		// members
-		$wpdb->query("
-			DELETE FROM		$wpdb->geko_user_meta_members
+		$wpdb->query( sprintf( '
+			DELETE FROM		%s
 			WHERE			umeta_id NOT IN (
 				SELECT			umeta_id
-				FROM			$wpdb->usermeta
+				FROM			%s
 			)
-		");
+		', $wpdb->geko_user_meta_members, $wpdb->usermeta ) );
 		
 	}
 	
@@ -533,21 +396,27 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 			$aMetaFields = array();
 			
 			foreach ( $aDetails[ 'meta_keys' ] as $sKey ) {
-				$aMetaFields[] = "( f.meta_key = '" . $this->getPrefixWithSep() . $sKey . "' )";
+				$aMetaFields[] = sprintf( "( f.meta_key = '%s%s' )", $this->getPrefixWithSep(), $sKey );
 			}
 			
-			$sMetaFields = '( ' . implode( ' OR ', $aMetaFields ) . ' ) ';
+			$sMetaFields = sprintf( '( %s ) ', implode( ' OR ', $aMetaFields ) );
 			
 			parent::cleanOrphanFiles(
-				"	SELECT				f.meta_value
-					FROM				$wpdb->usermeta f
-					WHERE				$sMetaFields
-				",
-				"	DELETE FROM 		$wpdb->usermeta f
-					WHERE				$sMetaFields AND
-										( f.meta_value = %s )
-				",
-				$sDocRoot . '/'
+				
+				sprintf( '
+					SELECT				f.meta_value
+					FROM				%s f
+					WHERE				%s
+				', $wpdb->usermeta, $sMetaFields ),
+				
+				sprintf( '
+					DELETE FROM 		%s f
+					WHERE				%s AND
+										( f.meta_value = %%s )
+				', $wpdb->usermeta, $sMetaFields ),
+				
+				sprintf( '%s/', $sDocRoot )
+				
 			);
 			
 		}

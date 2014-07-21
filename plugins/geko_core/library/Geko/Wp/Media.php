@@ -55,7 +55,7 @@ class Geko_Wp_Media extends Geko_Wp_Post
 
 	//
 	public function getMimeTypeIconImg( $iWidth = 36, $iHeight = 36 ) {
-		return '<img src="' . $this->getMimeTypeIconSrc() . '" width="' . $iWidth . '" height="' . $iHeight . '" border="0" />';
+		return sprintf( '<img src="%s" width="%d" height="%d" border="0" />', $this->getMimeTypeIconSrc(), $iWidth, $iHeight );
 	}
 	
 	//
@@ -107,13 +107,13 @@ class Geko_Wp_Media extends Geko_Wp_Post
 		foreach ( $aMeta as $sKey => $mValue ) {
 			if ( $mValue ) {
 				if ( preg_match( '/[0-9]/', $mValue ) ) {
-					$aFmt[] = $sKey . ': ' . $mValue;
+					$aFmt[] = sprintf( '%s: %d', $sKey, $mValue );
 				} else {
-					$aFmt[] = $sKey . ": '" . $mValue . "'";			
+					$aFmt[] = sprintf( "%s: '%s'", $sKey, addslashes( $mValue ) );			
 				}
 			}
 		}
-		return '{' . implode( ', ', $aFmt ) . '}';
+		return sprintf( '{%s}', implode( ', ', $aFmt ) );
 	}
 
 	
@@ -125,10 +125,11 @@ class Geko_Wp_Media extends Geko_Wp_Post
 			( $sImage = $this->getUrl() ) && 
 			( $this->isImage() )
 		) {
+			
 			// remove the http:// portion of the image path
 			$sSrcDir = Geko_PhpQuery_FormTransform_Plugin_File::getDefaultFileDocRoot();
 			$sImage = str_replace( Geko_Wp::getUrl(), '', $sImage );
-			$sImage = $sSrcDir . '/' . trim( $sImage, "/" );
+			$sImage = sprintf( '%s/%s', $sSrcDir, trim( $sImage, '/' ) );
 			
 			$aParams[ 'src' ] = $sImage;
 		}
