@@ -69,13 +69,13 @@ class Geko_Wp_User_Photo extends Geko_Wp_User_Meta
 	//// front-end display methods
 	
 	//
-	public function formFields() {	
-		?><p>
-			<label class="main">Upload Image</label> 
-			<input type="file" id="user_photo" name="user_photo" _file_upload_dir="<?php echo $this->_sUploadDir; ?>" />
-			<label class="side">(jpg, jpeg, gif, or png)</label><br />
-			<span _bind_to="<?php echo $this->getPrefixWithSep(); ?>user_photo" _thumb_width="150" _thumb_height="200"></span>
-		</p><?php
+	public function formFields() {
+		
+		$this->fieldRow( 'Upload Image', 'user_photo', array(
+			'thumb_width' => 175,
+			'thumb_height' => 225
+		), 'image_upload' );
+		
 	}
 	
 	

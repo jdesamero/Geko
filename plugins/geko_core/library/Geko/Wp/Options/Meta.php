@@ -223,6 +223,24 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 	}
 	
 	//
+	public function fieldRadio( $sName, $aParams = array() ) {
+
+		$sClass = $this->fieldClass( $aParams[ 'class' ] );
+		
+		if ( $aValues = $aParams[ 'values' ] ) {
+			
+			foreach ( $aValues as $sKey => $sLabel ) {
+				
+				$sId = sprintf( '%s_%s', $sName, $sKey );
+				
+				printf( '<input id="%s" name="%s" type="radio" value="%s" /> <label for="%s">%s</label><br />', $sId, $sName, $sKey, $sId, $sLabel );
+			}
+		}
+		
+		return $this;
+	}
+	
+	//
 	public function fieldSelect( $sName, $aParams = array() ) {
 		
 		$sClass = $this->fieldClass( $aParams[ 'class' ] );
@@ -258,6 +276,16 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 	}
 	
 	//
+	public function fieldTextarea( $sName, $aParams = array() ) {
+		
+		$sClass = $this->fieldClass( $aParams[ 'class' ] );
+		
+		printf( '<textarea id="%s" name="%s" %s ></textarea>', $sName, $sName, $sClass );
+		
+		return $this;
+	}
+
+	//
 	public function fieldImageUpload( $sName, $aParams = array() ) {
 		
 		$sClass = $this->fieldClass( $aParams[ 'class' ] );
@@ -281,6 +309,31 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 		return $this;
 	}
 	
+	
+	//
+	public function fieldImagePicker( $sName, $aParams = array() ) {
+		
+		$sDefaultClass = 'image_picker';
+		if ( $aParams[ 'multi' ] ) {
+			$sDefaultClass = trim( sprintf( '%s multi', $sDefaultClass ) );
+		}
+		
+		$sClass = $this->fieldClass( $aParams[ 'class' ], $sDefaultClass );
+		
+		printf( '<div %s >', $sClass );
+			
+		if ( $aImages = $aParams[ 'query' ] ) {
+			$this->fieldImagePickerItems( $aImages );
+		}
+		
+		printf( '<input type="hidden" id="%s" name="%s" class="imgpck_field" _member_ids="yes" />', $sName, $sName );
+			
+		echo '</div>';
+		
+		return $this;
+	}
+	
+	
 	//
 	public function fieldClass( $sClass, $sDefaultClass = '' ) {
 		
@@ -293,6 +346,19 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 		return '';
 	}
 	
+	
+	//
+	public function fieldImagePickerItems( $aImages ) {
+		
+		$aThumbParams = array( 'w' => 75, 'h' => 75 );
+		
+		foreach ( $aImages as $oAtt ): ?>
+			<a href="<?php $oAtt->echoUrl(); ?>" title="<?php $oAtt->escechoTitle(); ?>" id="<?php $oAtt->echoId(); ?>">
+				<img src="<?php $oAtt->echoTheImageUrl( $aThumbParams ); ?>" width="75" height="75" />
+			</a><?php
+		endforeach;
+	}
+
 	
 	
 	

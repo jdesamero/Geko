@@ -9,19 +9,17 @@ class Gloc_User_Meta extends Geko_Wp_User_Meta
 	}
 	
 	
-	/*
+	/* /
 	//
-	public function affix() {
+	public function add() {
+		
+		parent::add();
+		
 		Geko_Wp_Enumeration_Manage::getInstance()->init();
+		
 		return $this;
 	}
-	
-	
-	//
-	public function affixAdmin() {
-		return $this;
-	}
-	*/
+	/* */
 
 	// $aCategories = Geko_Wp_Enumeration_Query::getSet( 'user-categories' );
 	
@@ -35,17 +33,11 @@ class Gloc_User_Meta extends Geko_Wp_User_Meta
 			$sRole = $oUser->getRoleSlug();
 		}
 		
-		?>
-		
-		<!-- agent fields -->
-		<?php if ( 'subscriber' == $sRole ): ?>
-			<p>
-				<label class="main">Phone</label>
-				<input id="phone" name="phone" type="text" value="" />
-			</p>
-		<?php endif; ?>
-		
-		<?php
+		if ( 'subscriber' == $sRole ) {
+			
+			$this->fieldRow( 'Phone', 'phone' );
+			
+		}
 		
 	}
 	

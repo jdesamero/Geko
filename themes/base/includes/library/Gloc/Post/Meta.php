@@ -104,30 +104,22 @@ class Gloc_Post_Meta extends Geko_Wp_Post_Meta
 		}
 		
 		?>
-		<table class="fields">
-			<?php if ( $oPost && $oPost->inCategory( 'news' ) ): ?>
-				<tr>
-					<th><label for="main_image">Main Image</label></th>
-					<td><div class="image_picker">
-						<?php $this->echoImagePickerItems( $aImages ); ?>
-						<input type="hidden" id="main_image" name="main_image" class="imgpck_field" />
-					</div></td>
-				</tr>
-			<?php endif; ?>
-		</table>
+		<table class="fields"><?php
+			
+			if ( $oPost && $oPost->inCategory( 'news' ) ) {
+			
+				$this->fieldRow( 'Main Image', 'main_image', array(
+					'query' => $aImages
+				), 'image_picker' );			
+			
+			}
+			
+		?></table>
 		<?php
 		
 	}
 	
-	//
-	public function echoImagePickerItems( $aImages ) {
-		$aThumbParams = array( 'w' => 75, 'h' => 75 );
-		foreach ( $aImages as $oAtt ): ?>
-			<a href="<?php $oAtt->echoUrl(); ?>" title="<?php $oAtt->escechoTitle(); ?>" id="<?php $oAtt->echoId(); ?>">
-				<img src="<?php $oAtt->echoTheImageUrl( $aThumbParams ); ?>" width="75" height="75" />
-			</a><?php
-		endforeach;
-	}
+	
 	
 }
 

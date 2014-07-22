@@ -110,45 +110,36 @@ class Gloc_Page_Meta extends Geko_Wp_Page_Meta
 		}
 		
 		?>
-		<table class="fields">
-			<?php if ( $oPage && ( 'homepage.php' == $oPage->getPageTemplate() ) ): ?>
-				<tr>
-					<th><label for="slideshow_images">Slideshow Images</label></th>
-					<td><div class="image_picker multi">
-						<?php $this->echoImagePickerItems( $aImages ); ?>
-						<input type="hidden" id="slideshow_images" name="slideshow_images" class="imgpck_field" _member_ids="yes" />
-					</div></td>
-				</tr>
-			<?php elseif ( $oPage && ( 'page_form.php' == $oPage->getPageTemplate() ) ):
+		<table class="fields"><?php
+			
+			if ( $oPage && ( 'homepage.php' == $oPage->getPageTemplate() ) ) {
+			
+				$this->fieldRow( 'Main Image', 'main_image', array(
+					'query' => $aImages
+				), 'image_picker' );
+				
+			} elseif ( $oPage && ( 'page_form.php' == $oPage->getPageTemplate() ) ) {
 				
 				$aForms = new Geko_Wp_Form_Query( array(
 					'showposts' => -1,
 					'posts_per_page' => -1
 				), FALSE );
 				
-				?><tr>
-					<th><label for="form">Form</label></th>
-					<td><select id="form" name="form">
-						<option value="">- Select -</option>
-						<?php echo $aForms->implode( array( '<option value="##Id##">##Title##</option>', '' ) ); ?>
-					</select></td>
-				</tr>
-			<?php endif; ?>
-		</table>
+				if ( count( $aForms ) > 0 ) {
+					
+					$this->fieldRow( 'Form', 'form', array(
+						'query' => $aForms
+					), 'select' );
+					
+				}
+				
+			}
+			
+		?></table>
 		<?php
 	}
 	
-	//// helpers
 	
-	//
-	public function echoImagePickerItems( $aImages ) {
-		$aThumbParams = array( 'w' => 75, 'h' => 75 );
-		foreach ( $aImages as $oAtt ): ?>
-			<a href="<?php $oAtt->echoUrl(); ?>" title="<?php $oAtt->escechoTitle(); ?>" id="<?php $oAtt->echoId(); ?>">
-				<img src="<?php $oAtt->echoTheImageUrl( $aThumbParams ); ?>" width="75" height="75" />
-			</a><?php
-		endforeach;
-	}
 	
 }
 
