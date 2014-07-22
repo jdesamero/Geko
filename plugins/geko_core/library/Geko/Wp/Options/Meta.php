@@ -154,6 +154,153 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 	
 	
 	
+	
+	
+	
+	//// form field generation shortcuts
+	
+	//
+	public function _fieldRow( $sLabel, $sName, $aParams = array(), $sType = 'text', $sRowType = 'tr' ) {
+		
+		$sMethod = sprintf( 'field%s', Geko_Inflector::camelize( $sType ) );
+		
+		if ( method_exists( $this, $sMethod ) ) {
+			
+			if ( 'p' == $sRowType ): ?>
+				
+				<p>
+					<label class="main" for="<?php echo $sName; ?>"><?php echo $sLabel; ?></label> 
+					<?php $this->$sMethod( $sName, $aParams ); ?>
+				</p>
+			
+			<?php else: ?>
+				
+				<tr>
+					<th><label for="<?php echo $sName; ?>"><?php echo $sLabel; ?></label></th>
+					<td><?php $this->$sMethod( $sName, $aParams ); ?></td>
+				</tr>			
+			
+			<?php endif;
+			
+		}
+		
+		return $this;
+	}
+	
+	//
+	public function fieldRow( $sLabel, $sName, $aParams = array(), $sType = 'text' ) {
+		
+		$this->_fieldRow( $sLabel, $sName, $aParams, $sType );
+		
+		return $this;
+	}
+
+	
+	
+	//
+	public function fieldText( $sName, $aParams = array() ) {
+		
+		$sClass = $this->fieldClass( $aParams[ 'class' ], 'regular-text' );
+		
+		printf( '<input id="%s" name="%s" type="text" %s value="" />', $sName, $sName, $sClass );
+		
+		return $this;
+	}
+	
+	//
+	public function fieldCheckbox( $sName, $aParams = array() ) {
+		
+		$sValue = $aParams[ 'value' ];
+		if ( NULL === $sValue ) {
+			$sValue = 1;
+		}
+
+		$sClass = $this->fieldClass( $aParams[ 'class' ] );
+		
+		printf( '<input id="%s" name="%s" type="checkbox" value="%s" %s />', $sName, $sName, $sValue, $sClass );
+		
+		return $this;
+	}
+	
+	//
+	public function fieldSelect( $sName, $aParams = array() ) {
+		
+		$sClass = $this->fieldClass( $aParams[ 'class' ] );
+		
+		$sMultiple = '';
+		if ( $aParams[ 'multiple' ] ) {
+			$sMultiple = ' multiple="multiple" ';
+		}
+		
+		
+		printf( '<select id="%s" name="%s" %s %s>', $sName, $sName, $sMultiple, $sClass );
+		
+		if ( $sEmptyLabel = $aParams[ 'default_empty_label' ] ) {
+			printf( '<option value="">%s</option>', $sEmptyLabel );
+		}
+		
+		if ( $aQuery = $aParams[ 'query' ] ) {
+			
+			if ( !$sQryVal = $aParams[ 'query_value' ] ) {
+				$sQryVal = '##Id##';
+			}
+			
+			if ( !$sQryLbl = $aParams[ 'query_label' ] ) {
+				$sQryLbl = '##Title##';
+			}
+			
+			echo $aQuery->implode( array( sprintf( '<option value="%s">%s</option>', $sQryVal, $sQryLbl ), '' ) );
+		}
+		
+		echo '</select>';
+		
+		return $this;
+	}
+	
+	//
+	public function fieldImageUpload( $sName, $aParams = array() ) {
+		
+		$sClass = $this->fieldClass( $aParams[ 'class' ] );
+		
+		$sNameWithPfx = sprintf( '%s%s', $this->getPrefixWithSep(), $sName );
+		
+		if ( !$iWidth = $aParams[ 'thumb_width' ] ) {
+			$iWidth = 200;
+		}
+		
+		if ( !$iHeight = $aParams[ 'thumb_height' ] ) {
+			$iHeight = 200;		
+		}
+		
+		?>
+		<input type="file" id="<?php echo $sName; ?>" name="<?php echo $sName; ?>" _file_upload_dir="<?php echo $this->_sUploadDir; ?>" />
+		<label class="side">(jpg, jpeg, gif, or png)</label><br />
+		<span _bind_to="<?php echo $sNameWithPfx; ?>" _thumb_width="<?php echo $iWidth; ?>" _thumb_height="<?php echo $iHeight; ?>"></span>
+		<?php
+		
+		return $this;
+	}
+	
+	//
+	public function fieldClass( $sClass, $sDefaultClass = '' ) {
+		
+		$sConcatClass = trim( sprintf( '%s %s', $sDefaultClass, $sClass ) );
+		
+		if ( $sConcatClass ) {
+			return sprintf( ' class="%s" ', $sConcatClass );
+		}
+		
+		return '';
+	}
+	
+	
+	
+	
+	
+	
+	////
+	
+	
 	//
 	public function getMetaData( $aParams = array() ) {
 		

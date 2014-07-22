@@ -302,6 +302,15 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 	}	
 	
 	
+	//
+	public function fieldRow( $sLabel, $sName, $aParams = array(), $sType = 'text' ) {
+		
+		$this->_fieldRow( $sLabel, $sName, $aParams, $sType, 'p' );
+		
+		return $this;
+	}
+	
+	
 	
 	
 	//// crud methods
