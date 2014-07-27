@@ -40,6 +40,11 @@
 		<file id="geko-backstab-factory" src="##geko_core_uri##/js/backstab/factory.js" dependencies="geko-jquery-tmpl geko-backstab-model geko-backstab-collection geko-backstab-view" />
 		
 		
+		<!-- d3, http://d3js.org -->
+		
+		<file id="geko-d3" src="##geko_core_uri##/external/js/d3.v3.min.js" />
+		<file id="geko-d3_geo_projection" src="##geko_core_uri##/external/js/d3.geo.projection.v0.min.js" dependencies="geko-d3" />
+		
 		
 		<!-- for jQuery UI version 1.3.2 -->
 			
@@ -246,7 +251,7 @@
 		<file id="geko-jquery-geko_horizontal_scroll" src="##geko_core_uri##/js/jquery.geko_horizontal_scroll.js" dependencies="jquery geko-jquery-ui-slider" />
 		<file id="geko-jquery-geko_hovermenu" src="##geko_core_uri##/js/jquery.geko_hovermenu.js" dependencies="geko-string_format jquery" />
 		<file id="geko-jquery-geko_image_picker" src="##geko_core_uri##/js/jquery.geko_image_picker.js" dependencies="geko-jquery-geko_util" />
-		<file id="geko-jquery-geko_map_projection" src="##geko_core_uri##/js/jquery.geko_map_projection.js" dependencies="geko-jquery-geko_util" />
+		<file id="geko-jquery-geko_map_projection" src="##geko_core_uri##/js/jquery.geko_map_projection.js" dependencies="geko-jquery-geko_util geko-d3_geo_projection" />
 		<file id="geko-jquery-geko_pagination" src="##geko_core_uri##/js/jquery.geko_pagination.js" dependencies="jquery" />
 		<file id="geko-jquery-geko_portfolio" src="##geko_core_uri##/js/jquery.geko_portfolio.js" dependencies="jquery" />
 		<file id="geko-jquery-geko_read_only_form" src="##geko_core_uri##/js/jquery.geko_read_only_form.js" dependencies="jquery" />
