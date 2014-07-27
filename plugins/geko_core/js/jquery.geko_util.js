@@ -359,6 +359,71 @@
 		return degrees * Math.PI / 180;
 	};
 	
+	$.gekoMath = {
+		
+		vals: {
+			
+			e: Math.E,
+			pi: Math.PI,
+			sqrt2: Math.SQRT2,
+			sqrt1_2: Math.SQRT1_2,
+			ln2: Math.LN2,
+			ln10: Math.LN10,
+			log2e: Math.LOG2E,
+			log10e: Math.LOG10E,
+			
+			abs: Math.abs,
+			acos: Math.acos,
+			asin: Math.asin,
+			atan: Math.atan,
+			atan2: Math.atan2,
+			ceil: Math.ceil,
+			cos: Math.cos,
+			exp: Math.exp,
+			floor: Math.floor,
+			log: Math.log,
+			max: Math.max,
+			min: Math.min,
+			pow: Math.pow,
+			random: Math.random,
+			round: Math.round,
+			sin: Math.sin,
+			sqrt: Math.sqrt,
+			tan: Math.tan,
+			
+			pi1_2: ( Math.PI / 2 ),
+			radians: ( Math.PI / 180 ),
+			degrees: ( 180 / Math.PI ),
+			tau: ( Math.PI * 2 ),
+			e2: ( Math.E * Math.E ),
+			
+			sqr: function( x ) { return x * x; },
+			cube: function( x ) { return x * x * x; },
+			sgn: function( x ) { return x > 0 ? 1 : x < 0 ? -1 : 0; },
+			randInt: function( min, max ) { return Math.floor( Math.random() * ( max - min + 1 ) ) + min; },
+			degToRad: function( deg ) { return radians * 180 / Math.PI; },
+			radToDeg: function( rad ) { return degrees * Math.PI / 180; },
+			
+			sinh: function( x ) { return ( ( x = Math.exp( x ) ) - 1 / x) / 2; },
+			cosh: function( x ) { return ( ( x = Math.exp( x ) ) + 1 / x) / 2; },
+			tanh: function( x ) { return ( ( x = Math.exp( 2 * x ) ) - 1) / ( x + 1 ); }
+			
+		},
+		
+		load: function () {
+			
+			var sOut = 'var __gm = jQuery.gekoMath.vals';
+			
+			for ( var k in jQuery.gekoMath.vals ) {
+				sOut += ', %s = __gm.%s'.printf( k, k );
+			}
+			
+			return sOut + ';';
+		}
+		
+	};
+	
+	
 	
 	
 	//// browser detect
