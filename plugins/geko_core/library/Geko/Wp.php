@@ -366,11 +366,56 @@ class Geko_Wp extends Geko
 		}
 		
 		$oLoader->registerFromXmlConfigFile( $sFile, array(
-			'script' => 'wp_register_script',
-			'style' => 'wp_register_style'
+			'script' => array( __CLASS__, 'wpRegisterScript' ),
+			'style' => array( __CLASS__, 'wpRegisterStyle' )
 		) );
 		
 	}
+	
+	//// adapter methods for wp_register_script/wp_register_style
+	
+	//
+	public static function wpRegisterScript( $sId, $aParams ) {
+		
+		$sSrc = $aParams[ 'file' ];
+		
+		if ( !$aDeps = $aParams[ 'dependencies' ] ) {
+			$aDeps = array();
+		}
+		
+		if ( !$sVer = $aParams[ 'version' ] ) {
+			$sVer = FALSE;
+		}
+		
+		if ( !$bInFooter = $aParams[ 'in_footer' ] ) {
+			$bInFooter = FALSE;
+		}
+		
+		wp_register_script( $sId, $sSrc, $aDeps, $sVer, $bInFooter );
+		
+	}
+	
+	//
+	public static function wpRegisterStyle( $sId, $aParams ) {
+		
+		$sSrc = $aParams[ 'file' ];
+		
+		if ( !$aDeps = $aParams[ 'dependencies' ] ) {
+			$aDeps = array();
+		}
+		
+		if ( !$sVer = $aParams[ 'version' ] ) {
+			$sVer = FALSE;
+		}
+		
+		if ( !$sMedia = $aParams[ 'media' ] ) {
+			$sMedia = 'all';
+		}
+		
+		wp_register_style( $sId, $sSrc, $aDeps, $sVer, $sMedia );
+		
+	}
+	
 	
 	
 	//

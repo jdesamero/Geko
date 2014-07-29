@@ -195,6 +195,7 @@
 		<file id="geko-jquery-cycle_all" src="##geko_core_uri##/external/js/jquery.cycle.all.js" dependencies="geko-jquery-easing" />
 		<file id="geko-jquery-easing" src="##geko_core_uri##/external/js/jquery.easing.1.3.js" dependencies="jquery" />
 		<file id="geko-jquery-fixboxmodel" src="##geko_core_uri##/external/js/jquery.fixBoxModel.js" dependencies="jquery" />
+		<file id="geko-jquery-flexslider" src="##geko_core_uri##/external/js/jquery.flexslider-min.js" dependencies="jquery" />
 		<file id="geko-jquery-form" src="##geko_core_uri##/external/js/jquery.form.js" dependencies="jquery" />
 		<file id="geko-jquery-googlemaps" src="##geko_core_uri##/external/js/jquery.googlemaps-1.01.1.js" dependencies="geko-googlemaps jquery" />
 		<file id="geko-jquery-greensock" src="##geko_core_uri##/external/js/greensock.js" dependencies="jquery" />

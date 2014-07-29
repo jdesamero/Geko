@@ -73,11 +73,11 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 	//// main methods
 	
 	//
-	public function register( $iType, $sId, $sFile, $aDependencies = NULL ) {
+	public function register( $iType, $sId, $aParams ) {
 		
 		$this->init();
 		
-		$this->_aRegistered[ $iType ][ $sId ] = array( $sFile, $aDependencies );
+		$this->_aRegistered[ $iType ][ $sId ] = $aParams;
 		return $this;
 	}
 	
@@ -95,7 +95,7 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 			// queue the dependencies first, if any
 			
 			$aItem = $this->_aRegistered[ $iType ][ $sId ];
-			$aDependencies = $aItem[ 1 ];
+			$aDependencies = $aItem[ 'dependencies' ];
 			
 			if ( is_array( $aDependencies ) ) {
 				foreach ( $aDependencies as $sDependency ) {
@@ -126,10 +126,10 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 		) {
 			if ( 0 === strpos( $sFile, '/' ) ) {
 				// absolute path
-				$sFile = $this->_sBaseUrl . $sFile;		
+				$sFile = sprintf( '%s%s', $this->_sBaseUrl, $sFile );		
 			} else {
 				// relative path
-				$sFile = $this->_sCurUrl . '/' . $sFile;			
+				$sFile = sprintf( '%s/%s', $this->_sCurUrl, $sFile );			
 			}
 		}
 		return $sFile;
@@ -140,8 +140,8 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 	//// type wrappers
 	
 	//
-	public function registerScript( $sId, $sFile, $aDependencies = NULL ) {
-		return $this->register( self::SCRIPT_TYPE, $sId, $sFile, $aDependencies );
+	public function registerScript( $sId, $aParams ) {
+		return $this->register( self::SCRIPT_TYPE, $sId, $aParams );
 	}
 	
 	//
@@ -151,8 +151,8 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 	
 	
 	//
-	public function registerStyle( $sId, $sFile, $aDependencies = NULL ) {
-		return $this->register( self::STYLE_TYPE, $sId, $sFile, $aDependencies );
+	public function registerStyle( $sId, $aParams ) {
+		return $this->register( self::STYLE_TYPE, $sId, $aParams );
 	}
 	
 	//
@@ -170,7 +170,7 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 	public function renderScriptTag( $aItem ) {
 		$aAtts = array(
 			'type' => 'text/javascript',
-			'src' => $this->modifyFileUrl( $aItem[ 0 ] )
+			'src' => $this->modifyFileUrl( $aItem[ 'file' ] )
 		);
 		echo strval( _ge( 'script', $aAtts ) );
 		echo "\n";
@@ -188,7 +188,7 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 		$aAtts = array(
 			'rel' => 'stylesheet',
 			'type' => 'text/css',
-			'href' => $this->modifyFileUrl( $aItem[ 0 ] )
+			'href' => $this->modifyFileUrl( $aItem[ 'file' ] )
 		);
 		echo strval( _ge( 'link', $aAtts ) );
 		echo "\n";
@@ -234,28 +234,20 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 		//
 		foreach ( $this->_aXmlConfigTypes as $sType ) {
 			
-			$sTag = $sType . 's';
+			$sTag = sprintf( '%ss', $sType );
 			$fCallback = $aCallbacks[ $sType ];
 			
 			// make sure function exists
 			if ( !is_callable( $fCallback ) ) continue;
 			
-			foreach ( $oReg->$sTag->file as $oScript ) {
-				
-				$sId = trim( $oScript[ 'id' ] );
-				$sFile = trim( $oScript[ 'src' ] );
-				
-				$aDependencies = NULL;
-				if ( $aDependencies = trim( $oScript[ 'dependencies' ] ) ) {
-					$aDependencies = array_filter( explode( ' ', $aDependencies ) );
-				}
-				
+			foreach ( $oReg->$sTag->file as $oItem ) {
+								
 				$bContinue = TRUE;
 				
 				// check the version flags and ensure correct file version is loaded
 				foreach ( $aUseVersion as $sFlag => $sUseVersion ) {
 					$sVerKey = sprintf( '%s-version', $sFlag );		
-					$sVersion = trim( $oScript[ $sVerKey ] );
+					$sVersion = trim( $oItem[ $sVerKey ] );
 					if ( $sVersion && ( $sUseVersion != $sVersion ) ) {
 						$bContinue = FALSE;
 						break;
@@ -263,7 +255,9 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 				}
 				
 				if ( $bContinue ) {
-					
+
+					$sFile = trim( $oItem[ 'src' ] );
+				
 					$aRegs = array();
 					if ( preg_match( '/##([A-Za-z-_]+)##/', $sFile, $aRegs ) ) {
 						
@@ -282,8 +276,26 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 						}
 					}
 					
-					// printf( '%s - %s - %s - %s<br />', $sFunc, $sId, $sFile, implode( ', ', $aDependencies ) );
-					call_user_func( $fCallback, $sId, $sFile, $aDependencies );
+					$sId = trim( $oItem[ 'id' ] );
+					
+					$aParams = array( 'file' => $sFile );
+					
+					if ( $sDeps = trim( $oItem[ 'dependencies' ] ) ) {
+						$aParams[ 'dependencies' ] = array_filter( explode( ' ', $sDeps ) );
+					}
+					
+					if (
+						( 'style' == $sType ) && 
+						( $sMedia = trim( $oItem[ 'media' ] ) )
+					) {
+						$aParams[ 'media' ] = $sMedia;
+					}
+					
+					
+					call_user_func( $fCallback, $sId, $aParams );
+
+					// printf( '%s - %s - %s<br />', $sId, $sFile, implode( ', ', $aDependencies ) );
+					
 				}
 				
 			}
