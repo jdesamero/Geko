@@ -168,10 +168,12 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 	}
 	
 	public function renderScriptTag( $aItem ) {
+		
 		$aAtts = array(
 			'type' => 'text/javascript',
 			'src' => $this->modifyFileUrl( $aItem[ 'file' ] )
 		);
+		
 		echo strval( _ge( 'script', $aAtts ) );
 		echo "\n";
 	}
@@ -185,11 +187,17 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 	
 	//
 	public function renderStyleTag( $aItem ) {
+		
 		$aAtts = array(
 			'rel' => 'stylesheet',
 			'type' => 'text/css',
 			'href' => $this->modifyFileUrl( $aItem[ 'file' ] )
 		);
+		
+		if ( $sMedia = $aItem[ 'media' ] ) {
+			$aAtts[ 'media' ] = $sMedia;
+		}
+		
 		echo strval( _ge( 'link', $aAtts ) );
 		echo "\n";
 	}
