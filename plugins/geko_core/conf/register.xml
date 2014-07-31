@@ -253,6 +253,7 @@
 		<file id="geko-jquery-geko_hovermenu" src="##geko_core_uri##/js/jquery.geko_hovermenu.js" dependencies="geko-string_format jquery" />
 		<file id="geko-jquery-geko_image_picker" src="##geko_core_uri##/js/jquery.geko_image_picker.js" dependencies="geko-jquery-geko_util" />
 		<file id="geko-jquery-geko_map_projection" src="##geko_core_uri##/js/jquery.geko_map_projection.js" dependencies="geko-jquery-geko_util geko-d3_geo_projection" />
+		<file id="geko-jquery-geko_mobilymap" src="##geko_core_uri##/js/jquery.geko_mobilymap.js" dependencies="geko-jquery-ui-draggable geko-jquery-mobilymap" />
 		<file id="geko-jquery-geko_pagination" src="##geko_core_uri##/js/jquery.geko_pagination.js" dependencies="jquery" />
 		<file id="geko-jquery-geko_portfolio" src="##geko_core_uri##/js/jquery.geko_portfolio.js" dependencies="jquery" />
 		<file id="geko-jquery-geko_read_only_form" src="##geko_core_uri##/js/jquery.geko_read_only_form.js" dependencies="jquery" />
