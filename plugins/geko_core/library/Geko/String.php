@@ -378,6 +378,19 @@ class Geko_String
 		return $sContent;
 	}
 	
+	
+	// replace first match only
+	public static function replaceFirstMatch( $sNeedle, $sReplace, $sHaystack ) {
+		
+		$iPos = strpos( $sHaystack, $sNeedle );
+		if ( FALSE !== $iPos ) {
+			$sHaystack = substr_replace( $sHaystack, $sReplace, $iPos, strlen( $sNeedle ) );
+		}
+		
+		return $sHaystack;
+	}
+	
+	
 }
 
 

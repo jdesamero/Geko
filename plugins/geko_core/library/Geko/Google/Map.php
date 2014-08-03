@@ -32,6 +32,12 @@ class Geko_Google_Map
 		return new Geko_Google_Map_Result( $aRes );
 	}
 	
+	//
+	public function getQueryObj() {
+		return $this->_oGquery;
+	}
+	
+	
 }
 
 

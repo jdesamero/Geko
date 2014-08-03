@@ -24,6 +24,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 			
 			->mergeDeps( array(
 				
+				'db' => NULL,
 				'sess' => NULL,
 				'consts' => NULL,
 				'setup' => NULL,
@@ -71,7 +72,8 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 			) )
 			
 			->mergeConfig( array(
-
+				
+				'db' => TRUE,
 				'consts' => TRUE,
 				'setup' => TRUE,
 				'extfiles' => TRUE,
@@ -107,6 +109,27 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	
 	
 	//// components
+	
+	
+	// database connection
+	// independent
+	public function compDb( $aArgs ) {
+		
+		if ( is_string( $aArgs[ 0 ] ) ) {
+			
+			$oDb = Geko_Db::factory( $aArgs[ 0 ], $aArgs[ 1 ] );
+			
+		} else {
+			
+			$oDb = Geko_Db::factory( 'Wp_Db_Adapter', array(
+				'adapterNamespace' => 'Geko'
+			) );
+			
+		}
+		
+		$this->set( 'db', $oDb );
+	}
+
 	
 	
 	// session handler

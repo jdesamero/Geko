@@ -4,6 +4,10 @@
 class Geko_Db
 {
 	
+	protected static $_bReplacePrefixPlaceholder = TRUE;
+	protected static $_bResolveNamedParams = FALSE;
+	
+	
 	protected $_sPrefix = NULL;
 	protected $_sPrefixPlaceholder = '##pfx##';
 	
@@ -24,7 +28,38 @@ class Geko_Db
 		
 		$aArgs = func_get_args();
 		
-		// create native instance of Zend_Db_Adapter
+		//// determine the adapter class name
+		
+		$aArgParams = $aArgs[ 1 ];
+		
+		//
+		$sDbAdptClass = $aArgs[ 0 ];
+		
+		if ( !$sAdptNamespace = $aArgParams[ 'adapterNamespace' ] ) {
+			$sAdptNamespace = 'Zend_Db_Adapter';
+		}
+		
+		$sDbAdptClass = sprintf( '%s_%s', $sAdptNamespace, $sDbAdptClass );
+		
+		
+		//// look for argFormat method
+		
+		$fnArgFormat = $aArgParams[ 'argFormatCallback' ];
+		
+		// second check, use default if it exists
+		if ( !$fnArgFormat && method_exists( $sDbAdptClass, 'argFormat' ) ) {
+			$fnArgFormat = 'argFormat';
+		}
+		
+		//
+		if ( $fnArgFormat ) {
+			$aArgs = call_user_func( array( $sDbAdptClass, $fnArgFormat ), $aArgs[ 0 ], $aArgParams );
+		}
+		
+		
+		
+		//// create native instance of Zend_Db_Adapter
+		
 		$oDb = call_user_func_array( array( 'Zend_Db', 'factory' ), $aArgs );
 		
 		// wrap it
@@ -38,6 +73,20 @@ class Geko_Db
 	}
 	
 	
+	//
+	public static function setReplacePrefixPlaceholder( $bReplacePrefixPlaceholder ) {
+		self::$_bReplacePrefixPlaceholder = $bReplacePrefixPlaceholder;
+	}
+	
+	//
+	public static function setResolveNamedParams( $bResolveNamedParams ) {
+		self::$_bResolveNamedParams = $bResolveNamedParams;
+	}
+	
+	
+	
+	
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 	
 	
 	//
@@ -94,6 +143,68 @@ class Geko_Db
 	
 	
 	
+	////
+	
+	//
+	public function resolveNamedParams( $sQuery, $mParams ) {
+		
+		if ( $mParams ) {
+			
+			if ( !is_array( $mParams ) ) {
+				$aParams = array( $mParams );
+			} else {
+				$aParams = $mParams;
+			}
+			
+			$aRegs = array();
+			
+			if ( preg_match_all( '/:[A-Za-z0-1_]+|\?/sm', $sQuery, $aRegs ) )  {
+				
+				$aNamedParams = array();
+				$aIntParams = array();
+				
+				foreach ( $aParams as $mKey => $sValue ) {
+					
+					if ( is_int( $mKey ) ) {
+						$aIntParams[] = $sValue;
+					} else {
+						$aNamedParams[ $mKey ] = $sValue;
+					}
+					
+				}
+				
+				$aParams = array();			// reset
+				
+				$aMatches = $aRegs[ 0 ];
+				
+				foreach ( $aMatches as $sPlaceholder ) {
+					
+					if ( '?' == $sPlaceholder ) {
+						
+						$sParam = '';
+						if ( count( $aIntParams ) > 0 ) {
+							$sParam = array_shift( $aIntParams );
+						}
+						
+						$aParams[] = $sParam;
+						
+					} else {
+						
+						$aParams[] = $aNamedParams[ $sPlaceholder ];
+						$sQuery = Geko_String::replaceFirstMatch( $sPlaceholder, '?', $sQuery );
+					}
+				}
+				
+			}
+		
+		}
+		
+		return array( $sQuery, $aParams );
+	}
+	
+	
+	
+	
 	//// delegate to matching vendor handler
 	
 	//
@@ -146,7 +257,8 @@ class Geko_Db
 				$sTableName = $this->replacePrefixPlaceholder( $sTableName );
 				$oDb->describeTable( $sTableName );
 			} catch ( Exception $s ) {
-				$oDb->exec( $sQuery );
+				$sQuery = $this->replacePrefixPlaceholder( $sQuery );
+				$oDb->query( $sQuery );
 			}
 		}
 		
@@ -159,9 +271,27 @@ class Geko_Db
 		if ( $oDb = $this->_oDb ) {
 			
 			if ( in_array( $sMethod, array(
-				'insert', 'update', 'delete', 'fetchAll', 'fetchAssoc', 'fetchCol', 'fetchPairs', 'fetchRow', 'fetchOne'
+				'insert', 'update', 'delete', 'fetchAll', 'fetchAssoc', 'fetchCol', 'fetchPairs', 'fetchRow', 'fetchOne', 'describeTable'
 			) ) ) {
-				$aArgs[ 0 ] = $this->replacePrefixPlaceholder( $aArgs[ 0 ] );
+				
+				if ( self::$_bReplacePrefixPlaceholder ) {
+					$aArgs[ 0 ] = $this->replacePrefixPlaceholder( $aArgs[ 0 ] );
+				}
+				
+				$bResolveNamedParams = NULL;
+				
+				$aConfig = $oDb->getConfig();
+				
+				if ( isset( $aConfig[ 'resolveNamedParams' ] ) ) {
+					$bResolveNamedParams = $aConfig[ 'resolveNamedParams' ];
+				} else {
+					$bResolveNamedParams = self::$_bResolveNamedParams;
+				}
+				
+				if ( $bResolveNamedParams ) {
+					$aArgs = $this->resolveNamedParams( $aArgs[ 0 ], $aArgs[ 1 ] );
+				}
+				
 			}
 			
 			// delegate
