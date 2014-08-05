@@ -5,6 +5,7 @@ class Geko_Google_Map
 {
 	
 	protected $_oGquery = NULL;
+	protected $_oCachedQuery = NULL;
 	
 	//
 	public function __construct( $sVersion = NULL, $aParams = array() ) {
@@ -31,6 +32,18 @@ class Geko_Google_Map
 		
 		return new Geko_Google_Map_Result( $aRes );
 	}
+	
+	
+	//
+	public function cachedQuery( $sQuery, $oEngine = NULL ) {
+		
+		if ( !$this->_oCachedQuery ) {
+			$this->_oCachedQuery = new Geko_Google_Map_CachedLookup( $this->_oGquery, $oEngine );
+		}
+		
+		return $this->_oCachedQuery->getResult( $sQuery );
+	}
+	
 	
 	//
 	public function getQueryObj() {

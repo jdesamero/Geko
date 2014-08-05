@@ -125,9 +125,23 @@ class Geko_Class
 		
 		return NULL;
 	}
-
+	
+	
+	//
+	public static function createInstance( $sClass, $aParams ) {
+		
+		// no need to use reflection class if there are no params
+		if ( !$aParams ) {
+			return new $sClass();
+		}
+		
+		$oReflect = new ReflectionClass( $sClass );
+		
+		return $oReflect->newInstanceArgs( $aParams );
+	}
 	
 	
 }
+
 
 
