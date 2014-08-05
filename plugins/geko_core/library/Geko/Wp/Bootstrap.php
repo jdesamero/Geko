@@ -28,7 +28,6 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 				'sess' => NULL,
 				'consts' => NULL,
 				'setup' => NULL,
-				'extfiles' => NULL,
 				'hooks' => NULL,
 				
 				'role.types' => NULL,
@@ -76,7 +75,6 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 				'db' => TRUE,
 				'consts' => TRUE,
 				'setup' => TRUE,
-				'extfiles' => TRUE,
 				'hooks' => TRUE
 				
 			) )
@@ -157,6 +155,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 			Geko_Uri::forceHttps();	
 		}
 		
+		
 		// form transformation hooks
 		
 		Geko_PhpQuery_FormTransform_Plugin_File::setDefaultFileDocRoot( substr( ABSPATH, 0, strlen( ABSPATH ) - 1 ) );
@@ -165,15 +164,19 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 		Geko_PhpQuery_FormTransform::registerPlugin( 'Geko_PhpQuery_FormTransform_Plugin_File' );
 		Geko_PhpQuery_FormTransform::registerPlugin( 'Geko_PhpQuery_FormTransform_Plugin_RowTemplate' );
 		
+		
+		// external files
+		Geko_Wp::registerExternalFiles( sprintf( '%s/etc/register.xml', TEMPLATEPATH ) );
+		
+		
+		// misc
+		if ( isset( $aArgs[ 'use_is_home' ] ) ) {
+			Geko_Wp::setUseIsHome( $aArgs[ 'use_is_home' ] );
+		}
+		
 	}
 
 	
-	// external files
-	public function compExtfiles( $aArgs ) {
-		
-		Geko_Wp::registerExternalFiles( sprintf( '%s/etc/register.xml', TEMPLATEPATH ) );
-		
-	}
 	
 	
 	// hooks
@@ -229,24 +232,6 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	}
 	
 	
-	// location manage
-	public function compLoc_Mng( $aArgs ) {
-		
-		$oLocMng = Geko_Wp_Location_Manage::getInstance();
-		
-		$oLocMng->init()
-			/* /
-			->install()
-			->populateContinentTable( array( 'NA' ) )	
-			->populateCountryTable( array( 'CA' ) )
-			->populateProvinceTable()
-			/* */
-		;
-		
-		$this->set( 'loc.mng', $oLocMng );
-	}
-	
-	
 	//
 	public function compCat_Meta( $aArgs ) {
 		
@@ -293,23 +278,6 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 		
 		$this->set( 'lang.mng', $oLangMng );
 	}
-	
-	
-	// point manage
-	public function compPnt_Mng( $aArgs ) {
-		
-		$oPntMng = Geko_Wp_Point_Manage::getInstance();
-		
-		if ( $sPaEmsg = $aArgs[ 'points_approval_emsg' ] ) {
-			$oPntMng->setPointsApprovalEmsg( $sPaEmsg );
-		}
-		
-		$oPntMng->init();
-		
-		$this->set( 'pnt.mng', $oPntMng );
-	}
-	
-	
 	
 	
 	

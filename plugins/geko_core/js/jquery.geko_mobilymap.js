@@ -129,8 +129,8 @@
 						var aCoords = sCoords.split( ',' );
 
 						var oPos = oMapProj.getCoords( parseFloat( aCoords[ 0 ] ), parseFloat( aCoords[ 1 ] ) );
-						var iXpos = parseInt( oPos.x + aCoords[ 2 ] );
-						var iYpos = parseInt( oPos.y + aCoords[ 3 ] );
+						var iXpos = parseInt( oPos.x + parseInt( aCoords[ 2 ] ) );
+						var iYpos = parseInt( oPos.y + parseInt( aCoords[ 3 ] ) );
 						
 						eMarker.attr( 'id', 'p-%d-%d'.printf( iXpos, iYpos ) );
 					}
@@ -156,6 +156,23 @@
 					//
 					if ( oMmOpts ) {
 						
+						if ( oMmOpts.dynamicViewerScale ) {
+						
+							var iScaleFactor = oMmOpts.dynamicViewerScale;
+							
+							var fnResize = function(){
+								
+								eViewer
+									.css( 'width', eMap.width() / iScaleFactor )
+									.css( 'height', eMap.height() / iScaleFactor )
+								;
+							};
+							
+							$( window ).resize( fnResize );
+							
+							// init
+							fnResize();
+						}
 						
 						
 						var iMapWdt = eMap.width();
@@ -207,6 +224,9 @@
 						var pos = eImageContent.position();
 						fnReposViewer( eViewer, pos.left, pos.top, xRFactor, yRFactor );
 						eViewer.show();
+						
+						
+						
 						
 					}
 					

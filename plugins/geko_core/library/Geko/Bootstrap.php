@@ -407,10 +407,34 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 				
 				Geko_Debug::out( sprintf( 'Class found: %s', $sClass ), __METHOD__ );
 				
-				$oSingleton = Geko_Singleton_Abstract::getInstance( $sClass );
-				$oSingleton->init();
+				$aBiArgs = array();			// Before init args
+				$aAiArgs = array();			// After init args
 				
-				$this->set( $sKey, $oSingleton );
+				foreach ( $aArgs as $sKey => $aParams ) {
+					
+					if ( is_string( $sKey ) ) {
+						
+						if ( 0 === strpos( $sKey, 'ai:' ) ) {
+							$aAiArgs[ substr( $sKey, 3 ) ] = $aParams;						
+						} else {
+							$aBiArgs[ $sKey ] = $aParams;
+						}
+					}
+				}
+				
+				$oComp = Geko_Singleton_Abstract::getInstance( $sClass );
+				
+				if ( count( $aBiArgs ) > 0 ) {
+					$oComp = $this->callComponentMethods( $oComp, $aBiArgs );			
+				}
+				
+				$oComp->init();
+				
+				if ( count( $aAiArgs ) > 0 ) {
+					$oComp = $this->callComponentMethods( $oComp, $aAiArgs );			
+				}
+				
+				$this->set( $sKey, $oComp );
 				
 				return TRUE;
 			}
@@ -419,6 +443,41 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 		
 		return FALSE;
 	}
+	
+	
+	//
+	public function callComponentMethods( $oComp, $aArgs ) {
+		
+		foreach ( $aArgs as $sKey => $aParams ) {
+			
+			$aParams = Geko_Array::wrap( $aParams );
+			
+			$sMethod = lcfirst( Geko_Inflector::camelize( $sKey ) );
+
+			if ( !method_exists( $oComp, $sMethod ) ) {
+				
+				$sMethod = sprintf( 'set%s', ucfirst( $sMethod ) );
+				
+				if ( !method_exists( $oComp, $sMethod ) ) {
+					// okay, give up
+					$sMethod = NULL;
+				}
+			}
+			
+			if ( $sMethod ) {
+				
+				if ( count( $aParams ) > 0 ) {
+					call_user_func_array( array( $oComp, $sMethod ), $aParams );
+				} else {
+					$oComp->$sMethod();
+				}
+			}
+			
+		}
+		
+		return $oComp;
+	}
+	
 	
 	
 	
