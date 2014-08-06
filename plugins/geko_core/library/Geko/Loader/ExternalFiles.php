@@ -211,7 +211,7 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 	
 	//
 	public function registerFromXmlConfigFile( $sFile, $aCallbacks = NULL ) {
-				
+		
 		$oReg = simplexml_load_file( $sFile );
 		
 		// default callbacks

@@ -8,6 +8,7 @@ define( 'GEKO_CORE_EXTERNAL_LIB_ROOT', realpath( sprintf( '%s/external/libs', GE
 define( 'GEKO_LOG', realpath( sprintf( '%s/logs/logs.txt', GEKO_STANDALONE_PATH ) ) );
 define( 'GEKO_REGISTER_EXTRA_XML', realpath(  sprintf( '%s/conf/register_extra.xml', GEKO_CORE_ROOT ) ) );
 define( 'GEKO_REGISTER_XML', realpath( sprintf( '%s/conf/register.xml', GEKO_CORE_ROOT ) ) );
+define( 'GEKO_GEOGRAPHY_XML', realpath( sprintf( '%s/conf/geography.xml', GEKO_CORE_ROOT ) ) );
 define( 'GEKO_VIEW_HELPER_PATH', realpath( sprintf( '%s/library', GEKO_CORE_ROOT ) ) );
 
 
@@ -64,6 +65,10 @@ $oLoader
 	->registerFromXmlConfigFile( GEKO_REGISTER_EXTRA_XML )
 	->registerFromXmlConfigFile( GEKO_REGISTER_XML )
 ;
+
+
+Geko_Geography_Xml::setFile( GEKO_GEOGRAPHY_XML );
+
 
 
 if ( method_exists( 'Geko_Constant_Values', 'getUrls' ) ) {

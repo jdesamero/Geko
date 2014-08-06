@@ -95,7 +95,7 @@
 		<country continent="EU" abbr="PL" altabbr="POL" name="Poland" latitude="51.919438" longitude="19.145136" />
 		<country continent="EU" abbr="PT" altabbr="PRT" name="Portugal" latitude="39.399835" longitude="-8.224910" />
 		<country continent="EU" abbr="RO" altabbr="ROU" name="Romania" latitude="45.943161" longitude="24.966760" />
-		<country continent="EU" abbr="RU" altabbr="RUS" name="Russian Federation" variations="Russia" latitude="61.524010" longitude="105.318756" />
+		<country continent="EU" abbr="RU" altabbr="RUS" name="Russia" variations="Russian Federation" latitude="61.524010" longitude="105.318756" />
 		<country continent="EU" abbr="SM" altabbr="SMR" name="San Marino" latitude="43.942360" longitude="12.457777" />
 		<country continent="EU" abbr="SK" altabbr="SVK" name="Slovakia (Slovak Republic)" variations="Slovakia" latitude="48.669026" longitude="19.699024" />
 		<country continent="EU" abbr="SI" altabbr="SLO" name="Slovenia" variations="Slovenia" latitude="46.151241" longitude="14.995463" />
@@ -621,6 +621,3 @@
 	</cities>
 	
 </data>
-
-
-

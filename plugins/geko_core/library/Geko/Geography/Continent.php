@@ -3,19 +3,24 @@
 //
 class Geko_Geography_Continent
 {
-	public static $aContinents = array(
-		'AF' => 'Africa',
-		'AS' => 'Asia',
-		'EU' => 'Europe',
-		'NA' => 'North America',
-		'SA' => 'South America',
-		'OC' => 'Oceania',
-		'AN' => 'Antarctica'
-	);
+	
+	public static $aContinents = NULL;
+	
+	
 	
 	//
 	public static function get() {
+		
+		if ( NULL === self::$aContinents ) {
+			Geko_Geography_Xml::loadData();
+		}
+		
 		return self::$aContinents;
+	}
+	
+	//
+	public static function set( $aContinents ) {
+		self::$aContinents = $aContinents;
 	}
 	
 	// $sState could be code or name
