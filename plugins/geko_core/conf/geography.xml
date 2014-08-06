@@ -1,0 +1,626 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<data>
+	
+	<continents>		
+		<continent abbr="AF" name="Africa" countrylabel="African Countries" />
+		<continent abbr="AS" name="Asia" countrylabel="Asian Countries" />
+		<continent abbr="EU" name="Europe" countrylabel="European Countries" />
+		<continent abbr="NA" name="North America" countrylabel="North American Countries" />
+		<continent abbr="SA" name="South America" countrylabel="South American Countries" />
+		<continent abbr="OC" name="Oceania" countrylabel="Oceanian Countries" />
+		<continent abbr="AN" name="Antarctica" countrylabel="Antarctican Territories" />
+	</continents>
+	
+	<countries>
+		
+		<!-- North America -->
+		<country continent="NA" abbr="CA" altabbr="CAN" name="Canada" statelabel="Canadian Provinces" latitude="56.130366" longitude="-106.346771" />
+		<country continent="NA" abbr="US" altabbr="USA" name="United States" variations="USA" statelabel="U.S. States" latitude="37.090240" longitude="-95.712891" />
+		<country continent="NA" abbr="AI" altabbr="AIA" name="Anguilla" latitude="18.220554" longitude="-63.068615" />
+		<country continent="NA" abbr="AG" altabbr="ATG" name="Antigua and Barbuda" latitude="17.060816" longitude="-61.796428" />
+		<country continent="NA" abbr="AW" altabbr="ABW" name="Aruba" latitude="12.521110" longitude="-69.968338" />
+		<country continent="NA" abbr="BS" altabbr="BHS" name="Bahamas" latitude="25.034280" longitude="-77.396280" />
+		<country continent="NA" abbr="BB" altabbr="BRB" name="Barbados" latitude="13.193887" longitude="-59.543198" />
+		<country continent="NA" abbr="BZ" altabbr="BLZ" name="Belize" latitude="17.189877" longitude="-88.497650" />
+		<country continent="NA" abbr="BM" altabbr="BMU" name="Bermuda" latitude="32.307800" longitude="-64.750500" />
+		<country continent="NA" abbr="KY" altabbr="CYM" name="Cayman Islands" latitude="19.313300" longitude="-81.254600" />
+		<country continent="NA" abbr="CR" altabbr="CRI" name="Costa Rica" latitude="9.748917" longitude="-83.753428" />
+		<country continent="NA" abbr="CU" altabbr="CUB" name="Cuba" latitude="21.521757" longitude="-77.781167" />
+		<country continent="NA" abbr="DM" altabbr="DMA" name="Dominica" latitude="15.414999" longitude="-61.370976" />
+		<country continent="NA" abbr="DO" altabbr="DOM" name="Dominican Republic" latitude="18.735693" longitude="-70.162651" />
+		<country continent="NA" abbr="SV" altabbr="SLV" name="El Salvador" latitude="13.794185" longitude="-88.896530" />
+		<country continent="NA" abbr="GL" altabbr="GRL" name="Greenland" latitude="71.706936" longitude="-42.604303" />
+		<country continent="NA" abbr="GD" altabbr="GRD" name="Grenada" latitude="12.116500" longitude="-61.679000" />
+		<country continent="NA" abbr="GP" altabbr="GLP" name="Guadeloupe" latitude="16.265000" longitude="-61.551000" />
+		<country continent="NA" abbr="GT" altabbr="GTM" name="Guatemala" latitude="15.783471" longitude="-90.230759" />
+		<country continent="NA" abbr="HT" altabbr="HTI" name="Haiti" latitude="18.971187" longitude="-72.285215" />
+		<country continent="NA" abbr="HN" altabbr="HND" name="Honduras" latitude="15.199999" longitude="-86.241905" />
+		<country continent="NA" abbr="JM" altabbr="JAM" name="Jamaica" latitude="18.109581" longitude="-77.297508" />
+		<country continent="NA" abbr="MQ" altabbr="MTQ" name="Martinique" latitude="14.641528" longitude="-61.024174" />
+		<country continent="NA" abbr="MX" altabbr="MEX" name="Mexico" latitude="23.634501" longitude="-102.552784" />
+		<country continent="NA" abbr="MS" altabbr="MSR" name="Montserrat" latitude="16.742498" longitude="-62.187366" />
+		<country continent="NA" abbr="AN" altabbr="ANT" name="Netherlands Antilles" latitude="12.201890" longitude="-68.262382" />
+		<country continent="NA" abbr="NI" altabbr="NIC" name="Nicaragua" latitude="12.865416" longitude="-85.207229" />
+		<country continent="NA" abbr="PA" altabbr="PAN" name="Panama" latitude="8.537981" longitude="-80.782127" />
+		<country continent="NA" abbr="PR" altabbr="PRI" name="Puerto Rico" latitude="18.220833" longitude="-66.590149" />
+		<country continent="NA" abbr="KN" altabbr="KNA" name="Saint Kitts and Nevis" latitude="17.357822" longitude="-62.782998" />
+		<country continent="NA" abbr="LC" altabbr="LCA" name="Saint Lucia" latitude="13.909444" longitude="-60.978893" />
+		<country continent="NA" abbr="VC" altabbr="VCT" name="Saint Vincent and the Grenadines" latitude="13.253351" longitude="-61.196251" />
+		<country continent="NA" abbr="PM" altabbr="SPM" name="St. Pierre and Miquelon" latitude="46.885200" longitude="-56.315900" />
+		<country continent="NA" abbr="TT" altabbr="TTO" name="Trinidad and Tobago" latitude="10.691803" longitude="-61.222503" />
+		<country continent="NA" abbr="TC" altabbr="TCA" name="Turks and Caicos Islands" latitude="21.694025" longitude="-71.797928" />
+		<country continent="NA" abbr="VG" altabbr="VGB" name="Virgin Islands (British)" latitude="18.420695" longitude="-64.639968" />
+		<country continent="NA" abbr="VI" altabbr="VIR" name="Virgin Islands (U.S.)" latitude="18.335765" longitude="-64.896335" />
+		
+		<!-- Europe -->
+		<country continent="EU" abbr="GB" altabbr="GBR" name="United Kingdom" latitude="55.378051" longitude="-3.435973" />
+		<country continent="EU" abbr="AL" altabbr="ALB" name="Albania" latitude="41.153332" longitude="20.168331" />
+		<country continent="EU" abbr="AD" altabbr="AND" name="Andorra" latitude="42.506285" longitude="1.521802" />
+		<country continent="EU" abbr="AM" altabbr="ARM" name="Armenia" latitude="40.069099" longitude="45.038189" />
+		<country continent="EU" abbr="AT" altabbr="AST" name="Austria" latitude="47.516231" longitude="14.550072" />
+		<country continent="EU" abbr="AZ" altabbr="AZE" name="Azerbaijan" latitude="40.143105" longitude="47.576927" />
+		<country continent="EU" abbr="BY" altabbr="BLR" name="Belarus" latitude="53.709807" longitude="27.953389" />
+		<country continent="EU" abbr="BE" altabbr="BEL" name="Belgium" latitude="50.503887" longitude="4.469936" />
+		<country continent="EU" abbr="BA" altabbr="BIH" name="Bosnia and Herzegowina" variations="Bosnia and Herzegovina" latitude="43.915886" longitude="17.679076" />
+		<country continent="EU" abbr="BG" altabbr="BGR" name="Bulgaria" latitude="42.733883" longitude="25.485830" />
+		<country continent="EU" abbr="HR" altabbr="HRV" name="Croatia (Hrvatska)" variations="Croatia" latitude="45.100000" longitude="15.200000" />
+		<country continent="EU" abbr="CY" altabbr="CYP" name="Cyprus" latitude="35.126413" longitude="33.429859" />
+		<country continent="EU" abbr="CZ" altabbr="CZE" name="Czech Republic" latitude="49.817492" longitude="15.472962" />
+		<country continent="EU" abbr="DK" altabbr="DNK" name="Denmark" latitude="56.263920" longitude="9.501785" />
+		<country continent="EU" abbr="EE" altabbr="EST" name="Estonia" latitude="58.595272" longitude="25.013607" />
+		<country continent="EU" abbr="FO" altabbr="FRO" name="Faroe Islands" latitude="61.892635" longitude="-6.911806" />
+		<country continent="EU" abbr="FI" altabbr="FIN" name="Finland" latitude="61.924110" longitude="25.748151" />
+		<country continent="EU" abbr="FR" altabbr="FRA" name="France" latitude="46.227638" longitude="2.213749" />
+		<country continent="EU" abbr="FX" altabbr="FXX" name="France, Metropolitan" latitude="48.836495" longitude="2.236716" />
+		<country continent="EU" abbr="GE" altabbr="GEO" name="Georgia" latitude="32.165622" longitude="-82.900075" />
+		<country continent="EU" abbr="DE" altabbr="DEU" name="Germany" latitude="51.165691" longitude="10.451526" />
+		<country continent="EU" abbr="GI" altabbr="GIB" name="Gibraltar" latitude="36.140751" longitude="-5.353585" />
+		<country continent="EU" abbr="GR" altabbr="GRC" name="Greece" latitude="39.074208" longitude="21.824312" />
+		<country continent="EU" abbr="VA" altabbr="VAT" name="Holy See (Vatican City State)" latitude="41.902916" longitude="12.453389" />
+		<country continent="EU" abbr="HU" altabbr="HUN" name="Hungary" latitude="47.162494" longitude="19.503304" />
+		<country continent="EU" abbr="IS" altabbr="ISL" name="Iceland" latitude="64.963051" longitude="-19.020835" />
+		<country continent="EU" abbr="IE" altabbr="IRL" name="Ireland" latitude="53.412910" longitude="-8.243890" />
+		<country continent="EU" abbr="IT" altabbr="ITA" name="Italy" latitude="41.871940" longitude="12.567380" />
+		<country continent="EU" abbr="KZ" altabbr="KAZ" name="Kazakhstan" latitude="48.019573" longitude="66.923684" />
+		<country continent="EU" abbr="LV" altabbr="LVA" name="Latvia" latitude="56.879635" longitude="24.603189" />
+		<country continent="EU" abbr="LI" altabbr="LIE" name="Liechtenstein" latitude="47.166000" longitude="9.555373" />
+		<country continent="EU" abbr="LT" altabbr="LTU" name="Lithuania" latitude="55.169438" longitude="23.881275" />
+		<country continent="EU" abbr="LU" altabbr="LUX" name="Luxembourg" latitude="49.815273" longitude="6.129583" />
+		<country continent="EU" abbr="MK" altabbr="MKD" name="Macedonia, The Former Yugoslav Republic of" latitude="41.608635" longitude="21.745275" />
+		<country continent="EU" abbr="MT" altabbr="MLT" name="Malta" latitude="35.937496" longitude="14.375416" />
+		<country continent="EU" abbr="MD" altabbr="MDA" name="Moldova, Republic of" latitude="47.411631" longitude="28.369885" />
+		<country continent="EU" abbr="MC" altabbr="MCO" name="Monaco" latitude="43.738418" longitude="7.424616" />
+		<country continent="EU" abbr="NL" altabbr="NLD" name="Netherlands" latitude="52.132633" longitude="5.291266" />
+		<country continent="EU" abbr="NO" altabbr="NOR" name="Norway" latitude="60.472024" longitude="8.468946" />
+		<country continent="EU" abbr="PL" altabbr="POL" name="Poland" latitude="51.919438" longitude="19.145136" />
+		<country continent="EU" abbr="PT" altabbr="PRT" name="Portugal" latitude="39.399835" longitude="-8.224910" />
+		<country continent="EU" abbr="RO" altabbr="ROU" name="Romania" latitude="45.943161" longitude="24.966760" />
+		<country continent="EU" abbr="RU" altabbr="RUS" name="Russian Federation" variations="Russia" latitude="61.524010" longitude="105.318756" />
+		<country continent="EU" abbr="SM" altabbr="SMR" name="San Marino" latitude="43.942360" longitude="12.457777" />
+		<country continent="EU" abbr="SK" altabbr="SVK" name="Slovakia (Slovak Republic)" variations="Slovakia" latitude="48.669026" longitude="19.699024" />
+		<country continent="EU" abbr="SI" altabbr="SLO" name="Slovenia" variations="Slovenia" latitude="46.151241" longitude="14.995463" />
+		<country continent="EU" abbr="ES" altabbr="ESP" name="Spain" latitude="40.463667" longitude="-3.749220" />
+		<country continent="EU" abbr="SJ" altabbr="SJM" name="Svalbard and Jan Mayen Islands" variations=" 	Svalbard and Jan Mayen" latitude="71.021354" longitude="-8.522313" />
+		<country continent="EU" abbr="SE" altabbr="SWE" name="Sweden" latitude="60.128161" longitude="18.643501" />
+		<country continent="EU" abbr="CH" altabbr="CHE" name="Switzerland" latitude="46.818188" longitude="8.227512" />
+		<country continent="EU" abbr="TR" altabbr="TUR" name="Turkey" latitude="38.963745" longitude="35.243322" />
+		<country continent="EU" abbr="UA" altabbr="UKR" name="Ukraine" latitude="48.379433" longitude="31.165580" />
+		<country continent="EU" abbr="YU" altabbr="YUG" name="Yugoslavia" latitude="-27.493740" longitude="-58.793400" />
+		
+		<!-- Oceania -->
+		<country continent="OC" abbr="AU" altabbr="AUS" name="Australia" statelabel="Australian States" latitude="-25.274398" longitude="133.775136" />
+		<country continent="OC" abbr="AS" altabbr="ASM" name="American Samoa" latitude="-14.306407" longitude="-170.695018" />
+		<country continent="OC" abbr="CK" altabbr="COK" name="Cook Islands" latitude="-21.236736" longitude="-159.777671" />
+		<country continent="OC" abbr="FJ" altabbr="FJI" name="Fiji" latitude="-17.713371" longitude="178.065032" />
+		<country continent="OC" abbr="PF" altabbr="PYF" name="French Polynesia" latitude="-17.679742" longitude="-149.406843" />
+		<country continent="OC" abbr="GU" altabbr="GUM" name="Guam" latitude="13.444304" longitude="144.793731" />
+		<country continent="OC" abbr="KI" altabbr="KIR" name="Kiribati" latitude="1.870918" longitude="-157.362601" />
+		<country continent="OC" abbr="MH" altabbr="MHL" name="Marshall Islands" latitude="7.131474" longitude="171.184478" />
+		<country continent="OC" abbr="FM" altabbr="FSM" name="Micronesia, Federated States of" latitude="6.887351" longitude="158.215072" />
+		<country continent="OC" abbr="NR" altabbr="NRU" name="Nauru" latitude="-0.522778" longitude="166.931503" />
+		<country continent="OC" abbr="NC" altabbr="NCL" name="New Caledonia" latitude="-20.904305" longitude="165.618042" />
+		<country continent="OC" abbr="NZ" altabbr="NZL" name="New Zealand" latitude="-40.900557" longitude="174.885971" />
+		<country continent="OC" abbr="NU" altabbr="NIU" name="Niue" latitude="-19.054445" longitude="-169.867233" />
+		<country continent="OC" abbr="NF" altabbr="NFK" name="Norfolk Island" latitude="-29.023064" longitude="167.939597" />
+		<country continent="OC" abbr="MP" altabbr="MNP" name="Northern Mariana Islands" latitude="15.097900" longitude="145.673900" />
+		<country continent="OC" abbr="PW" altabbr="PLW" name="Palau" latitude="7.514980" longitude="134.582520" />
+		<country continent="OC" abbr="PG" altabbr="PNG" name="Papua New Guinea" latitude="-6.314993" longitude="143.955550" />
+		<country continent="OC" abbr="PN" altabbr="PCN" name="Pitcairn" latitude="-24.372974" longitude="-128.324647" />
+		<country continent="OC" abbr="WS" altabbr="WSM" name="Samoa" latitude="-13.759029" longitude="-172.104629" />
+		<country continent="OC" abbr="SB" altabbr="SLB" name="Solomon Islands" latitude="-9.645710" longitude="160.156194" />
+		<country continent="OC" abbr="TK" altabbr="TKL" name="Tokelau" latitude="-9.200200" longitude="-171.848400" />
+		<country continent="OC" abbr="TO" altabbr="TON" name="Tonga" latitude="-21.178986" longitude="-175.198242" />
+		<country continent="OC" abbr="TV" altabbr="TUV" name="Tuvalu" latitude="-7.478442" longitude="178.679921" />
+		<country continent="OC" abbr="UM" altabbr="UMI" name="United States Minor Outlying Islands" latitude="19.282319" longitude="166.647047" />
+		<country continent="OC" abbr="VU" altabbr="VUT" name="Vanuatu" latitude="-15.376706" longitude="166.959158" />
+		<country continent="OC" abbr="WF" altabbr="WLF" name="Wallis and Futuna Islands" variations="Wallis and Futuna" latitude="-14.290203" longitude="-178.099845" />
+		
+		<!-- Asia -->
+		<country continent="AS" abbr="AF" altabbr="AFG" name="Afghanistan" latitude="33.939110" longitude="67.709953" />
+		<country continent="AS" abbr="BH" altabbr="BHR" name="Bahrain" latitude="26.066700" longitude="50.557700" />
+		<country continent="AS" abbr="BD" altabbr="BGD" name="Bangladesh" latitude="23.684994" longitude="90.356331" />
+		<country continent="AS" abbr="BT" altabbr="BTN" name="Bhutan" latitude="27.514162" longitude="90.433601" />
+		<country continent="AS" abbr="IO" altabbr="IOT" name="British Indian Ocean Territory" latitude="-7.334756" longitude="72.424233" />
+		<country continent="AS" abbr="BN" altabbr="BRN" name="Brunei Darussalam" latitude="4.535277" longitude="114.727669" />
+		<country continent="AS" abbr="KH" altabbr="KHM" name="Cambodia" latitude="12.565679" longitude="104.990963" />
+		<country continent="AS" abbr="CN" altabbr="CHN" name="China" latitude="35.861660" longitude="104.195397" />
+		<country continent="AS" abbr="CX" altabbr="CXR" name="Christmas Island" latitude="-10.447525" longitude="105.690449" />
+		<country continent="AS" abbr="CC" altabbr="CCK" name="Cocos (Keeling) Islands" latitude="-12.170874" longitude="96.841739" />
+		<country continent="AS" abbr="TP" altabbr="TMP" name="East Timor" latitude="-8.874217" longitude="125.727539" />
+		<country continent="AS" abbr="HK" altabbr="HKG" name="Hong Kong" latitude="22.396428" longitude="114.109497" />
+		<country continent="AS" abbr="IN" altabbr="IND" name="India" latitude="20.593684" longitude="78.962880" />
+		<country continent="AS" abbr="ID" altabbr="IDN" name="Indonesia" latitude="-0.789275" longitude="113.921327" />
+		<country continent="AS" abbr="IR" altabbr="IRN" name="Iran" variations="Iran (Islamic Republic of)" latitude="32.427908" longitude="53.688046" />
+		<country continent="AS" abbr="IQ" altabbr="IRQ" name="Iraq" latitude="33.223191" longitude="43.679291" />
+		<country continent="AS" abbr="IL" altabbr="ISR" name="Israel" latitude="31.046051" longitude="34.851612" />
+		<country continent="AS" abbr="JP" altabbr="JPN" name="Japan" latitude="36.204824" longitude="138.252924" />
+		<country continent="AS" abbr="JO" altabbr="JOR" name="Jordan" latitude="30.585164" longitude="36.238414" />
+		<country continent="AS" abbr="KP" altabbr="PRK" name="Korea, Democratic People's Republic of" variations="North Korea" latitude="40.339852" longitude="127.510093" />
+		<country continent="AS" abbr="KR" altabbr="KOR" name="Korea, Republic of" variations="South Korea" latitude="35.907757" longitude="127.766922" />
+		<country continent="AS" abbr="KW" altabbr="KWT" name="Kuwait" latitude="29.311660" longitude="47.481766" />
+		<country continent="AS" abbr="KG" altabbr="KGZ" name="Kyrgyzstan" latitude="41.204380" longitude="74.766098" />
+		<country continent="AS" abbr="LA" altabbr="LAO" name="Laos" variations="Lao People's Democratic Republic" latitude="19.856270" longitude="102.495496" />
+		<country continent="AS" abbr="LB" altabbr="LBN" name="Lebanon" latitude="33.854721" longitude="35.862285" />
+		<country continent="AS" abbr="MO" altabbr="MAC" name="Macau" variations="Macao" latitude="22.198745" longitude="113.543873" />
+		<country continent="AS" abbr="MY" altabbr="MYS" name="Malaysia" latitude="4.210484" longitude="101.975766" />
+		<country continent="AS" abbr="MV" altabbr="MDV" name="Maldives" latitude="1.977247" longitude="73.536103" />
+		<country continent="AS" abbr="MN" altabbr="MNG" name="Mongolia" latitude="46.862496" longitude="103.846656" />
+		<country continent="AS" abbr="MM" altabbr="MMR" name="Myanmar" latitude="21.913965" longitude="95.956223" />
+		<country continent="AS" abbr="NP" altabbr="NPL" name="Nepal" latitude="28.394857" longitude="84.124008" />
+		<country continent="AS" abbr="OM" altabbr="OMN" name="Oman" latitude="21.512583" longitude="55.923255" />
+		<country continent="AS" abbr="PK" altabbr="PAK" name="Pakistan" latitude="30.375321" longitude="69.345116" />
+		<country continent="AS" abbr="PH" altabbr="PHL" name="Philippines" latitude="12.879721" longitude="121.774017" />
+		<country continent="AS" abbr="QA" altabbr="QAT" name="Qatar" latitude="25.354826" longitude="51.183884" />
+		<country continent="AS" abbr="SA" altabbr="SAU" name="Saudi Arabia" latitude="23.885942" longitude="45.079162" />
+		<country continent="AS" abbr="SG" altabbr="SGP" name="Singapore" latitude="1.352083" longitude="103.819836" />
+		<country continent="AS" abbr="LK" altabbr="LKA" name="Sri Lanka" latitude="7.873054" longitude="80.771797" />
+		<country continent="AS" abbr="SY" altabbr="SYR" name="Syria" variations="Syrian Arab Republic" latitude="34.802075" longitude="38.996815" />
+		<country continent="AS" abbr="TW" altabbr="TWN" name="Taiwan" variations="Taiwan, Province of China" latitude="23.697810" longitude="120.960515" />
+		<country continent="AS" abbr="TJ" altabbr="TJK" name="Tajikistan" latitude="38.861034" longitude="71.276093" />
+		<country continent="AS" abbr="TH" altabbr="THA" name="Thailand" latitude="15.870032" longitude="100.992541" />
+		<country continent="AS" abbr="TM" altabbr="TKM" name="Turkmenistan" latitude="38.969719" longitude="59.556278" />
+		<country continent="AS" abbr="AE" altabbr="ARE" name="United Arab Emirates" variations="UAE" latitude="23.424076" longitude="53.847818" />
+		<country continent="AS" abbr="UZ" altabbr="UZB" name="Uzbekistan" latitude="41.377491" longitude="64.585262" />
+		<country continent="AS" abbr="VN" altabbr="VNM" name="Vietnam" variations="Viet Nam" latitude="14.058324" longitude="108.277199" />
+		<country continent="AS" abbr="YE" altabbr="YEM" name="Yemen" latitude="15.552727" longitude="48.516388" />
+		
+		<!-- Africa -->
+		<country continent="AF" abbr="DZ" altabbr="DZA" name="Algeria" latitude="28.033886" longitude="1.659626" />
+		<country continent="AF" abbr="AO" altabbr="AGO" name="Angola" latitude="-11.202692" longitude="17.873887" />
+		<country continent="AF" abbr="BJ" altabbr="BEN" name="Benin" latitude="9.307690" longitude="2.315834" />
+		<country continent="AF" abbr="BW" altabbr="BWA" name="Botswana" latitude="-22.328474" longitude="24.684866" />
+		<country continent="AF" abbr="BF" altabbr="BFA" name="Burkina Faso" latitude="12.238333" longitude="-1.561593" />
+		<country continent="AF" abbr="BI" altabbr="BDI" name="Burundi" latitude="-3.373056" longitude="29.918886" />
+		<country continent="AF" abbr="CM" altabbr="CMR" name="Cameroon" latitude="7.369722" longitude="12.354722" />
+		<country continent="AF" abbr="CV" altabbr="CPV" name="Cape Verde" variations="Cabo Verde" latitude="15.120142" longitude="-23.605172" />
+		<country continent="AF" abbr="CF" altabbr="CAF" name="Central African Republic" latitude="6.611111" longitude="20.939444" />
+		<country continent="AF" abbr="TD" altabbr="TCD" name="Chad" latitude="15.454166" longitude="18.732207" />
+		<country continent="AF" abbr="KM" altabbr="COM" name="Comoros" latitude="-11.645500" longitude="43.333300" />
+		<country continent="AF" abbr="CG" altabbr="COG" name="Congo" latitude="-0.228021" longitude="15.827659" />
+		<country continent="AF" abbr="CD" altabbr="COD" name="Congo, the Democratic Republic of the" latitude="-4.038333" longitude="21.758664" />
+		<country continent="AF" abbr="CI" altabbr="CIV" name="Cote d'Ivoire" latitude="7.539989" longitude="-5.547080" />
+		<country continent="AF" abbr="DJ" altabbr="DJI" name="Djibouti" latitude="11.825138" longitude="42.590275" />
+		<country continent="AF" abbr="EG" altabbr="EGY" name="Egypt" latitude="26.820553" longitude="30.802498" />
+		<country continent="AF" abbr="GQ" altabbr="GNQ" name="Equatorial Guinea" latitude="1.650801" longitude="10.267895" />
+		<country continent="AF" abbr="ER" altabbr="ERI" name="Eritrea" latitude="15.179384" longitude="39.782334" />
+		<country continent="AF" abbr="ET" altabbr="ETH" name="Ethiopia" latitude="9.145000" longitude="40.489673" />
+		<country continent="AF" abbr="GA" altabbr="GAB" name="Gabon" latitude="-0.803689" longitude="11.609444" />
+		<country continent="AF" abbr="GM" altabbr="GMB" name="Gambia" latitude="13.443182" longitude="-15.310139" />
+		<country continent="AF" abbr="GH" altabbr="GHA" name="Ghana" latitude="7.946527" longitude="-1.023194" />
+		<country continent="AF" abbr="GN" altabbr="GIN" name="Guinea" latitude="9.945587" longitude="-9.696645" />
+		<country continent="AF" abbr="GW" altabbr="GNB" name="Guinea-Bissau" latitude="11.803749" longitude="-15.180413" />
+		<country continent="AF" abbr="KE" altabbr="KEN" name="Kenya" latitude="-0.023559" longitude="37.906193" />
+		<country continent="AF" abbr="LS" altabbr="LSO" name="Lesotho" latitude="-29.609988" longitude="28.233608" />
+		<country continent="AF" abbr="LR" altabbr="LBR" name="Liberia" latitude="6.428055" longitude="-9.429499" />
+		<country continent="AF" abbr="LY" altabbr="LBY" name="Libya" variations="Libyan Arab Jamahiriya" latitude="26.335100" longitude="17.228331" />
+		<country continent="AF" abbr="MG" altabbr="MDG" name="Madagascar" latitude="-18.766947" longitude="46.869107" />
+		<country continent="AF" abbr="MW" altabbr="MWI" name="Malawi" latitude="-13.254308" longitude="34.301525" />
+		<country continent="AF" abbr="ML" altabbr="MLI" name="Mali" latitude="17.570692" longitude="-3.996166" />
+		<country continent="AF" abbr="MR" altabbr="MRT" name="Mauritania" latitude="21.007890" longitude="-10.940835" />
+		<country continent="AF" abbr="MU" altabbr="MUS" name="Mauritius" latitude="-20.348404" longitude="57.552152" />
+		<country continent="AF" abbr="YT" altabbr="MYT" name="Mayotte" latitude="-12.827500" longitude="45.166244" />
+		<country continent="AF" abbr="MA" altabbr="MAR" name="Morocco" latitude="31.791702" longitude="-7.092620" />
+		<country continent="AF" abbr="MZ" altabbr="MOZ" name="Mozambique" latitude="-18.665695" longitude="35.529562" />
+		<country continent="AF" abbr="NA" altabbr="NAM" name="Namibia" latitude="-22.957640" longitude="18.490410" />
+		<country continent="AF" abbr="NE" altabbr="NER" name="Niger" latitude="17.607789" longitude="8.081666" />
+		<country continent="AF" abbr="NG" altabbr="NGA" name="Nigeria" latitude="9.081999" longitude="8.675277" />
+		<country continent="AF" abbr="RE" altabbr="REU" name="Reunion" latitude="-21.115141" longitude="55.536384" />
+		<country continent="AF" abbr="RW" altabbr="RWA" name="Rwanda" latitude="-1.940278" longitude="29.873888" />
+		<country continent="AF" abbr="ST" altabbr="STP" name="Sao Tome and Principe" latitude="0.186360" longitude="6.613081" />
+		<country continent="AF" abbr="SN" altabbr="SEN" name="Senegal" latitude="14.497401" longitude="-14.452362" />
+		<country continent="AF" abbr="SC" altabbr="SYC" name="Seychelles" latitude="-4.679574" longitude="55.491977" />
+		<country continent="AF" abbr="SL" altabbr="SLE" name="Sierra Leone" latitude="8.460555" longitude="-11.779889" />
+		<country continent="AF" abbr="SO" altabbr="SOM" name="Somalia" latitude="5.152149" longitude="46.199616" />
+		<country continent="AF" abbr="ZA" altabbr="ZAF" name="South Africa" latitude="-30.559482" longitude="22.937506" />
+		<country continent="AF" abbr="SH" altabbr="SHN" name="St. Helena" variations="Saint Helena, Ascension and Tristan da Cunha" latitude="-15.965010" longitude="-5.708924" />
+		<country continent="AF" abbr="SD" altabbr="SDN" name="Sudan" latitude="12.862807" longitude="30.217636" />
+		<country continent="AF" abbr="SZ" altabbr="SWZ" name="Swaziland" latitude="-26.522503" longitude="31.465866" />
+		<country continent="AF" abbr="TZ" altabbr="TZA" name="Tanzania, United Republic of" latitude="-6.369028" longitude="34.888822" />
+		<country continent="AF" abbr="TG" altabbr="TGO" name="Togo" latitude="8.619543" longitude="0.824782" />
+		<country continent="AF" abbr="TN" altabbr="TUN" name="Tunisia" latitude="33.886917" longitude="9.537499" />
+		<country continent="AF" abbr="UG" altabbr="UGA" name="Uganda" latitude="1.373333" longitude="32.290275" />
+		<country continent="AF" abbr="EH" altabbr="ESH" name="Western Sahara" latitude="24.215527" longitude="-12.885834" />
+		<country continent="AF" abbr="ZM" altabbr="ZMB" name="Zambia" latitude="-13.133897" longitude="27.849332" />
+		<country continent="AF" abbr="ZW" altabbr="ZWE" name="Zimbabwe" latitude="-19.015438" longitude="29.154857" />
+		
+		<!-- South America -->
+		<country continent="SA" abbr="AR" altabbr="ARG" name="Argentina" latitude="-38.416097" longitude="-63.616672" />
+		<country continent="SA" abbr="BO" altabbr="BOL" name="Bolivia" variations="Bolivia, Plurinational State of" latitude="-16.290154" longitude="-63.588653" />
+		<country continent="SA" abbr="BR" altabbr="BRA" name="Brazil" latitude="-14.235004" longitude="-51.925280" />
+		<country continent="SA" abbr="CL" altabbr="CHL" name="Chile" latitude="-35.675147" longitude="-71.542969" />
+		<country continent="SA" abbr="CO" altabbr="COL" name="Colombia" latitude="4.570868" longitude="-74.297333" />
+		<country continent="SA" abbr="EC" altabbr="ECU" name="Ecuador" latitude="-1.831239" longitude="-78.183406" />
+		<country continent="SA" abbr="FK" altabbr="FLK" name="Falkland Islands (Malvinas)" latitude="-51.796253" longitude="-59.523613" />
+		<country continent="SA" abbr="GF" altabbr="GUF" name="French Guiana" latitude="3.933889" longitude="-53.125782" />
+		<country continent="SA" abbr="GY" altabbr="GUY" name="Guyana" latitude="4.860416" longitude="-58.930180" />
+		<country continent="SA" abbr="PY" altabbr="PRY" name="Paraguay" latitude="-23.442503" longitude="-58.443832" />
+		<country continent="SA" abbr="PE" altabbr="PER" name="Peru" latitude="-9.189967" longitude="-75.015152" />
+		<country continent="SA" abbr="SR" altabbr="SUR" name="Suriname" latitude="3.919305" longitude="-56.027783" />
+		<country continent="SA" abbr="UY" altabbr="URY" name="Uruguay" latitude="-32.522779" longitude="-55.765835" />
+		<country continent="SA" abbr="VE" altabbr="VEN" name="Venezuela" variations="Venezuela, Bolivarian Republic of" latitude="6.423750" longitude="-66.589730" />
+				
+		<!-- Antartica -->		
+		<country continent="AN" abbr="AQ" altabbr="ATA" name="Antarctica" latitude="-82.862752" longitude="-135.000000" />
+		<country continent="AN" abbr="BV" altabbr="BVT" name="Bouvet Island" latitude="-54.420791" longitude="3.346450" />
+		<country continent="AN" abbr="TF" altabbr="ATF" name="French Southern Territories" latitude="-49.280366" longitude="69.348557" />
+		<country continent="AN" abbr="HM" altabbr="HMD" name="Heard and Mc Donald Islands" variations="Heard Island and McDonald Islands" latitude="-53.106000" longitude="73.513000" />
+		<country continent="AN" abbr="GS" altabbr="SGS" name="South Georgia and the South Sandwich Islands" latitude="-54.429579" longitude="-36.587909" />
+		
+	</countries>
+		
+	<states>
+		
+		<!-- Canada -->
+		<state country="CA" abbr="AB" name="Alberta" />
+		<state country="CA" abbr="BC" name="British Columbia" />
+		<state country="CA" abbr="MB" name="Manitoba" />
+		<state country="CA" abbr="NB" name="New Brunswick" />
+		<state country="CA" abbr="NF" name="Newfoundland" />
+		<state country="CA" abbr="NT" name="Northwest Territories" />
+		<state country="CA" abbr="NS" name="Nova Scotia" />
+		<state country="CA" abbr="NU" name="Nunavut" />
+		<state country="CA" abbr="ON" name="Ontario" />
+		<state country="CA" abbr="PE" name="Prince Edward Island" />
+		<state country="CA" abbr="QC" name="Quebec" />
+		<state country="CA" abbr="SK" name="Saskatchewan" />
+		<state country="CA" abbr="YT" name="Yukon Territory" />
+		
+		<!-- United States -->
+		<state country="US" abbr="AK" name="Alaska" />
+		<state country="US" abbr="AL" name="Alabama" />
+		<state country="US" abbr="AR" name="Arkansas" />
+		<state country="US" abbr="AZ" name="Arizona" />
+		<state country="US" abbr="CA" name="California" />
+		<state country="US" abbr="CO" name="Colorado" />
+		<state country="US" abbr="CT" name="Connecticut" />
+		<state country="US" abbr="DC" name="District of Columbia" />
+		<state country="US" abbr="DE" name="Delaware" />
+		<state country="US" abbr="FL" name="Florida" />
+		<state country="US" abbr="GA" name="Georgia" />
+		<state country="US" abbr="HI" name="Hawaii" />
+		<state country="US" abbr="IA" name="Iowa" />
+		<state country="US" abbr="ID" name="Idaho" />
+		<state country="US" abbr="IL" name="Illinois" />
+		<state country="US" abbr="IN" name="Indiana" />
+		<state country="US" abbr="KS" name="Kansas" />
+		<state country="US" abbr="KY" name="Kentucky" />
+		<state country="US" abbr="LA" name="Louisiana" />
+		<state country="US" abbr="MA" name="Massachusetts" />
+		<state country="US" abbr="MD" name="Maryland" />
+		<state country="US" abbr="ME" name="Maine" />
+		<state country="US" abbr="MI" name="Michigan" />
+		<state country="US" abbr="MN" name="Minnesota" />
+		<state country="US" abbr="MO" name="Missouri" />
+		<state country="US" abbr="MS" name="Mississippi" />
+		<state country="US" abbr="MT" name="Montana" />
+		<state country="US" abbr="NC" name="North Carolina" />
+		<state country="US" abbr="ND" name="North Dakota" />
+		<state country="US" abbr="NE" name="Nebraska" />
+		<state country="US" abbr="NH" name="New Hampshire" />
+		<state country="US" abbr="NJ" name="New Jersey" />
+		<state country="US" abbr="NM" name="New Mexico" />
+		<state country="US" abbr="NV" name="Nevada" />
+		<state country="US" abbr="NY" name="New York" />
+		<state country="US" abbr="OH" name="Ohio" />
+		<state country="US" abbr="OK" name="Oklahoma" />
+		<state country="US" abbr="OR" name="Oregon" />
+		<state country="US" abbr="PA" name="Pennsylvania" />
+		<state country="US" abbr="PR" name="Puerto Rico" />
+		<state country="US" abbr="RI" name="Rhode Island" />
+		<state country="US" abbr="SC" name="South Carolina" />
+		<state country="US" abbr="SD" name="South Dakota" />
+		<state country="US" abbr="TN" name="Tennessee" />
+		<state country="US" abbr="TX" name="Texas" />
+		<state country="US" abbr="UT" name="Utah" />
+		<state country="US" abbr="VA" name="Virginia" />
+		<state country="US" abbr="VT" name="Vermont" />
+		<state country="US" abbr="WA" name="Washington" />
+		<state country="US" abbr="WI" name="Wisconsin" />
+		<state country="US" abbr="WV" name="West Virginia" />
+		<state country="US" abbr="WY" name="Wyoming" />
+		
+		<!-- Australia -->
+		<state country="AU" abbr="ACT" name="Australian Capital Territory" />
+		<state country="AU" abbr="NSW" name="New South Wales" />
+		<state country="AU" abbr="NT" name="Northern Territory" />
+		<state country="AU" abbr="QLD" name="Queensland" />
+		<state country="AU" abbr="SA" name="South Australia" />
+		<state country="AU" abbr="TAS" name="Tasmania" />
+		<state country="AU" abbr="VIC" name="Victoria" />
+		<state country="AU" abbr="WA" name="Western Australia" />
+		
+		<!-- United Kingdom -->
+		<state country="GB" abbr="ENG" name="England" />
+		<state country="GB" abbr="NIR" name="Northern Ireland" />
+		<state country="GB" abbr="SCT" name="Scotland" />
+		<state country="GB" abbr="WAL" name="Wales" />
+		
+	</states>
+	
+	<cities>
+		
+		<!-- Canada -->
+		<city country="CA" state="AB" name="Calgary" latitude="51.100000" longitude="-114.100000" />
+		<city country="CA" state="AB" name="Edmonton" latitude="53.340000" longitude="-113.280000" />
+		<city country="CA" state="ON" name="Kingston" latitude="44.150000" longitude="-76.300000" />
+		<city country="CA" state="ON" name="London" latitude="43.200000" longitude="-81.340000" />
+		<city country="CA" state="QC" name="Montreal" latitude="45.300000" longitude="-73.350000" />
+		<city country="CA" state="SK" name="Moose Jaw" latitude="50.370000" longitude="-105.310000" />
+		<city country="CA" state="BC" name="Nelson" latitude="49.300000" longitude="-117.170000" />
+		<city country="CA" state="ON" name="Ottawa" latitude="45.240000" longitude="-75.430000" />
+		<city country="CA" state="QC" name="Quebec" latitude="46.490000" longitude="-71.110000" />
+		<city country="CA" state="NB" name="St. John" latitude="45.180000" longitude="-66.100000" />
+		<city country="CA" state="ON" name="Toronto" latitude="43.400000" longitude="-79.240000" />
+		<city country="CA" state="BC" name="Vancouver" latitude="49.130000" longitude="-123.600000" />
+		<city country="CA" state="BC" name="Victoria" latitude="48.250000" longitude="-123.210000" />
+		<city country="CA" state="MB" name="Winnipeg" latitude="49.540000" longitude="-97.700000" />	
+
+		<!-- United States -->
+		<city country="US" state="NY" name="Albany" latitude="42.400000" longitude="-73.450000" />
+		<city country="US" state="NM" name="Albuquerque" latitude="35.500000" longitude="-106.390000" />
+		<city country="US" state="TX" name="Amarillo" latitude="35.110000" longitude="-101.500000" />
+		<city country="US" state="AK" name="Anchorage" latitude="61.130000" longitude="-149.540000" />
+		<city country="US" state="GA" name="Atlanta" latitude="33.450000" longitude="-84.230000" />
+		<city country="US" state="TX" name="Austin" latitude="30.160000" longitude="-97.440000" />
+		<city country="US" state="OR" name="Baker" latitude="44.470000" longitude="-117.500000" />
+		<city country="US" state="MD" name="Baltimore" latitude="39.180000" longitude="-76.380000" />
+		<city country="US" state="ME" name="Bangor" latitude="44.480000" longitude="-68.470000" />
+		<city country="US" state="AL" name="Birmingham" latitude="33.300000" longitude="-86.500000" />
+		<city country="US" state="ND" name="Bismarck" latitude="46.480000" longitude="-100.470000" />
+		<city country="US" state="ID" name="Boise" latitude="43.360000" longitude="-116.130000" />
+		<city country="US" state="MA" name="Boston" latitude="42.210000" longitude="-71.500000" />
+		<city country="US" state="NY" name="Buffalo" latitude="42.550000" longitude="-78.500000" />
+		<city country="US" state="NM" name="Carlsbad" latitude="32.260000" longitude="-104.150000" />
+		<city country="US" state="SC" name="Charleston" latitude="32.470000" longitude="-79.560000" />
+		<city country="US" state="WV" name="Charleston" latitude="38.210000" longitude="-81.380000" />
+		<city country="US" state="NC" name="Charlotte" latitude="35.140000" longitude="-80.500000" />
+		<city country="US" state="WY" name="Cheyenne" latitude="41.900000" longitude="-104.520000" />
+		<city country="US" state="IL" name="Chicago" latitude="41.500000" longitude="-87.370000" />
+		<city country="US" state="OH" name="Cincinnati" latitude="39.800000" longitude="-84.300000" />
+		<city country="US" state="OH" name="Cleveland" latitude="41.280000" longitude="-81.370000" />
+		<city country="US" state="SC" name="Columbia" latitude="34.000000" longitude="-81.200000" />
+		<city country="US" state="OH" name="Columbus" latitude="40.000000" longitude="-83.100000" />
+		<city country="US" state="TX" name="Dallas" latitude="32.460000" longitude="-96.460000" />
+		<city country="US" state="CO" name="Denver" latitude="39.450000" longitude="-105.000000" />
+		<city country="US" state="IA" name="Des Moines" latitude="41.350000" longitude="-93.370000" />
+		<city country="US" state="MI" name="Detroit" latitude="42.200000" longitude="-83.300000" />
+		<city country="US" state="IA" name="Dubuque" latitude="42.310000" longitude="-90.400000" />
+		<city country="US" state="MN" name="Duluth" latitude="46.490000" longitude="-92.500000" />
+		<city country="US" state="ME" name="Eastport" latitude="44.540000" longitude="-67.000000" />
+		<city country="US" state="CA" name="El Centro" latitude="32.380000" longitude="-115.330000" />
+		<city country="US" state="TX" name="El Paso" latitude="31.460000" longitude="-106.290000" />
+		<city country="US" state="OR" name="Eugene" latitude="44.300000" longitude="-123.500000" />
+		<city country="US" state="ND" name="Fargo" latitude="46.520000" longitude="-96.480000" />
+		<city country="US" state="AZ" name="Flagstaff" latitude="35.130000" longitude="-111.410000" />
+		<city country="US" state="TX" name="Fort Worth" latitude="32.430000" longitude="-97.190000" />
+		<city country="US" state="CA" name="Fresno" latitude="36.440000" longitude="-119.480000" />
+		<city country="US" state="CO" name="Grand Junction" latitude="39.500000" longitude="-108.330000" />
+		<city country="US" state="MI" name="Grand Rapids" latitude="42.580000" longitude="-85.400000" />
+		<city country="US" state="MT" name="Havre" latitude="48.330000" longitude="-109.430000" />
+		<city country="US" state="MT" name="Helena" latitude="46.350000" longitude="-112.200000" />
+		<city country="US" state="HI" name="Honolulu" latitude="21.180000" longitude="-157.500000" />
+		<city country="US" state="AR" name="Hot Springs" latitude="34.310000" longitude="-93.300000" />
+		<city country="US" state="TX" name="Houston" latitude="29.450000" longitude="-95.210000" />
+		<city country="US" state="ID" name="Idaho Falls" latitude="43.300000" longitude="-112.100000" />
+		<city country="US" state="IN" name="Indianapolis" latitude="39.460000" longitude="-86.100000" />
+		<city country="US" state="MS" name="Jackson" latitude="32.200000" longitude="-90.120000" />
+		<city country="US" state="FL" name="Jacksonville" latitude="30.220000" longitude="-81.400000" />
+		<city country="US" state="AK" name="Juneau" latitude="58.180000" longitude="-134.240000" />
+		<city country="US" state="MO" name="Kansas City" latitude="39.600000" longitude="-94.350000" />
+		<city country="US" state="FL" name="Key West" latitude="24.330000" longitude="-81.480000" />
+		<city country="US" state="OR" name="Klamath Falls" latitude="42.100000" longitude="-121.440000" />
+		<city country="US" state="TN" name="Knoxville" latitude="35.570000" longitude="-83.560000" />
+		<city country="US" state="NV" name="Las Vegas" latitude="36.100000" longitude="-115.120000" />
+		<city country="US" state="ID" name="Lewiston" latitude="46.240000" longitude="-117.200000" />
+		<city country="US" state="NE" name="Lincoln" latitude="40.500000" longitude="-96.400000" />
+		<city country="US" state="CA" name="Long Beach" latitude="33.460000" longitude="-118.110000" />
+		<city country="US" state="CA" name="Los Angeles" latitude="34.300000" longitude="-118.150000" />
+		<city country="US" state="KY" name="Louisville" latitude="38.150000" longitude="-85.460000" />
+		<city country="US" state="NH" name="Manchester" latitude="43.000000" longitude="-71.300000" />
+		<city country="US" state="TN" name="Memphis" latitude="35.900000" longitude="-90.300000" />
+		<city country="US" state="FL" name="Miami" latitude="25.460000" longitude="-80.120000" />
+		<city country="US" state="WI" name="Milwaukee" latitude="43.200000" longitude="-87.550000" />
+		<city country="US" state="MN" name="Minneapolis" latitude="44.590000" longitude="-93.140000" />
+		<city country="US" state="AL" name="Mobile" latitude="30.420000" longitude="-88.300000" />
+		<city country="US" state="AL" name="Montgomery" latitude="32.210000" longitude="-86.180000" />
+		<city country="US" state="VT" name="Montpelier" latitude="44.150000" longitude="-72.320000" />
+		<city country="US" state="TN" name="Nashville" latitude="36.100000" longitude="-86.470000" />
+		<city country="US" state="NJ" name="Newark" latitude="40.440000" longitude="-74.100000" />
+		<city country="US" state="CT" name="New Haven" latitude="41.190000" longitude="-72.550000" />
+		<city country="US" state="LA" name="New Orleans" latitude="29.570000" longitude="-90.400000" />
+		<city country="US" state="NY" name="New York" latitude="40.470000" longitude="-73.580000" />
+		<city country="US" state="AK" name="Nome" latitude="64.250000" longitude="-165.300000" />
+		<city country="US" state="CA" name="Oakland" latitude="37.480000" longitude="-122.160000" />
+		<city country="US" state="OK" name="Oklahoma City" latitude="35.260000" longitude="-97.280000" />
+		<city country="US" state="NE" name="Omaha" latitude="41.150000" longitude="-95.560000" />
+		<city country="US" state="PA" name="Philadelphia" latitude="39.570000" longitude="-75.100000" />
+		<city country="US" state="AZ" name="Phoenix" latitude="33.290000" longitude="-112.400000" />
+		<city country="US" state="SD" name="Pierre" latitude="44.220000" longitude="-100.210000" />
+		<city country="US" state="PA" name="Pittsburgh" latitude="40.270000" longitude="-79.570000" />
+		<city country="US" state="ME" name="Portland" latitude="43.400000" longitude="-70.150000" />
+		<city country="US" state="OR" name="Portland" latitude="45.310000" longitude="-122.410000" />
+		<city country="US" state="RI" name="Providence" latitude="41.500000" longitude="-71.240000" />
+		<city country="US" state="NC" name="Raleigh" latitude="35.460000" longitude="-78.390000" />
+		<city country="US" state="NV" name="Reno" latitude="39.300000" longitude="-119.490000" />
+		<city country="US" state="UT" name="Richfield" latitude="38.460000" longitude="-112.500000" />
+		<city country="US" state="VA" name="Richmond" latitude="37.330000" longitude="-77.290000" />
+		<city country="US" state="VA" name="Roanoke" latitude="37.170000" longitude="-79.570000" />
+		<city country="US" state="CA" name="Sacramento" latitude="38.350000" longitude="-121.300000" />
+		<city country="US" state="MO" name="St. Louis" latitude="38.350000" longitude="-90.120000" />
+		<city country="US" state="UT" name="Salt Lake City" latitude="40.460000" longitude="-111.540000" />
+		<city country="US" state="TX" name="San Antonio" latitude="29.230000" longitude="-98.330000" />
+		<city country="US" state="CA" name="San Diego" latitude="32.420000" longitude="-117.100000" />
+		<city country="US" state="CA" name="San Francisco" latitude="37.470000" longitude="-122.260000" />
+		<city country="US" state="CA" name="San Jose" latitude="37.200000" longitude="-121.530000" />
+		<city country="US" state="PR" name="San Juan" latitude="18.300000" longitude="-66.100000" />
+		<city country="US" state="NM" name="Santa Fe" latitude="35.410000" longitude="-105.570000" />
+		<city country="US" state="GA" name="Savannah" latitude="32.500000" longitude="-81.500000" />
+		<city country="US" state="WA" name="Seattle" latitude="47.370000" longitude="-122.200000" />
+		<city country="US" state="LA" name="Shreveport" latitude="32.280000" longitude="-93.420000" />
+		<city country="US" state="SD" name="Sioux Falls" latitude="43.330000" longitude="-96.440000" />
+		<city country="US" state="AK" name="Sitka" latitude="57.100000" longitude="-135.150000" />
+		<city country="US" state="WA" name="Spokane" latitude="47.400000" longitude="-117.260000" />
+		<city country="US" state="IL" name="Springfield" latitude="39.480000" longitude="-89.380000" />
+		<city country="US" state="MA" name="Springfield" latitude="42.600000" longitude="-72.340000" />
+		<city country="US" state="MO" name="Springfield" latitude="37.130000" longitude="-93.170000" />
+		<city country="US" state="NY" name="Syracuse" latitude="43.200000" longitude="-76.800000" />
+		<city country="US" state="FL" name="Tampa" latitude="27.570000" longitude="-82.270000" />
+		<city country="US" state="OH" name="Toledo" latitude="41.390000" longitude="-83.330000" />
+		<city country="US" state="OK" name="Tulsa" latitude="36.900000" longitude="-95.590000" />
+		<city country="US" state="VA" name="Virginia Beach" latitude="36.510000" longitude="-75.580000" />
+		<city country="US" state="DC" name="Washington" latitude="38.530000" longitude="-77.200000" />
+		<city country="US" state="KS" name="Wichita" latitude="37.430000" longitude="-97.170000" />
+		<city country="US" state="NC" name="Wilmington" latitude="34.140000" longitude="-77.570000" />
+		
+		<!-- United Kingdom -->
+		<city country="GB" state="SCT" name="Aberdeen" latitude="57.900000" longitude="-2.900000" />
+		<city country="GB" state="NIR" name="Belfast" latitude="54.370000" longitude="-5.560000" />
+		<city country="GB" state="ENG" name="Birmingham" latitude="52.250000" longitude="-1.550000" />
+		<city country="GB" state="ENG" name="Bristol" latitude="51.280000" longitude="-2.350000" />
+		<city country="GB" state="SCT" name="Edinburgh" latitude="55.550000" longitude="-3.100000" />
+		<city country="GB" state="SCT" name="Glasgow" latitude="55.500000" longitude="-4.150000" />
+		<city country="GB" state="ENG" name="Leeds" latitude="53.450000" longitude="-1.300000" />
+		<city country="GB" state="ENG" name="Liverpool" latitude="53.250000" longitude="-3.000000" />
+		<city country="GB" state="ENG" name="London" latitude="51.320000" longitude="-0.500000" />
+		<city country="GB" state="ENG" name="Manchester" latitude="53.300000" longitude="-2.150000" />
+		<city country="GB" state="ENG" name="Newcastle-on-Tyne" latitude="54.580000" longitude="-1.370000" />
+		<city country="GB" state="ENG" name="Plymouth" latitude="50.250000" longitude="-4.500000" />
+		
+		<!-- Australia -->
+		<city country="AU" state="SA" name="Adelaide" latitude="-34.550000" longitude="138.360000" />
+		<city country="AU" state="QLD" name="Brisbane" latitude="-27.290000" longitude="153.800000" />
+		<city country="AU" state="NT" name="Darwin" latitude="-12.280000" longitude="130.510000" />
+		<city country="AU" state="TAS" name="Hobart" latitude="-42.520000" longitude="147.190000" />
+		<city country="AU" state="VIC" name="Melbourne" latitude="-37.470000" longitude="144.580000" />
+		<city country="AU" state="WA" name="Perth" latitude="-31.570000" longitude="115.520000" />
+		<city country="AU" state="NSW" name="Sydney" latitude="-34.000000" longitude="151.000000" />
+		
+		<!-- Other -->
+		<city country="DZ" name="Algiers" latitude="36.500000" longitude="3.000000" />
+		<city country="NL" name="Amsterdam" latitude="52.220000" longitude="4.530000" />
+		<city country="TR" name="Ankara" latitude="39.550000" longitude="32.550000" />
+		<city country="PY" name="Asuncion" latitude="-25.150000" longitude="-57.400000" />
+		<city country="GR" name="Athens" latitude="37.580000" longitude="23.430000" />
+		<city country="NZ" name="Auckland" latitude="-36.520000" longitude="174.450000" />
+		<city country="TH" name="Bangkok" latitude="13.450000" longitude="100.300000" />
+		<city country="ES" name="Barcelona" latitude="41.230000" longitude="2.900000" />
+		<city country="CN" name="Beijing" latitude="39.550000" longitude="116.250000" />
+		<city country="BR" name="Belem" latitude="-1.280000" longitude="-48.290000" />
+		<city country="RS" name="Belgrade" latitude="44.520000" longitude="20.320000" />
+		<city country="DE" name="Berlin" latitude="52.300000" longitude="13.250000" />
+		<city country="CO" name="Bogota" latitude="4.320000" longitude="-74.150000" />
+		<city country="IN" name="Bombay" latitude="19.000000" longitude="72.480000" />
+		<city country="FR" name="Bordeaux" latitude="44.500000" longitude="-0.310000" />
+		<city country="DE" name="Bremen" latitude="53.500000" longitude="8.490000" />
+		<city country="BE" name="Brussels" latitude="50.520000" longitude="4.220000" />
+		<city country="RO" name="Bucharest" latitude="44.250000" longitude="26.700000" />
+		<city country="HU" name="Budapest" latitude="47.300000" longitude="19.500000" />
+		<city country="AR" name="Buenos Aires" latitude="-34.350000" longitude="-58.220000" />
+		<city country="EG" name="Cairo" latitude="30.200000" longitude="31.210000" />
+		<city country="IN" name="Calcutta" latitude="22.340000" longitude="88.240000" />
+		<city country="CN" name="Canton" latitude="23.700000" longitude="113.150000" />
+		<city country="ZA" name="Cape Town" latitude="-33.550000" longitude="18.220000" />
+		<city country="VE" name="Caracas" latitude="10.280000" longitude="-67.200000" />
+		<city country="GF" name="Cayenne" latitude="4.490000" longitude="-52.180000" />
+		<city country="MX" name="Chihuahua" latitude="28.370000" longitude="-106.500000" />
+		<city country="CN" name="Chongqing" latitude="29.460000" longitude="106.340000" />
+		<city country="DK" name="Copenhagen" latitude="55.400000" longitude="12.340000" />
+		<city country="AR" name="Cordoba" latitude="-31.280000" longitude="-64.100000" />
+		<city country="SN" name="Dakar" latitude="14.400000" longitude="-17.280000" />
+		<city country="DJ" name="Djibouti" latitude="11.300000" longitude="43.300000" />
+		<city country="IE" name="Dublin" latitude="53.200000" longitude="-6.150000" />
+		<city country="ZA" name="Durban" latitude="-29.530000" longitude="30.530000" />
+		<city country="DE" name="Frankfurt" latitude="50.700000" longitude="8.410000" />
+		<city country="GY" name="Georgetown" latitude="6.450000" longitude="-58.150000" />
+		<city country="GT" name="Guatemala City" latitude="14.370000" longitude="-90.310000" />
+		<city country="EC" name="Guayaquil" latitude="-2.100000" longitude="-79.560000" />
+		<city country="DE" name="Hamburg" latitude="53.330000" longitude="10.200000" />
+		<city country="NO" name="Hammerfest" latitude="70.380000" longitude="23.380000" />
+		<city country="CU" name="Havana" latitude="23.800000" longitude="-82.230000" />
+		<city country="FI" name="Helsinki" latitude="60.100000" longitude="25.000000" />
+		<city country="CN" name="Hong Kong" latitude="22.200000" longitude="114.110000" />
+		<city country="CL" name="Iquique" latitude="-20.100000" longitude="-70.700000" />
+		<city country="RU" name="Irkutsk" latitude="52.300000" longitude="104.200000" />
+		<city country="ID" name="Jakarta" latitude="-6.160000" longitude="106.480000" />
+		<city country="ZA" name="Johannesburg" latitude="-26.120000" longitude="28.400000" />
+		<city country="JM" name="Kingston" latitude="17.590000" longitude="-76.490000" />
+		<city country="CG" name="Kinshasa" latitude="-4.180000" longitude="15.170000" />
+		<city country="MY" name="Kuala Lumpur" latitude="3.800000" longitude="101.420000" />
+		<city country="BO" name="La Paz" latitude="-16.270000" longitude="-68.220000" />
+		<city country="PE" name="Lima" latitude="-12.000000" longitude="-77.200000" />
+		<city country="PT" name="Lisbon" latitude="38.440000" longitude="-9.900000" />
+		<city country="FR" name="Lyons" latitude="45.450000" longitude="4.500000" />
+		<city country="ES" name="Madrid" latitude="40.260000" longitude="-3.420000" />
+		<city country="PH" name="Manila" latitude="14.350000" longitude="120.570000" />
+		<city country="FR" name="Marseilles" latitude="43.200000" longitude="5.200000" />
+		<city country="MX" name="Mazatlan" latitude="23.120000" longitude="-106.250000" />
+		<city country="SA" name="Mecca" latitude="21.290000" longitude="39.450000" />
+		<city country="MX" name="Mexico City" latitude="19.260000" longitude="-99.700000" />
+		<city country="IT" name="Milan" latitude="45.270000" longitude="9.100000" />
+		<city country="UY" name="Montevideo" latitude="-34.530000" longitude="-56.100000" />
+		<city country="RU" name="Moscow" latitude="55.450000" longitude="37.360000" />
+		<city country="DE" name="Munich" latitude="48.800000" longitude="11.350000" />
+		<city country="JP" name="Nagasaki" latitude="32.480000" longitude="129.570000" />
+		<city country="JP" name="Nagoya" latitude="35.700000" longitude="136.560000" />
+		<city country="KE" name="Nairobi" latitude="-1.250000" longitude="36.550000" />
+		<city country="CN" name="Nanjing (Nanking)" latitude="32.300000" longitude="118.530000" />
+		<city country="IT" name="Naples" latitude="40.500000" longitude="14.150000" />
+		<city country="IN" name="New Delhi" latitude="28.350000" longitude="77.120000" />
+		<city country="UA" name="Odessa" latitude="46.270000" longitude="30.480000" />
+		<city country="JP" name="Osaka" latitude="34.320000" longitude="135.300000" />
+		<city country="NO" name="Oslo" latitude="59.570000" longitude="10.420000" />
+		<city country="PA" name="Panama City" latitude="8.580000" longitude="-79.320000" />
+		<city country="SR" name="Paramaribo" latitude="5.450000" longitude="-55.150000" />
+		<city country="FR" name="Paris" latitude="48.480000" longitude="2.200000" />
+		<city country="PG" name="Port Moresby" latitude="-9.250000" longitude="147.800000" />
+		<city country="CZ" name="Prague" latitude="50.500000" longitude="14.260000" />
+		<city country="MM" name="Rangoon" latitude="16.500000" longitude="96.000000" />
+		<city country="IS" name="Reykjavik" latitude="64.400000" longitude="-21.580000" />
+		<city country="BR" name="Rio de Janeiro" latitude="-22.570000" longitude="-43.120000" />
+		<city country="IT" name="Rome" latitude="41.540000" longitude="12.270000" />
+		<city country="BR" name="Salvador" latitude="-12.560000" longitude="-38.270000" />
+		<city country="CL" name="Santiago" latitude="-33.280000" longitude="-70.450000" />
+		<city country="RU" name="St. Petersburg" latitude="59.560000" longitude="30.180000" />
+		<city country="BR" name="Sao Paulo" latitude="-23.310000" longitude="-46.310000" />
+		<city country="CN" name="Shanghai" latitude="31.100000" longitude="121.280000" />
+		<city country="SG" name="Singapore" latitude="1.140000" longitude="103.550000" />
+		<city country="BG" name="Sofia" latitude="42.400000" longitude="23.200000" />
+		<city country="SE" name="Stockholm" latitude="59.170000" longitude="18.300000" />
+		<city country="MG" name="Tananarive" latitude="-18.500000" longitude="47.330000" />
+		<city country="IR" name="Teheran" latitude="35.450000" longitude="51.450000" />
+		<city country="JP" name="Tokyo" latitude="35.400000" longitude="139.450000" />
+		<city country="LY" name="Tripoli" latitude="32.570000" longitude="13.120000" />
+		<city country="IT" name="Venice" latitude="45.260000" longitude="12.200000" />
+		<city country="MX" name="Veracruz" latitude="19.100000" longitude="-96.100000" />
+		<city country="AT" name="Vienna" latitude="48.140000" longitude="16.200000" />
+		<city country="RU" name="Vladivostok" latitude="43.100000" longitude="132.000000" />
+		<city country="PL" name="Warsaw" latitude="52.140000" longitude="21.000000" />
+		<city country="NZ" name="Wellington" latitude="-41.170000" longitude="174.470000" />
+		<city country="CH" name="Zurich" latitude="47.210000" longitude="8.310000" />
+		
+	</cities>
+	
+</data>
+
+
+
