@@ -24,6 +24,7 @@ define( 'GEKO_CORE_URI', $sPluginUrl );
 define( 'GEKO_CORE_EXTERNAL_LIB_ROOT', realpath( sprintf( '%s/external/libs', GEKO_CORE_ROOT ) ) );
 define( 'GEKO_LOG', realpath( sprintf( '%s/wp-content/logs/logs.txt', ABSPATH ) ) );
 define( 'GEKO_REGISTER_XML', realpath( sprintf( '%s/conf/register.xml', GEKO_CORE_ROOT ) ) );
+define( 'GEKO_GEOGRAPHY_XML', realpath( sprintf( '%s/conf/geography.xml', GEKO_CORE_ROOT ) ) );
 define( 'GEKO_VIEW_HELPER_PATH', realpath( sprintf( '%s/library', GEKO_CORE_ROOT ) ) );
 
 define( 'GEKO_IMAGE_THUMB_CACHE_DIR', realpath( sprintf( '%s/wp-content/cache/', ABSPATH ) ) );
@@ -72,12 +73,18 @@ Geko_Loader::registerNamespaces(
 	'PEAR_', 'Console_', 'OLE_', 'Spreadsheet_', 'WideImage_'
 );
 
-// register JavaScript/CSS files
+
+// register external files (js/css)
 Geko_Wp::setStandardPlaceholders( array(
 	'geko_core_root' => GEKO_CORE_ROOT,
 	'geko_core_uri' => GEKO_CORE_URI
 ) );
 Geko_Wp::registerExternalFiles( GEKO_REGISTER_XML );
+
+
+// set XML file for geographic data
+$oGeo = Geko_Geography_Xml::getInstance();
+$oGeo->setFile( GEKO_GEOGRAPHY_XML );
 
 
 // register global urls to services

@@ -1155,7 +1155,7 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 
 		global $wpdb;
 		
-		$oGeoCoun = Geko_Geography_Country::getInstance();
+		$oGeoState = Geko_Geography_CountryState::getInstance();
 		
 		
 		$sTable = $wpdb->geko_location_province;
@@ -1167,12 +1167,15 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 			$aCountryAbbrHash[ $oRow->country_abbr ] = $oRow->country_id;
 		}
 		
-		// provinces
-		$aCountries = $oGeoCoun->get();
+		
+		// states/provinces
+		$aCountries = $oGeoState->get();
 		
 		$aProvData = array();
 		foreach ( $aCountries as $sCountryAbbr => $aCountry ) {
+			
 			$aProvinces = $aCountry[ 'states' ];
+			
 			foreach ( $aProvinces as $sProvAbbr => $sProvName ) {
 				
 				if (

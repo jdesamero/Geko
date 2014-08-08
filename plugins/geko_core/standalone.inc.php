@@ -55,7 +55,7 @@ Geko_Loader::registerNamespaces(
 );
 
 
-
+// register external files (js/css)
 $oLoader = Geko_Loader_ExternalFiles::getInstance();
 $oLoader
 	->setMergeParams( array(
@@ -66,6 +66,7 @@ $oLoader
 	->registerFromXmlConfigFile( GEKO_REGISTER_XML )
 ;
 
+// set XML file for geographic data
 $oGeo = Geko_Geography_Xml::getInstance();
 $oGeo->setFile( GEKO_GEOGRAPHY_XML );
 
