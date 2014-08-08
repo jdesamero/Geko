@@ -1,22 +1,18 @@
 <?php
 
 //
-class Geko_Geography_Country
+class Geko_Geography_Country extends Geko_Singleton_Abstract
 {	
 	
-	public static $aContinents = NULL;
-	public static $a3LetterCode = NULL;
-	public static $aCountryCodeHash = NULL;
+	protected $_aContinents = NULL;
+	protected $_a3LetterCode = NULL;
+	protected $_aCountryCodeHash = NULL;
+	
+	protected $_aCountries = array();
+	protected $_aCountryContinentHash = array();
 	
 	
-	//
-	public static $aCountries = array();
-	public static $aCountryContinentHash = array();
-	
-	
-	
-	
-	public static $aCountryNameVariations = array(
+	protected $_aCountryNameVariations = array(
 		1 => array(
 			'VN' => 'Vietnam'
 		)
@@ -25,33 +21,31 @@ class Geko_Geography_Country
 	
 	
 	//
-	private static function init() {
+	private function myInit() {
 		
-		if ( 0 == count( self::$aCountries ) ) {
+		if ( 0 == count( $this->_aCountries ) ) {
 			
-			if ( NULL === self::$aCountryCodeHash ) {
-				Geko_Geography_Xml::loadData();
-			}
+			$this->get();		// init $this->_aContinents
 			
 			$aNorm = array();
 			
-			foreach ( self::$aCountryCodeHash as $sKey => $sValue ) {
+			foreach ( $this->_aCountryCodeHash as $sKey => $sValue ) {
 				$aNorm[ strtoupper( $sKey ) ] = $sValue;
 			}
 			
-			self::$aCountryCodeHash = $aNorm;
+			$this->_aCountryCodeHash = $aNorm;
 			
-			foreach ( self::$aContinents as $sContinentCode => $aContinent ) {
+			foreach ( $this->_aContinents as $sContinentCode => $aContinent ) {
 				
-				self::$aCountries = array_merge( self::$aCountries, $aContinent[ 'countries' ] );
+				$this->_aCountries = array_merge( $this->_aCountries, $aContinent[ 'countries' ] );
 				
 				foreach ( $aContinent[ 'countries' ] as $sCountryCode => $sCountryName ) {
 					
 					$sCountryNameNorm = strtoupper( $sCountryName );
 					
-					self::$aCountryContinentHash[ $sCountryCode ] = $sContinentCode;
-					self::$aCountryContinentHash[ $sCountryNameNorm ] = $sContinentCode;
-					self::$aCountryCodeHash[ $sCountryNameNorm ] = $sCountryCode;
+					$this->_aCountryContinentHash[ $sCountryCode ] = $sContinentCode;
+					$this->_aCountryContinentHash[ $sCountryNameNorm ] = $sContinentCode;
+					$this->_aCountryCodeHash[ $sCountryNameNorm ] = $sCountryCode;
 					
 				}
 			}
@@ -60,44 +54,62 @@ class Geko_Geography_Country
 
 	
 	//
-	public static function get() {
+	public function get() {
 		
-		if ( NULL === self::$aContinents ) {
-			Geko_Geography_Xml::loadData();
+		if ( NULL === $this->_aContinents ) {
+			$oGeo = Geko_Geography_Xml::getInstance();
+			$oGeo->loadData( GEKO_GEOGRAPHY_XML );
 		}
 		
-		return self::$aContinents;
+		return $this->_aContinents;
 	}
 	
 	//
-	public static function set( $aContinents, $a3LetterCode, $aCountryCodeHash ) {
-		self::$aContinents = $aContinents;
-		self::$a3LetterCode = $a3LetterCode;
-		self::$aCountryCodeHash = $aCountryCodeHash;
+	public function set( $aContinents, $a3LetterCode, $aCountryCodeHash ) {
+		$this->_aContinents = $aContinents;
+		$this->_a3LetterCode = $a3LetterCode;
+		$this->_aCountryCodeHash = $aCountryCodeHash;
 	}
 	
 	
 	
 	//
-	public static function getCountries() {
+	public function getCountries() {
 		
-		self::init();
+		$this->myInit();
 		
-		return self::$aCountries;
+		return $this->_aCountries;
 	}
 	
 	//
-	public static function getCountryNameFromCountryCode( $sCountryCode, $iVariation = 0 ) {
+	public function getThreeLetterCodes() {
 		
-		self::init();
+		$this->get();
+		
+		return $this->_a3LetterCode;
+	}
+	
+	//
+	public function getCountryCodeHash() {
+
+		$this->get();
+		
+		return $this->_aCountryCodeHash;	
+	}
+	
+	
+	//
+	public function getCountryNameFromCountryCode( $sCountryCode, $iVariation = 0 ) {
+		
+		$this->myInit();
 		
 		if ( $iVariation ) {
-			$sRet = self::$aCountryNameVariations[ $iVariation ][ $sCountryCode ];
+			$sRet = $this->_aCountryNameVariations[ $iVariation ][ $sCountryCode ];
 		}
 		
 		if ( !$sRet ) {
 			$sCountryCodeNormalize = strtoupper( trim( $sCountryCode ) );		// normalize
-			$sRet = self::$aCountries[ $sCountryCodeNormalize ];
+			$sRet = $this->_aCountries[ $sCountryCodeNormalize ];
 		}
 		
 		return ( '' == $sRet ) ? $sCountryCode : $sRet;
@@ -105,49 +117,47 @@ class Geko_Geography_Country
 	
 	
 	//
-	public static function getCountryCodeFromCountryName( $sCountryName ) {
+	public function getCountryCodeFromCountryName( $sCountryName ) {
 		
-		self::init();
+		$this->myInit();
 		
 		$sCountryNameNormalize = strtoupper( trim( $sCountryName ) );		// normalize
-		$sRet = self::$aCountryCodeHash[ $sCountryNameNormalize ];
+		$sRet = $this->_aCountryCodeHash[ $sCountryNameNormalize ];
 		
 		return ( '' == $sRet ) ? $sCountryName : $sRet;
 	}
 	
 	
 	// alias
-	public static function getNameFromCode( $sCode ) {
-		return self::getCountryNameFromCountryCode( $sCode );
+	public function getNameFromCode( $sCode ) {
+		return $this->getCountryNameFromCountryCode( $sCode );
 	}
 	
 	// $sCountry could be code or name
-	public static function getContinentCodeFromCountry( $sCountry ) {
+	public function getContinentCodeFromCountry( $sCountry ) {
 		
-		self::init();
+		$this->myInit();
 		
 		$sCountry = strtoupper( trim( $sCountry ) );						// normalize
 		
-		return self::$aCountryContinentHash[ $sCountry ];
+		return $this->_aCountryContinentHash[ $sCountry ];
 	}
 
 	// $sState could be code or name
-	public static function getContinentNameFromCountry( $sCountry ) {
+	public function getContinentNameFromCountry( $sCountry ) {
 		
-		self::init();
+		$this->myInit();
 		
-		return self::$aContinents[ self::getContinentCodeFromCountry( $sCountry ) ][ 'name' ];
+		return $this->_aContinents[ $this->getContinentCodeFromCountry( $sCountry ) ][ 'name' ];
 	}
 	
 	
 	//
-	public static function getCountryCodeFrom3Letter( $s3Letter ) {
+	public function getCountryCodeFrom3Letter( $s3Letter ) {
 		
-		if ( NULL === self::$a3LetterCode ) {
-			Geko_Geography_Xml::loadData();
-		}
+		$this->get();		// init $this->_aContinents
 		
-		return self::$a3LetterCode[ strtoupper( $s3Letter ) ];
+		return $this->_a3LetterCode[ strtoupper( $s3Letter ) ];
 	}
 	
 	

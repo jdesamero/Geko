@@ -263,7 +263,7 @@
 		<file id="geko-jquery-geko_slideshow" src="##geko_core_uri##/js/jquery.geko_slideshow.js" dependencies="jquery" />
 		<file id="geko-jquery-geko_sysomos_aggregator" src="##geko_core_uri##/js/jquery.geko_sysomos_aggregator.js" dependencies="geko-jquery-geko_sysomos_service" />
 		<file id="geko-jquery-geko_sysomos_feed" src="##geko_core_uri##/js/jquery.geko_sysomos_feed.js" dependencies="geko-jquery-geko_sysomos_service" />
-		<file id="geko-jquery-geko_sysomos_mapfeed" src="##geko_core_uri##/js/jquery.geko_sysomos_mapfeed.js" dependencies="geko-jquery-geko_sysomos_service geko-jquery-geko_map_projection geko-jquery-fx-pulsate geko-jquery-fx-scale geko-jquery-geko_geo_coords" />
+		<file id="geko-jquery-geko_sysomos_mapfeed" src="##geko_core_uri##/js/jquery.geko_sysomos_mapfeed.js" dependencies="geko-jquery-geko_sysomos_service geko-jquery-geko_map_projection geko-jquery-fx-pulsate geko-jquery-fx-scale" />
 		<file id="geko-jquery-geko_sysomos_service" src="##geko_core_uri##/js/jquery.geko_sysomos_service.js" dependencies="geko-jquery-geko_util" />
 		<file id="geko-jquery-geko_sysomos_top_ten" src="##geko_core_uri##/js/jquery.geko_sysomos_top_ten.js" dependencies="geko-jquery-geko_sysomos_service geko-jquery-tinysort_charorder" />
 		<file id="geko-jquery-geko_update" src="##geko_core_uri##/js/jquery.geko_update.js" dependencies="jquery" />
@@ -301,9 +301,6 @@
 		<file id="geko_wp_navigationmanagement_pagemanager_search" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/Search.js" dependencies="geko_navigation_pagemanager_implicitlabelabstract" />
 		<file id="geko_wp_options_manage" src="##geko_core_uri##/js/Geko/Wp/Options/Manage.js" dependencies="geko-jquery-ui-dialog" />
 		
-		
-		<!-- for testing -->
-		<file id="geko-jquery-geko_geo_coords" src="##geko_core_uri##/testing/js/jquery.geko_geo_coords.js" dependencies="geko-array jquery" />
 		
 		
 	</scripts>

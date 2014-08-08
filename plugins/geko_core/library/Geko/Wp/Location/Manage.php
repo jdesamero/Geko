@@ -1120,6 +1120,9 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	//
 	public function populateDb( $bFull = TRUE ) {
 		
+		$oGeoCoun = Geko_Geography_Country::getInstance();
+		$oGeoState = Geko_Geography_CountryState::getInstance();
+		
 		$aOnlyProvince = NULL;
 		$aOnlyCountry = NULL;
 		$aOnlyContinent = NULL;
@@ -1127,13 +1130,13 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		if ( !$bFull ) {
 			
 			// populate only with countries defined in Geko_Geography_CountryState
-			$aCountries = Geko_Geography_CountryState::get();
+			$aCountries = $oGeoState->get();
 			$aOnlyCountry = array_keys( $aCountries );
 			
 			// populate only with continents applicable to above
 			$aOnlyContinent = array();
 			foreach ( $aOnlyCountry as $sCountryAbbr ) {
-				$aOnlyContinent[] = Geko_Geography_Country::getContinentCodeFromCountry( $sCountryAbbr );
+				$aOnlyContinent[] = $oGeoCoun->getContinentCodeFromCountry( $sCountryAbbr );
 			}
 			
 		}
@@ -1152,6 +1155,9 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 
 		global $wpdb;
 		
+		$oGeoCoun = Geko_Geography_Country::getInstance();
+		
+		
 		$sTable = $wpdb->geko_location_province;
 		$this->resetTable( $sTable );
 		
@@ -1162,8 +1168,9 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		}
 		
 		// provinces
+		$aCountries = $oGeoCoun->get();
+		
 		$aProvData = array();
-		$aCountries = Geko_Geography_CountryState::get();
 		foreach ( $aCountries as $sCountryAbbr => $aCountry ) {
 			$aProvinces = $aCountry[ 'states' ];
 			foreach ( $aProvinces as $sProvAbbr => $sProvName ) {
@@ -1202,6 +1209,9 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		
 		global $wpdb;
 		
+		$oGeoCoun = Geko_Geography_Country::getInstance();
+		
+		
 		$sTable = $wpdb->geko_location_country;
 		$this->resetTable( $sTable );
 		
@@ -1212,8 +1222,9 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		}
 		
 		// countries
+		$aContinents = $oGeoCoun->get();
+		
 		$aCountryData = array();
-		$aContinents = Geko_Geography_Country::get();
 		foreach ( $aContinents as $sContinentAbbr => $aContinent ) {
 			$aCountries = $aContinent[ 'countries' ];
 			foreach ( $aCountries as $sCountryAbbr => $sCountryName ) {
@@ -1256,8 +1267,10 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		$this->resetTable( $sTable );
 		
 		// continents
+		$oGeoCont = Geko_Geography_Continent::getInstance();
+		$aContinents = $oGeoCont->get();
+		
 		$aContinentData = array();
-		$aContinents = Geko_Geography_Continent::get();
 		foreach ( $aContinents as $sContinentAbbr => $sContinentName ) {
 			if (
 				( NULL === $aOnly ) ||

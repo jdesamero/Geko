@@ -1,32 +1,38 @@
 <?php
 
 //
-class Geko_Geography_Continent
+class Geko_Geography_Continent extends Geko_Singleton_Abstract
 {
 	
-	public static $aContinents = NULL;
+	protected $_aContinents = NULL;
 	
 	
 	
 	//
-	public static function get() {
+	public function get() {
 		
-		if ( NULL === self::$aContinents ) {
-			Geko_Geography_Xml::loadData();
+		if ( NULL === $this->_aContinents ) {
+			$oGeo = Geko_Geography_Xml::getInstance();
+			$oGeo->loadData( GEKO_GEOGRAPHY_XML );
 		}
 		
-		return self::$aContinents;
+		return $this->_aContinents;
 	}
 	
 	//
-	public static function set( $aContinents ) {
-		self::$aContinents = $aContinents;
+	public function set( $aContinents ) {
+		$this->_aContinents = $aContinents;
 	}
 	
 	// $sState could be code or name
-	public static function getNameFromCode( $sCode ) {
-		return self::$aContinents[ $sCode ];
+	public function getNameFromCode( $sCode ) {
+		
+		$this->get();		// init $this->_aContinents
+		
+		return $this->_aContinents[ $sCode ];
 	}
 	
+	
 }
+
 

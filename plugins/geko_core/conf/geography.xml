@@ -53,7 +53,7 @@
 		<country continent="NA" abbr="VI" altabbr="VIR" name="Virgin Islands (U.S.)" latitude="18.335765" longitude="-64.896335" />
 		
 		<!-- Europe -->
-		<country continent="EU" abbr="GB" altabbr="GBR" name="United Kingdom" latitude="55.378051" longitude="-3.435973" />
+		<country continent="EU" abbr="GB" altabbr="GBR" name="United Kingdom" statelabel="Countries of Great Britain" latitude="55.378051" longitude="-3.435973" />
 		<country continent="EU" abbr="AL" altabbr="ALB" name="Albania" latitude="41.153332" longitude="20.168331" />
 		<country continent="EU" abbr="AD" altabbr="AND" name="Andorra" latitude="42.506285" longitude="1.521802" />
 		<country continent="EU" abbr="AM" altabbr="ARM" name="Armenia" latitude="40.069099" longitude="45.038189" />

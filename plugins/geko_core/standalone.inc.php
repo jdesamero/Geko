@@ -66,8 +66,8 @@ $oLoader
 	->registerFromXmlConfigFile( GEKO_REGISTER_XML )
 ;
 
-
-Geko_Geography_Xml::setFile( GEKO_GEOGRAPHY_XML );
+$oGeo = Geko_Geography_Xml::getInstance();
+$oGeo->setFile( GEKO_GEOGRAPHY_XML );
 
 
 

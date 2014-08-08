@@ -17,10 +17,13 @@ class GekoTest_Geography_Continent extends Geko_PhpUnit_TestCase
 	 * @dataProvider providerCodes
 	 */
 	public function testGetNameFromCode( $sCode, $sResult ) {
-		 $this->assertEquals(
-		 	Geko_Geography_Continent::getNameFromCode( $sCode ),
-		 	$sResult
-		 );
+		
+		$oGeoCont = Geko_Geography_Continent::getInstance();
+		
+		$this->assertEquals(
+			$oGeoCont->getNameFromCode( $sCode ),
+			$sResult
+		);
 	}
 
 }

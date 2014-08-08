@@ -29,8 +29,10 @@ class Geko_App_Sysomos_Proc_Mentions extends Geko_Proc
 			
 		} else {
 			
+			$oGeoCoun = Geko_Geography_Country::getInstance();
+			
 			// query all countries
-			$aCountryFilters = array_keys( Geko_Geography_Country::getCountries() );
+			$aCountryFilters = array_keys( $oGeoCoun->getCountries() );
 		}
 		
 		
