@@ -57,9 +57,11 @@ abstract class Geko_Singleton_Abstract
 		
 		if ( !$this->_bCalledInit ) {
 			
-			$this->preStart();
-			$this->start();
-			$this->postStart();
+			$aArgs = func_get_args();
+			
+			call_user_func_array( array( $this, 'preStart' ), $aArgs );
+			call_user_func_array( array( $this, 'start' ), $aArgs );
+			call_user_func_array( array( $this, 'postStart' ), $aArgs );
 			
 			$this->_bCalledInit = TRUE;
 		}
@@ -101,7 +103,7 @@ abstract class Geko_Singleton_Abstract
 		
 		$this->_bCalledInit = FALSE;
 		
-		$this->reStart();
+		call_user_func_array( array( $this, 'reStart' ), $aArgs );
 		
 		return call_user_func_array( array( $this, 'init' ), $aArgs );
 	}

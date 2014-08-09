@@ -100,73 +100,20 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		$this->addTable( $oSqlTable );
 		
 		
-		// province
+		// geocache
 		
-		$sTableName2 = 'geko_location_province';
+		$sTableName2 = 'geko_location_geocache';
 		Geko_Wp_Db::addPrefix( $sTableName2 );
 		
 		$oSqlTable2 = new Geko_Sql_Table();
 		$oSqlTable2
-			->create( $wpdb->$sTableName2, 'p' )
-			->fieldInt( 'province_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
-			->fieldVarChar( 'province_name', array( 'size' => 256 ) )
-			->fieldVarChar( 'province_abbr', array( 'size' => 16 ) )
-			->fieldInt( 'country_id', array( 'unsgnd', 'key' ) )
-			->fieldInt( 'rank', array( 'unsgnd' ) )
-		;
-		
-		$this->addTable( $oSqlTable2, FALSE );
-		
-		
-		// country
-		
-		$sTableName3 = 'geko_location_country';
-		Geko_Wp_Db::addPrefix( $sTableName3 );
-		
-		$oSqlTable3 = new Geko_Sql_Table();
-		$oSqlTable3
-			->create( $wpdb->$sTableName3, 'c' )
-			->fieldInt( 'country_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
-			->fieldVarChar( 'country_name', array( 'size' => 256 ) )
-			->fieldVarChar( 'country_abbr', array( 'size' => 16 ) )
-			->fieldInt( 'continent_id', array( 'unsgnd', 'key' ) )
-			->fieldInt( 'rank', array( 'unsgnd' ) )
-		;
-		
-		$this->addTable( $oSqlTable3, FALSE );
-		
-		
-		// continent
-		
-		$sTableName4 = 'geko_location_continent';
-		Geko_Wp_Db::addPrefix( $sTableName4 );
-
-		$oSqlTable4 = new Geko_Sql_Table();
-		$oSqlTable4
-			->create( $wpdb->$sTableName4, 't' )
-			->fieldTinyInt( 'continent_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
-			->fieldVarChar( 'continent_name', array( 'size' => 256 ) )
-			->fieldVarChar( 'continent_abbr', array( 'size' => 16 ) )
-			->fieldTinyInt( 'rank', array( 'unsgnd' ) )
-		;
-		
-		$this->addTable( $oSqlTable4, FALSE );
-		
-		
-		// geocache
-		
-		$sTableName5 = 'geko_location_geocache';
-		Geko_Wp_Db::addPrefix( $sTableName5 );
-
-		$oSqlTable5 = new Geko_Sql_Table();
-		$oSqlTable5
-			->create( $wpdb->$sTableName5, 'g' )
+			->create( $wpdb->$sTableName2, 'g' )
 			->fieldVarChar( 'geo_key', array( 'size' => 64, 'notnull', 'prky' ) )
 			->fieldFloat( 'latitude', array( 'size' => '10,7', 'sgnd' ) )
 			->fieldFloat( 'longitude', array( 'size' => '10,7', 'sgnd' ) )
 		;
 		
-		$this->addTable( $oSqlTable5, FALSE );
+		$this->addTable( $oSqlTable2, FALSE );
 		
 		
 		return $this;
@@ -194,9 +141,6 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		Geko_Wp_Options_MetaKey::install();
 		
 		$this->createTableOnce();
-		$this->createTableOnce( $wpdb->geko_location_province );
-		$this->createTableOnce( $wpdb->geko_location_country );
-		$this->createTableOnce( $wpdb->geko_location_continent );
 		$this->createTableOnce( $wpdb->geko_location_geocache );
 		
 		
@@ -580,9 +524,12 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		$aRes = array( '', '' );
 		
 		$aProvinces = $this->getProvinces();
+		
 		if ( $oProvince = $aProvinces[ $iProvinceId ] ) {
+			
 			$aRes[ 0 ] = $oProvince->province_name;
 			$aCountries = $this->getCountries();
+			
 			if ( $oCountry = $aCountries[ $oProvince->country_id ] ) {
 				$aRes[ 1 ] = $oCountry->country_name;
 			}
@@ -671,7 +618,7 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 			
 			foreach ( $aFields as $sField ) {
 				if ( $oCurrentEntity->hasEntityProperty( $sField ) ) {
-					$sPostKey = $sPrefix . $sField;
+					$sPostKey = sprintf( '%s%s', $sPrefix, $sField );
 					$aRet[ $sPostKey ] = $oCurrentEntity->getEntityPropertyValue( $sField );
 				}
 			}
@@ -695,7 +642,7 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		
 		if ( NULL === $sEmptyValLabel ) {
 			$aFieldLabels = $this->getFieldLabels( $oPlugin );
-			$sEmptyValLabel = 'Select a ' . $aFieldLabels[ 'city' ];
+			$sEmptyValLabel = sprintf( 'Select a %s', $aFieldLabels[ 'city' ] );
 		}
 		
 		?>
@@ -717,7 +664,7 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		
 		if ( NULL === $sEmptyValLabel ) {
 			$aFieldLabels = $this->getFieldLabels( $oPlugin );
-			$sEmptyValLabel = 'Select a ' . $aFieldLabels[ 'province_id' ];
+			$sEmptyValLabel = sprintf( 'Select a %s', $aFieldLabels[ 'province_id' ] );
 		}
 		
 		?>
@@ -739,7 +686,7 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		
 		if ( NULL === $sEmptyValLabel ) {
 			$aFieldLabels = $this->getFieldLabels( $oPlugin );
-			$sEmptyValLabel = 'Select a ' . $aFieldLabels[ 'country_id' ];
+			$sEmptyValLabel = sprintf( 'Select a %s', $aFieldLabels[ 'country_id' ] );
 		}
 		
 		?>	
@@ -760,7 +707,7 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		global $wpdb;
 		
 		if ( NULL === $sEmptyValLabel ) {
-			$sEmptyValLabel = 'Select a ' . $this->_aFieldLabels[ 'continent_id' ];
+			$sEmptyValLabel = sprintf( 'Select a %s', $this->_aFieldLabels[ 'continent_id' ] );
 		}
 		
 		?>
@@ -860,16 +807,14 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 			
 			$sLabel = Geko_String::sw( '<label for="%s$1">%s$0</label>', $aPart[ 'label' ], $aPart[ 'name' ] );
 			$sFieldGroup = Geko_String::sw( '%s<br />', $aPart[ 'field_group' ] );
+			$sFieldDesc = Geko_String::sw( '<span class="description">%s</span>', $aPart[ 'description' ] );
 			
-			$sFields .= '
-				<tr class="form-field"' . $sRowId . '>
-					<th>' . $sLabel . '</th>
-					<td>
-						' . $sFieldGroup . '
-						' . Geko_String::sw( '<span class="description">%s</span>', $aPart[ 'description' ] ) . '
-					</td>
+			$sFields .= sprintf( '
+				<tr class="form-field">
+					<th>%s</th>
+					<td>%s%s</td>
 				</tr>
-			';
+			', $sLabel, $sFieldGroup, $sFieldDesc );
 		}
 		
 		return $sFields;
@@ -989,7 +934,7 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 			);
 			
 			foreach ( $aFields as $sField ) {
-				$sPostKey = $sPrefix . $sField;
+				$sPostKey = sprintf( '%s%s', $sPrefix, $sField );
 				if ( isset( $_POST[ $sPostKey ] ) ) {
 					$aVals[ $sField ] = stripslashes( $_POST[ $sPostKey ] );
 				}
@@ -1022,7 +967,7 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 			$aMapQuery = array();
 			
 			// address
-			if ( $sAddress = trim( $aVals[ 'street_number' ] . ' ' . $aVals[ 'street_name' ] ) ) {
+			if ( $sAddress = trim( sprintf( '%s %s', $aVals[ 'street_number' ], $aVals[ 'street_name' ] ) ) ) {
 				$aMapQuery[] = $sAddress;
 			} elseif ( $sAddress = trim( $aVals[ 'address_line_1' ] ) ) {
 				$aMapQuery[] = $sAddress;
@@ -1121,7 +1066,7 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	public function populateDb( $bFull = TRUE ) {
 		
 		$oGeoCoun = Geko_Geography_Country::getInstance();
-		$oGeoState = Geko_Geography_CountryState::getInstance();
+		$oGeoState = Geko_Geography_State::getInstance();
 		
 		$aOnlyProvince = NULL;
 		$aOnlyCountry = NULL;
@@ -1129,9 +1074,8 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		
 		if ( !$bFull ) {
 			
-			// populate only with countries defined in Geko_Geography_CountryState
-			$aCountries = $oGeoState->get();
-			$aOnlyCountry = array_keys( $aCountries );
+			// populate only with countries defined in Geko_Geography_State
+			$aOnlyCountry = $oGeoState->getCountries();
 			
 			// populate only with continents applicable to above
 			$aOnlyContinent = array();
@@ -1151,112 +1095,19 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	}
 	
 	//
-	public function populateProvinceTable( $aOnly = NULL, $bHasCountry = TRUE ) {
-
-		global $wpdb;
+	public function populateProvinceTable( $aOnly = NULL ) {
 		
-		$oGeoState = Geko_Geography_CountryState::getInstance();
-		
-		
-		$sTable = $wpdb->geko_location_province;
-		$this->resetTable( $sTable );
-		
-		$aCountryDb = $this->getCountries( TRUE );
-		$aCountryAbbrHash = array();
-		foreach ( $aCountryDb as $oRow ) {
-			$aCountryAbbrHash[ $oRow->country_abbr ] = $oRow->country_id;
-		}
-		
-		
-		// states/provinces
-		$aCountries = $oGeoState->get();
-		
-		$aProvData = array();
-		foreach ( $aCountries as $sCountryAbbr => $aCountry ) {
-			
-			$aProvinces = $aCountry[ 'states' ];
-			
-			foreach ( $aProvinces as $sProvAbbr => $sProvName ) {
-				
-				if (
-					( is_array( $aOnly ) ) && 
-					( !in_array( $sProvAbbr, $aOnly ) )
-				) continue;
-				
-				$iCountryId = $aCountryAbbrHash[ $sCountryAbbr ];
-				
-				if ( $bHasCountry && !$iCountryId ) continue;
-
-				$aProvData[] = array(
-					'province_name' => $sProvName,
-					'province_abbr' => $sProvAbbr,
-					'country_id' => $iCountryId
-				);
-				
-			}
-		}
-		
-		foreach ( $aProvData as $aData ) {
-			$wpdb->insert(
-				$sTable,
-				$aData,
-				array( '%s', '%s', '%d' )
-			);
-		}
+		$oGeoState = Geko_Geography_State::getInstance();
+		$oGeoState->resetTable()->populateStateTable( $aOnly );
 		
 		return $this;
 	}
 	
 	//
-	public function populateCountryTable( $aOnly = NULL, $bHasContinent = TRUE ) {
-		
-		global $wpdb;
+	public function populateCountryTable( $aOnly = NULL ) {
 		
 		$oGeoCoun = Geko_Geography_Country::getInstance();
-		
-		
-		$sTable = $wpdb->geko_location_country;
-		$this->resetTable( $sTable );
-		
-		$aContinentDb = $this->getContinents( TRUE );
-		$aContinentAbbrHash = array();
-		foreach ( $aContinentDb as $oRow ) {
-			$aContinentAbbrHash[ $oRow->continent_abbr ] = $oRow->continent_id;
-		}
-		
-		// countries
-		$aContinents = $oGeoCoun->get();
-		
-		$aCountryData = array();
-		foreach ( $aContinents as $sContinentAbbr => $aContinent ) {
-			$aCountries = $aContinent[ 'countries' ];
-			foreach ( $aCountries as $sCountryAbbr => $sCountryName ) {
-				
-				if (
-					( is_array( $aOnly ) ) && 
-					( !in_array( $sCountryAbbr, $aOnly ) )
-				) continue;
-				
-				$iContinentId =  $aContinentAbbrHash[ $sContinentAbbr ];
-				
-				if ( $bHasContinent && !$iContinentId ) continue;
-				
-				$aCountryData[] = array(
-					'country_name' => $sCountryName,
-					'country_abbr' => $sCountryAbbr,
-					'continent_id' => $iContinentId
-				);
-				
-			}
-		}
-		
-		foreach ( $aCountryData as $aData ) {
-			$wpdb->insert(
-				$sTable,
-				$aData,
-				array( '%s', '%s', '%d' )
-			);
-		}
+		$oGeoCoun->resetTable()->populateCountryTable( $aOnly );
 		
 		return $this;
 	}
@@ -1264,38 +1115,8 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	// $aOnly can be an array of continent codes
 	public function populateContinentTable( $aOnly = NULL ) {
 		
-		global $wpdb;
-		
-		$sTable = $wpdb->geko_location_continent;
-		$this->resetTable( $sTable );
-		
-		// continents
 		$oGeoCont = Geko_Geography_Continent::getInstance();
-		$aContinents = $oGeoCont->get();
-		
-		$aContinentData = array();
-		foreach ( $aContinents as $sContinentAbbr => $sContinentName ) {
-			if (
-				( NULL === $aOnly ) ||
-				(
-					( is_array( $aOnly ) ) && 
-					( in_array( $sContinentAbbr, $aOnly ) )
-				)
-			) {
-				$aContinentData[] = array(
-					'continent_name' => $sContinentName,
-					'continent_abbr' => $sContinentAbbr
-				);
-			}
-		}
-		
-		foreach ( $aContinentData as $aData ) {
-			$wpdb->insert(
-				$sTable,
-				$aData,
-				array( '%s', '%s' )
-			);
-		}
+		$oGeoCont->resetTable()->populateContinentTable( $aOnly );
 		
 		return $this;
 	}
@@ -1357,7 +1178,7 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 				$aFieldParams[ 'type' ] = 'select';
 				
 				$aFieldParams[ 'empty_choice' ] = array(
-					'label' => 'Select a ' . $aFieldLabels[ $sField ],
+					'label' => sprintf( 'Select a %s', $aFieldLabels[ $sField ] ),
 					'atts' => array(
 						'class' => 'default'
 					)
@@ -1370,7 +1191,7 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 						$aChoices[ $oProvince->province_id ] = array(
 							'label' => $oProvince->province_name,
 							'atts' => array(
-								'class' => 'country-' . $oProvince->country_id
+								'class' => sprintf( 'country-%d', $oProvince->country_id )
 							)
 						);
 					}
@@ -1382,7 +1203,7 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 						$aChoices[ $oCountry->country_id ] = array(
 							'label' => $oCountry->country_name,
 							'atts' => array(
-								'class' => 'continent-' . $oCountry->continent_id
+								'class' => sprintf( 'continent-%d', $oCountry->continent_id )
 							)
 						);
 					}

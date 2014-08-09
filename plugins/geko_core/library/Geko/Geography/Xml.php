@@ -1,7 +1,7 @@
 <?php
 
 //
-class Geko_Geography_Xml extends Geko_Singleton_Abstract
+class Geko_Geography_Xml extends Geko_Geography
 {
 	
 	public $_sFile = '';
@@ -26,7 +26,7 @@ class Geko_Geography_Xml extends Geko_Singleton_Abstract
 			
 			$oGeoCont = Geko_Geography_Continent::getInstance();
 			$oGeoCoun = Geko_Geography_Country::getInstance();
-			$oGeoState = Geko_Geography_CountryState::getInstance();
+			$oGeoState = Geko_Geography_State::getInstance();
 			$oGeoCity = Geko_Geography_City::getInstance();
 			
 			
@@ -36,13 +36,16 @@ class Geko_Geography_Xml extends Geko_Singleton_Abstract
 			$aContXml = $oXml->continents[ 0 ];
 			
 			$aContinents = array();
-			$aCounTitle = array();
 			foreach ( $aContXml as $oCont ) {
 				
 				$sAbbr = strval( $oCont[ 'abbr' ] );
 				
-				$aContinents[ $sAbbr ] = strval( $oCont[ 'name' ] );
-				$aCounTitle[ $sAbbr ] = strval( $oCont[ 'countrylabel' ] );
+				$aContinents[ $sAbbr ] = array(
+					Geko_Geography_Continent::FIELD_NAME => strval( $oCont[ 'name' ] ),
+					Geko_Geography_Continent::FIELD_COUNTRY_LABEL => strval( $oCont[ 'countrylabel' ] ),
+					Geko_Geography_Continent::FIELD_DB_ID => NULL
+				);
+				
 			}
 			
 			$oGeoCont->set( $aContinents );
@@ -53,67 +56,52 @@ class Geko_Geography_Xml extends Geko_Singleton_Abstract
 			$aCounXml = $oXml->countries[ 0 ];
 			
 			$aCountries = array();
-			$a3LetterCode = array();
-			$aCountryCodeHash = array();
-			$aStateLabel = array();
 			
 			foreach ( $aCounXml as $oCoun ) {
 				
-				$sCont = strval( $oCoun[ 'continent' ] );
 				$sAbbr = strval( $oCoun[ 'abbr' ] );
-				$sAltAbbr = strval( $oCoun[ 'altabbr' ] );
-				$sStateLabel = strval( $oCoun[ 'statelabel' ] );
 				
-				$aCountries[ $sCont ][ $sAbbr ] = strval( $oCoun[ 'name' ] );
-				$a3LetterCode[ $sAltAbbr ] = $sAbbr;
-				
-				if ( $sVaryAtt = strval( $oCoun[ 'variations' ] ) ) {
-					$aVary = explode( ';', $sVaryAtt );
-					foreach ( $aVary as $sVary ) {
-						$aCountryCodeHash[ trim( $sVary ) ] = $sAbbr;
-					}
-				}
-				
-				if ( $sStateLabel ) {
-					$aStateLabel[ $sAbbr ] = $sStateLabel;
-				}
-			}
-			
-			foreach ( $aContinents as $sKey => $sName ) {
-				$aContinents[ $sKey ] = array(
-					'title' => $aCounTitle[ $sKey ],
-					'name' => $sName,
-					'countries' => $aCountries[ $sKey ]
+				$aCountries[ $sAbbr ] = array(
+					Geko_Geography_Country::FIELD_NAME => strval( $oCoun[ 'name' ] ),
+					Geko_Geography_Country::FIELD_CONTINENT => strval( $oCoun[ 'continent' ] ),
+					Geko_Geography_Country::FIELD_STATE_LABEL => strval( $oCoun[ 'statelabel' ] ),
+					Geko_Geography_Country::FIELD_ALT_ABBR => strval( $oCoun[ 'altabbr' ] ),
+					Geko_Geography_Country::FIELD_VARIATIONS => Geko_Array::explodeTrimEmpty( ';', strval( $oCoun[ 'variations' ] ) ),
+					Geko_Geography_Country::FIELD_LATITUDE => floatval( strval( $oCoun[ 'latitude' ] ) ),
+					Geko_Geography_Country::FIELD_LONGITUDE => floatval( strval( $oCoun[ 'longitude' ] ) ),
+					Geko_Geography_Country::FIELD_DB_ID => NULL			// populate only when needed
 				);
+				
 			}
 			
-			$oGeoCoun->set( $aContinents, $a3LetterCode, $aCountryCodeHash );
+			$oGeoCoun->set( $aCountries );
 			
 			
 			//// load states
 			
 			$aStateXml = $oXml->states[ 0 ];
 			
-			$aCounState = array();
-			$aStatesGrouped = array();
+			$aStates = array();
 			
 			foreach ( $aStateXml as $oState ) {
 				
 				$sCountry = strval( $oState[ 'country' ] );
 				$sAbbr = strval( $oState[ 'abbr' ] );
 				
-				$aStatesGrouped[ $sCountry ][ $sAbbr ] = strval( $oState[ 'name' ] );
-			}
-			
-			foreach ( $aStatesGrouped as $sKey => $aStates ) {
-				$aStatesGrouped[ $sKey ] = array(
-					'title' => $aStateLabel[ $sKey ],
-					'name' => $oGeoCoun->getNameFromCode( $sKey ),
-					'states' => $aStates
+				$sCode = sprintf( '%s.%s', $sCountry, $sAbbr );
+				
+				$aStates[ $sCode ] = array(
+					Geko_Geography_State::FIELD_NAME => strval( $oState[ 'name' ] ),
+					Geko_Geography_State::FIELD_COUNTRY => $sCountry,
+					Geko_Geography_State::FIELD_ABBR => $sAbbr,
+					Geko_Geography_State::FIELD_VARIATIONS => Geko_Array::explodeTrimEmpty( ';', strval( $oState[ 'variations' ] ) ),
+					Geko_Geography_State::FIELD_LATITUDE => floatval( strval( $oState[ 'latitude' ] ) ),
+					Geko_Geography_State::FIELD_LONGITUDE => floatval( strval( $oState[ 'longitude' ] ) ),
+					Geko_Geography_State::FIELD_DB_ID => NULL			// populate only when needed
 				);
 			}
 			
-			$oGeoState->set( $aStatesGrouped );
+			$oGeoState->set( $aStates );
 			
 			
 			//// load cities
@@ -124,19 +112,14 @@ class Geko_Geography_Xml extends Geko_Singleton_Abstract
 			
 			foreach ( $aCityXml as $oCity ) {
 				
-				$aCity = array( 'name' => strval( $oCity[ 'name' ] ) );
-				
-				if ( $sState = strval( $oCity[ 'state' ] ) ) {
-					$aCity[ 'state' ] = $sState;
-				}
-				
-				$aCity = array_merge( $aCity, array(
-					'country' => strval( $oCity[ 'country' ] ),
-					'lat' => floatval( strval( $oCity[ 'latitude' ] ) ),
-					'lng' => floatval( strval( $oCity[ 'longitude' ] ) )
-				) );
-				
-				$aCities[] = $aCity;
+				$aCities[] = array(
+					Geko_Geography_City::FIELD_NAME => strval( $oCity[ 'name' ] ),
+					Geko_Geography_City::FIELD_COUNTRY => strval( $oCity[ 'country' ] ),
+					Geko_Geography_City::FIELD_STATE => strval( $oCity[ 'state' ] ),
+					Geko_Geography_City::FIELD_VARIATIONS => Geko_Array::explodeTrimEmpty( ';', strval( $oCity[ 'variations' ] ) ),
+					Geko_Geography_City::FIELD_LATITUDE => floatval( strval( $oCity[ 'latitude' ] ) ),
+					Geko_Geography_City::FIELD_LONGITUDE => floatval( strval( $oCity[ 'longitude' ] ) )
+				);
 			}
 			
 			$oGeoCity->set( $aCities );

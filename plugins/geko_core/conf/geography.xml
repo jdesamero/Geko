@@ -165,7 +165,7 @@
 		<country continent="AS" abbr="MY" altabbr="MYS" name="Malaysia" latitude="4.210484" longitude="101.975766" />
 		<country continent="AS" abbr="MV" altabbr="MDV" name="Maldives" latitude="1.977247" longitude="73.536103" />
 		<country continent="AS" abbr="MN" altabbr="MNG" name="Mongolia" latitude="46.862496" longitude="103.846656" />
-		<country continent="AS" abbr="MM" altabbr="MMR" name="Myanmar" latitude="21.913965" longitude="95.956223" />
+		<country continent="AS" abbr="MM" altabbr="MMR" name="Myanmar" variations="Burma" latitude="21.913965" longitude="95.956223" />
 		<country continent="AS" abbr="NP" altabbr="NPL" name="Nepal" latitude="28.394857" longitude="84.124008" />
 		<country continent="AS" abbr="OM" altabbr="OMN" name="Oman" latitude="21.512583" longitude="55.923255" />
 		<country continent="AS" abbr="PK" altabbr="PAK" name="Pakistan" latitude="30.375321" longitude="69.345116" />
@@ -198,7 +198,7 @@
 		<country continent="AF" abbr="KM" altabbr="COM" name="Comoros" latitude="-11.645500" longitude="43.333300" />
 		<country continent="AF" abbr="CG" altabbr="COG" name="Congo" latitude="-0.228021" longitude="15.827659" />
 		<country continent="AF" abbr="CD" altabbr="COD" name="Congo, the Democratic Republic of the" latitude="-4.038333" longitude="21.758664" />
-		<country continent="AF" abbr="CI" altabbr="CIV" name="Cote d'Ivoire" latitude="7.539989" longitude="-5.547080" />
+		<country continent="AF" abbr="CI" altabbr="CIV" name="Cote d'Ivoire" variations="Ivory Coast" latitude="7.539989" longitude="-5.547080" />
 		<country continent="AF" abbr="DJ" altabbr="DJI" name="Djibouti" latitude="11.825138" longitude="42.590275" />
 		<country continent="AF" abbr="EG" altabbr="EGY" name="Egypt" latitude="26.820553" longitude="30.802498" />
 		<country continent="AF" abbr="GQ" altabbr="GNQ" name="Equatorial Guinea" latitude="1.650801" longitude="10.267895" />
@@ -271,352 +271,403 @@
 	<states>
 		
 		<!-- Canada -->
-		<state country="CA" abbr="AB" name="Alberta" />
-		<state country="CA" abbr="BC" name="British Columbia" />
-		<state country="CA" abbr="MB" name="Manitoba" />
-		<state country="CA" abbr="NB" name="New Brunswick" />
-		<state country="CA" abbr="NF" name="Newfoundland" />
-		<state country="CA" abbr="NT" name="Northwest Territories" />
-		<state country="CA" abbr="NS" name="Nova Scotia" />
-		<state country="CA" abbr="NU" name="Nunavut" />
-		<state country="CA" abbr="ON" name="Ontario" />
-		<state country="CA" abbr="PE" name="Prince Edward Island" />
-		<state country="CA" abbr="QC" name="Quebec" />
-		<state country="CA" abbr="SK" name="Saskatchewan" />
-		<state country="CA" abbr="YT" name="Yukon Territory" />
+		<state country="CA" abbr="AB" name="Alberta" latitude="53.933270" longitude="-116.576508" />
+		<state country="CA" abbr="BC" name="British Columbia" latitude="53.726669" longitude="-127.647621" />
+		<state country="CA" abbr="MB" name="Manitoba" latitude="53.760860" longitude="-98.813873" />
+		<state country="CA" abbr="NB" name="New Brunswick" latitude="46.565315" longitude="-66.461914" />
+		<state country="CA" abbr="NF" name="Newfoundland" latitude="53.135509" longitude="-57.660435" />
+		<state country="CA" abbr="NT" name="Northwest Territories" latitude="64.825546" longitude="-124.845734" />
+		<state country="CA" abbr="NS" name="Nova Scotia" latitude="44.681988" longitude="-63.744312" />
+		<state country="CA" abbr="NU" name="Nunavut" latitude="70.299774" longitude="-83.107574" />
+		<state country="CA" abbr="ON" name="Ontario" latitude="51.253777" longitude="-85.323212" />
+		<state country="CA" abbr="PE" name="Prince Edward Island" latitude="46.510712" longitude="-63.416813" />
+		<state country="CA" abbr="QC" name="Quebec" latitude="52.939915" longitude="-73.549133" />
+		<state country="CA" abbr="SK" name="Saskatchewan" latitude="52.939915" longitude="-106.450867" />
+		<state country="CA" abbr="YT" name="Yukon Territory" latitude="64.282326" longitude="-135.000000" />
 		
 		<!-- United States -->
-		<state country="US" abbr="AK" name="Alaska" />
-		<state country="US" abbr="AL" name="Alabama" />
-		<state country="US" abbr="AR" name="Arkansas" />
-		<state country="US" abbr="AZ" name="Arizona" />
-		<state country="US" abbr="CA" name="California" />
-		<state country="US" abbr="CO" name="Colorado" />
-		<state country="US" abbr="CT" name="Connecticut" />
-		<state country="US" abbr="DC" name="District of Columbia" />
-		<state country="US" abbr="DE" name="Delaware" />
-		<state country="US" abbr="FL" name="Florida" />
-		<state country="US" abbr="GA" name="Georgia" />
-		<state country="US" abbr="HI" name="Hawaii" />
-		<state country="US" abbr="IA" name="Iowa" />
-		<state country="US" abbr="ID" name="Idaho" />
-		<state country="US" abbr="IL" name="Illinois" />
-		<state country="US" abbr="IN" name="Indiana" />
-		<state country="US" abbr="KS" name="Kansas" />
-		<state country="US" abbr="KY" name="Kentucky" />
-		<state country="US" abbr="LA" name="Louisiana" />
-		<state country="US" abbr="MA" name="Massachusetts" />
-		<state country="US" abbr="MD" name="Maryland" />
-		<state country="US" abbr="ME" name="Maine" />
-		<state country="US" abbr="MI" name="Michigan" />
-		<state country="US" abbr="MN" name="Minnesota" />
-		<state country="US" abbr="MO" name="Missouri" />
-		<state country="US" abbr="MS" name="Mississippi" />
-		<state country="US" abbr="MT" name="Montana" />
-		<state country="US" abbr="NC" name="North Carolina" />
-		<state country="US" abbr="ND" name="North Dakota" />
-		<state country="US" abbr="NE" name="Nebraska" />
-		<state country="US" abbr="NH" name="New Hampshire" />
-		<state country="US" abbr="NJ" name="New Jersey" />
-		<state country="US" abbr="NM" name="New Mexico" />
-		<state country="US" abbr="NV" name="Nevada" />
-		<state country="US" abbr="NY" name="New York" />
-		<state country="US" abbr="OH" name="Ohio" />
-		<state country="US" abbr="OK" name="Oklahoma" />
-		<state country="US" abbr="OR" name="Oregon" />
-		<state country="US" abbr="PA" name="Pennsylvania" />
-		<state country="US" abbr="PR" name="Puerto Rico" />
-		<state country="US" abbr="RI" name="Rhode Island" />
-		<state country="US" abbr="SC" name="South Carolina" />
-		<state country="US" abbr="SD" name="South Dakota" />
-		<state country="US" abbr="TN" name="Tennessee" />
-		<state country="US" abbr="TX" name="Texas" />
-		<state country="US" abbr="UT" name="Utah" />
-		<state country="US" abbr="VA" name="Virginia" />
-		<state country="US" abbr="VT" name="Vermont" />
-		<state country="US" abbr="WA" name="Washington" />
-		<state country="US" abbr="WI" name="Wisconsin" />
-		<state country="US" abbr="WV" name="West Virginia" />
-		<state country="US" abbr="WY" name="Wyoming" />
+		<state country="US" abbr="AK" name="Alaska" latitude="64.200844" longitude="-149.493668" />
+		<state country="US" abbr="AL" name="Alabama" latitude="32.318230" longitude="-86.902298" />
+		<state country="US" abbr="AR" name="Arkansas" latitude="35.201050" longitude="-91.831833" />
+		<state country="US" abbr="AZ" name="Arizona" latitude="34.048927" longitude="-111.093735" />
+		<state country="US" abbr="CA" name="California" latitude="36.778259" longitude="-119.417931" />
+		<state country="US" abbr="CO" name="Colorado" latitude="39.550053" longitude="-105.782066" />
+		<state country="US" abbr="CT" name="Connecticut" latitude="41.603222" longitude="-73.087746" />
+		<state country="US" abbr="DC" name="District of Columbia" latitude="38.905987" longitude="-77.033417" />
+		<state country="US" abbr="DE" name="Delaware" latitude="38.910832" longitude="-75.527672" />
+		<state country="US" abbr="FL" name="Florida" latitude="27.664827" longitude="-81.515755" />
+		<state country="US" abbr="GA" name="Georgia" latitude="32.165623" longitude="-82.900078" />
+		<state country="US" abbr="HI" name="Hawaii" latitude="19.896767" longitude="-155.582779" />
+		<state country="US" abbr="IA" name="Iowa" latitude="41.878002" longitude="-93.097702" />
+		<state country="US" abbr="ID" name="Idaho" latitude="44.068203" longitude="-114.742042" />
+		<state country="US" abbr="IL" name="Illinois" latitude="40.633125" longitude="-89.398529" />
+		<state country="US" abbr="IN" name="Indiana" latitude="40.267193" longitude="-86.134903" />
+		<state country="US" abbr="KS" name="Kansas" latitude="39.011902" longitude="-98.484245" />
+		<state country="US" abbr="KY" name="Kentucky" latitude="37.839333" longitude="-84.270020" />
+		<state country="US" abbr="LA" name="Louisiana" latitude="30.984299" longitude="-91.962334" />
+		<state country="US" abbr="MA" name="Massachusetts" latitude="42.407211" longitude="-71.382439" />
+		<state country="US" abbr="MD" name="Maryland" latitude="39.045753" longitude="-76.641273" />
+		<state country="US" abbr="ME" name="Maine" latitude="45.253784" longitude="-69.445473" />
+		<state country="US" abbr="MI" name="Michigan" latitude="44.314842" longitude="-85.602364" />
+		<state country="US" abbr="MN" name="Minnesota" latitude="46.729553" longitude="-94.685898" />
+		<state country="US" abbr="MO" name="Missouri" latitude="37.964253" longitude="-91.831833" />
+		<state country="US" abbr="MS" name="Mississippi" latitude="32.354668" longitude="-89.398529" />
+		<state country="US" abbr="MT" name="Montana" latitude="46.879681" longitude="-110.362564" />
+		<state country="US" abbr="NC" name="North Carolina" latitude="35.759575" longitude="-79.019302" />
+		<state country="US" abbr="ND" name="North Dakota" latitude="47.551495" longitude="-101.002014" />
+		<state country="US" abbr="NE" name="Nebraska" latitude="41.492539" longitude="-99.901810" />
+		<state country="US" abbr="NH" name="New Hampshire" latitude="43.193852" longitude="-71.572395" />
+		<state country="US" abbr="NJ" name="New Jersey" latitude="40.058323" longitude="-74.405663" />
+		<state country="US" abbr="NM" name="New Mexico" latitude="34.519939" longitude="-105.870087" />
+		<state country="US" abbr="NV" name="Nevada" latitude="38.802608" longitude="-116.419388" />
+		<state country="US" abbr="NY" name="New York" latitude="40.712784" longitude="-74.005943" />
+		<state country="US" abbr="OH" name="Ohio" latitude="40.417286" longitude="-82.907120" />
+		<state country="US" abbr="OK" name="Oklahoma" latitude="35.007751" longitude="-97.092880" />
+		<state country="US" abbr="OR" name="Oregon" latitude="43.804134" longitude="-120.554199" />
+		<state country="US" abbr="PA" name="Pennsylvania" latitude="41.203323" longitude="-77.194527" />
+		<state country="US" abbr="PR" name="Puerto Rico" latitude="26.128073" longitude="-98.007256" />
+		<state country="US" abbr="RI" name="Rhode Island" latitude="41.580093" longitude="-71.477432" />
+		<state country="US" abbr="SC" name="South Carolina" latitude="33.836083" longitude="-81.163727" />
+		<state country="US" abbr="SD" name="South Dakota" latitude="43.969517" longitude="-99.901810" />
+		<state country="US" abbr="TN" name="Tennessee" latitude="35.517490" longitude="-86.580444" />
+		<state country="US" abbr="TX" name="Texas" latitude="31.968599" longitude="-99.901810" />
+		<state country="US" abbr="UT" name="Utah" latitude="39.320980" longitude="-111.093735" />
+		<state country="US" abbr="VA" name="Virginia" latitude="37.431572" longitude="-78.656891" />
+		<state country="US" abbr="VT" name="Vermont" latitude="44.558804" longitude="-72.577843" />
+		<state country="US" abbr="WA" name="Washington" latitude="47.751076" longitude="-120.740135" />
+		<state country="US" abbr="WI" name="Wisconsin" latitude="43.784439" longitude="-88.787865" />
+		<state country="US" abbr="WV" name="West Virginia" latitude="38.597626" longitude="-80.454903" />
+		<state country="US" abbr="WY" name="Wyoming" latitude="43.075970" longitude="-107.290283" />
 		
 		<!-- Australia -->
-		<state country="AU" abbr="ACT" name="Australian Capital Territory" />
-		<state country="AU" abbr="NSW" name="New South Wales" />
-		<state country="AU" abbr="NT" name="Northern Territory" />
-		<state country="AU" abbr="QLD" name="Queensland" />
-		<state country="AU" abbr="SA" name="South Australia" />
-		<state country="AU" abbr="TAS" name="Tasmania" />
-		<state country="AU" abbr="VIC" name="Victoria" />
-		<state country="AU" abbr="WA" name="Western Australia" />
-		
+		<state country="AU" abbr="ACT" name="Australian Capital Territory" latitude="-35.473469" longitude="149.012375" />
+		<state country="AU" abbr="NSW" name="New South Wales" latitude="-31.253218" longitude="146.921097" />
+		<state country="AU" abbr="NT" name="Northern Territory" latitude="-19.491411" longitude="132.550964" />
+		<state country="AU" abbr="QLD" name="Queensland" latitude="-20.917574" longitude="142.702789" />
+		<state country="AU" abbr="SA" name="South Australia" latitude="-30.000233" longitude="136.209152" />
+		<state country="AU" abbr="TAS" name="Tasmania" latitude="-41.365044" longitude="146.628494" />
+		<state country="AU" abbr="VIC" name="Victoria" latitude="-37.471310" longitude="144.785156" />
+		<state country="AU" abbr="WA" name="Western Australia" latitude="-27.672817" longitude="121.628311" />
+
 		<!-- United Kingdom -->
-		<state country="GB" abbr="ENG" name="England" />
-		<state country="GB" abbr="NIR" name="Northern Ireland" />
-		<state country="GB" abbr="SCT" name="Scotland" />
-		<state country="GB" abbr="WAL" name="Wales" />
+		<state country="GB" abbr="ENG" name="England" latitude="52.355518" longitude="-1.174320" />
+		<state country="GB" abbr="NIR" name="Northern Ireland" latitude="54.787716" longitude="-6.492314" />
+		<state country="GB" abbr="SCT" name="Scotland" latitude="56.490669" longitude="-4.202646" />
+		<state country="GB" abbr="WAL" name="Wales" latitude="52.130661" longitude="-3.783712" />
 		
 	</states>
 	
 	<cities>
 		
 		<!-- Canada -->
-		<city country="CA" state="AB" name="Calgary" latitude="51.100000" longitude="-114.100000" />
-		<city country="CA" state="AB" name="Edmonton" latitude="53.340000" longitude="-113.280000" />
-		<city country="CA" state="ON" name="Kingston" latitude="44.150000" longitude="-76.300000" />
-		<city country="CA" state="ON" name="London" latitude="43.200000" longitude="-81.340000" />
-		<city country="CA" state="QC" name="Montreal" latitude="45.300000" longitude="-73.350000" />
-		<city country="CA" state="SK" name="Moose Jaw" latitude="50.370000" longitude="-105.310000" />
-		<city country="CA" state="BC" name="Nelson" latitude="49.300000" longitude="-117.170000" />
-		<city country="CA" state="ON" name="Ottawa" latitude="45.240000" longitude="-75.430000" />
-		<city country="CA" state="QC" name="Quebec" latitude="46.490000" longitude="-71.110000" />
-		<city country="CA" state="NB" name="St. John" latitude="45.180000" longitude="-66.100000" />
-		<city country="CA" state="ON" name="Toronto" latitude="43.400000" longitude="-79.240000" />
-		<city country="CA" state="BC" name="Vancouver" latitude="49.130000" longitude="-123.600000" />
-		<city country="CA" state="BC" name="Victoria" latitude="48.250000" longitude="-123.210000" />
-		<city country="CA" state="MB" name="Winnipeg" latitude="49.540000" longitude="-97.700000" />	
-
+		<city country="CA" state="AB" name="Calgary" latitude="51.045326" longitude="-114.058098" />
+		<city country="CA" state="AB" name="Edmonton" latitude="53.544388" longitude="-113.490929" />
+		<city country="CA" state="ON" name="Kingston" latitude="44.231171" longitude="-76.485954" />
+		<city country="CA" state="ON" name="London" latitude="42.986950" longitude="-81.243179" />
+		<city country="CA" state="QC" name="Montreal" latitude="45.508671" longitude="-73.553993" />
+		<city country="CA" state="SK" name="Moose Jaw" latitude="50.391582" longitude="-105.534859" />
+		<city country="CA" state="BC" name="Nelson" latitude="49.492813" longitude="-117.294830" />
+		<city country="CA" state="ON" name="Ottawa" latitude="45.421532" longitude="-75.697189" />
+		<city country="CA" state="QC" name="Quebec" latitude="46.803284" longitude="-71.242798" />
+		<city country="CA" state="NB" name="St. John" latitude="45.273315" longitude="-66.063309" />
+		<city country="CA" state="ON" name="Toronto" latitude="43.653225" longitude="-79.383186" />
+		<city country="CA" state="BC" name="Vancouver" latitude="49.261227" longitude="-123.113930" />
+		<city country="CA" state="BC" name="Victoria" latitude="48.428421" longitude="-123.365646" />
+		<city country="CA" state="MB" name="Winnipeg" latitude="49.899754" longitude="-97.137497" />
+		
 		<!-- United States -->
-		<city country="US" state="NY" name="Albany" latitude="42.400000" longitude="-73.450000" />
-		<city country="US" state="NM" name="Albuquerque" latitude="35.500000" longitude="-106.390000" />
-		<city country="US" state="TX" name="Amarillo" latitude="35.110000" longitude="-101.500000" />
-		<city country="US" state="AK" name="Anchorage" latitude="61.130000" longitude="-149.540000" />
-		<city country="US" state="GA" name="Atlanta" latitude="33.450000" longitude="-84.230000" />
-		<city country="US" state="TX" name="Austin" latitude="30.160000" longitude="-97.440000" />
-		<city country="US" state="OR" name="Baker" latitude="44.470000" longitude="-117.500000" />
-		<city country="US" state="MD" name="Baltimore" latitude="39.180000" longitude="-76.380000" />
-		<city country="US" state="ME" name="Bangor" latitude="44.480000" longitude="-68.470000" />
-		<city country="US" state="AL" name="Birmingham" latitude="33.300000" longitude="-86.500000" />
-		<city country="US" state="ND" name="Bismarck" latitude="46.480000" longitude="-100.470000" />
-		<city country="US" state="ID" name="Boise" latitude="43.360000" longitude="-116.130000" />
-		<city country="US" state="MA" name="Boston" latitude="42.210000" longitude="-71.500000" />
-		<city country="US" state="NY" name="Buffalo" latitude="42.550000" longitude="-78.500000" />
-		<city country="US" state="NM" name="Carlsbad" latitude="32.260000" longitude="-104.150000" />
-		<city country="US" state="SC" name="Charleston" latitude="32.470000" longitude="-79.560000" />
-		<city country="US" state="WV" name="Charleston" latitude="38.210000" longitude="-81.380000" />
-		<city country="US" state="NC" name="Charlotte" latitude="35.140000" longitude="-80.500000" />
-		<city country="US" state="WY" name="Cheyenne" latitude="41.900000" longitude="-104.520000" />
-		<city country="US" state="IL" name="Chicago" latitude="41.500000" longitude="-87.370000" />
-		<city country="US" state="OH" name="Cincinnati" latitude="39.800000" longitude="-84.300000" />
-		<city country="US" state="OH" name="Cleveland" latitude="41.280000" longitude="-81.370000" />
-		<city country="US" state="SC" name="Columbia" latitude="34.000000" longitude="-81.200000" />
-		<city country="US" state="OH" name="Columbus" latitude="40.000000" longitude="-83.100000" />
-		<city country="US" state="TX" name="Dallas" latitude="32.460000" longitude="-96.460000" />
-		<city country="US" state="CO" name="Denver" latitude="39.450000" longitude="-105.000000" />
-		<city country="US" state="IA" name="Des Moines" latitude="41.350000" longitude="-93.370000" />
-		<city country="US" state="MI" name="Detroit" latitude="42.200000" longitude="-83.300000" />
-		<city country="US" state="IA" name="Dubuque" latitude="42.310000" longitude="-90.400000" />
-		<city country="US" state="MN" name="Duluth" latitude="46.490000" longitude="-92.500000" />
-		<city country="US" state="ME" name="Eastport" latitude="44.540000" longitude="-67.000000" />
-		<city country="US" state="CA" name="El Centro" latitude="32.380000" longitude="-115.330000" />
-		<city country="US" state="TX" name="El Paso" latitude="31.460000" longitude="-106.290000" />
-		<city country="US" state="OR" name="Eugene" latitude="44.300000" longitude="-123.500000" />
-		<city country="US" state="ND" name="Fargo" latitude="46.520000" longitude="-96.480000" />
-		<city country="US" state="AZ" name="Flagstaff" latitude="35.130000" longitude="-111.410000" />
-		<city country="US" state="TX" name="Fort Worth" latitude="32.430000" longitude="-97.190000" />
-		<city country="US" state="CA" name="Fresno" latitude="36.440000" longitude="-119.480000" />
-		<city country="US" state="CO" name="Grand Junction" latitude="39.500000" longitude="-108.330000" />
-		<city country="US" state="MI" name="Grand Rapids" latitude="42.580000" longitude="-85.400000" />
-		<city country="US" state="MT" name="Havre" latitude="48.330000" longitude="-109.430000" />
-		<city country="US" state="MT" name="Helena" latitude="46.350000" longitude="-112.200000" />
-		<city country="US" state="HI" name="Honolulu" latitude="21.180000" longitude="-157.500000" />
-		<city country="US" state="AR" name="Hot Springs" latitude="34.310000" longitude="-93.300000" />
-		<city country="US" state="TX" name="Houston" latitude="29.450000" longitude="-95.210000" />
-		<city country="US" state="ID" name="Idaho Falls" latitude="43.300000" longitude="-112.100000" />
-		<city country="US" state="IN" name="Indianapolis" latitude="39.460000" longitude="-86.100000" />
-		<city country="US" state="MS" name="Jackson" latitude="32.200000" longitude="-90.120000" />
-		<city country="US" state="FL" name="Jacksonville" latitude="30.220000" longitude="-81.400000" />
-		<city country="US" state="AK" name="Juneau" latitude="58.180000" longitude="-134.240000" />
-		<city country="US" state="MO" name="Kansas City" latitude="39.600000" longitude="-94.350000" />
-		<city country="US" state="FL" name="Key West" latitude="24.330000" longitude="-81.480000" />
-		<city country="US" state="OR" name="Klamath Falls" latitude="42.100000" longitude="-121.440000" />
-		<city country="US" state="TN" name="Knoxville" latitude="35.570000" longitude="-83.560000" />
-		<city country="US" state="NV" name="Las Vegas" latitude="36.100000" longitude="-115.120000" />
-		<city country="US" state="ID" name="Lewiston" latitude="46.240000" longitude="-117.200000" />
-		<city country="US" state="NE" name="Lincoln" latitude="40.500000" longitude="-96.400000" />
-		<city country="US" state="CA" name="Long Beach" latitude="33.460000" longitude="-118.110000" />
-		<city country="US" state="CA" name="Los Angeles" latitude="34.300000" longitude="-118.150000" />
-		<city country="US" state="KY" name="Louisville" latitude="38.150000" longitude="-85.460000" />
-		<city country="US" state="NH" name="Manchester" latitude="43.000000" longitude="-71.300000" />
-		<city country="US" state="TN" name="Memphis" latitude="35.900000" longitude="-90.300000" />
-		<city country="US" state="FL" name="Miami" latitude="25.460000" longitude="-80.120000" />
-		<city country="US" state="WI" name="Milwaukee" latitude="43.200000" longitude="-87.550000" />
-		<city country="US" state="MN" name="Minneapolis" latitude="44.590000" longitude="-93.140000" />
-		<city country="US" state="AL" name="Mobile" latitude="30.420000" longitude="-88.300000" />
-		<city country="US" state="AL" name="Montgomery" latitude="32.210000" longitude="-86.180000" />
-		<city country="US" state="VT" name="Montpelier" latitude="44.150000" longitude="-72.320000" />
-		<city country="US" state="TN" name="Nashville" latitude="36.100000" longitude="-86.470000" />
-		<city country="US" state="NJ" name="Newark" latitude="40.440000" longitude="-74.100000" />
-		<city country="US" state="CT" name="New Haven" latitude="41.190000" longitude="-72.550000" />
-		<city country="US" state="LA" name="New Orleans" latitude="29.570000" longitude="-90.400000" />
-		<city country="US" state="NY" name="New York" latitude="40.470000" longitude="-73.580000" />
-		<city country="US" state="AK" name="Nome" latitude="64.250000" longitude="-165.300000" />
-		<city country="US" state="CA" name="Oakland" latitude="37.480000" longitude="-122.160000" />
-		<city country="US" state="OK" name="Oklahoma City" latitude="35.260000" longitude="-97.280000" />
-		<city country="US" state="NE" name="Omaha" latitude="41.150000" longitude="-95.560000" />
-		<city country="US" state="PA" name="Philadelphia" latitude="39.570000" longitude="-75.100000" />
-		<city country="US" state="AZ" name="Phoenix" latitude="33.290000" longitude="-112.400000" />
-		<city country="US" state="SD" name="Pierre" latitude="44.220000" longitude="-100.210000" />
-		<city country="US" state="PA" name="Pittsburgh" latitude="40.270000" longitude="-79.570000" />
-		<city country="US" state="ME" name="Portland" latitude="43.400000" longitude="-70.150000" />
-		<city country="US" state="OR" name="Portland" latitude="45.310000" longitude="-122.410000" />
-		<city country="US" state="RI" name="Providence" latitude="41.500000" longitude="-71.240000" />
-		<city country="US" state="NC" name="Raleigh" latitude="35.460000" longitude="-78.390000" />
-		<city country="US" state="NV" name="Reno" latitude="39.300000" longitude="-119.490000" />
-		<city country="US" state="UT" name="Richfield" latitude="38.460000" longitude="-112.500000" />
-		<city country="US" state="VA" name="Richmond" latitude="37.330000" longitude="-77.290000" />
-		<city country="US" state="VA" name="Roanoke" latitude="37.170000" longitude="-79.570000" />
-		<city country="US" state="CA" name="Sacramento" latitude="38.350000" longitude="-121.300000" />
-		<city country="US" state="MO" name="St. Louis" latitude="38.350000" longitude="-90.120000" />
-		<city country="US" state="UT" name="Salt Lake City" latitude="40.460000" longitude="-111.540000" />
-		<city country="US" state="TX" name="San Antonio" latitude="29.230000" longitude="-98.330000" />
-		<city country="US" state="CA" name="San Diego" latitude="32.420000" longitude="-117.100000" />
-		<city country="US" state="CA" name="San Francisco" latitude="37.470000" longitude="-122.260000" />
-		<city country="US" state="CA" name="San Jose" latitude="37.200000" longitude="-121.530000" />
-		<city country="US" state="PR" name="San Juan" latitude="18.300000" longitude="-66.100000" />
-		<city country="US" state="NM" name="Santa Fe" latitude="35.410000" longitude="-105.570000" />
-		<city country="US" state="GA" name="Savannah" latitude="32.500000" longitude="-81.500000" />
-		<city country="US" state="WA" name="Seattle" latitude="47.370000" longitude="-122.200000" />
-		<city country="US" state="LA" name="Shreveport" latitude="32.280000" longitude="-93.420000" />
-		<city country="US" state="SD" name="Sioux Falls" latitude="43.330000" longitude="-96.440000" />
-		<city country="US" state="AK" name="Sitka" latitude="57.100000" longitude="-135.150000" />
-		<city country="US" state="WA" name="Spokane" latitude="47.400000" longitude="-117.260000" />
-		<city country="US" state="IL" name="Springfield" latitude="39.480000" longitude="-89.380000" />
-		<city country="US" state="MA" name="Springfield" latitude="42.600000" longitude="-72.340000" />
-		<city country="US" state="MO" name="Springfield" latitude="37.130000" longitude="-93.170000" />
-		<city country="US" state="NY" name="Syracuse" latitude="43.200000" longitude="-76.800000" />
-		<city country="US" state="FL" name="Tampa" latitude="27.570000" longitude="-82.270000" />
-		<city country="US" state="OH" name="Toledo" latitude="41.390000" longitude="-83.330000" />
-		<city country="US" state="OK" name="Tulsa" latitude="36.900000" longitude="-95.590000" />
-		<city country="US" state="VA" name="Virginia Beach" latitude="36.510000" longitude="-75.580000" />
-		<city country="US" state="DC" name="Washington" latitude="38.530000" longitude="-77.200000" />
-		<city country="US" state="KS" name="Wichita" latitude="37.430000" longitude="-97.170000" />
-		<city country="US" state="NC" name="Wilmington" latitude="34.140000" longitude="-77.570000" />
+		<city country="US" state="NY" name="Albany" latitude="42.652580" longitude="-73.756233" />
+		<city country="US" state="NM" name="Albuquerque" latitude="35.110703" longitude="-106.609993" />
+		<city country="US" state="TX" name="Amarillo" latitude="35.221996" longitude="-101.831299" />
+		<city country="US" state="AK" name="Anchorage" latitude="61.218056" longitude="-149.900284" />
+		<city country="US" state="GA" name="Atlanta" latitude="33.748997" longitude="-84.387985" />
+		<city country="US" state="TX" name="Austin" latitude="30.267153" longitude="-97.743057" />
+		<city country="US" state="OR" name="Baker" latitude="44.774876" longitude="-117.834389" />
+		<city country="US" state="MD" name="Baltimore" latitude="39.290386" longitude="-76.612190" />
+		<city country="US" state="ME" name="Bangor" latitude="44.801182" longitude="-68.777817" />
+		<city country="US" state="AL" name="Birmingham" latitude="33.520660" longitude="-86.802490" />
+		<city country="US" state="ND" name="Bismarck" latitude="46.808327" longitude="-100.783737" />
+		<city country="US" state="ID" name="Boise" latitude="43.618710" longitude="-116.214607" />
+		<city country="US" state="MA" name="Boston" latitude="42.358433" longitude="-71.059776" />
+		<city country="US" state="NY" name="Buffalo" latitude="42.886448" longitude="-78.878372" />
+		<city country="US" state="NM" name="Carlsbad" latitude="32.420673" longitude="-104.228836" />
+		<city country="US" state="SC" name="Charleston" latitude="32.776474" longitude="-79.931053" />
+		<city country="US" state="WV" name="Charleston" latitude="38.349819" longitude="-81.632622" />
+		<city country="US" state="NC" name="Charlotte" latitude="35.227085" longitude="-80.843124" />
+		<city country="US" state="WY" name="Cheyenne" latitude="41.139980" longitude="-104.820244" />
+		<city country="US" state="IL" name="Chicago" latitude="41.878113" longitude="-87.629799" />
+		<city country="US" state="OH" name="Cincinnati" latitude="39.103119" longitude="-84.512016" />
+		<city country="US" state="OH" name="Cleveland" latitude="41.499321" longitude="-81.694359" />
+		<city country="US" state="SC" name="Columbia" latitude="34.000709" longitude="-81.034813" />
+		<city country="US" state="OH" name="Columbus" latitude="39.961178" longitude="-82.998795" />
+		<city country="US" state="TX" name="Dallas" latitude="32.780140" longitude="-96.800453" />
+		<city country="US" state="CO" name="Denver" latitude="39.737568" longitude="-104.984718" />
+		<city country="US" state="IA" name="Des Moines" latitude="41.600544" longitude="-93.609108" />
+		<city country="US" state="MI" name="Detroit" latitude="42.331429" longitude="-83.045754" />
+		<city country="US" state="IA" name="Dubuque" latitude="42.500557" longitude="-90.664574" />
+		<city country="US" state="MN" name="Duluth" latitude="46.786671" longitude="-92.100487" />
+		<city country="US" state="ME" name="Eastport" latitude="44.906193" longitude="-66.989975" />
+		<city country="US" state="CA" name="El Centro" latitude="32.792000" longitude="-115.563049" />
+		<city country="US" state="TX" name="El Paso" latitude="31.777576" longitude="-106.442459" />
+		<city country="US" state="OR" name="Eugene" latitude="44.052071" longitude="-123.086754" />
+		<city country="US" state="ND" name="Fargo" latitude="46.877186" longitude="-96.789803" />
+		<city country="US" state="AZ" name="Flagstaff" latitude="35.198284" longitude="-111.651298" />
+		<city country="US" state="TX" name="Fort Worth" latitude="32.755489" longitude="-97.330765" />
+		<city country="US" state="CA" name="Fresno" latitude="36.746841" longitude="-119.772591" />
+		<city country="US" state="CO" name="Grand Junction" latitude="39.063870" longitude="-108.550652" />
+		<city country="US" state="MI" name="Grand Rapids" latitude="42.963360" longitude="-85.668083" />
+		<city country="US" state="MT" name="Havre" latitude="48.549999" longitude="-109.684090" />
+		<city country="US" state="MT" name="Helena" latitude="46.595806" longitude="-112.027031" />
+		<city country="US" state="HI" name="Honolulu" latitude="21.306944" longitude="-157.858337" />
+		<city country="US" state="AR" name="Hot Springs" latitude="34.503700" longitude="-93.055176" />
+		<city country="US" state="TX" name="Houston" latitude="29.760193" longitude="-95.369392" />
+		<city country="US" state="ID" name="Idaho Falls" latitude="43.491650" longitude="-112.033966" />
+		<city country="US" state="IN" name="Indianapolis" latitude="39.768402" longitude="-86.158066" />
+		<city country="US" state="MS" name="Jackson" latitude="32.298756" longitude="-90.184807" />
+		<city country="US" state="FL" name="Jacksonville" latitude="30.332184" longitude="-81.655647" />
+		<city country="US" state="AK" name="Juneau" latitude="58.301945" longitude="-134.419724" />
+		<city country="US" state="MO" name="Kansas City" latitude="39.099728" longitude="-94.578568" />
+		<city country="US" state="FL" name="Key West" latitude="24.555059" longitude="-81.779984" />
+		<city country="US" state="OR" name="Klamath Falls" latitude="42.224869" longitude="-121.781670" />
+		<city country="US" state="TN" name="Knoxville" latitude="35.960636" longitude="-83.920738" />
+		<city country="US" state="NV" name="Las Vegas" latitude="36.169941" longitude="-115.139831" />
+		<city country="US" state="ID" name="Lewiston" latitude="46.400410" longitude="-117.001190" />
+		<city country="US" state="NE" name="Lincoln" latitude="40.809723" longitude="-96.675278" />
+		<city country="US" state="CA" name="Long Beach" latitude="33.770050" longitude="-118.193741" />
+		<city country="US" state="CA" name="Los Angeles" latitude="34.052235" longitude="-118.243683" />
+		<city country="US" state="KY" name="Louisville" latitude="38.252666" longitude="-85.758453" />
+		<city country="US" state="NH" name="Manchester" latitude="42.995640" longitude="-71.454788" />
+		<city country="US" state="TN" name="Memphis" latitude="35.149532" longitude="-90.048981" />
+		<city country="US" state="FL" name="Miami" latitude="25.789097" longitude="-80.204041" />
+		<city country="US" state="WI" name="Milwaukee" latitude="43.038902" longitude="-87.906471" />
+		<city country="US" state="MN" name="Minneapolis" latitude="44.983334" longitude="-93.266670" />
+		<city country="US" state="AL" name="Mobile" latitude="30.695366" longitude="-88.039894" />
+		<city country="US" state="AL" name="Montgomery" latitude="32.366806" longitude="-86.299972" />
+		<city country="US" state="VT" name="Montpelier" latitude="44.260059" longitude="-72.575386" />
+		<city country="US" state="TN" name="Nashville" latitude="36.166668" longitude="-86.783333" />
+		<city country="US" state="NJ" name="Newark" latitude="40.735657" longitude="-74.172363" />
+		<city country="US" state="CT" name="New Haven" latitude="41.308273" longitude="-72.927879" />
+		<city country="US" state="LA" name="New Orleans" latitude="29.951065" longitude="-90.071533" />
+		<city country="US" state="NY" name="New York" latitude="40.712784" longitude="-74.005943" />
+		<city country="US" state="AK" name="Nome" latitude="64.501114" longitude="-165.406387" />
+		<city country="US" state="CA" name="Oakland" latitude="37.804363" longitude="-122.271111" />
+		<city country="US" state="OK" name="Oklahoma City" latitude="35.467560" longitude="-97.516426" />
+		<city country="US" state="NE" name="Omaha" latitude="41.252361" longitude="-95.997986" />
+		<city country="US" state="PA" name="Philadelphia" latitude="39.952335" longitude="-75.163788" />
+		<city country="US" state="AZ" name="Phoenix" latitude="33.448376" longitude="-112.074036" />
+		<city country="US" state="SD" name="Pierre" latitude="44.368317" longitude="-100.350967" />
+		<city country="US" state="PA" name="Pittsburgh" latitude="40.440624" longitude="-79.995888" />
+		<city country="US" state="ME" name="Portland" latitude="43.661472" longitude="-70.255325" />
+		<city country="US" state="OR" name="Portland" latitude="45.523453" longitude="-122.676209" />
+		<city country="US" state="RI" name="Providence" latitude="41.823990" longitude="-71.412834" />
+		<city country="US" state="NC" name="Raleigh" latitude="35.779591" longitude="-78.638176" />
+		<city country="US" state="NV" name="Reno" latitude="39.529633" longitude="-119.813805" />
+		<city country="US" state="UT" name="Richfield" latitude="38.772469" longitude="-112.084091" />
+		<city country="US" state="VA" name="Richmond" latitude="37.540726" longitude="-77.436050" />
+		<city country="US" state="VA" name="Roanoke" latitude="37.270969" longitude="-79.941429" />
+		<city country="US" state="CA" name="Sacramento" latitude="38.581573" longitude="-121.494400" />
+		<city country="US" state="MO" name="St. Louis" latitude="38.627003" longitude="-90.199402" />
+		<city country="US" state="UT" name="Salt Lake City" latitude="40.760780" longitude="-111.891045" />
+		<city country="US" state="TX" name="San Antonio" latitude="29.424122" longitude="-98.493629" />
+		<city country="US" state="CA" name="San Diego" latitude="32.715736" longitude="-117.161087" />
+		<city country="US" state="CA" name="San Francisco" latitude="37.774929" longitude="-122.419418" />
+		<city country="US" state="CA" name="San Jose" latitude="37.339386" longitude="-121.894959" />
+		<city country="US" state="PR" name="San Juan" latitude="18.466333" longitude="-66.105721" />
+		<city country="US" state="NM" name="Santa Fe" latitude="35.686974" longitude="-105.937798" />
+		<city country="US" state="GA" name="Savannah" latitude="32.083542" longitude="-81.099831" />
+		<city country="US" state="WA" name="Seattle" latitude="47.606209" longitude="-122.332069" />
+		<city country="US" state="LA" name="Shreveport" latitude="32.525150" longitude="-93.750175" />
+		<city country="US" state="SD" name="Sioux Falls" latitude="43.544598" longitude="-96.731102" />
+		<city country="US" state="AK" name="Sitka" latitude="57.053055" longitude="-135.330002" />
+		<city country="US" state="WA" name="Spokane" latitude="47.658779" longitude="-117.426048" />
+		<city country="US" state="IL" name="Springfield" latitude="39.781719" longitude="-89.650147" />
+		<city country="US" state="MA" name="Springfield" latitude="42.101482" longitude="-72.589813" />
+		<city country="US" state="MO" name="Springfield" latitude="37.208958" longitude="-93.292297" />
+		<city country="US" state="NY" name="Syracuse" latitude="43.048122" longitude="-76.147423" />
+		<city country="US" state="FL" name="Tampa" latitude="27.950575" longitude="-82.457176" />
+		<city country="US" state="OH" name="Toledo" latitude="41.663937" longitude="-83.555214" />
+		<city country="US" state="OK" name="Tulsa" latitude="36.153980" longitude="-95.992775" />
+		<city country="US" state="VA" name="Virginia Beach" latitude="36.852924" longitude="-75.977982" />
+		<city country="US" state="DC" name="Washington" latitude="38.907192" longitude="-77.036873" />
+		<city country="US" state="KS" name="Wichita" latitude="37.688888" longitude="-97.336113" />
+		<city country="US" state="NC" name="Wilmington" latitude="34.225727" longitude="-77.944710" />
 		
 		<!-- United Kingdom -->
-		<city country="GB" state="SCT" name="Aberdeen" latitude="57.900000" longitude="-2.900000" />
-		<city country="GB" state="NIR" name="Belfast" latitude="54.370000" longitude="-5.560000" />
-		<city country="GB" state="ENG" name="Birmingham" latitude="52.250000" longitude="-1.550000" />
-		<city country="GB" state="ENG" name="Bristol" latitude="51.280000" longitude="-2.350000" />
-		<city country="GB" state="SCT" name="Edinburgh" latitude="55.550000" longitude="-3.100000" />
-		<city country="GB" state="SCT" name="Glasgow" latitude="55.500000" longitude="-4.150000" />
-		<city country="GB" state="ENG" name="Leeds" latitude="53.450000" longitude="-1.300000" />
-		<city country="GB" state="ENG" name="Liverpool" latitude="53.250000" longitude="-3.000000" />
-		<city country="GB" state="ENG" name="London" latitude="51.320000" longitude="-0.500000" />
-		<city country="GB" state="ENG" name="Manchester" latitude="53.300000" longitude="-2.150000" />
-		<city country="GB" state="ENG" name="Newcastle-on-Tyne" latitude="54.580000" longitude="-1.370000" />
-		<city country="GB" state="ENG" name="Plymouth" latitude="50.250000" longitude="-4.500000" />
+		<city country="GB" state="SCT" name="Aberdeen" latitude="57.149715" longitude="-2.094278" />
+		<city country="GB" state="NIR" name="Belfast" latitude="54.597286" longitude="-5.930120" />
+		<city country="GB" state="ENG" name="Birmingham" latitude="52.486244" longitude="-1.890401" />
+		<city country="GB" state="ENG" name="Bristol" latitude="51.454513" longitude="-2.587910" />
+		<city country="GB" state="SCT" name="Edinburgh" latitude="55.953251" longitude="-3.188267" />
+		<city country="GB" state="SCT" name="Glasgow" latitude="55.873543" longitude="-4.289058" />
+		<city country="GB" state="ENG" name="Leeds" latitude="53.800754" longitude="-1.549077" />
+		<city country="GB" state="ENG" name="Liverpool" latitude="53.408371" longitude="-2.991573" />
+		<city country="GB" state="ENG" name="London" latitude="51.507351" longitude="-0.127758" />
+		<city country="GB" state="ENG" name="Manchester" latitude="53.479324" longitude="-2.248485" />
+		<city country="GB" state="ENG" name="Newcastle-on-Tyne" latitude="54.978252" longitude="-1.617780" />
+		<city country="GB" state="ENG" name="Plymouth" latitude="50.375458" longitude="-4.142657" />
 		
 		<!-- Australia -->
-		<city country="AU" state="SA" name="Adelaide" latitude="-34.550000" longitude="138.360000" />
-		<city country="AU" state="QLD" name="Brisbane" latitude="-27.290000" longitude="153.800000" />
-		<city country="AU" state="NT" name="Darwin" latitude="-12.280000" longitude="130.510000" />
-		<city country="AU" state="TAS" name="Hobart" latitude="-42.520000" longitude="147.190000" />
-		<city country="AU" state="VIC" name="Melbourne" latitude="-37.470000" longitude="144.580000" />
-		<city country="AU" state="WA" name="Perth" latitude="-31.570000" longitude="115.520000" />
-		<city country="AU" state="NSW" name="Sydney" latitude="-34.000000" longitude="151.000000" />
+		<city country="AU" state="SA" name="Adelaide" latitude="-34.928619" longitude="138.599960" />
+		<city country="AU" state="QLD" name="Brisbane" latitude="-27.471010" longitude="153.023453" />
+		<city country="AU" state="NT" name="Darwin" latitude="-12.462827" longitude="130.841782" />
+		<city country="AU" state="TAS" name="Hobart" latitude="-42.881905" longitude="147.323807" />
+		<city country="AU" state="VIC" name="Melbourne" latitude="-37.814106" longitude="144.963287" />
+		<city country="AU" state="WA" name="Perth" latitude="-31.953005" longitude="115.857468" />
+		<city country="AU" state="NSW" name="Sydney" latitude="-33.867489" longitude="151.206986" />
 		
 		<!-- Other -->
-		<city country="DZ" name="Algiers" latitude="36.500000" longitude="3.000000" />
-		<city country="NL" name="Amsterdam" latitude="52.220000" longitude="4.530000" />
-		<city country="TR" name="Ankara" latitude="39.550000" longitude="32.550000" />
-		<city country="PY" name="Asuncion" latitude="-25.150000" longitude="-57.400000" />
-		<city country="GR" name="Athens" latitude="37.580000" longitude="23.430000" />
-		<city country="NZ" name="Auckland" latitude="-36.520000" longitude="174.450000" />
-		<city country="TH" name="Bangkok" latitude="13.450000" longitude="100.300000" />
-		<city country="ES" name="Barcelona" latitude="41.230000" longitude="2.900000" />
-		<city country="CN" name="Beijing" latitude="39.550000" longitude="116.250000" />
-		<city country="BR" name="Belem" latitude="-1.280000" longitude="-48.290000" />
-		<city country="RS" name="Belgrade" latitude="44.520000" longitude="20.320000" />
-		<city country="DE" name="Berlin" latitude="52.300000" longitude="13.250000" />
-		<city country="CO" name="Bogota" latitude="4.320000" longitude="-74.150000" />
-		<city country="IN" name="Bombay" latitude="19.000000" longitude="72.480000" />
-		<city country="FR" name="Bordeaux" latitude="44.500000" longitude="-0.310000" />
-		<city country="DE" name="Bremen" latitude="53.500000" longitude="8.490000" />
-		<city country="BE" name="Brussels" latitude="50.520000" longitude="4.220000" />
-		<city country="RO" name="Bucharest" latitude="44.250000" longitude="26.700000" />
-		<city country="HU" name="Budapest" latitude="47.300000" longitude="19.500000" />
-		<city country="AR" name="Buenos Aires" latitude="-34.350000" longitude="-58.220000" />
-		<city country="EG" name="Cairo" latitude="30.200000" longitude="31.210000" />
-		<city country="IN" name="Calcutta" latitude="22.340000" longitude="88.240000" />
-		<city country="CN" name="Canton" latitude="23.700000" longitude="113.150000" />
-		<city country="ZA" name="Cape Town" latitude="-33.550000" longitude="18.220000" />
-		<city country="VE" name="Caracas" latitude="10.280000" longitude="-67.200000" />
-		<city country="GF" name="Cayenne" latitude="4.490000" longitude="-52.180000" />
-		<city country="MX" name="Chihuahua" latitude="28.370000" longitude="-106.500000" />
-		<city country="CN" name="Chongqing" latitude="29.460000" longitude="106.340000" />
-		<city country="DK" name="Copenhagen" latitude="55.400000" longitude="12.340000" />
-		<city country="AR" name="Cordoba" latitude="-31.280000" longitude="-64.100000" />
-		<city country="SN" name="Dakar" latitude="14.400000" longitude="-17.280000" />
-		<city country="DJ" name="Djibouti" latitude="11.300000" longitude="43.300000" />
-		<city country="IE" name="Dublin" latitude="53.200000" longitude="-6.150000" />
-		<city country="ZA" name="Durban" latitude="-29.530000" longitude="30.530000" />
-		<city country="DE" name="Frankfurt" latitude="50.700000" longitude="8.410000" />
-		<city country="GY" name="Georgetown" latitude="6.450000" longitude="-58.150000" />
-		<city country="GT" name="Guatemala City" latitude="14.370000" longitude="-90.310000" />
-		<city country="EC" name="Guayaquil" latitude="-2.100000" longitude="-79.560000" />
-		<city country="DE" name="Hamburg" latitude="53.330000" longitude="10.200000" />
-		<city country="NO" name="Hammerfest" latitude="70.380000" longitude="23.380000" />
-		<city country="CU" name="Havana" latitude="23.800000" longitude="-82.230000" />
-		<city country="FI" name="Helsinki" latitude="60.100000" longitude="25.000000" />
-		<city country="CN" name="Hong Kong" latitude="22.200000" longitude="114.110000" />
-		<city country="CL" name="Iquique" latitude="-20.100000" longitude="-70.700000" />
-		<city country="RU" name="Irkutsk" latitude="52.300000" longitude="104.200000" />
-		<city country="ID" name="Jakarta" latitude="-6.160000" longitude="106.480000" />
-		<city country="ZA" name="Johannesburg" latitude="-26.120000" longitude="28.400000" />
-		<city country="JM" name="Kingston" latitude="17.590000" longitude="-76.490000" />
-		<city country="CG" name="Kinshasa" latitude="-4.180000" longitude="15.170000" />
-		<city country="MY" name="Kuala Lumpur" latitude="3.800000" longitude="101.420000" />
-		<city country="BO" name="La Paz" latitude="-16.270000" longitude="-68.220000" />
-		<city country="PE" name="Lima" latitude="-12.000000" longitude="-77.200000" />
-		<city country="PT" name="Lisbon" latitude="38.440000" longitude="-9.900000" />
-		<city country="FR" name="Lyons" latitude="45.450000" longitude="4.500000" />
-		<city country="ES" name="Madrid" latitude="40.260000" longitude="-3.420000" />
-		<city country="PH" name="Manila" latitude="14.350000" longitude="120.570000" />
-		<city country="FR" name="Marseilles" latitude="43.200000" longitude="5.200000" />
-		<city country="MX" name="Mazatlan" latitude="23.120000" longitude="-106.250000" />
-		<city country="SA" name="Mecca" latitude="21.290000" longitude="39.450000" />
-		<city country="MX" name="Mexico City" latitude="19.260000" longitude="-99.700000" />
-		<city country="IT" name="Milan" latitude="45.270000" longitude="9.100000" />
-		<city country="UY" name="Montevideo" latitude="-34.530000" longitude="-56.100000" />
-		<city country="RU" name="Moscow" latitude="55.450000" longitude="37.360000" />
-		<city country="DE" name="Munich" latitude="48.800000" longitude="11.350000" />
-		<city country="JP" name="Nagasaki" latitude="32.480000" longitude="129.570000" />
-		<city country="JP" name="Nagoya" latitude="35.700000" longitude="136.560000" />
-		<city country="KE" name="Nairobi" latitude="-1.250000" longitude="36.550000" />
-		<city country="CN" name="Nanjing (Nanking)" latitude="32.300000" longitude="118.530000" />
-		<city country="IT" name="Naples" latitude="40.500000" longitude="14.150000" />
-		<city country="IN" name="New Delhi" latitude="28.350000" longitude="77.120000" />
-		<city country="UA" name="Odessa" latitude="46.270000" longitude="30.480000" />
-		<city country="JP" name="Osaka" latitude="34.320000" longitude="135.300000" />
-		<city country="NO" name="Oslo" latitude="59.570000" longitude="10.420000" />
-		<city country="PA" name="Panama City" latitude="8.580000" longitude="-79.320000" />
-		<city country="SR" name="Paramaribo" latitude="5.450000" longitude="-55.150000" />
-		<city country="FR" name="Paris" latitude="48.480000" longitude="2.200000" />
-		<city country="PG" name="Port Moresby" latitude="-9.250000" longitude="147.800000" />
-		<city country="CZ" name="Prague" latitude="50.500000" longitude="14.260000" />
-		<city country="MM" name="Rangoon" latitude="16.500000" longitude="96.000000" />
-		<city country="IS" name="Reykjavik" latitude="64.400000" longitude="-21.580000" />
-		<city country="BR" name="Rio de Janeiro" latitude="-22.570000" longitude="-43.120000" />
-		<city country="IT" name="Rome" latitude="41.540000" longitude="12.270000" />
-		<city country="BR" name="Salvador" latitude="-12.560000" longitude="-38.270000" />
-		<city country="CL" name="Santiago" latitude="-33.280000" longitude="-70.450000" />
-		<city country="RU" name="St. Petersburg" latitude="59.560000" longitude="30.180000" />
-		<city country="BR" name="Sao Paulo" latitude="-23.310000" longitude="-46.310000" />
-		<city country="CN" name="Shanghai" latitude="31.100000" longitude="121.280000" />
-		<city country="SG" name="Singapore" latitude="1.140000" longitude="103.550000" />
-		<city country="BG" name="Sofia" latitude="42.400000" longitude="23.200000" />
-		<city country="SE" name="Stockholm" latitude="59.170000" longitude="18.300000" />
-		<city country="MG" name="Tananarive" latitude="-18.500000" longitude="47.330000" />
-		<city country="IR" name="Teheran" latitude="35.450000" longitude="51.450000" />
-		<city country="JP" name="Tokyo" latitude="35.400000" longitude="139.450000" />
-		<city country="LY" name="Tripoli" latitude="32.570000" longitude="13.120000" />
-		<city country="IT" name="Venice" latitude="45.260000" longitude="12.200000" />
-		<city country="MX" name="Veracruz" latitude="19.100000" longitude="-96.100000" />
-		<city country="AT" name="Vienna" latitude="48.140000" longitude="16.200000" />
-		<city country="RU" name="Vladivostok" latitude="43.100000" longitude="132.000000" />
-		<city country="PL" name="Warsaw" latitude="52.140000" longitude="21.000000" />
-		<city country="NZ" name="Wellington" latitude="-41.170000" longitude="174.470000" />
-		<city country="CH" name="Zurich" latitude="47.210000" longitude="8.310000" />
+		<city country="CI" name="Abidjan" latitude="5.316667" longitude="-4.033333" />
+		<city country="ET" name="Addis Ababa" latitude="8.980603" longitude="38.757759" />
+		<city country="IN" name="Ahmedabad" latitude="23.022505" longitude="72.571365" />
+		<city country="EG" name="Alexandria" latitude="31.200092" longitude="29.918739" />
+		<city country="DZ" name="Algiers" latitude="36.752888" longitude="3.042048" />
+		<city country="NL" name="Amsterdam" latitude="52.370216" longitude="4.895168" />
+		<city country="TR" name="Ankara" variations="Ancyra;Angora" latitude="39.920769" longitude="32.854111" />
+		<city country="PY" name="Asuncion" latitude="-25.282198" longitude="-57.635101" />
+		<city country="GR" name="Athens" latitude="37.983917" longitude="23.729361" />
+		<city country="NZ" name="Auckland" latitude="-36.848461" longitude="174.763336" />
+		<city country="IQ" name="Baghdad" latitude="33.325001" longitude="44.422001" />
+		<city country="TH" name="Bangkok" latitude="13.727896" longitude="100.524124" />
+		<city country="ES" name="Barcelona" latitude="41.385063" longitude="2.173404" />
+		<city country="CN" name="Beijing" latitude="39.904030" longitude="116.407524" />
+		<city country="BR" name="Belem" latitude="-1.455755" longitude="-48.490181" />
+		<city country="RS" name="Belgrade" latitude="44.816666" longitude="20.466667" />
+		<city country="IN" name="Bengaluru" latitude="12.971599" longitude="77.594566" />
+		<city country="DE" name="Berlin" latitude="52.520008" longitude="13.404954" />
+		<city country="CO" name="Bogota" latitude="4.598056" longitude="-74.075836" />
+		<city country="IN" name="Bombay" variations="Mumbai" latitude="19.075983" longitude="72.877655" />
+		<city country="FR" name="Bordeaux" latitude="44.837788" longitude="-0.579180" />
+		<city country="DE" name="Bremen" latitude="53.079296" longitude="8.801694" />
+		<city country="BE" name="Brussels" latitude="50.850342" longitude="4.351710" />
+		<city country="RO" name="Bucharest" latitude="44.432499" longitude="26.103890" />
+		<city country="HU" name="Budapest" latitude="47.497913" longitude="19.040236" />
+		<city country="AR" name="Buenos Aires" latitude="-34.603722" longitude="-58.381592" />
+		<city country="KR" name="Busan" latitude="35.179554" longitude="129.075638" />
+		<city country="EG" name="Cairo" latitude="30.044420" longitude="31.235712" />
+		<city country="IN" name="Calcutta" latitude="22.572645" longitude="88.363892" />
+		<city country="CN" name="Canton" latitude="23.129164" longitude="113.264435" />
+		<city country="ZA" name="Cape Town" latitude="-33.924740" longitude="18.424107" />
+		<city country="VE" name="Caracas" latitude="10.500000" longitude="-66.916664" />
+		<city country="GF" name="Cayenne" latitude="4.922700" longitude="-52.326901" />
+		<city country="CN" name="Changsha" latitude="28.228209" longitude="112.938812" />
+		<city country="CN" name="Chengdu" latitude="30.572269" longitude="104.066544" />
+		<city country="CN" name="Chennai" latitude="13.063720" longitude="80.276756" />
+		<city country="MX" name="Chihuahua" latitude="28.632996" longitude="-106.069099" />
+		<city country="CN" name="Chongqing" latitude="29.563009" longitude="106.551559" />
+		<city country="DK" name="Copenhagen" latitude="55.676098" longitude="12.568337" />
+		<city country="AR" name="Cordoba" latitude="-31.398930" longitude="-64.182129" />
+		<city country="SN" name="Dakar" latitude="14.764504" longitude="-17.366030" />
+		<city country="TZ" name="Dar es Salaam" latitude="-6.800000" longitude="39.283333" />
+		<city country="BD" name="Dhaka" latitude="23.810331" longitude="90.412521" />
+		<city country="DJ" name="Djibouti" latitude="11.588333" longitude="43.145001" />
+		<city country="CN" name="Dongguan" latitude="23.020536" longitude="113.751762" />
+		<city country="IE" name="Dublin" latitude="53.349804" longitude="-6.260310" />
+		<city country="ZA" name="Durban" latitude="-29.858681" longitude="31.021839" />
+		<city country="ZA" name="Ekurhuleni" latitude="-26.177702" longitude="28.346195" />
+		<city country="CN" name="Foshan" latitude="23.021479" longitude="113.121437" />
+		<city country="DE" name="Frankfurt" latitude="50.110924" longitude="8.682127" />
+		<city country="GY" name="Georgetown" latitude="6.800000" longitude="-58.166668" />
+		<city country="EG" name="Giza" latitude="30.013056" longitude="31.208853" />
+		<city country="CN" name="Guangzhou" latitude="23.129164" longitude="113.264435" />
+		<city country="GT" name="Guatemala City" latitude="14.613333" longitude="-90.535278" />
+		<city country="EC" name="Guayaquil" latitude="-2.170998" longitude="-79.922356" />
+		<city country="DE" name="Hamburg" latitude="53.551086" longitude="9.993682" />
+		<city country="NO" name="Hammerfest" latitude="70.663437" longitude="23.681967" />
+		<city country="CN" name="Hangzhou" latitude="30.274084" longitude="120.155067" />
+		<city country="VN" name="Hanoi" latitude="21.033333" longitude="105.849998" />
+		<city country="CN" name="Harbin" latitude="45.803776" longitude="126.534965" />
+		<city country="CU" name="Havana" latitude="23.054070" longitude="-82.345192" />
+		<city country="CN" name="Hefei" latitude="31.820587" longitude="117.227242" />
+		<city country="FI" name="Helsinki" latitude="60.173325" longitude="24.941025" />
+		<city country="VN" name="Ho Chi Minh City" latitude="10.823099" longitude="106.629662" />
+		<city country="CN" name="Hong Kong" latitude="22.282459" longitude="114.161568" />
+		<city country="IN" name="Hyderabad" latitude="17.385044" longitude="78.486671" />
+		<city country="CL" name="Iquique" latitude="-20.216700" longitude="-70.142219" />
+		<city country="RU" name="Irkutsk" latitude="52.312221" longitude="104.295830" />
+		<city country="TR" name="Istanbul" latitude="41.005268" longitude="28.976959" />
+		<city country="IN" name="Jaipur" latitude="26.912434" longitude="75.787270" />
+		<city country="ID" name="Jakarta" latitude="-6.208763" longitude="106.845596" />
+		<city country="SA" name="Jeddah" latitude="21.543333" longitude="39.172779" />
+		<city country="ZA" name="Johannesburg" latitude="-26.193947" longitude="28.027391" />
+		<city country="AF" name="Kabul" latitude="34.533333" longitude="69.166664" />
+		<city country="PK" name="Karachi" latitude="24.861462" longitude="67.009941" />
+		<city country="JM" name="Kingston" latitude="17.983334" longitude="-76.800003" />
+		<city country="CG" name="Kinshasa" latitude="-4.387061" longitude="15.969988" />
+		<city country="IN" name="Kolkata" variations="Calcutta" latitude="22.572645" longitude="88.363892" />
+		<city country="MY" name="Kuala Lumpur" latitude="3.139003" longitude="101.686852" />
+		<city country="BO" name="La Paz" latitude="-16.500000" longitude="-68.150002" />
+		<city country="NG" name="Lagos" latitude="6.524379" longitude="3.379206" />
+		<city country="PK" name="Lahore" latitude="31.554606" longitude="74.357155" />
+		<city country="PE" name="Lima" latitude="-12.046374" longitude="-77.042793" />
+		<city country="PT" name="Lisbon" latitude="38.722252" longitude="-9.139337" />
+		<city country="AO" name="Luanda" latitude="-8.838333" longitude="13.234444" />
+		<city country="FR" name="Lyons" latitude="45.764042" longitude="4.835659" />
+		<city country="ES" name="Madrid" latitude="40.416775" longitude="-3.703790" />
+		<city country="PH" name="Manila" latitude="14.599512" longitude="120.984222" />
+		<city country="FR" name="Marseilles" latitude="43.296482" longitude="5.369780" />
+		<city country="MX" name="Mazatlan" latitude="23.249414" longitude="-106.411140" />
+		<city country="SA" name="Mecca" latitude="21.416668" longitude="39.816666" />
+		<city country="MX" name="Mexico City" latitude="19.432608" longitude="-99.133209" />
+		<city country="IT" name="Milan" latitude="45.465424" longitude="9.185924" />
+		<city country="UY" name="Montevideo" latitude="-34.883610" longitude="-56.181946" />
+		<city country="RU" name="Moscow" latitude="55.755825" longitude="37.617298" />
+		<city country="DE" name="Munich" latitude="48.135124" longitude="11.581981" />
+		<city country="JP" name="Nagasaki" latitude="32.750286" longitude="129.877670" />
+		<city country="JP" name="Nagoya" latitude="35.181446" longitude="136.906403" />
+		<city country="KE" name="Nairobi" latitude="-1.292066" longitude="36.821945" />
+		<city country="CN" name="Nanjing" variations="Nanking" latitude="32.060253" longitude="118.796875" />
+		<city country="IT" name="Naples" latitude="40.851776" longitude="14.268124" />
+		<city country="IN" name="New Delhi" latitude="28.635307" longitude="77.224960" />
+		<city country="TW" name="New Taipei City" latitude="24.915712" longitude="121.673935" />
+		<city country="UA" name="Odessa" latitude="46.482525" longitude="30.723309" />
+		<city country="JP" name="Osaka" latitude="34.693737" longitude="135.502167" />
+		<city country="NO" name="Oslo" latitude="59.913868" longitude="10.752245" />
+		<city country="PA" name="Panama City" latitude="8.983333" longitude="-79.516670" />
+		<city country="SR" name="Paramaribo" latitude="5.852036" longitude="-55.203827" />
+		<city country="FR" name="Paris" latitude="48.856613" longitude="2.352222" />
+		<city country="PG" name="Port Moresby" latitude="-9.443800" longitude="147.180267" />
+		<city country="CZ" name="Prague" latitude="50.075539" longitude="14.437800" />
+		<city country="IN" name="Pune" latitude="18.520430" longitude="73.856743" />
+		<city country="KP" name="Pyongyang" latitude="39.039219" longitude="125.762528" />
+		<city country="CN" name="Quanzhou" latitude="24.874132" longitude="118.675674" />
+		<city country="MM" name="Rangoon" latitude="16.799999" longitude="96.150002" />
+		<city country="IS" name="Reykjavik" latitude="64.133331" longitude="-21.933332" />
+		<city country="BR" name="Rio de Janeiro" latitude="-22.913395" longitude="-43.200710" />
+		<city country="SA" name="Riyadh" latitude="24.633333" longitude="46.716667" />
+		<city country="IT" name="Rome" latitude="41.872391" longitude="12.480180" />
+		<city country="BR" name="Salvador" latitude="-12.972229" longitude="-38.501419" />
+		<city country="CL" name="Santiago" latitude="-33.469120" longitude="-70.641998" />
+		<city country="BR" name="Sao Paulo" latitude="-23.550520" longitude="-46.633308" />
+		<city country="KR" name="Seoul" latitude="37.566536" longitude="126.977966" />
+		<city country="CN" name="Shanghai" latitude="31.230415" longitude="121.473702" />
+		<city country="CN" name="Shantou" latitude="23.354092" longitude="116.681969" />
+		<city country="CN" name="Shenyang" latitude="41.805866" longitude="123.432251" />
+		<city country="CN" name="Shenzhen" latitude="22.543098" longitude="114.057869" />
+		<city country="SG" name="Singapore" latitude="1.280094" longitude="103.850952" />
+		<city country="BG" name="Sofia" latitude="42.697708" longitude="23.321867" />
+		<city country="RU" name="St. Petersburg" latitude="59.934280" longitude="30.335098" />
+		<city country="SE" name="Stockholm" latitude="59.329323" longitude="18.068581" />
+		<city country="IN" name="Surat" latitude="21.170240" longitude="72.831062" />
+		<city country="CN" name="Suzhou" latitude="31.298885" longitude="120.585319" />
+		<city country="MG" name="Tananarive" latitude="-18.933332" longitude="47.516666" />
+		<city country="IR" name="Teheran" variations="Tehran" latitude="35.696110" longitude="51.423058" />
+		<city country="CN" name="Tianjin" latitude="39.084160" longitude="117.200981" />
+		<city country="JP" name="Tokyo" latitude="35.689487" longitude="139.691711" />
+		<city country="LY" name="Tripoli" latitude="32.808411" longitude="13.150967" />
+		<city country="IT" name="Venice" latitude="45.440846" longitude="12.315515" />
+		<city country="MX" name="Veracruz" latitude="19.173773" longitude="-96.134224" />
+		<city country="AT" name="Vienna" latitude="48.208176" longitude="16.373819" />
+		<city country="RU" name="Vladivostok" latitude="43.112423" longitude="132.009842" />
+		<city country="PL" name="Warsaw" latitude="52.229675" longitude="21.012230" />
+		<city country="NZ" name="Wellington" latitude="-41.286461" longitude="174.776230" />
+		<city country="CN" name="Wenzhou" latitude="27.994266" longitude="120.699364" />
+		<city country="CN" name="Wuhan" latitude="30.593100" longitude="114.305389" />
+		<city country="CN" name="Xi'an" latitude="34.341568" longitude="108.940178" />
+		<city country="CN" name="Xiamen" latitude="24.479834" longitude="118.089424" />
+		<city country="MM" name="Yangon" latitude="16.799999" longitude="96.150002" />
+		<city country="JP" name="Yokohama" latitude="35.443706" longitude="139.638031" />
+		<city country="CN" name="Zhengzhou" latitude="34.746601" longitude="113.625366" />
+		<city country="CH" name="Zurich" latitude="47.368648" longitude="8.539182" />
 		
 	</cities>
 	

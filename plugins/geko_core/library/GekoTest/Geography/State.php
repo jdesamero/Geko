@@ -1,7 +1,7 @@
 <?php
 
 //
-class GekoTest_Geography_CountryState extends Geko_PhpUnit_TestCase
+class GekoTest_Geography_State extends Geko_PhpUnit_TestCase
 {
 
 	//
@@ -19,7 +19,7 @@ class GekoTest_Geography_CountryState extends Geko_PhpUnit_TestCase
 	 */
 	public function testGetNameFromCode( $sCode, $sResult ) {
 		
-		$oGeoState = Geko_Geography_CountryState::getInstance();
+		$oGeoState = Geko_Geography_State::getInstance();
 		
 		$this->assertEquals(
 			$oGeoState->getNameFromCode( $sCode ),

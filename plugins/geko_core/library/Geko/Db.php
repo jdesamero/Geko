@@ -253,15 +253,29 @@ class Geko_Db
 			
 			$oDb = $this->_oDb;
 			
+			$sPrefixedTableName = $this->replacePrefixPlaceholder( $sTableName );
+			
+			if ( method_exists( $oDb, 'registerTableName' ) ) {
+				$oDb->registerTableName( $sPrefixedTableName, $sTableName );
+			}
+			
 			try {
-				$sTableName = $this->replacePrefixPlaceholder( $sTableName );
-				$oDb->describeTable( $sTableName );
+				
+				// if this fails, table does not exist
+				$oDb->describeTable( $sPrefixedTableName );
+			
 			} catch ( Exception $s ) {
+				
+				// this creates the table
 				$sQuery = $this->replacePrefixPlaceholder( $sQuery );
 				$oDb->query( $sQuery );
+				
+				return TRUE;
 			}
+			
 		}
 		
+		return FALSE;
 	}
 	
 	
@@ -271,7 +285,7 @@ class Geko_Db
 		if ( $oDb = $this->_oDb ) {
 			
 			if ( in_array( $sMethod, array(
-				'insert', 'update', 'delete', 'fetchAll', 'fetchAssoc', 'fetchCol', 'fetchPairs', 'fetchRow', 'fetchOne', 'describeTable'
+				'insert', 'update', 'delete', 'fetchAll', 'fetchAssoc', 'fetchCol', 'fetchPairs', 'fetchRow', 'fetchOne', 'describeTable', 'query'
 			) ) ) {
 				
 				if ( self::$_bReplacePrefixPlaceholder ) {

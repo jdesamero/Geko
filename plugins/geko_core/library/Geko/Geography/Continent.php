@@ -1,35 +1,160 @@
 <?php
 
 //
-class Geko_Geography_Continent extends Geko_Singleton_Abstract
+class Geko_Geography_Continent extends Geko_Geography
 {
 	
-	protected $_aContinents = NULL;
+	const FIELD_NAME = 1;
+	const FIELD_COUNTRY_LABEL = 2;
+	const FIELD_DB_ID = 3;
 	
+	
+	protected $_aContinents = NULL;
+	protected $_aNameAbbrHash = array();
+	
+	protected $_sTableName = '##pfx##geko_location_continent';
+	
+	
+	
+	//// initialization
+	
+	//
+	public function start() {
+		
+		parent::start();
+		
+		//
+		foreach ( $this->_aContinents as $sCode => $aRow ) {
+			
+			$this->_aNameAbbrHash[ $this->normalize( $aRow[ self::FIELD_NAME ] ) ] = $sCode;
+		}
+				
+	}
 	
 	
 	//
-	public function get() {
+	public function runInitDb( $oDb ) {
+			
+		$oSqlTable = new Geko_Sql_Table();
+		$oSqlTable
+			->create( $this->_sTableName, 't' )
+			->fieldTinyInt( 'continent_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
+			->fieldVarChar( 'continent_name', array( 'size' => 256 ) )
+			->fieldVarChar( 'continent_abbr', array( 'size' => 16 ) )
+			->fieldTinyInt( 'rank', array( 'unsgnd' ) )
+		;
 		
-		if ( NULL === $this->_aContinents ) {
-			$oGeo = Geko_Geography_Xml::getInstance();
-			$oGeo->loadData( GEKO_GEOGRAPHY_XML );
-		}
+		// if table was not created
+		if ( !$oDb->tableCreateIfNotExists( $oSqlTable ) ) {
+			
+			//// populate with $this->_aContinents with existing ids
+			
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				->field( 't.continent_id', 'id' )
+				->field( 't.continent_abbr', 'abbr' )
+				->from( $this->_sTableName, 't' )
+			;
+			
+			$aRes = $oDb->fetchAll( strval( $oQuery ) );
+			foreach ( $aRes as $aRow ) {
+				
+				$sCode = $aRow[ 'abbr' ];
+				$iId = intval( $aRow[ 'id' ] );
+				
+				if ( $this->_aContinents[ $sCode ] ) {
+					$this->_aContinents[ $sCode ][ self::FIELD_DB_ID ] = $iId;
+				}
+			}
+			
+		}			
+		
+	}
+	
+	
+	
+	//// accessors
+	
+	//
+	public function get() {
+		return $this->getContinents();
+	}
+	
+	
+	//
+	public function getContinents() {
+		
+		$this->init();
 		
 		return $this->_aContinents;
 	}
 	
 	//
 	public function set( $aContinents ) {
+		
 		$this->_aContinents = $aContinents;
+		
+		return $this;
 	}
 	
-	// $sState could be code or name
+	//
 	public function getNameFromCode( $sCode ) {
 		
-		$this->get();		// init $this->_aContinents
+		$this->init();
 		
-		return $this->_aContinents[ $sCode ];
+		return $this->_aContinents[ $sCode ][ self::FIELD_NAME ];
+	}
+	
+	
+	//// db dependent
+	
+	//
+	public function getContinentId( $sCodeOrName ) {
+		
+		$this->initDb();
+		
+		$iDbId = NULL;
+		
+		if ( $oDb = Geko::get( 'db' ) ) {
+			
+			$sCode = $this->getCodeFromValue( $sCodeOrName );
+			
+			if (
+				( $aRow = $this->_aContinents[ $sCode ] ) &&
+				( !$iDbId = $aRow[ self::FIELD_DB_ID ] )
+			) {
+				
+				$aData = array(
+					'continent_name' => $aRow[ self::FIELD_NAME ],
+					'continent_abbr' => $sCode
+				);
+				
+				$oDb->insert( $this->_sTableName, $aData );
+				
+				$iDbId = $oDb->lastInsertId();
+				
+				// track the id
+				$this->_aContinents[ $sCode ][ self::FIELD_DB_ID ] = $iDbId;
+			}
+			
+		}
+		
+		return $iDbId;
+	}
+	
+	//
+	public function populateContinentTable( $aCodes ) {
+		
+		if ( NULL === $aCodes ) {
+			$aCodes = array_keys( $this->getContinents() );
+		}
+		
+		//
+		foreach ( $aCodes as $sCode ) {
+			$this->getContinentId( $sCode );
+		}
+		
+		return $this;
 	}
 	
 	

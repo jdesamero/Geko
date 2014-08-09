@@ -6,59 +6,63 @@ class Geko_Google_Map_CachedLookup_Engine_Db extends Geko_CachedLookup_Engine_Db
 	
 	protected $_oDb;
 	
+	protected $_sTableSignature = 'geko_google_map';
+	
+	
 	
 	//
-	public function init() {
+	public function createTable() {
 		
-		if ( $oDb = $this->_oDb ) {
-			
-			//// address lookup table
-			
-			$oSqlTable = new Geko_Sql_Table();
-			$oSqlTable
-				->create( '##pfx##geko_gmap_lookup', 'l' )
-				->fieldBigInt( 'id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
-				->fieldLongText( 'lookup' )
-				->fieldChar( 'slug', array( 'size' => 32, 'unq' ) )
-			;
-			
-			$oDb->tableCreateIfNotExists( $oSqlTable );
-			
-			
-			//// rel table
-			
-			$oSqlTable2 = new Geko_Sql_Table();
-			$oSqlTable2
-				->create( '##pfx##geko_gmap_lookup_coords_rel', 'r' )
-				->fieldBigInt( 'coord_id' )
-				->fieldBigInt( 'lookup_id' )
-				->fieldSmallInt( 'idx' )
-			;
-			
-			$oDb->tableCreateIfNotExists( $oSqlTable2 );
-			
-			
-			//// location table
-			
-			$oSqlTable3 = new Geko_Sql_Table();
-			$oSqlTable3
-				->create( '##pfx##geko_gmap_coords', 'c' )
-				->fieldBigInt( 'id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
-				->fieldChar( 'slug', array( 'size' => 32, 'unq' ) )
-				->fieldLongText( 'address' )
-				->fieldLongText( 'type' )
-				->fieldFloat( 'lat', array( 'size' => '10,7', 'sgnd' ) )
-				->fieldFloat( 'lng', array( 'size' => '10,7', 'sgnd' ) )
-				->fieldFloat( 'ne_lat', array( 'size' => '10,7', 'sgnd' ) )
-				->fieldFloat( 'ne_lng', array( 'size' => '10,7', 'sgnd' ) )
-				->fieldFloat( 'sw_lat', array( 'size' => '10,7', 'sgnd' ) )
-				->fieldFloat( 'sw_lng', array( 'size' => '10,7', 'sgnd' ) )
-				->fieldInt( 'country_id', array( 'unsgnd' ) )
-			;
-			
-			$oDb->tableCreateIfNotExists( $oSqlTable3 );
 		
-		}
+		$oDb = $this->_oDb;
+		
+		
+		//// address lookup table
+		
+		$oSqlTable = new Geko_Sql_Table();
+		$oSqlTable
+			->create( '##pfx##geko_gmap_lookup', 'l' )
+			->fieldBigInt( 'id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
+			->fieldLongText( 'lookup' )
+			->fieldChar( 'slug', array( 'size' => 32, 'unq' ) )
+		;
+		
+		$oDb->tableCreateIfNotExists( $oSqlTable );
+		
+		
+		//// rel table
+		
+		$oSqlTable2 = new Geko_Sql_Table();
+		$oSqlTable2
+			->create( '##pfx##geko_gmap_lookup_coords_rel', 'r' )
+			->fieldBigInt( 'coord_id' )
+			->fieldBigInt( 'lookup_id' )
+			->fieldSmallInt( 'idx' )
+		;
+		
+		$oDb->tableCreateIfNotExists( $oSqlTable2 );
+		
+		
+		//// location table
+		
+		$oSqlTable3 = new Geko_Sql_Table();
+		$oSqlTable3
+			->create( '##pfx##geko_gmap_coords', 'c' )
+			->fieldBigInt( 'id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
+			->fieldChar( 'slug', array( 'size' => 32, 'unq' ) )
+			->fieldLongText( 'address' )
+			->fieldLongText( 'type' )
+			->fieldFloat( 'lat', array( 'size' => '10,7', 'sgnd' ) )
+			->fieldFloat( 'lng', array( 'size' => '10,7', 'sgnd' ) )
+			->fieldFloat( 'ne_lat', array( 'size' => '10,7', 'sgnd' ) )
+			->fieldFloat( 'ne_lng', array( 'size' => '10,7', 'sgnd' ) )
+			->fieldFloat( 'sw_lat', array( 'size' => '10,7', 'sgnd' ) )
+			->fieldFloat( 'sw_lng', array( 'size' => '10,7', 'sgnd' ) )
+			->fieldInt( 'country_id', array( 'unsgnd' ) )
+		;
+		
+		$oDb->tableCreateIfNotExists( $oSqlTable3 );
+		
 		
 	}
 	
@@ -138,7 +142,8 @@ class Geko_Google_Map_CachedLookup_Engine_Db extends Geko_CachedLookup_Engine_Db
 		if ( FALSE === $iCoordId ) {
 			
 			if ( !$iCountryId = $aCoord[ 'country_id' ] ) {
-				$iCountryId = $this->getCountryId( $aCoord[ 'country' ] );
+				$oGeoCoun = Geko_Geography_Country::getInstance();
+				$iCountryId = $oGeoCoun->getCountryId( $aCoord[ 'country' ] );
 			}
 			
 			$aValues = array(
@@ -191,28 +196,6 @@ class Geko_Google_Map_CachedLookup_Engine_Db extends Geko_CachedLookup_Engine_Db
 		
 		return $this;
 	}
-	
-	
-	//
-	public function getCountryId( $sCountryAbbr ) {
-		
-		$oDb = $this->_oDb;
-		
-		$sCountryAbbr = strtoupper( trim( $sCountryAbbr ) );
-
-		$oQuery = new Geko_Sql_Select();
-		$oQuery
-			->field( 'c.country_id' )
-			->from( '##pfx##geko_location_country', 'c' )
-			->where( 'country_abbr = ?', $sCountryAbbr )
-		;
-		
-		$iCountryId = $oDb->fetchOne( strval( $oQuery ) );
-		
-		return $iCountryId;
-	}
-	
-	
 	
 	
 	

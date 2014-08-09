@@ -318,6 +318,29 @@ class Geko_Wp_Db_Adapter extends Zend_Db_Adapter_Abstract
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 	
+	
+	//
+	public function registerTableName( $sPrefixedTableName, $sTableName ) {
+		
+		$this->_connect();
+		
+		$wpdb = $this->_connection;
+		$oDb = Geko_Wp::get( 'db' );
+		
+		if ( $wpdb && $oDb ) {
+			
+			$sTableName = str_replace( $oDb->getPrefixPlaceholder(), '', $sTableName );
+			
+			if ( $sPrefixedTableName != $sTableName ) {
+				$wpdb->$sTableName = $sPrefixedTableName;
+			}
+		}
+		
+	}
+	
+	
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
+	
 	//
 	public static function argFormat( $sDbClass, $aParams ) {
 		
