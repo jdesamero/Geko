@@ -85,6 +85,65 @@ class Geko_Sql_Select
 		return $this;
 	}
 	
+	//
+	public function isMutated() {
+		
+		if (
+			( $this->_bDistinct ) || 
+			( count( $this->_aOptions ) > 0 ) || 
+			( count( $this->_aFields ) > 0 ) || 
+			( count( $this->_aFrom ) > 0 ) || 
+			( count( $this->_aJoins ) > 0 ) || 
+			( count( $this->_aOn ) > 0 ) || 
+			( count( $this->_aWhere ) > 0 ) || 
+			( count( $this->_aGroup ) > 0 ) || 
+			( count( $this->_aHaving ) > 0 ) || 
+			( count( $this->_aUnion ) > 0 ) || 
+			( count( $this->_aOrder ) > 0 ) || 
+			( $this->_iLimit ) || 
+			( $this->_iOffset )
+		) {
+			return TRUE;
+		}
+		
+		return FALSE;
+	}
+	
+	
+	
+	//// get query parts
+	
+	//
+	public function getFields() {
+		return trim( $this->createFieldList( $this->_aFields ) );
+	}
+	
+	//
+	public function getJoins() {
+		
+		$sOutput = '';
+		
+		// join clauses
+		foreach ( $this->_aJoins as $sKey => $aValue ) {
+			
+			list( $mTable, $sType, $iFlag ) = $aValue;
+			
+			if ( self::KVP == $iFlag ) {
+				$sOutput .= $this->createKvpJoinClause( $aValue, $sKey );
+			} else {
+				$sOutput .= sprintf( '%s %s AS %s ON ', $sType, $this->encloseExpression( $mTable ), $sKey );
+				$sOutput .= $this->createExpressionList( $this->_aOn[ $sKey ] );
+			}
+		}
+		
+		return trim( $sOutput );
+	}
+	
+	//
+	public function getWhere() {
+		return trim( $this->createExpressionList( $this->_aWhere ) );
+	}
+	
 	
 	
 	//// query methods
@@ -905,12 +964,12 @@ class Geko_Sql_Select
 			if ( is_string( $mKey ) ) {
 				$sOutput .= sprintf( '%s AS %s, ', $this->encloseExpression( $aField[ 0 ] ), $mKey );
 			} else {
-				$sOutput .= $this->encloseExpression( $aField[ 0 ] ) . ', ';
+				$sOutput .= sprintf( '%s, ', $this->encloseExpression( $aField[ 0 ] ) );
 			}
 		}
 		
 		// trim the trailing ', ' and re-introduce a ' '
-		$sOutput = rtrim( $sOutput, ', ' ) . ' ';
+		$sOutput = sprintf( '%s ', rtrim( $sOutput, ', ' ) );
 		
 		return $sOutput;
 	}
@@ -946,7 +1005,7 @@ class Geko_Sql_Select
 			( 'KVP' == $sType ) && 
 			( is_string( $sColumn ) ) && 		// just making sure
 			( preg_match( '/^(([0-9a-zA-Z_-]*[a-zA-Z_-]+)([0-9]+))\./', $sColumn, $aRegs ) ) && 
-			( $sJoinKey = $aRegs[2] . '*' ) && 
+			( $sJoinKey = sprintf( '%s*', $aRegs[ 2 ] ) ) && 
 			( $aJoinValue = $this->_aJoins[ $sJoinKey ] )
 		) {
 			
@@ -1017,7 +1076,7 @@ class Geko_Sql_Select
 		
 		// options
 		if ( count( $this->_aOptions ) > 0 ) {	
-			$sOutput .= implode( ' ', $this->_aOptions ) . ' ';
+			$sOutput .= sprintf( '%s ', implode( ' ', $this->_aOptions ) );
 		}
 		
 		// fields

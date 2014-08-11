@@ -420,6 +420,50 @@ class Geko_Array
 	
 	
 	
+	// format results from preg_match_all to an associative array with the given hash
+	public static function formatPregMatchAll( $aRegs, $aHash ) {
+		
+		$aRes = array();
+		$aCol = $aRegs[ 0 ];		// first regs column
+		
+		foreach ( $aCol as $i => $sCol ) {
+			
+			$aRow = array();
+			foreach ( $aHash as $mKey => $mParams ) {
+				
+				$iIdx = NULL;
+				$bTrim = FALSE;
+				
+				if ( is_int( $mKey ) ) {
+					$sKey = $mParams;
+					$iIdx = $mKey;
+				} else {
+					$sKey = $mKey;
+				}
+				
+				if ( is_array( $mParams ) ) {
+					$iIdx = $mParams[ 'idx' ];
+					$bTrim = $mParams[ 'trim' ];
+				} else {
+					if ( NULL === $iIdx ) {
+						$iIdx = $mParams;
+					}
+				}
+				
+				$sVal = $aRegs[ $iIdx ][ $i ];
+				if ( $bTrim ) $sVal = trim( $sVal );
+				
+				$aRow[ $sKey ] = $sVal;
+			}
+			
+			$aRes[] = $aRow;
+		}
+		
+		return $aRes;
+	}
+	
+	
+	
 }
 
 

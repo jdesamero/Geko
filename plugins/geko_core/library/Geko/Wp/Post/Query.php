@@ -2,7 +2,12 @@
 
 class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 {
+	
 	protected $oWpQuery;
+	
+	protected static $sQhVar = 'geko_post_query_hooks';
+	protected static $bInitQueryHooks = FALSE;
+	
 	
 	//
 	public function getDefaultParams() {
@@ -37,21 +42,36 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 		global $wp_query;
 		
 		if ( $this->_bIsDefaultQuery ) {
+			
 			$this->oWpQuery = $wp_query;
+		
 		} else {
+			
 			$aParams = $this->_aParams;
+			
 			if ( $this->_bAddToDefaultParams ) {
 				$aParams = array_merge( $this->getDefaultParams(), $aParams );
 			}
+			
+			$oQuery = $this->constructQuery( $aParams, TRUE );
+			
+			if ( $oQuery->isMutated() ) {
+				self::initQueryHooks();
+				$aParams[ self::$sQhVar ] = $oQuery;
+			}
+			
 			$this->oWpQuery = new WP_Query( $aParams );		
 		}
 		
 		$this->_aEntities = $this->oWpQuery->posts;
 		$this->_iTotalRows = $this->oWpQuery->found_posts;
 		
+		
 		// HACK!!! Hackity hack hack...
 		$iItemsPerPage = intval( $this->_aParams[ 'posts_per_page' ] );
+		
 		if ( $iItemsPerPage > 0 ) {
+			
 			$wp_query->found_posts = $this->_iTotalRows;
 			$wp_query->max_num_pages = ceil( $this->_iTotalRows / $iItemsPerPage );
 		}
@@ -86,6 +106,11 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 	
 	// only kicks in when "use_non_native_query" is set to TRUE
 	public function modifyQuery( $oQuery, $aParams ) {
+		
+		// short circuit this
+		if ( !$aParams[ 'use_non_native_query' ] ) {
+			return $oQuery;
+		}
 		
 		global $wpdb;
 		
@@ -132,6 +157,218 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 		return $oQuery;
 		
 	}
+	
+	
+	
+	//// static query hook methods
+	
+	
+	// wp-includes/query.php
+	
+	// do_action_ref_array('pre_get_posts', array(&$this));
+	// $search = apply_filters_ref_array( 'posts_search', array( $search, &$this ) );
+	// $where = apply_filters_ref_array('posts_where', array( $where, &$this ) );
+	// $join = apply_filters_ref_array('posts_join', array( $join, &$this ) );
+	
+	//// first
+	
+	// $where		= apply_filters_ref_array( 'posts_where_paged',	array( $where, &$this ) );
+	// $groupby	= apply_filters_ref_array( 'posts_groupby',		array( $groupby, &$this ) );
+	// $join		= apply_filters_ref_array( 'posts_join_paged',	array( $join, &$this ) );
+	// $orderby	= apply_filters_ref_array( 'posts_orderby',		array( $orderby, &$this ) );
+	// $distinct	= apply_filters_ref_array( 'posts_distinct',	array( $distinct, &$this ) );
+	// $limits		= apply_filters_ref_array( 'post_limits',		array( $limits, &$this ) );
+	// $fields		= apply_filters_ref_array( 'posts_fields',		array( $fields, &$this ) );
+	
+	// do_action( 'posts_selection', $where . $groupby . $orderby . $limits . $join );
+
+	//// second, caching plugins
+	
+	// $where		= apply_filters_ref_array( 'posts_where_request',		array( $where, &$this ) );
+	// $groupby	= apply_filters_ref_array( 'posts_groupby_request',		array( $groupby, &$this ) );
+	// $join		= apply_filters_ref_array( 'posts_join_request',		array( $join, &$this ) );
+	// $orderby	= apply_filters_ref_array( 'posts_orderby_request',		array( $orderby, &$this ) );
+	// $distinct	= apply_filters_ref_array( 'posts_distinct_request',	array( $distinct, &$this ) );
+	// $fields		= apply_filters_ref_array( 'posts_fields_request',		array( $fields, &$this ) );
+	// $limits		= apply_filters_ref_array( 'post_limits_request',		array( $limits, &$this ) );
+
+	// Filter all clauses at once, for convenience
+	// $clauses = (array) apply_filters_ref_array( 'posts_clauses_request', array( compact( $pieces ), &$this ) );
+
+	
+	//
+	public static function initQueryHooks() {
+		
+		if ( !self::$bInitQueryHooks ) {
+			
+			add_action( 'pre_get_posts', array( __CLASS__, 'qhPreGetPosts' ) );
+			
+			add_filter( 'posts_search', array( __CLASS__, 'qhPostsSearch' ), 10, 2 );
+			add_filter( 'posts_where', array( __CLASS__, 'qhPostsWhere' ), 10, 2 );
+			add_filter( 'posts_join', array( __CLASS__, 'qhPostsJoin' ), 10, 2 );
+			add_filter( 'posts_where_paged', array( __CLASS__, 'qhPostsWherePaged' ), 10, 2 );
+			add_filter( 'posts_groupby', array( __CLASS__, 'qhPostsGroupBy' ), 10, 2 );
+			add_filter( 'posts_join_paged', array( __CLASS__, 'qhPostsJoinPaged' ), 10, 2 );
+			add_filter( 'posts_orderby', array( __CLASS__, 'qhPostsOrderBy' ), 10, 2 );
+			add_filter( 'posts_distinct', array( __CLASS__, 'qhPostsDistinct' ), 10, 2 );
+			add_filter( 'posts_fields', array( __CLASS__, 'qhPostsFields' ), 10, 2 );
+			add_filter( 'post_limits', array( __CLASS__, 'qhPostLimits' ), 10, 2 );
+			add_filter( 'posts_request', array( __CLASS__, 'qhPostsRequest' ), 10, 2 );
+			
+			self::$bInitQueryHooks = TRUE;
+		}
+		
+	}	
+	
+	
+	//
+	public static function qhPreGetPosts( $oWpQuery ) {
+		
+	}
+	
+	//
+	public static function qhPostsSearch( $sSearch, $oWpQuery ) {
+		
+		if ( $oQuery = $oWpQuery->get( self::$sQhVar ) ) {
+			
+		}
+		
+		return $sSearch;
+	}
+	
+	//
+	public static function qhPostsWhere( $sWhere, $oWpQuery ) {
+		
+		if (
+			( $oQuery = $oWpQuery->get( self::$sQhVar ) ) &&
+			( $sQhWhere = $oQuery->getWhere() )
+		) {
+			$sWhere .= sprintf( ' AND %s ', self::replaceReferences( $sQhWhere ) );
+		}
+		
+		return $sWhere;
+	}
+	
+	//
+	public static function qhPostsJoin( $sJoin, $oWpQuery ) {
+		
+		if (
+			( $oQuery = $oWpQuery->get( self::$sQhVar ) ) &&
+			( $sQhJoin = $oQuery->getJoins() )
+		) {			
+			$sJoin .= self::replaceReferences( $sQhJoin );
+		}
+		
+		return $sJoin;
+	}
+	
+	//
+	public static function qhPostsWherePaged( $sWherePaged, $oWpQuery ) {
+		
+		if ( $oQuery = $oWpQuery->get( self::$sQhVar ) ) {
+			
+		}
+		
+		return $sWherePaged;
+	}
+	
+	//
+	public static function qhPostsGroupBy( $sGroupBy, $oWpQuery ) {
+		
+		if ( $oQuery = $oWpQuery->get( self::$sQhVar ) ) {
+			
+		}
+		
+		return $sGroupBy;
+	}
+	
+	//
+	public static function qhPostsJoinPaged( $sJoinPaged, $oWpQuery ) {
+		
+		if ( $oQuery = $oWpQuery->get( self::$sQhVar ) ) {
+			
+		}
+		
+		return $sJoinPaged;
+	}
+	
+	//
+	public static function qhPostsOrderBy( $sOrderBy, $oWpQuery ) {
+		
+		if ( $oQuery = $oWpQuery->get( self::$sQhVar ) ) {
+			
+		}
+		
+		return $sOrderBy;
+	}
+	
+	//
+	public static function qhPostsDistinct( $sDistinct, $oWpQuery ) {
+		
+		if ( $oQuery = $oWpQuery->get( self::$sQhVar ) ) {
+			
+		}
+		
+		return $sDistinct;
+	}
+	
+	//
+	public static function qhPostsFields( $sFields, $oWpQuery ) {
+
+		if (
+			( $oQuery = $oWpQuery->get( self::$sQhVar ) ) && 
+			( $sQhFields = $oQuery->getFields() )
+		) {
+			$sFields .= sprintf( ', %s', self::replaceReferences( $sQhFields ) );
+		}
+		
+		return $sFields;
+	}
+	
+	//
+	public static function qhPostLimits( $sLimits, $oWpQuery ) {
+
+		if ( $oQuery = $oWpQuery->get( self::$sQhVar ) ) {
+			
+		}
+		
+		return $sLimits;
+	}
+	
+	//
+	public static function qhPostsRequest( $sRequest, $oWpQuery ) {
+
+		if ( $oQuery = $oWpQuery->get( self::$sQhVar ) ) {
+			
+		}
+		
+		return $sRequest;
+	}
+	
+	
+	//// helpers
+	
+	//
+	public static function replaceReferences( $sValue ) {
+		
+		global $wpdb;
+		
+		$sValue = sprintf( ' %s ', $sValue );
+		
+		$aRegs = array();
+		
+		if ( preg_match_all( '/([^a-zA-Z_])p\.([a-zA-Z_]+[^a-zA-Z_])/ms', $sValue, $aRegs ) ) {
+			
+			$aRegsFmt = Geko_Array::formatPregMatchAll( $aRegs, array( 'full', 'pre', 'post' ) );
+			
+			foreach ( $aRegsFmt as $aRow ) {
+				$sValue = str_replace( $aRow[ 'full' ], sprintf( '%s%s.%s', $aRow[ 'pre' ], $wpdb->posts, $aRow[ 'post' ] ), $sValue );
+			}
+		}
+		
+		return $sValue;
+	}
+	
 	
 }
 
