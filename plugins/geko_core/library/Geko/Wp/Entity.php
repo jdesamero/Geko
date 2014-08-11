@@ -20,6 +20,8 @@ abstract class Geko_Wp_Entity extends Geko_Entity
 			$this->_sEntityClass, '', '_Service', $this->_sServiceClass
 		);
 		
+		do_action( sprintf( '%s::init', $this->_sEntityClass ), $this );
+		
 		return $this;
 		
 	}

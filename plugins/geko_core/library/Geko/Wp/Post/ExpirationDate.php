@@ -15,8 +15,21 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 		
 		parent::add();
 		
-		Geko_Wp_Post_ExpirationDate_QueryHooks::register();
+		// deprecated:
+		// Geko_Wp_Post_ExpirationDate_QueryHooks::register();
 		
+		// add functionality to entity and queries
+		
+		$aPrefixes = array( 'Gloc_', 'Geko_Wp_' );
+		
+		$sPostEntityClass = Geko_Class::getBestMatch( $aPrefixes, array( 'Post' ) );		
+		add_action( sprintf( '%s::init', $sPostEntityClass ), array( $this, 'initEntity' ) );
+		
+		$sPostQueryClass = Geko_Class::getBestMatch( $aPrefixes, array( 'Post_Query' ) );		
+		add_action( sprintf( '%s::init', $sPostQueryClass ), array( $this, 'initQuery' ) );
+		
+		
+		//// install table
 		
 		$sTableName = 'geko_expiry';
 		Geko_Wp_Db::addPrefix( $sTableName );
@@ -43,6 +56,17 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 		$this->createTableOnce();
 		
 		return $this;
+	}
+	
+	
+	//
+	public function initEntity( $oPost ) {
+		$oPost->addDelegate( 'Geko_Wp_Post_ExpirationDate_Delegate' );
+	}
+	
+	//
+	public function initQuery( $oQuery ) {
+		$oQuery->addPlugin( 'Geko_Wp_Post_ExpirationDate_QueryPlugin' );
 	}
 	
 	
@@ -299,8 +323,8 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 	//
 	private function getMysqlDateFromPost( $prefix ) {
 		
-		$iHr = $_POST[ $prefix . '-hr' ];
-		if ( 'PM' == $_POST[ $prefix . '-ampm' ] ) {
+		$iHr = $_POST[ sprintf( '%s-hr', $prefix ) ];
+		if ( 'PM' == $_POST[ sprintf( '%s-ampm', $prefix ) ] ) {
 			if ( 12 != $iHr ) $iHr += 12;			
 		} else {
 			if ( 12 == $iHr ) $iHr = 0;
@@ -308,19 +332,19 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 		
 		return sprintf(
 			"%s-%'02d-%'02d %'02d:%'02d:00",
-			$_POST[ $prefix . '-yr' ],
-			$_POST[ $prefix . '-mon' ],
-			$_POST[ $prefix . '-dy' ],
+			$_POST[ sprintf( '%s-yr', $prefix ) ],
+			$_POST[ sprintf( '%s-mon', $prefix ) ],
+			$_POST[ sprintf( '%s-dy', $prefix ) ],
 			$iHr,
-			$_POST[ $prefix . '-min' ]
+			$_POST[ sprintf( '%s-min', $prefix ) ]
 		);
 	}
 	
 	//
 	private function getMysqlDateInsertValue( $prefix ) {
 		
-		if ( $_POST[ $prefix . '-check' ] ) {
-			return "'" . $this->getMysqlDateFromPost( $prefix ) . "'";
+		if ( $_POST[ sprintf( '%s-check', $prefix ) ] ) {
+			return sprintf( "'%s'", $this->getMysqlDateFromPost( $prefix ) );
 		} else {
 			return 'NULL';
 		}
@@ -379,25 +403,17 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 		//// DB stuff
 		
 		// Clean-up first
-		$wpdb->query( "DELETE FROM $wpdb->geko_expiry WHERE post_id = $post_id" );
+		$wpdb->query( sprintf( 'DELETE FROM %s WHERE post_id = %d', $wpdb->geko_expiry, $post_id ) );
 		
 		// Insert if present
 		if ( $_POST[ 'gexp-start-check' ] || $_POST[ 'gexp-expiry-check' ] ) {
-			$wpdb->query( "
-				INSERT INTO
-					$wpdb->geko_expiry
-					(
-						post_id,
-						start_date,
-						expiry_date
-					)
-				VALUES
-					(
-						$post_id, " .
-						$this->getMysqlDateInsertValue( 'gexp-start' ) . ", " .
-						$this->getMysqlDateInsertValue( 'gexp-expiry' ) . "
-					)
-			" );
+			
+			$wpdb->insert( $wpdb->geko_expiry, array(
+				'post_id' => $post_id,
+				'start_date' => $this->getMysqlDateInsertValue( 'gexp-start' ),
+				'expiry_date' => $this->getMysqlDateInsertValue( 'gexp-expiry' )
+			) );
+			
 		}
 		
 		return TRUE;	// ???
@@ -408,7 +424,7 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 		
 		global $wpdb;
 		
-		$wpdb->query( "DELETE FROM $wpdb->geko_expiry WHERE post_id = $post_id" );
+		$wpdb->query( sprintf( 'DELETE FROM %s WHERE post_id = %d', $wpdb->geko_expiry, $post_id ) );
 		
 		return TRUE;	// ???
 	}

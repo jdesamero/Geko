@@ -1,5 +1,7 @@
 <?php
 
+// DEPRACATED...
+
 // adds "start_date" and "expiry_date" fields to the query_posts()
 class Geko_Wp_Post_ExpirationDate_QueryHooks extends Geko_Wp_Query_Hooks_Abstract
 {

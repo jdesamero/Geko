@@ -144,6 +144,11 @@ class Geko_Sql_Select
 		return trim( $this->createExpressionList( $this->_aWhere ) );
 	}
 	
+	//
+	public function getOrder() {
+		return trim( implode( ', ', $this->_aOrder ) );
+	}
+	
 	
 	
 	//// query methods

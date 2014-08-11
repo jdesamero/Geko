@@ -110,7 +110,7 @@ class Geko_Wp_Post extends Geko_Wp_Entity
 			return self::get()->post_title;
 		} else {
 			// add dot at the end
-			return self::get()->post_title . '.';
+			return sprintf( '%s.', self::get()->post_title );
 		}
 	}
 	
@@ -130,7 +130,7 @@ class Geko_Wp_Post extends Geko_Wp_Entity
 		$sLastName = get_the_author_lastname();
 		
 		if ( ( '' != $sFirstName ) && ( '' != $sLastName ) ) {
-			return $sFirstName . ' ' . $sLastName;
+			return sprintf( '%s %s', $sFirstName, $sLastName );
 		} else {
 			return get_the_author();
 		}
@@ -373,9 +373,9 @@ class Geko_Wp_Post extends Geko_Wp_Entity
 		
 		// get the category the post belongs to; if more than one, use the first
 		$aCats = $this->getCategories();
-		if ( $aCats->count() > 0 ) $oCat = $aCats[0];
+		if ( $aCats->count() > 0 ) $oCat = $aCats[ 0 ];
 		
-		$oCat = apply_filters( $this->_sEntityClass . '::getCategory', $oCat, $this );
+		$oCat = apply_filters( sprintf( '%s::getCategory', $this->_sEntityClass ), $oCat, $this );
 		
 		return $oCat;
 	}

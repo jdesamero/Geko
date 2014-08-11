@@ -12,9 +12,15 @@ class Geko_Wp_Service_EventCalendar extends Geko_Wp_Service
 	//
 	public function processGetEvents() {
 		
+		$aPrefixes = array( 'Gloc_', 'Geko_Wp_' );
+		
+		$sCatQueryClass = Geko_Class::getBestMatch( $aPrefixes, array( 'Category_Query' ) );
+		$sPostQueryClass = Geko_Class::getBestMatch( $aPrefixes, array( 'Post_Query' ) );
+		
+		
 		
 		// gather category ids
-		$aCalCats = new Gloc_Category_Query( array( 'add_to_calendar' => 1 ) );
+		$aCalCats = new $sCatQueryClass( array( 'add_to_calendar' => 1 ) );
 		
 		$aParams = array(
 			'cat' => $aCalCats->implode( array( '##Id##', ',' ) ),
@@ -54,7 +60,7 @@ class Geko_Wp_Service_EventCalendar extends Geko_Wp_Service
 			$aEvents = array();
 			$aData = array();
 			
-			$aPosts = new Gloc_Post_Query( $aParams, FALSE );
+			$aPosts = new $sPostQueryClass( $aParams, FALSE );
 			
 			foreach ( $aPosts as $i => $oPost ) {
 				
@@ -107,7 +113,7 @@ class Geko_Wp_Service_EventCalendar extends Geko_Wp_Service
 			$aParams[ 'order' ] = 'DESC';
 			
 			// max
-			$aPosts = new Gloc_Post_Query( $aParams, FALSE );
+			$aPosts = new $sPostQueryClass( $aParams, FALSE );
 			$oPost = $aPosts->getOne();
 			
 			$aRange[ 'max' ] = array(
@@ -120,7 +126,7 @@ class Geko_Wp_Service_EventCalendar extends Geko_Wp_Service
 			$aParams[ 'order' ] = 'ASC';
 			
 			// min
-			$aPosts = new Gloc_Post_Query( $aParams, FALSE );
+			$aPosts = new $sPostQueryClass( $aParams, FALSE );
 			$oPost = $aPosts->getOne();
 			
 			$aRange[ 'min' ] = array(

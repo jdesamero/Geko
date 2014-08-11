@@ -39,6 +39,8 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 			return parent::init();
 		}
 		
+		$this->initHooks();
+		
 		global $wp_query;
 		
 		if ( $this->_bIsDefaultQuery ) {
@@ -295,8 +297,11 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 	//
 	public static function qhPostsOrderBy( $sOrderBy, $oWpQuery ) {
 		
-		if ( $oQuery = $oWpQuery->get( self::$sQhVar ) ) {
-			
+		if (
+			( $oQuery = $oWpQuery->get( self::$sQhVar ) ) && 
+			( $sQhOrder = $oQuery->getOrder() )
+		) {
+			$sOrderBy = self::replaceReferences( $sQhOrder );
 		}
 		
 		return $sOrderBy;

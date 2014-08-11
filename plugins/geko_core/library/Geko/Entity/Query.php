@@ -15,6 +15,7 @@ abstract class Geko_Entity_Query
 	protected $_iPos = 0;	
 	
 	protected $_sEntityClass = '';
+	protected $_sQueryClass = '';
 	protected $_sManageClass = '';
 	
 	protected $_sDefaultField = 'Link';
@@ -22,6 +23,12 @@ abstract class Geko_Entity_Query
 	protected $_bIsDefaultQuery = FALSE;
 	
 	protected $_aSubsets = array();
+	
+	protected $_aPlugins = array();
+	
+	
+	
+	
 	
 	/*
 	 * if $mParams is NULL, use default query
@@ -37,6 +44,8 @@ abstract class Geko_Entity_Query
 		$aParams = array();
 		$this->_bAddToDefaultParams = $bAddToDefaultParams;
 		$this->_aData = $aData;
+		
+		$this->_sQueryClass = get_class( $this );
 		
 		$this->_sEntityClass = Geko_Class::resolveRelatedClass(
 			$this, '_Query', '', $this->_sEntityClass
@@ -413,6 +422,16 @@ abstract class Geko_Entity_Query
 		
 		if ( !$oQuery ) $oQuery = $this->createSqlSelect();
 		
+		// modify if there are plugins
+		if ( count( $this->_aPlugins ) > 0 ) {
+			
+			foreach ( $this->_aPlugins as $sPluginClass ) {
+				$oPlugin = Geko_Singleton_Abstract::getInstance( $sPluginClass );
+				$oQuery = $oPlugin->modifyQuery( $oQuery, $aParams );
+			}
+		}
+		
+		
 		// further manipulate by sub-class
 		$oQuery = $this->modifyQuery( $oQuery, $aParams );
 		
@@ -548,6 +567,20 @@ abstract class Geko_Entity_Query
 	public function modifySubset( $sField ) {
 		
 	}
+	
+	
+	//
+	public function addPlugin( $sClassName ) {
+		
+		if ( is_string( $sClassName ) && !in_array( $sClassName, $this->_aPlugins ) ) {
+			$this->_aPlugins[] = $sClassName;
+		}
+		
+		return $this;
+	}
+
+	
+	
 	
 	//// magic methods
 	

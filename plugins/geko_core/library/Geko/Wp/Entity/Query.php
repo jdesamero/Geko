@@ -10,6 +10,8 @@ abstract class Geko_Wp_Entity_Query extends Geko_Entity_Query
 	// implement by sub-class to populate entities/total rows
 	public function init() {
 		
+		$this->initHooks();
+		
 		global $wp_query;
 		
 		$this->_sSqlQuery = $this->constructQuery( $this->_aParams );
@@ -22,6 +24,14 @@ abstract class Geko_Wp_Entity_Query extends Geko_Entity_Query
 			$wp_query->found_posts = $this->_iTotalRows;
 			$wp_query->max_num_pages = ceil( $this->_iTotalRows / $iItemsPerPage );
 		}
+		
+		return $this;
+	}
+	
+	//
+	public function initHooks() {
+		
+		do_action( sprintf( '%s::init', $this->_sQueryClass ), $this );
 		
 		return $this;
 	}
