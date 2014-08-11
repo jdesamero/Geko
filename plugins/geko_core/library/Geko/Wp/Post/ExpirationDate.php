@@ -15,10 +15,9 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 		
 		parent::add();
 		
-		// deprecated:
-		// Geko_Wp_Post_ExpirationDate_QueryHooks::register();
 		
-		// add functionality to entity and queries
+		
+		//// add functionality to entity and queries
 		
 		$aPrefixes = array( 'Gloc_', 'Geko_Wp_' );
 		
@@ -27,6 +26,7 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 		
 		$sPostQueryClass = Geko_Class::getBestMatch( $aPrefixes, array( 'Post_Query' ) );		
 		add_action( sprintf( '%s::init', $sPostQueryClass ), array( $this, 'initQuery' ) );
+		
 		
 		
 		//// install table
