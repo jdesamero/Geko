@@ -912,9 +912,9 @@ class Geko_Sql_Select
 			$aValues[] = sprintf( '(%s)', $sUnquoted );
 			
 			
-			// replace :symbol with array value array('symbol' => 'value')
-			foreach ( $mArgs as $sSymbol => $sValue )
-			{
+			// replace :symbol with array value array( 'symbol' => 'value' )
+			foreach ( $mArgs as $sSymbol => $sValue ) {
+				
 				$aReplace[] = sprintf( ':%s', $sSymbol );
 				$aValues[] = sprintf( "'%s'", Geko_String_Slashes::add( $sValue ) );
 			}

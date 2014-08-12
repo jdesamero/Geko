@@ -64,7 +64,7 @@ class Geko_Wp_Post_ExpirationDate_QueryPlugin extends Geko_Entity_Query_Plugin
 			}
 			
 			if ( $bAddIsExpired ) {
-				$oQuery->field( sprintf( "gpexp.expiry_date <= '%s'", current_time( 'mysql' ) ), 'is_expired' );
+				$oQuery->field( array( 'gpexp.expiry_date <= ?', current_time( 'mysql' ) ), 'is_expired' );
 			}
 			
 			if ( $bAddMin ) {
