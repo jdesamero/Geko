@@ -134,7 +134,7 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 			$this->setMetaCache( $iTermId );
 		}
 		
-		$sValueKey = ( $bInheritValue ) ? 'inherit' : 'meta_value' ;
+		$sValueKey = ( $bInheritValue ) ? 'inherit' : 'meta_value';
 		
 		if ( $sMetaKey ) {
 			
@@ -263,19 +263,18 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 			$aTermIds = array( intval( $aTermIds ) );		// wrap as array
 		}
 		
-		$sQuery = sprintf(
-			
-			"SELECT			m.term_id,
+		$sQuery = "
+			SELECT			m.term_id,
 							n.meta_key,
 							m.meta_value,
 							m.inherit,
 							m.tmeta_id
-			FROM			%s m
+			FROM			$wpdb->geko_term_meta m
 			
-			LEFT JOIN		%s n
+			LEFT JOIN		$wpdb->geko_meta_key n
 				ON			n.mkey_id = m.mkey_id
 			
-			WHERE			m.term_id IN (%s)
+			WHERE			m.term_id IN (" . implode( ',', $aTermIds) . ")
 			
 			UNION
 			
@@ -284,18 +283,11 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 							t.parent AS meta_value,
 							1 AS inherit,
 							0 AS tmeta_id
-			FROM			%s t
+			FROM			$wpdb->term_taxonomy t
 			
-			WHERE			t.term_id IN (%s) AND 
-							t.taxonomy = 'category'",
-			
-			$wpdb->geko_term_meta,
-			$wpdb->geko_meta_key,
-			implode( ',', $aTermIds ),
-			$wpdb->term_taxonomy,
-			implode( ',', $aTermIds )
-		
-		);
+			WHERE			t.term_id IN (" . implode( ',', $aTermIds) . ") AND 
+							t.taxonomy = 'category'
+		";
 		
 		$aFmt = $wpdb->get_results( $sQuery );
 		
@@ -391,101 +383,98 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 		
 		parent::addAdminHead();
 		
-		Geko_Once::run( sprintf( '%s::js', __METHOD__ ), function() {
+		Geko_Once::run( sprintf( '%s::js', __METHOD__ ), array( $this, 'adminHeadJs' ) );
+		
+	}
+	
+	// TO DO: This stuff should be enqueued
+	public function adminHeadJs() {
+		
+		$sParentId = Geko_Wp_Admin_Hooks::getCurrentPlugin()->getValue( 'parent_id' );
+		
+		?><style type="text/css">
 			
-			$sParentId = Geko_Wp_Admin_Hooks::getCurrentPlugin()->getValue( 'parent_id' );
+			.form-field input.checkbox,
+			.form-field input.radio {
+				width: 20px;
+			}
 			
-			$aJsonParams = array(
-				'parent_id_sel' => $sParentId
-			);
+			label.side {
+				display: inline;
+			}
 			
-			?><style type="text/css">
-				
-				.form-field input.checkbox,
-				.form-field input.radio {
-					width: 20px;
-				}
-				
-				label.side {
-					display: inline;
-				}
-				
-				.inherit-toggle label {
-					font-style: italic;
-				}
-				
-				#wpcontent select.multi {
-					height: 6em;
-				}
-				
-			</style>
+			.inherit-toggle label {
+				font-style: italic;
+			}
 			
-			<script type="text/javascript">
+			#wpcontent select.multi {
+				height: 6em;
+			}
+			
+		</style>
+		
+		<script type="text/javascript">
+			
+			var ajaxUpdateCallbacks = new Array();
+			var parent_id_sel = '#<?php echo $sParentId; ?>';
+			
+			jQuery( document ).ready( function( $ ) {
 				
-				var oParams = <?php echo Zend_Json::encode( $aJsonParams ); ?>;
+				// setup
+				var catParentId;
 				
-				var ajaxUpdateCallbacks = [];
-				var parent_id_sel = oParams.parent_id_sel;
-				
-				jQuery( document ).ready( function( $ ) {
+				var updateFields = function( fade, delay ) {
 					
-					// setup
-					var catParentId;
+					catParentId = parseInt( $( parent_id_sel ).val() );
 					
-					var updateFields = function( fade, delay ) {
+					$( '.form-field.inheritable' ).each( function() {
+						var fieldGroup = $( this ).find( '.field-group' );
+						var inheritToggle = $( this ).find( '.inherit-toggle' );
 						
-						catParentId = parseInt( $( parent_id_sel ).val() );
-						
-						$( '.form-field.inheritable' ).each( function() {
-							var fieldGroup = $( this ).find( '.field-group' );
-							var inheritToggle = $( this ).find( '.inherit-toggle' );
+						if ( -1 == catParentId ) {
+							fieldGroup.showX( fade, delay );
+							inheritToggle.hideX( fade, delay );
+						} else {
+							if ( inheritToggle.find( '.checkbox' ).attr( 'checked' ) ) fieldGroup.hideX( fade, delay );
+							else fieldGroup.showX( fade, delay );
 							
-							if ( -1 == catParentId ) {
-								fieldGroup.showX( fade, delay );
-								inheritToggle.hideX( fade, delay );
-							} else {
-								if ( inheritToggle.find( '.checkbox' ).attr( 'checked' ) ) fieldGroup.hideX( fade, delay );
-								else fieldGroup.showX( fade, delay );
-								
-								inheritToggle.showX( fade, delay );
-							}
-						} );
-						
-					}
-					
-					updateFields();									// update with no effects
-					ajaxUpdateCallbacks.push( updateFields );		// register so it's triggered during an ajax request
-					
-					$( parent_id_sel ).change( function () {
-						catParentId = parseInt( $( this ).val() );
-						updateFields( true );		// update with effects
-					} );
-					
-					$( '.inherit-toggle .checkbox' ).click( function () {
-						var fieldGroup = $( this ).parent().parent().find( '.field-group' );
-						
-						if ( $( this ).attr( 'checked' ) ) fieldGroup.fadeOut( 200 );
-						else fieldGroup.fadeIn( 200 );					
-					} );
-					
-					$( '#addcat' ).ajaxComplete( function ( evt, req, settings) {
-						if ( 'add-cat' == settings.action ) {
-							
-							$( '.inherit-toggle .checkbox' ).each( function() {
-								$( this ).attr( 'checked', 'checked' );
-							} );
-							
-							$.each( ajaxUpdateCallbacks, function() {
-								this();
-							} );
+							inheritToggle.showX( fade, delay );
 						}
 					} );
 					
+				}
+				
+				updateFields();									// update with no effects
+				ajaxUpdateCallbacks.push( updateFields );		// register so it's triggered during an ajax request
+				
+				$( parent_id_sel ).change( function () {
+					catParentId = parseInt( $( this ).val() );
+					updateFields( true );		// update with effects
 				} );
 				
-			</script><?php
+				$( '.inherit-toggle .checkbox' ).click( function () {
+					var fieldGroup = $( this ).parent().parent().find( '.field-group' );
+					
+					if ( $( this ).attr( 'checked' ) ) fieldGroup.fadeOut( 200 );
+					else fieldGroup.fadeIn( 200 );					
+				} );
+				
+				$( '#addcat' ).ajaxComplete( function ( evt, req, settings) {
+					if ( 'add-cat' == settings.action ) {
+						
+						$( '.inherit-toggle .checkbox' ).each( function() {
+							$( this ).attr( 'checked', 'checked' );
+						} );
+						
+						$.each( ajaxUpdateCallbacks, function() {
+							this();
+						} );
+					}
+				} );
+				
+			} );
 			
-		} );
+		</script><?php
 		
 	}
 	
@@ -507,20 +496,16 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 		$sFields = '';
 		
 		foreach ( $aParts as $aPart ) {
-			
-			$sFields .= sprintf(
-				
-				'<div class="%s">%s<div class="%s">%s</div>%s%s</div>',
-				
-				$aPart[ 'row_class' ],
-				$aPart[ 'label' ],
-				$aPart[ 'field_group_class' ],
-				$aPart[ 'field_group' ],
-				$aPart[ 'inherit_toggle' ],
-				Geko_String::sw( '<p>%s</p>', $aPart[ 'description' ] )
-				
-			);
-			
+			$sFields .= '
+				<div class="' . $aPart[ 'row_class' ] . '">
+					' . $aPart[ 'label' ] . '
+					<div class="' . $aPart[ 'field_group_class' ] . '">
+						' . $aPart[ 'field_group' ] . '
+					</div>
+					' . $aPart[ 'inherit_toggle' ] . '
+					' . Geko_String::sw( '<p>%s</p>', $aPart[ 'description' ] ) . '
+				</div>
+			';
 		}
 		
 		Geko_PhpQuery::last( $oCatDoc[ 'div.form-field' ] )->after( $sFields );
@@ -535,23 +520,18 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 		$sFields = '';
 		
 		foreach ( $aParts as $aPart ) {
-			
-			$sFields .= sprintf(
-			
-				'<tr class="%s">
-					<th scope="row" valign="top">%s</th>
-					<td><div class="%s">%s</div>%s%s</td>
-				</tr>',
-				
-				$aPart[ 'row_class' ],
-				$aPart[ 'label' ],
-				$aPart[ 'field_group_class' ],
-				$aPart[ 'field_group' ],
-				$aPart[ 'inherit_toggle' ],
-				Geko_String::sw( '<span class="description">%s</span>', $aPart[ 'description' ] )
-				
-			);
-			
+			$sFields .= '
+				<tr class="' . $aPart[ 'row_class' ] . '">
+					<th scope="row" valign="top">' . $aPart[ 'label' ] . '</th>
+					<td>
+						<div class="' . $aPart[ 'field_group_class' ] . '">
+							' . $aPart[ 'field_group' ] . '
+						</div>
+						' . $aPart[ 'inherit_toggle' ] . '
+					' . Geko_String::sw( '<span class="description">%s</span>', $aPart[ 'description' ] ) . '
+					</td>
+				</tr>
+			';
 		}
 		
 		Geko_PhpQuery::last( $oCatDoc[ 'tr.form-field' ] )->after( $sFields );
@@ -572,7 +552,7 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 			
 			$aPart[ 'inheritable' ] = TRUE;
 			
-			$sToggleId = sprintf( 'inherit-%s', $aPart[ 'name' ] );
+			$sToggleId = 'inherit-' . $aPart[ 'name' ];
 			
 			$sChecked = '';
 			if ( $iCatId = $this->_getCatId() ) {
@@ -583,13 +563,12 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 				$sChecked = 'checked="checked"';
 			}
 			
-			$sInheritToggle = sprintf( '
+			$sInheritToggle = '
 				<div class="inherit-toggle">
-					<input type="checkbox" class="checkbox" id="%s" name="%s" %s value="1" /> 
-					<label class="side" for="%s">Inherit from parent</label>
+					<input type="checkbox" class="checkbox" id="' . $sToggleId . '" name="' . $sToggleId . '" ' . $sChecked . ' value="1" /> 
+					<label class="side" for="' . $sToggleId . '">Inherit from parent</label>
 				</div>
-			', $sToggleId, $sToggleId, $sChecked, $sToggleId );
-			
+			';
 			$sFieldGroupClass = 'field-group';
 			$sRowClass .= ' inheritable';
 			
@@ -634,29 +613,25 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 		;
 		
 		if ( 'update' == $sMode ) {
-			
-			$aMeta = Geko_Wp_Db::getResultsHash( sprintf(
+			$aMeta = Geko_Wp_Db::getResultsHash(
+				$wpdb->prepare(
+					"	SELECT			m.term_id,
+										n.meta_key,
+										m.meta_value,
+										m.inherit,
+										m.tmeta_id
+						FROM				$wpdb->geko_term_meta m
 					
-				'SELECT			m.term_id,
-								n.meta_key,
-								m.meta_value,
-								m.inherit,
-								m.tmeta_id
-				FROM				%s m
-			
-				LEFT JOIN		%s n
-					ON			n.mkey_id = m.mkey_id
-			
-				WHERE			m.term_id = %d',
-				
-				$wpdb->geko_term_meta,
-				$wpdb->geko_meta_key,
-				$iTermId
-				
-			), 'meta_key' );
-			
+						LEFT JOIN		$wpdb->geko_meta_key n
+							ON			n.mkey_id = m.mkey_id
+					
+						WHERE			m.term_id = %d
+					",
+					$iTermId
+				),
+				'meta_key'
+			);
 		} else {
-			
 			$aMeta = array();
 		}
 		
@@ -682,7 +657,7 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 	
 	//
 	protected function commitMetaDataValue( $aVals, $oMeta, $sMetaKey, $aParams ) {
-		$aVals[ 'inherit' ] = intval( $_POST[ sprintf( 'inherit-%s', $sMetaKey ) ] );
+		$aVals[ 'inherit' ] = intval( $_POST[ 'inherit-' . $sMetaKey ] );
 		return $aVals;
 	}
 	
@@ -700,22 +675,22 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 		global $wpdb;
 				
 		// meta
-		$wpdb->query( "
+		$wpdb->query("
 			DELETE FROM		$wpdb->geko_term_meta
 			WHERE			term_id NOT IN (
 				SELECT			term_id
 				FROM			$wpdb->terms
 			)
-		" );
+		");
 		
 		// members
-		$wpdb->query( "
+		$wpdb->query("
 			DELETE FROM		$wpdb->geko_term_meta_members
 			WHERE			tmeta_id NOT IN (
 				SELECT			tmeta_id
 				FROM			$wpdb->geko_term_meta
 			)
-		" );
+		");
 		
 	}
 	

@@ -11,7 +11,10 @@
 			mapImgSel: 'img.map',
 			
 			minimap: null,
-			geoproj: null
+			geoproj: null,
+			
+			viewPortWidth: null,
+			viewPortHeight: null
 			
 		}, options );
 		
@@ -27,7 +30,8 @@
 			
 			oMmOpts = $.extend( {
 				mainSel: '.minimap',
-				viewerSel: '.viewer'				
+				viewerSel: '.viewer',
+				markerCallback: null
 			}, oMmOpts );
 			
 		}
@@ -67,10 +71,23 @@
 			var eMap = $( this );
 			var eMapImg = eMap.find( opts.mapImgSel );
 			
+			var iScaleFactor = null;
+			var sMiniMarkerClass = null;
+			
 			if ( oMmOpts ) {
+				
 				var eMiniMap = eMap.parent().find( oMmOpts.mainSel );
 				var eViewer = eMiniMap.find( oMmOpts.viewerSel );
+				
 				eViewer.hide();
+				
+				if ( oMmOpts.dynamicViewerScale ) {
+					iScaleFactor = oMmOpts.dynamicViewerScale;
+				}
+
+				if ( oMmOpts.markerClass ) {
+					sMiniMarkerClass = oMmOpts.markerClass;
+				}
 			}
 			
 			
@@ -101,8 +118,14 @@
 					
 					var oCenPos = oMapProj.getCoords( iCenterLat, iCenterLng );
 					
-					var iCenXpos = parseInt( oCenPos.x - ( eMap.width() / 2 ) );
-					var iCenYpos = parseInt( oCenPos.y - ( eMap.height() / 2 ) );
+					var iMapWinWdt = opts.viewPortWidth;
+					if ( !iMapWinWdt ) iMapWinWdt = eMap.width();
+					
+					var iMapWinHgt = opts.viewPortHeight;
+					if ( !iMapWinHgt ) iMapWinHgt = eMap.height();
+					
+					var iCenXpos = parseInt( oCenPos.x - ( iMapWinWdt / 2 ) );
+					var iCenYpos = parseInt( oCenPos.y - ( iMapWinHgt / 2 ) );
 					
 					var iMapWdt = eMapImg.width();
 					var iMapHgt = eMapImg.height();
@@ -135,6 +158,27 @@
 						eMarker.attr( 'id', 'p-%d-%d'.printf( iXpos, iYpos ) );
 					}
 					
+					
+					if ( iScaleFactor && sMiniMarkerClass ) {
+						
+						var aMmPoint = eMarker.attr( 'id' ).split( '-' );
+
+						var eMiniMarker = $( '<div></div>' );
+						
+						eMiniMarker.addClass( sMiniMarkerClass );
+						
+						eMiniMarker.css( {
+							left: '%dpx'.printf( parseInt( aMmPoint[ 1 ] ) / iScaleFactor ),
+							top: '%dpx'.printf( parseInt( aMmPoint[ 2 ] ) / iScaleFactor )
+						} );
+						
+						eMiniMap.prepend( eMiniMarker );
+						
+						if ( oMmOpts.markerCallback ) {
+							oMmOpts.markerCallback.call( eMap, eMiniMarker, eMarker );
+						}
+					}
+											
 				} );
 				
 			}
@@ -156,9 +200,7 @@
 					//
 					if ( oMmOpts ) {
 						
-						if ( oMmOpts.dynamicViewerScale ) {
-						
-							var iScaleFactor = oMmOpts.dynamicViewerScale;
+						if ( iScaleFactor ) {
 							
 							var fnResize = function(){
 								
@@ -224,8 +266,6 @@
 						var pos = eImageContent.position();
 						fnReposViewer( eViewer, pos.left, pos.top, xRFactor, yRFactor );
 						eViewer.show();
-						
-						
 						
 						
 					}

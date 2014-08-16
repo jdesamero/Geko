@@ -153,29 +153,7 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 		
 		parent::addAdminHead( $oPlugin );
 		
-		
-		Geko_Once::run( sprintf( '%s::js', __METHOD__ ), function() {
-			
-			?><script type="text/javascript">		
-				
-				jQuery.fn.extend( {
-					showX: function ( fade, delay ) {
-						if ( !delay ) delay = 200;
-						
-						if ( !fade ) this.show();	
-						else this.fadeIn( delay );
-					},
-					hideX: function ( fade, delay ) {
-						if ( !delay ) delay = 200;
-						
-						if ( !fade ) this.hide();	
-						else this.fadeOut( delay );
-					}
-				} )
-				
-			</script><?php
-			
-		} );
+		Geko_Once::run( sprintf( '%s::js', __METHOD__ ), array( $this, 'adminHeadJs0' ) );
 		
 	}
 	
@@ -688,6 +666,33 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	
 	
 	//// form processing/injection methods
+	
+	// shared javascript
+	// TO DO: this should 
+	public function adminHeadJs0() {
+		
+		?><script type="text/javascript">		
+			
+			jQuery.fn.extend( {
+				showX: function ( fade, delay ) {
+					if ( !delay ) delay = 200;
+					
+					if ( !fade ) this.show();	
+					else this.fadeIn( delay );
+				},
+				hideX: function ( fade, delay ) {
+					if ( !delay ) delay = 200;
+					
+					if ( !fade ) this.hide();	
+					else this.fadeOut( delay );
+				}
+			} )
+			
+		</script><?php
+		
+		return $this;
+	}
+	
 	
 	//
 	protected function getFormDoc( $oPlugin = NULL ) {
