@@ -12,6 +12,20 @@ class Geko_Entity_Query_Plugin extends Geko_Singleton_Abstract
 	}
 	
 	
+	
+	//// helpers
+	
+	//
+	public function getImplodedIds( $mIds ) {
+		return ( is_array( $mIds ) ) ? implode( ',', $mIds ) : trim( $mIds ) ;
+	}
+	
+	//
+	public function getExplodedIds( $mIds ) {
+		return ( is_string( $mIds ) ) ? explode( ',', $mIds ) : $mIds ;
+	}
+	
+	
 	//
 	public function getSortOrder( $sOrder, $sDefOrder = 'ASC' ) {
 		

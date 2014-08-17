@@ -1,7 +1,7 @@
 <?php
 
 //
-class Geko_Wp_Post_QueryPlugin_Random extends Geko_Entity_Query_Plugin
+class Geko_Wp_Post_Query_Plugin_Random extends Geko_Entity_Query_Plugin
 {
 	
 	

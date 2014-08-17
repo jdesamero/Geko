@@ -3,7 +3,9 @@
 //
 class Geko_Wp_Category_PostTemplate extends Geko_Wp_Category_Meta
 {
-	protected $sTemplate;
+	
+	protected $_sTemplate;
+	
 	
 	
 	//// init
@@ -30,16 +32,16 @@ class Geko_Wp_Category_PostTemplate extends Geko_Wp_Category_Meta
 			$oPost = new Geko_Wp_Post( $post );
 			$iActualCatId = $oPost->getCategory()->getId();
 			
-			$iActualCatId = apply_filters( __METHOD__ . '::actualCatId', $iActualCatId, $oPost, $this );
+			$iActualCatId = apply_filters( sprintf( '%s::actualCatId', __METHOD__ ), $iActualCatId, $oPost, $this );
 			
 			// see if there is a matching template
 			if (
 				$iActualCatId && 
 				( $sTemplate = $this->getTemplate( $iActualCatId ) ) &&
-				( $sTemplatePath = realpath( TEMPLATEPATH . '/' . $sTemplate ) ) 
+				( $sTemplatePath = realpath( sprintf( '%s/%s', TEMPLATEPATH, $sTemplate ) ) ) 
 			) {
-				$this->sTemplate = $sTemplate;
-				include(  $sTemplatePath );
+				$this->_sTemplate = $sTemplate;
+				include( apply_filters( 'template_include', $sTemplatePath ) );
 				die();
 			}
 		}
@@ -52,11 +54,11 @@ class Geko_Wp_Category_PostTemplate extends Geko_Wp_Category_Meta
 	public function getTemplate( $iCatId = NULL ) {
 		
 		if ( NULL === $iCatId ) {
-			return $this->sTemplate;
+			return $this->_sTemplate;
 		} else {
 			return $this->getInheritedValue(
 				$iCatId,
-				$this->getPrefixWithSep() . 'category_post_template'
+				sprintf( '%scategory_post_template', $this->getPrefixWithSep() )
 			);
 		}
 	}
@@ -65,14 +67,14 @@ class Geko_Wp_Category_PostTemplate extends Geko_Wp_Category_Meta
 	public function getTemplates() {
 		$oTmpl = Geko_Wp_Template::getInstance();
 		return $oTmpl->getTemplateValues( array(
-			'prefix' => $this->getPrefixWithSep() . 'category-post-template',
+			'prefix' => sprintf( '%scategory-post-template', $this->getPrefixWithSep() ),
 			'attribute_name' => 'Category Post Template'
 		) );
 	}
 	
 	//
 	public function isTemplate( $sTemplate ) {
-		return ( $this->sTemplate == $sTemplate );
+		return ( $this->_sTemplate == $sTemplate );
 	}
 	
 	

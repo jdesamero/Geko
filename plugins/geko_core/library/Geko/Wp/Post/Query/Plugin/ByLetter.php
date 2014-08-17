@@ -1,7 +1,7 @@
 <?php
 
 //
-class Geko_Wp_Post_QueryPlugin_ByLetter extends Geko_Entity_Query_Plugin
+class Geko_Wp_Post_Query_Plugin_ByLetter extends Geko_Entity_Query_Plugin
 {
 	
 	

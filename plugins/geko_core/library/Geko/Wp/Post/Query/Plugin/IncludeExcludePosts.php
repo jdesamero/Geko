@@ -1,19 +1,8 @@
 <?php
 
 //
-class Geko_Wp_Post_QueryPlugin_IncludeExcludePosts extends Geko_Entity_Query_Plugin
+class Geko_Wp_Post_Query_Plugin_IncludeExcludePosts extends Geko_Entity_Query_Plugin
 {
-	
-	
-	//
-	public function getImplodedIds( $mIds ) {
-		return ( is_array( $mIds ) ) ? implode( ',', $mIds ) : trim( $mIds ) ;
-	}
-	
-	//
-	public function getExplodedIds( $mIds ) {
-		return ( is_string( $mIds ) ) ? explode( ',', $mIds ) : $mIds ;
-	}
 	
 	
 	//

@@ -3,7 +3,9 @@
 //
 class Geko_Wp_Category_Template extends Geko_Wp_Category_Meta
 {
-	protected $sTemplate;
+	
+	protected $_sTemplate;
+	
 	
 	
 	//// init
@@ -23,15 +25,15 @@ class Geko_Wp_Category_Template extends Geko_Wp_Category_Meta
 		
 		if ( is_category() ) {
 			
-			$iCatId = intval( get_query_var('cat') );
+			$iCatId = intval( get_query_var( 'cat' ) );
 			$sTemplate = $this->getTemplate( $iCatId );
 			
 			if (
 				$sTemplate &&
-				( $sTemplatePath = realpath( TEMPLATEPATH . '/' . $sTemplate ) ) 
+				( $sTemplatePath = realpath( sprintf( '%s/%s', TEMPLATEPATH, $sTemplate ) ) ) 
 			) {
-				$this->sTemplate = $sTemplate;
-				include(  $sTemplatePath );
+				$this->_sTemplate = $sTemplate;
+				include( apply_filters( 'template_include', $sTemplatePath ) );
 				die();
 			}
 		}
@@ -44,11 +46,11 @@ class Geko_Wp_Category_Template extends Geko_Wp_Category_Meta
 	public function getTemplate( $iCatId = NULL ) {
 		
 		if ( NULL === $iCatId ) {
-			return $this->sTemplate;
+			return $this->_sTemplate;
 		} else {
 			return $this->getInheritedValue(
 				$iCatId,
-				$this->getPrefixWithSep() . 'category_template'
+				sprintf( '%scategory_template', $this->getPrefixWithSep() )
 			);
 		}
 	}
@@ -57,14 +59,14 @@ class Geko_Wp_Category_Template extends Geko_Wp_Category_Meta
 	public function getTemplates() {
 		$oTmpl = Geko_Wp_Template::getInstance();
 		return $oTmpl->getTemplateValues( array(
-			'prefix' => $this->getPrefixWithSep() . 'category-template',
+			'prefix' => sprintf( '%scategory-template', $this->getPrefixWithSep() ),
 			'attribute_name' => 'Category Template'
 		) );
 	}
 	
 	//
 	public function isTemplate( $sTemplate ) {
-		return ( $this->sTemplate == $sTemplate );
+		return ( $this->_sTemplate == $sTemplate );
 	}
 	
 	
