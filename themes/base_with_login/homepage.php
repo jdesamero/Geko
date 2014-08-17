@@ -97,5 +97,5 @@ class Gloc_Layout_Homepage extends Gloc_Layout
 	
 }
 
-geko_render_template();
+
 

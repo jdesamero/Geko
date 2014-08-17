@@ -26,5 +26,5 @@ class Gloc_Layout_Page extends Gloc_Layout
 	}
 }
 
-geko_render_template();
+
 

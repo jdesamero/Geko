@@ -2,19 +2,9 @@
 
 // wordpress specific
 if ( defined( 'ABSPATH' ) ) {
-
+	
 	// constants
 	define( 'GEKO_WP_ABSPATH', substr_replace( ABSPATH, '', strlen( ABSPATH ) - 1, strlen( ABSPATH ) ) );
-	
-	// rendering function
-	function geko_render_template() {
-		
-		// only render if not in admin mode
-		if ( !is_admin() ) {
-			$sBootClass = Geko_Class::existsCoalesce( 'Gloc_Bootstrap', 'Geko_Wp_Bootstrap' );
-			Geko_Singleton_Abstract::getInstance( $sBootClass )->renderTemplate();
-		}
-	}
 	
 }
 

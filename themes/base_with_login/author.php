@@ -50,5 +50,5 @@ class Gloc_Layout_Author extends Gloc_Layout
 	
 }
 
-geko_render_template();
+
 

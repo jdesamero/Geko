@@ -32,5 +32,5 @@ class Gloc_Layout_Sitemap extends Gloc_Layout
 	}
 }
 
-geko_render_template();
+
 

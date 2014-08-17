@@ -135,5 +135,5 @@ class Gloc_Layout_PageLoginUnsubscribe extends Gloc_Layout
 	}
 }
 
-geko_render_template();
+
 

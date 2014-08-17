@@ -102,8 +102,19 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 		;
 		
 	}
-
 	
+	
+	
+	//// start
+	
+	//
+	public function start() {
+		
+		parent::start();
+		
+		add_filter( 'template_include', array( $this, 'templateInclude' ), 9999 );
+		
+	}
 	
 	
 	//// components
@@ -285,14 +296,11 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	//// helpers
 	
 	//
-	public function renderTemplate() {
+	public function templateInclude( $sTemplate ) {
 		
-		// determine the wordpress template file that was called
-		
-		$aBt = debug_backtrace();
-		$sTemplate = $aBt[ 1 ][ 'file' ];
 		
 		$sCurTmpSuffix = Geko_Inflector::camelize( pathinfo( $sTemplate, PATHINFO_FILENAME ) );
+		
 		
 		//
 		Geko_Debug::out( $sTemplate, __METHOD__ );
@@ -333,7 +341,14 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 		Geko_Singleton_Abstract::getInstance( $oResolve->getClass( 'Renderer' ) )->render();
 		
 		
+		
+		// let's have wp-includes/template-loader.php load an empty file instead
+		$sEmptyTemplate = sprintf( '%s/includes/empty.inc.php', TEMPLATEPATH );
+		
+		return $sEmptyTemplate;
 	}
+	
+	
 	
 	// hook methods
 	

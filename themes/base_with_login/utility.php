@@ -71,5 +71,5 @@ class Gloc_Layout_Utility extends Gloc_Layout
 	}
 }
 
-geko_render_template();
+
 

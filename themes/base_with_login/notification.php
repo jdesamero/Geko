@@ -69,5 +69,5 @@ class Gloc_Layout_Notification extends Gloc_Layout
 	
 }
 
-geko_render_template();
+
 

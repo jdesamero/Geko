@@ -135,5 +135,5 @@ class Gloc_Layout_PageLoginForgotPassword extends Gloc_Layout
 	}
 }
 
-geko_render_template();
+
 

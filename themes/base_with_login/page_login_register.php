@@ -197,5 +197,5 @@ class Gloc_Layout_PageLoginRegister extends Gloc_Layout
 	}
 }
 
-geko_render_template();
+
 

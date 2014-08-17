@@ -29,5 +29,5 @@ class Gloc_Layout_Nosidebar extends Gloc_Layout
 	}
 }
 
-geko_render_template();
+
 

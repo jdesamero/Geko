@@ -145,5 +145,5 @@ class Gloc_Layout_PageLoginActivateAccount extends Gloc_Layout
 	}
 }
 
-geko_render_template();
+
 

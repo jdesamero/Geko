@@ -59,5 +59,5 @@ class Gloc_Layout_Category extends Gloc_Layout
 	}
 }
 
-geko_render_template();
+
 

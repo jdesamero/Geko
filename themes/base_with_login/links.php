@@ -33,6 +33,6 @@ class Gloc_Layout_Links extends Gloc_Layout
 	}
 }
 
-geko_render_template();
+
 
 

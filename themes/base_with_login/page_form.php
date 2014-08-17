@@ -171,5 +171,5 @@ class Gloc_Layout_PageForm extends Gloc_Layout
 	
 }
 
-geko_render_template();
+
 

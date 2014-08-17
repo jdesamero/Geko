@@ -247,5 +247,5 @@ class Gloc_Layout_PageLoginUpdateProfile extends Gloc_Layout
 	
 }
 
-geko_render_template();
+
 

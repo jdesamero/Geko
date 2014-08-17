@@ -20,7 +20,7 @@ class Geko_Wp_Resolver
 	
 	//
 	public function setClassFileMapping( $aClassMapping ) {
-		$this->_aClassMapping = array_merge( $this->_aClassMapping, $aClassMapping );
+		$this->_aClassMapping += $aClassMapping;
 		return $this;
 	}
 	
