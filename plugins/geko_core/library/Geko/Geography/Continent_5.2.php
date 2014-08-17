@@ -113,20 +113,7 @@ class Geko_Geography_Continent extends Geko_Geography
 
 	//
 	public function getContinentId( $sCodeOrName ) {
-		
-		return $this->_getDbId(
-			
-			$sCodeOrName, '_aContinents', self::FIELD_DB_ID,
-			
-			function( $aRow, $sCode ) {
-				return array(
-					'continent_name' => $aRow[ Geko_Geography_Continent::FIELD_NAME ],
-					'continent_abbr' => $sCode
-				);			
-			}
-			
-		);
-		
+		return $this->_getDbId( $sCodeOrName, '_aContinents', self::FIELD_DB_ID );
 	}
 	
 	//
@@ -134,6 +121,14 @@ class Geko_Geography_Continent extends Geko_Geography
 		return $this->_populateDbTable( $aCodes, 'getContinents', 'getContinentId' );
 	}
 	
+	//
+	public function _formatDbInsertData( $aRow, $sCode ) {
+		return array(
+			'continent_name' => $aRow[ self::FIELD_NAME ],
+			'continent_abbr' => $sCode
+		);	
+	}
+
 	
 	
 }

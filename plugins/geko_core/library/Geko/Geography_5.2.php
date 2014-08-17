@@ -93,7 +93,7 @@ class Geko_Geography extends Geko_Singleton_Abstract
 				( !$iDbId = $aRow[ $iFldDbId ] )
 			) {
 				
-				$aData = call_user_func( $fnDataCb, $aRow, $sCode );
+				$aData = $this->_formatDbInsertData( $aRow, $sCode );
 				
 				$oDb->insert( $this->_sTableName, $aData );
 				
@@ -123,6 +123,10 @@ class Geko_Geography extends Geko_Singleton_Abstract
 		return $this;	
 	}
 	
+	// to be implemented by sub-class
+	public function _formatDbInsertData( $aRow, $sCode ) {
+	
+	}
 	
 	
 	

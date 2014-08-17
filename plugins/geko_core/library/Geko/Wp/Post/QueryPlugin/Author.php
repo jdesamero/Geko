@@ -10,6 +10,10 @@ class Geko_Wp_Post_QueryPlugin_Author extends Geko_Entity_Query_Plugin
 		
 		global $wpdb;
 		
+		// apply super-class manipulations
+		$oQuery = parent::modifyQuery( $oQuery, $aParams );
+		
+		
 		if ( $aParams[ 'add_author_field' ] ) {
 			
 			

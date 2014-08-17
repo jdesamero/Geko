@@ -6,14 +6,13 @@ class Geko_Wp_Role_Query extends Geko_Wp_Entity_Query
 	//// static methods
 
 	//
-	public function getDefaultParams()
-	{
+	public function getDefaultParams() {
 		return $this->setWpQueryVars( 'paged', 'posts_per_page' );
 	}
 	
 	//
-	public function modifyQuery( $oQuery, $aParams )
-	{
+	public function modifyQuery( $oQuery, $aParams ) {
+		
 		global $wpdb;
 		
 		// apply super-class manipulations

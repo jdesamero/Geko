@@ -237,26 +237,7 @@ class Geko_Geography_Country extends Geko_Geography
 
 	//
 	public function getCountryId( $sCodeOrName ) {
-		
-		return $this->_getDbId(
-			
-			$sCodeOrName, '_aCountries', self::FIELD_DB_ID,
-			
-			function( $aRow, $sCode ) {
-				
-				$oGeoCont = Geko_Geography_Continent::getInstance();
-				
-				return array(
-					'country_name' => $aRow[ Geko_Geography_Country::FIELD_NAME ],
-					'country_abbr' => $sCode,
-					'latitude' => $aRow[ Geko_Geography_Country::FIELD_LATITUDE ],
-					'longitude' => $aRow[ Geko_Geography_Country::FIELD_LONGITUDE ],
-					'continent_id' => $oGeoCont->getContinentId( $aRow[ Geko_Geography_Country::FIELD_CONTINENT ] )
-				);
-			}
-			
-		);
-		
+		return $this->_getDbId( $sCodeOrName, '_aCountries', self::FIELD_DB_ID );
 	}
 	
 	//
@@ -264,7 +245,21 @@ class Geko_Geography_Country extends Geko_Geography
 		return $this->_populateDbTable( $aCodes, 'getCountries', 'getCountryId' );
 	}
 	
-
+	//
+	public function _formatDbInsertData( $aRow, $sCode ) {
+		
+		$oGeoCont = Geko_Geography_Continent::getInstance();
+		
+		return array(
+			'country_name' => $aRow[ self::FIELD_NAME ],
+			'country_abbr' => $sCode,
+			'latitude' => $aRow[ self::FIELD_LATITUDE ],
+			'longitude' => $aRow[ self::FIELD_LONGITUDE ],
+			'continent_id' => $oGeoCont->getContinentId( $aRow[ self::FIELD_CONTINENT ] )
+		);
+	}
+	
+	
 	
 }
 

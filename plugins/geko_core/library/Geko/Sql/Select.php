@@ -145,9 +145,20 @@ class Geko_Sql_Select
 	}
 	
 	//
+	public function getGroup() {
+		return trim( implode( ', ', $this->_aGroup ) );
+	}
+
+	//
+	public function getHaving() {
+		return trim( $this->createExpressionList( $this->_aHaving ) );
+	}
+	
+	//
 	public function getOrder() {
 		return trim( implode( ', ', $this->_aOrder ) );
 	}
+	
 	
 	
 	

@@ -1,5 +1,7 @@
 <?php
 
+// DEPRECATED: Use Geko_Wp_Post_Query instead
+
 // static class container for $wp_query hooks
 abstract class Geko_Wp_Query_Hooks_Abstract
 {

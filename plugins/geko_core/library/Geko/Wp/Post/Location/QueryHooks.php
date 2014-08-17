@@ -1,5 +1,7 @@
 <?php
 
+// DEPRECATED: Use Geko_Wp_Post_Location_QueryPlugin instead
+
 //
 class Geko_Wp_Post_Location_QueryHooks extends Geko_Wp_Query_Hooks_Abstract
 {	

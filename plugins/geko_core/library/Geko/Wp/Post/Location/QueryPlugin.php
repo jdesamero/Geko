@@ -32,6 +32,10 @@ class Geko_Wp_Post_Location_QueryPlugin extends Geko_Entity_Query_Plugin
 		
 		global $wpdb;
 		
+		// apply super-class manipulations
+		$oQuery = parent::modifyQuery( $oQuery, $aParams );
+		
+		
 		$mParams = $aParams[ 'location_fields' ];
 		$bOrderByDistance = ( 'distance' == $aParams[ 'orderby' ] );
 		
@@ -183,10 +187,8 @@ class Geko_Wp_Post_Location_QueryPlugin extends Geko_Entity_Query_Plugin
 			//// order by
 			
 			if ( $bOrderByDistance ) {
-
-				if ( !$sOrder = $aParams[ 'order' ] ) {
-					$sOrder = 'ASC';
-				}
+				
+				$sOrder = $this->getSortOrder( $aParams[ 'order' ] );
 				
 				$oQuery->order( 'distance', $sOrder );
 			}

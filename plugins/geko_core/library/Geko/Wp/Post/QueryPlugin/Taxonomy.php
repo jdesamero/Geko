@@ -10,6 +10,10 @@ class Geko_Wp_Post_QueryPlugin_Taxonomy extends Geko_Entity_Query_Plugin
 		
 		global $wpdb;
 		
+		// apply super-class manipulations
+		$oQuery = parent::modifyQuery( $oQuery, $aParams );
+		
+		
 		// $aParams[ 'some_var' ]
 		
 		

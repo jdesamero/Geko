@@ -8,6 +8,9 @@ class Geko_Wp_Post_ExpirationDate_QueryPlugin extends Geko_Entity_Query_Plugin
 		
 		global $wpdb;
 		
+		// apply super-class manipulations
+		$oQuery = parent::modifyQuery( $oQuery, $aParams );
+		
 		
 		$bHideExpired = $aParams[ 'hide_expired' ];
 		$bHideUnexpired = $aParams[ 'hide_unexpired' ];
@@ -145,19 +148,17 @@ class Geko_Wp_Post_ExpirationDate_QueryPlugin extends Geko_Entity_Query_Plugin
 				
 				$sQhOrder = '';
 				
-				if ( !$sOrder = $aParams[ 'order' ] ) {
-					$sOrder = 'DESC';
-				}
-				
 				if ( $bOrderByStart ) {
 					
 					$sQhOrder = 'COALESCE(gpexp.start_date, p.post_date)';
 				
 				} else {
 					
-					// 'expiry_date' == $aParams[ 'orderby'
+					// 'expiry_date' == $aParams[ 'orderby' ]
 					$sQhOrder = 'COALESCE(gpexp.expiry_date, p.post_date)';				
 				}
+				
+				$sOrder = $this->getSortOrder( $aParams[ 'order' ], 'DESC' );
 				
 				$oQuery->order( $sQhOrder, $sOrder );
 			}

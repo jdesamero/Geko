@@ -191,34 +191,28 @@ class Geko_Geography_State extends Geko_Geography
 
 	// $sCountry, $sState can be code or name
 	public function getStateId( $sCodeOrName ) {
-		
-		return $this->_getDbId(
-			
-			$sCodeOrName, '_aStates', self::FIELD_DB_ID,
-			
-			function( $aRow, $sCode ) {
-				
-				$oGeoCoun = Geko_Geography_Country::getInstance();
-				
-				return array(
-					'province_name' => $aRow[ Geko_Geography_State::FIELD_NAME ],
-					'province_abbr' => $aRow[ Geko_Geography_State::FIELD_ABBR ],
-					'latitude' => $aRow[ Geko_Geography_State::FIELD_LATITUDE ],
-					'longitude' => $aRow[ Geko_Geography_State::FIELD_LONGITUDE ],
-					'country_id' => $oGeoCoun->getCountryId( $aRow[ Geko_Geography_State::FIELD_COUNTRY ] )
-				);
-			}
-			
-		);
-		
+		return $this->_getDbId( $sCodeOrName, '_aStates', self::FIELD_DB_ID );
 	}
-	
 	
 	//
 	public function populateStateTable( $aCodes = NULL ) {
 		return $this->_populateDbTable( $aCodes, 'getStates', 'getStateId' );
 	}
 	
+	//
+	public function _formatDbInsertData( $aRow, $sCode ) {
+
+		$oGeoCoun = Geko_Geography_Country::getInstance();
+		
+		return array(
+			'province_name' => $aRow[ self::FIELD_NAME ],
+			'province_abbr' => $aRow[ self::FIELD_ABBR ],
+			'latitude' => $aRow[ self::FIELD_LATITUDE ],
+			'longitude' => $aRow[ self::FIELD_LONGITUDE ],
+			'country_id' => $oGeoCoun->getCountryId( $aRow[ self::FIELD_COUNTRY ] )
+		);	
+	}
+
 	
 	
 }

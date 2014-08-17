@@ -278,8 +278,49 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 	public static function qhPostsGroupBy( $sGroupBy, $oWpQuery ) {
 		
 		if ( $oQuery = $oWpQuery->get( self::$sQhVar ) ) {
+
+			$sQhGroup = self::replaceReferences( $oQuery->getGroup() );
+			$sQhHaving = self::replaceReferences( $oQuery->getHaving() );
+			
+			if ( $sQhGroup || $sQhHaving ) {
+				
+				$aRegs = array();
+				
+				$sHaving = '';
+				
+				if ( preg_match( '/(.*?)(having)(.+)/msi', $sGroupBy, $aRegs ) ) {
+					
+					// has "HAVING" clause
+					$sGroupBy = trim( $aRegs[ 1 ] );
+					$sHaving = trim( sprintf( '%s%s', $aRegs[ 2 ], $aRegs[ 3 ] ) );
+					
+				}
+				
+				//// TO DO: allow overrides???
+				
+				// additional group clause
+				if ( $sQhGroup ) {
+					if ( $sGroupBy ) {
+						$sGroupBy = sprintf( '%s, %s', $sGroupBy, $sQhGroup );
+					} else {
+						$sGroupBy = $sQhGroup;
+					}
+				}
+				
+				// additional having clause
+				if ( $sQhHaving ) {
+					if ( $sHaving ) {
+						$sHaving = sprintf( '%s AND %s', $sHaving, $sQhHaving );
+					} else {
+						$sHaving = sprintf( 'HAVING %s', $sQhHaving );
+					}
+				}
+				
+				$sGroupBy = trim( sprintf( '%s %s', $sGroupBy, $sHaving ) );
+			}
 			
 		}
+		
 		
 		return $sGroupBy;
 	}
@@ -301,6 +342,9 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 			( $oQuery = $oWpQuery->get( self::$sQhVar ) ) && 
 			( $sQhOrder = $oQuery->getOrder() )
 		) {
+			
+			// TO DO: handle overrides/additions?
+			
 			$sOrderBy = self::replaceReferences( $sQhOrder );
 		}
 		
@@ -371,7 +415,7 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 			}
 		}
 		
-		return $sValue;
+		return trim( $sValue );
 	}
 	
 	
