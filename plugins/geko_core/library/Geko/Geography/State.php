@@ -192,20 +192,22 @@ class Geko_Geography_State extends Geko_Geography
 	// $sCountry, $sState can be code or name
 	public function getStateId( $sCodeOrName ) {
 		
+		$oThis = $this;
+		
 		return $this->_getDbId(
 			
 			$sCodeOrName, '_aStates', self::FIELD_DB_ID,
 			
-			function( $aRow, $sCode ) {
+			function( $aRow, $sCode ) use( $oThis ) {
 				
 				$oGeoCoun = Geko_Geography_Country::getInstance();
 				
 				return array(
-					'province_name' => $aRow[ Geko_Geography_State::FIELD_NAME ],
-					'province_abbr' => $aRow[ Geko_Geography_State::FIELD_ABBR ],
-					'latitude' => $aRow[ Geko_Geography_State::FIELD_LATITUDE ],
-					'longitude' => $aRow[ Geko_Geography_State::FIELD_LONGITUDE ],
-					'country_id' => $oGeoCoun->getCountryId( $aRow[ Geko_Geography_State::FIELD_COUNTRY ] )
+					'province_name' => $aRow[ $oThis::FIELD_NAME ],
+					'province_abbr' => $aRow[ $oThis::FIELD_ABBR ],
+					'latitude' => $aRow[ $oThis::FIELD_LATITUDE ],
+					'longitude' => $aRow[ $oThis::FIELD_LONGITUDE ],
+					'country_id' => $oGeoCoun->getCountryId( $aRow[ $oThis::FIELD_COUNTRY ] )
 				);
 			}
 			

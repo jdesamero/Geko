@@ -238,20 +238,22 @@ class Geko_Geography_Country extends Geko_Geography
 	//
 	public function getCountryId( $sCodeOrName ) {
 		
+		$oThis = $this;
+		
 		return $this->_getDbId(
 			
 			$sCodeOrName, '_aCountries', self::FIELD_DB_ID,
 			
-			function( $aRow, $sCode ) {
+			function( $aRow, $sCode ) use( $oThis ) {
 				
 				$oGeoCont = Geko_Geography_Continent::getInstance();
 				
 				return array(
-					'country_name' => $aRow[ Geko_Geography_Country::FIELD_NAME ],
+					'country_name' => $aRow[ $oThis::FIELD_NAME ],
 					'country_abbr' => $sCode,
-					'latitude' => $aRow[ Geko_Geography_Country::FIELD_LATITUDE ],
-					'longitude' => $aRow[ Geko_Geography_Country::FIELD_LONGITUDE ],
-					'continent_id' => $oGeoCont->getContinentId( $aRow[ Geko_Geography_Country::FIELD_CONTINENT ] )
+					'latitude' => $aRow[ $oThis::FIELD_LATITUDE ],
+					'longitude' => $aRow[ $oThis::FIELD_LONGITUDE ],
+					'continent_id' => $oGeoCont->getContinentId( $aRow[ $oThis::FIELD_CONTINENT ] )
 				);
 			}
 			

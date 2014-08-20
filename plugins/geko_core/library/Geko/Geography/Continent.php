@@ -114,13 +114,16 @@ class Geko_Geography_Continent extends Geko_Geography
 	//
 	public function getContinentId( $sCodeOrName ) {
 		
+		$oThis = $this;
+		
 		return $this->_getDbId(
 			
 			$sCodeOrName, '_aContinents', self::FIELD_DB_ID,
 			
-			function( $aRow, $sCode ) {
+			function( $aRow, $sCode ) use( $oThis ) {
+				
 				return array(
-					'continent_name' => $aRow[ Geko_Geography_Continent::FIELD_NAME ],
+					'continent_name' => $aRow[ $oThis::FIELD_NAME ],
 					'continent_abbr' => $sCode
 				);			
 			}
