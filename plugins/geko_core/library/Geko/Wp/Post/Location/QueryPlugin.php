@@ -19,6 +19,10 @@ class Geko_Wp_Post_Location_QueryPlugin extends Geko_Entity_Query_Plugin
 				$sAlias = $mParams[ $sFieldName ][ 'as' ];
 			}
 			
+			if ( !$sAlias ) {
+				$sAlias = $sFieldName;
+			}
+			
 			$oQuery->field( sprintf( '%s.%s', $sTable, $sFieldName ), $sAlias );
 		}
 		

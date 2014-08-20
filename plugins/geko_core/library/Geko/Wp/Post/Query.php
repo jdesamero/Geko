@@ -258,7 +258,7 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 			( $oQuery = $oWpQuery->get( self::$sQhVar ) ) &&
 			( $sQhJoin = $oQuery->getJoins() )
 		) {			
-			$sJoin .= self::replaceReferences( $sQhJoin );
+			$sJoin .= sprintf( ' %s', self::replaceReferences( $sQhJoin ) );
 		}
 		
 		return $sJoin;
@@ -316,7 +316,9 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 					}
 				}
 				
-				$sGroupBy = trim( sprintf( '%s %s', $sGroupBy, $sHaving ) );
+				$sClause = trim( sprintf( '%s %s', $sGroupBy, $sHaving ) );
+				
+				$sGroupBy = sprintf( ' %s', $sClause );
 			}
 			
 		}
