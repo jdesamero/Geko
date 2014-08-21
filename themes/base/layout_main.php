@@ -15,7 +15,10 @@ class Gloc_Layout_Main extends Gloc_Layout
 	
 	//
 	public function echoEnqueue() {
-		$this->enqueueScript( 'jquery' );
+		$this
+			->enqueueStyle( 'gloc' )
+			->enqueueScript( 'jquery' )
+		;
 	}
 	
 	//
@@ -43,7 +46,6 @@ class Gloc_Layout_Main extends Gloc_Layout
 			
 			<?php $this->doMeta(); ?>
 			
-			<link rel="stylesheet" type="text/css" href="<?php bloginfo( 'stylesheet_url' ); ?>" />
 			<link rel="alternate" type="application/rss+xml" href="<?php bloginfo( 'rss2_url' ); ?>" title="<?php echo wp_specialchars( get_bloginfo( 'name' ), 1 ); ?> <?php $this->e_102(); ?>" />
 			<link rel="alternate" type="application/rss+xml" href="<?php bloginfo( 'comments_rss2_url' ); ?>" title="<?php echo wp_specialchars( get_bloginfo( 'name' ), 1 ); ?> <?php $this->e_103(); ?>" />
 			<link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>" />

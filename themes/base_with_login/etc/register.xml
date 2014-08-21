@@ -10,8 +10,10 @@
 	<!-- css -->
 	<styles>
 		
-		<file id="gloc-gallery" src="##__bloginfo_stylesheet_directory##/styles/gallery.css" />
-		<file id="gloc-pagination" src="##__bloginfo_stylesheet_directory##/styles/pagination.css" />
+		<file id="gloc" src="##__bloginfo_stylesheet_directory##/style.css" />
+		
+		<file id="gloc-gallery" src="##__bloginfo_stylesheet_directory##/styles/gallery.css" dependencies="gloc" />
+		<file id="gloc-pagination" src="##__bloginfo_stylesheet_directory##/styles/pagination.css" dependencies="gloc" />
 		
 	</styles>
 	

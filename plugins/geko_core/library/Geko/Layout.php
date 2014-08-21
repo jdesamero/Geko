@@ -157,6 +157,14 @@ class Geko_Layout extends Geko_Singleton_Abstract
 		return htmlspecialchars( $sValue );
 	}
 	
+	//
+	public function redirect( $sUrl ) {
+		
+		if ( $sUrl ) {
+			header( sprintf( 'Location: %s', $sUrl ) );
+			die();
+		}
+	}
 	
 	
 	
