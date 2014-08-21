@@ -5,10 +5,6 @@ abstract class Geko_Wp_Rewrite_Abstract
 	implements Geko_Wp_Rewrite_Interface
 {
 	
-	const FLD_VARNAME = 1;
-	const FLD_DEFTMPL = 2;
-	
-	
 	protected $_sListKeyTag;
 	protected $_sListVarName;
 	protected $_sListDefaultTemplate;
@@ -18,8 +14,6 @@ abstract class Geko_Wp_Rewrite_Abstract
 	protected $_sSingleDefaultTemplate;
 	
 	protected $_aExtraRules;
-	
-	protected $_aTagHash = array();
 	
 	
 	
@@ -32,34 +26,6 @@ abstract class Geko_Wp_Rewrite_Abstract
 		add_filter( 'query_vars', array( $this, 'queryVars' ) );
 		add_action( 'template_redirect', array( $this, 'templateRedirect' ) );
 		
-		// set up $this->_aTagHash
-		
-		if ( $this->_sListKeyTag ) {
-			$this->_aTagHash[ $this->_sListKeyTag ] = array(
-				self::FLD_VARNAME => $this->_sListVarName,
-				self::FLD_DEFTMPL => $this->_sListDefaultTemplate
-			);
-		}
-
-		if ( $this->_sSingleKeyTag ) {
-			$this->_aTagHash[ $this->_sSingleKeyTag ] = array(
-				self::FLD_VARNAME => $this->_sSingleVarName,
-				self::FLD_DEFTMPL => $this->_sSingleDefaultTemplate
-			);
-		}
-		
-		
-		if ( $this->_aExtraRules ) {
-			
-			foreach ( $this->_aExtraRules as $aRule ) {
-				
-				$this->_aTagHash[ $aRule[ 'key_tag' ] ] = array(
-					self::FLD_VARNAME => $aRule[ 'var_name' ],
-					self::FLD_DEFTMPL => $aRule[ 'default_template' ]
-				);
-			}
-		}
-		
 	}
 	
 	
@@ -69,34 +35,35 @@ abstract class Geko_Wp_Rewrite_Abstract
 		global $wp_rewrite;
 		// add rewrite tokens
 		
-		$fnGenerateRule = function( $sVarName, $sTag ) {
 		
-			if ( $sVarName ) {
-				
-				$sKeyTag = sprintf( '%%%s%%', $sTag );
-				
-				$wp_rewrite->add_rewrite_tag( $sKeyTag, '(.+?)', sprintf( '%s=', $sVarName ) );
-				
-				$keywords_structure = sprintf( '%s%s/%s/', $wp_rewrite->root, $sTag, $sKeyTag );
-				$keywords_rewrite = $wp_rewrite->generate_rewrite_rules( $keywords_structure );
-				
-				$wp_rewrite->rules = $keywords_rewrite + $wp_rewrite->rules;
-				
-			}
-			
-		};
-		
-		$fnGenerateRule( $this->_sListVarName, $this->_sListKeyTag );
-		$fnGenerateRule( $this->_sSingleKeyTag, $this->_sSingleKeyTag );
+		$this->generateRule( $this->_sListVarName, $this->_sListKeyTag );
+		$this->generateRule( $this->_sSingleKeyTag, $this->_sSingleKeyTag );
 		
 		if ( $this->_aExtraRules ) {
 			
 			foreach ( $this->_aExtraRules as $aRule ) {
-				$fnGenerateRule( $aRule[ 'var_name' ], $aRule[ 'key_tag' ] );
+				$this->generateRule( $aRule[ 'var_name' ], $aRule[ 'key_tag' ] );
 			}
 		}
 		
 		return $wp_rewrite->rules;	
+	}
+	
+	//
+	public function generateRule( $sVarName, $sTag ) {
+
+		if ( $sVarName ) {
+			
+			$sKeyTag = sprintf( '%%%s%%', $sTag );
+			
+			$wp_rewrite->add_rewrite_tag( $sKeyTag, '(.+?)', sprintf( '%s=', $sVarName ) );
+			
+			$keywords_structure = sprintf( '%s%s/%s/', $wp_rewrite->root, $sTag, $sKeyTag );
+			$keywords_rewrite = $wp_rewrite->generate_rewrite_rules( $keywords_structure );
+			
+			$wp_rewrite->rules = $keywords_rewrite + $wp_rewrite->rules;
+			
+		}	
 	}
 	
 	

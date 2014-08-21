@@ -410,14 +410,14 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 				$aBiArgs = array();			// Before init args
 				$aAiArgs = array();			// After init args
 				
-				foreach ( $aArgs as $sKey => $aParams ) {
+				foreach ( $aArgs as $sArgKey => $aParams ) {
 					
-					if ( is_string( $sKey ) ) {
+					if ( is_string( $sArgKey ) ) {
 						
-						if ( 0 === strpos( $sKey, 'ai:' ) ) {
-							$aAiArgs[ substr( $sKey, 3 ) ] = $aParams;						
+						if ( 0 === strpos( $sArgKey, 'ai:' ) ) {
+							$aAiArgs[ substr( $sArgKey, 3 ) ] = $aParams;						
 						} else {
-							$aBiArgs[ $sKey ] = $aParams;
+							$aBiArgs[ $sArgKey ] = $aParams;
 						}
 					}
 				}
