@@ -69,6 +69,13 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		
 		//// register tables
 		
+		
+		// HACKISH!!!
+		Geko_Wp_Db::addPrefix( 'geko_location_continent' );
+		Geko_Wp_Db::addPrefix( 'geko_location_country' );
+		Geko_Wp_Db::addPrefix( 'geko_location_province' );
+		
+		
 		// address
 		
 		$sTableName = 'geko_location_address';
