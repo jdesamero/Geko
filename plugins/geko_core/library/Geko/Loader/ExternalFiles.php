@@ -248,7 +248,11 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 			// make sure function exists
 			if ( !is_callable( $fCallback ) ) continue;
 			
-			foreach ( $oReg->$sTag->file as $oItem ) {
+			if ( !$aFile = $oReg->$sTag->file ) {
+				continue;
+			}
+			
+			foreach ( $aFile as $oItem ) {
 								
 				$bContinue = TRUE;
 				

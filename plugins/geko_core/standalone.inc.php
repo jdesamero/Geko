@@ -72,7 +72,10 @@ $oGeo->setFile( GEKO_GEOGRAPHY_XML );
 
 
 
-if ( method_exists( 'Geko_Constant_Values', 'getUrls' ) ) {
+if (
+	@class_exists( 'Geko_Constant_Values' ) &&
+	method_exists( 'Geko_Constant_Values', 'getUrls' )
+) {
 	$oLoader->setMergeParams( Geko_Constant_Values::getUrls() );
 }
 
