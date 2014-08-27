@@ -499,4 +499,94 @@
 	
 	
 	
+	//// basic observer/listener implementation
+	
+	$.fn.gekoObserver = function() {
+
+		// var iNumArgs = arguments.length;
+		
+		var sOptsKey = 'geko_observer_options';
+		var sObsKey = 'geko_observers';
+		
+		var mArg0 = arguments[ 0 ];
+		var mArg1 = arguments[ 1 ];
+		
+		return this.each( function() {
+			
+			var eElem = $( this );
+						
+			if ( 'string' === $.type( mArg0 ) ) {
+
+				var opts = eElem.data( sOptsKey );
+				
+				if ( 'register' === mArg0 ) {
+					
+					if ( !eElem.data( sObsKey ) ) {
+						eElem.data( sObsKey, [] );
+					}
+					
+					if ( -1 === $.inArray( mArg1, eElem.data( sObsKey ) ) ) {
+						eElem.data( sObsKey ).push( mArg1 );
+					}
+					
+				} else if ( 'unregister' === mArg0 ) {
+					
+					if ( eElem.data( sObsKey ) ) {
+						
+						var iUnregIdx = $.inArray( mArg1, eElem.data( sObsKey ) );
+						
+						if ( -1 !== iUnregIdx ) {
+							eElem.data( sObsKey ).splice( iUnregIdx, 1 );
+						}
+					}
+					
+				}
+				
+			} else {
+				
+				//// default, initialize
+				
+				var opts = $.extend( {
+					prefix: null,
+					events: null
+				}, mArg0 );
+				
+				var eElem = $( this );
+				
+				if ( opts.events ) {
+					
+					eElem.on( opts.events, function() {
+						
+						var args = $.makeArray( arguments );
+						var evt = args.shift();
+						
+						var eThis = $( this );
+						
+						var aObs = eThis.data( sObsKey );
+						
+						$.each( aObs, function( i, v ) {
+							
+							var sTriggerEvent = evt.type;
+							
+							if ( opts.prefix ) {
+								sTriggerEvent = '%s:%s'.printf( opts.prefix, sTriggerEvent );
+							}
+							
+							v.trigger( sTriggerEvent, args );
+							
+						} );
+						
+					} );
+				}
+				
+				eElem.data( sOptsKey, opts );
+				
+			}
+			
+		} );
+		
+		
+	};
+	
+	
 } )( jQuery );
