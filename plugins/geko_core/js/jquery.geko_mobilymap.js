@@ -12,14 +12,17 @@
 			
 			minimap: null,
 			geoproj: null,
+			movemap: null,
 			
 			viewPortWidth: null,
-			viewPortHeight: null
+			viewPortHeight: null,
 			
 		}, options );
 		
 		
-		//
+		
+		//// minimap opts
+		
 		var oMmOpts = opts.minimap;
 		
 		if ( oMmOpts ) {
@@ -37,7 +40,8 @@
 		}
 		
 		
-		//
+		//// geo-projection opts
+		
 		var oGeoOpts = opts.geoproj;
 		
 		if ( oGeoOpts ) {
@@ -53,15 +57,41 @@
 		}
 		
 		
-		// console.log( oMmOpts );
+		//// move map opts (aka map animation)
+		
+		var oMoveOpts = opts.movemap;
+		
+		if ( oMoveOpts ) {
+			
+			if ( 'object' !== $.type( oMoveOpts ) ) {
+				oMoveOpts = {};
+			}
+			
+			oMoveOpts = $.extend( {
+				restartDelay: 5000
+			}, oMoveOpts );
+		}
 		
 		
-		// helpers 
-		var fnReposViewer = function( eViewer, iLeft, iTop, xRFactor, yRFactor ) {
-			eViewer.css( {
-				left: '%dpx'.printf( ( iLeft * -1 ) * xRFactor ),
-				top: '%dpx'.printf( ( iTop * -1 ) * yRFactor )
-			} );
+		
+		//// helpers
+		
+		//
+		var mapCheck = function( x, y, eMap, eImageContent ) {
+			
+			if ( y < ( eMap.height() - eImageContent.height() ) ) {
+				y = eMap.height() - eImageContent.height();
+			} else {
+				if( y > 0 ) y = 0;
+			}
+			
+			if ( x < ( eMap.width() - eImageContent.width() ) ) {
+				x = eMap.width() - eImageContent.width();
+			} else {
+				if ( x > 0 ) x = 0;
+			}
+			
+			return { x:x, y:y };
 		};
 		
 		
@@ -69,6 +99,13 @@
 		return this.each( function() {
 			
 			var eMap = $( this );
+			
+			eMap.gekoObserver( {
+				prefix: 'map',
+				events: 'reposition'
+			} );
+						
+			
 			var eMapImg = eMap.find( opts.mapImgSel );
 			
 			var iScaleFactor = null;
@@ -78,6 +115,16 @@
 				
 				var eMiniMap = eMap.parent().find( oMmOpts.mainSel );
 				var eViewer = eMiniMap.find( oMmOpts.viewerSel );
+				
+				eMap.gekoObserver( 'register', eViewer );
+				
+				
+				eViewer.on( 'map:reposition', function( e, iLeft, iTop, xRFactor, yRFactor ) {
+					$( this ).css( {
+						left: '%dpx'.printf( ( iLeft * -1 ) * xRFactor ),
+						top: '%dpx'.printf( ( iTop * -1 ) * yRFactor )
+					} );
+				} );
 				
 				eViewer.hide();
 				
@@ -189,14 +236,108 @@
 			
 						
 			//
-			if ( opts.onDragMap || oMmOpts ) {
+			if ( opts.onDragMap || oMmOpts || oMoveOpts ) {
 				
 				//
 				fnGekoMapLoad = function() {
 					
 					//
 					var eImageContent = eMap.find( '.imgContent' );
-										
+					
+					var mapTimeout, restartTimeout;
+					var mapLock = false;						
+					
+					var leftOffset = -1;
+					var topOffset = 1;
+					
+					var fnStopMap, fnStopMapDelay;
+					
+					
+					//// map animation stuff
+					
+					if ( oMoveOpts ) {
+						
+						eMap.on( 'move', function() {
+							
+							mapLock = true;
+							
+							var pos = eImageContent.position();
+							
+							var bottom = -( eImageContent.height() - eMap.height() );
+							var right = -( eImageContent.width() - eMap.width() );
+							
+							if ( pos.top == 0 ) {
+								topOffset = -1;
+							} else if ( pos.top == bottom ) {
+								topOffset = 1;
+							}
+							
+							if ( pos.left == 0 ) {
+								leftOffset = -1;
+							} else if ( pos.left == right ) {
+								leftOffset = 1;
+							}
+							
+							var checkPos = mapCheck( pos.left + leftOffset, pos.top + topOffset, eMap, eImageContent );
+													
+							eImageContent.css( { 'left': checkPos.x + 'px', 'top': checkPos.y + 'px' } );
+							
+							
+							eMap.trigger( 'reposition', [ pos.left, pos.top, xRFactor, yRFactor ] );
+							
+							mapTimeout = setTimeout( function() {
+								eMap.trigger( 'move' );
+							}, 30 );
+							
+						} );
+						
+						eMap.on( 'stop', function( e, delay ) {
+							
+							var fnMoveMap = function() {
+								eMap.trigger( 'move' );					
+							};
+							
+							if ( mapLock ) {
+								
+								clearTimeout( mapTimeout );
+								mapLock = false;
+								
+								if ( delay ) {
+									restartTimeout = setTimeout( fnMoveMap, delay );
+								}
+								
+							} else {
+								
+								clearTimeout( restartTimeout );
+								
+								if ( delay ) {
+									restartTimeout = setTimeout( fnMoveMap, delay );
+								}
+								
+							}
+							
+						} );
+						
+						
+						// $( '.imgContent, #viewer' )
+						
+						fnStopMap = function() {
+							eMap.trigger( 'stop' );
+						};
+						
+						fnStopMapDelay = function() {
+							eMap.trigger( 'stop', [ oMoveOpts.restartDelay ] );
+						};
+						
+						eImageContent
+							.on( 'mousedown', fnStopMap )
+							.on( 'mouseup', fnStopMapDelay )
+						;
+						
+					}
+					
+					
+					
 					//
 					if ( oMmOpts ) {
 						
@@ -204,10 +345,19 @@
 							
 							var fnResize = function(){
 								
+								var map = eMap.data( 'mmap' );
+								var pos = eImageContent.position();
+								//console.log( pos );
+											
+								var checkPos = mapCheck( pos.left, pos.top, eMap, eImageContent );
+													
+								eImageContent.css( { 'left': checkPos.x + 'px', 'top': checkPos.y + 'px' } );
+								
 								eViewer
 									.css( 'width', eMap.width() / iScaleFactor )
 									.css( 'height', eMap.height() / iScaleFactor )
 								;
+								
 							};
 							
 							$( window ).resize( fnResize );
@@ -264,9 +414,19 @@
 						
 						// init viewer state
 						var pos = eImageContent.position();
-						fnReposViewer( eViewer, pos.left, pos.top, xRFactor, yRFactor );
+						
+						eMap.trigger( 'reposition', [ pos.left, pos.top, xRFactor, yRFactor ] );
+						
 						eViewer.show();
 						
+						
+						if ( fnStopMap ) {
+							
+							eViewer
+								.on( 'mousedown', fnStopMap )
+								.on( 'mouseup', fnStopMapDelay )
+							;
+						}
 						
 					}
 					
@@ -293,7 +453,9 @@
 								// console.log( eImageContent.position() );
 								
 								var pos = eImageContent.position();
-								fnReposViewer( eViewer, pos.left, pos.top, xRFactor, yRFactor );
+								//fnReposViewer( eViewer, pos.left, pos.top, xRFactor, yRFactor );
+								
+								eMap.trigger( 'reposition', [ pos.left, pos.top, xRFactor, yRFactor ] );
 								
 							}
 							
@@ -304,7 +466,13 @@
 						}
 						
 					} );
+						
 					
+					
+					// animate map
+					if ( oMoveOpts ) {
+						eMap.trigger( 'move' );
+					}
 					
 				}
 				
@@ -335,7 +503,6 @@
 			
 			
 			eMap.mobilymap( opts );
-			
 			
 		} );
 		
