@@ -55,14 +55,9 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 				$aParams = array_merge( $this->getDefaultParams(), $aParams );
 			}
 			
-			$oQuery = $this->constructQuery( $aParams, TRUE );
+			$aParams = $this->setUpWpQueryFilters( $aParams );
 			
-			if ( $oQuery->isMutated() ) {
-				self::initQueryHooks();
-				$aParams[ self::$sQhVar ] = $oQuery;
-			}
-			
-			$this->oWpQuery = new WP_Query( $aParams );		
+			$this->oWpQuery = new WP_Query( $aParams );
 		}
 		
 		$this->_aEntities = $this->oWpQuery->posts;
@@ -81,10 +76,22 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 		return $this;
 	}
 	
+	//
+	public function setUpWpQueryFilters( $aParams ) {
+
+		$oQuery = $this->constructQuery( $aParams, TRUE );
+		
+		if ( $oQuery->isMutated() ) {
+			self::initQueryHooks();
+			$aParams[ self::$sQhVar ] = $oQuery;
+		}
+		
+		return $aParams;
+	}
 	
 	//
 	public function getSqlQuery() {
-		return ( $this->oWpQuery ) ? $this->oWpQuery->request : '';
+		return ( $this->oWpQuery ) ? $this->oWpQuery->request : '' ;
 	}
 	
 	//
@@ -96,11 +103,19 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 	//
 	public function getSingleEntity( $mParam ) {
 		
-		$aRes = query_posts( $mParam );
+		if ( is_string( $mParam ) ) {
+			$aParams = array();
+			parse_str( $mParam, $aParams );
+		} else {
+			$aParams = $mParam;
+		}
 		
-		if ( count( $aRes ) > 0 ) {
-			wp_reset_query();
-			return $aRes[ 0 ];
+		$aParams = $this->setUpWpQueryFilters( $aParams );
+		
+		$oWpQuery = new WP_Query( $aParams );
+		
+		if ( count( $oWpQuery->posts ) > 0 ) {
+			return $oWpQuery->posts[ 0 ];
 		}
 		
 		return NULL;
