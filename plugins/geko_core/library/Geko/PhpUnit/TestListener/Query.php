@@ -1,5 +1,10 @@
 <?php
 
+require_once( sprintf(
+	'%s/external/libs/pearpkgs/PHPUnit-3.4.14/library/PHPUnit/Framework.php',
+	dirname( dirname( dirname( dirname( dirname( __FILE__ ) ) ) ) )
+) );
+
 //
 class Geko_PhpUnit_TestListener_Query
 	extends Geko_Entity_Query
@@ -22,7 +27,7 @@ class Geko_PhpUnit_TestListener_Query
 	
 	//
 	public function getSuiteName() {
-		return ( $this->_oSuite ) ? $this->_oSuite->getName() : '';
+		return ( $this->_oSuite ) ? $this->_oSuite->getName() : '' ;
 	}
 	
 	//

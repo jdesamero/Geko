@@ -30,6 +30,9 @@ define( 'GEKO_VIEW_HELPER_PATH', realpath( sprintf( '%s/library', GEKO_CORE_ROOT
 define( 'GEKO_IMAGE_THUMB_CACHE_DIR', realpath( sprintf( '%s/wp-content/cache/', ABSPATH ) ) );
 define( 'GEKO_IMAGE_THUMB_CACHE_URI', sprintf( '%s/wp-content/cache/', get_bloginfo( 'wpurl' ) ) );
 
+define( 'GEKO_SCSS_CACHE_DIR', realpath( sprintf( '%s/wp-content/cache/', ABSPATH ) ) );
+define( 'GEKO_SCSS_CACHE_URI', sprintf( '%s/wp-content/cache/', get_bloginfo( 'wpurl' ) ) );
+
 
 
 // include path
@@ -55,22 +58,18 @@ Geko_Loader::addLibRootPaths(
 	'/pearpkgs/OLE-1.0.0RC1/library',
 	'/pearpkgs/Spreadsheet_Excel_Writer-0.9.1/library',
 	'/pearpkgs/WideImage-11.02.19/library',
-	'/mime_types-0.1',
-	'/recaptcha',
-	'/moneris'
+	'/recaptcha'
 );
 
 
 
 // manually require files
-require_once 'PHPUnit/Framework.php';
 require_once 'recaptchalib.php';
-require_once 'mpgClasses.php';
 
 // register class namespaces
 Geko_Loader::registerNamespaces(
-	'Geko_', 'GekoTest_', 'GekoX_', 'Gloc_', 'phpQuery_', 'Mime_Types_',
-	'PEAR_', 'Console_', 'OLE_', 'Spreadsheet_', 'WideImage_'
+	'Geko_', 'GekoTest_', 'GekoX_', 'Gloc_', 'phpQuery_', 'PEAR_',
+	'Console_', 'OLE_', 'Spreadsheet_', 'WideImage_'
 );
 
 
@@ -96,6 +95,7 @@ Geko_Uri::setUrl( array(
 	'geko_gmap_overlay' => sprintf( '%s/srv/gmap_overlay.php', GEKO_CORE_URI ),
 	'geko_pdf' => sprintf( '%s/srv/pdf.php', GEKO_CORE_URI ),
 	'geko_process' => sprintf( '%s/srv/process.php', GEKO_CORE_URI ),
+	'geko_scss' => sprintf( '%s/srv/scss.php', GEKO_CORE_URI ),
 	'geko_thumb' => sprintf( '%s/srv/thumb.php', GEKO_CORE_URI ),
 	'geko_upload' => sprintf( '%s/srv/upload.php', GEKO_CORE_URI ),
 	'geko_styles' => sprintf( '%s/styles', GEKO_CORE_URI ),
@@ -109,6 +109,9 @@ Geko_Uri::setUrl( array(
 
 // image thumbnailer
 Geko_Image_Thumb::setCacheDir( GEKO_IMAGE_THUMB_CACHE_DIR );
+
+// scss pre-processor
+Geko_Scss::setCacheDir( GEKO_SCSS_CACHE_DIR );
 
 
 

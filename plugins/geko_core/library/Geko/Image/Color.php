@@ -18,15 +18,18 @@ class Geko_Image_Color
 		$aColor = array();
 		
 		if ( 3 == strlen( $mHex ) ) {
+			
 			// 3 chars
-			$aColor['r'] = hexdec( str_repeat( substr( $mHex, 0, 1 ), 2 ) );
-			$aColor['g'] = hexdec( str_repeat( substr( $mHex, 1, 1 ), 2 ) );
-			$aColor['b'] = hexdec( str_repeat( substr( $mHex, 2, 1 ), 2 ) );
+			$aColor[ 'r' ] = hexdec( str_repeat( substr( $mHex, 0, 1 ), 2 ) );
+			$aColor[ 'g' ] = hexdec( str_repeat( substr( $mHex, 1, 1 ), 2 ) );
+			$aColor[ 'b' ] = hexdec( str_repeat( substr( $mHex, 2, 1 ), 2 ) );
+		
 		} else {
+			
 			// 6 chars
-			$aColor['r'] = hexdec( substr( $mHex, 0, 2 ) );
-			$aColor['g'] = hexdec( substr( $mHex, 2, 2 ) );
-			$aColor['b'] = hexdec( substr( $mHex, 4, 2 ) );		
+			$aColor[ 'r' ] = hexdec( substr( $mHex, 0, 2 ) );
+			$aColor[ 'g' ] = hexdec( substr( $mHex, 2, 2 ) );
+			$aColor[ 'b' ] = hexdec( substr( $mHex, 4, 2 ) );		
 		}
 		
 		return $aColor;
@@ -58,7 +61,7 @@ class Geko_Image_Color
 	public static function allocate( $rSource, $mHex ) {
 		
 		$aColor = self::getArray( $mHex );
-		return imagecolorallocate( $rSource, $aColor['r'], $aColor['g'], $aColor['b'] );
+		return imagecolorallocate( $rSource, $aColor[ 'r' ], $aColor[ 'g' ], $aColor[ 'b' ] );
 		
 	}
 	

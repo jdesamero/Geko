@@ -32,14 +32,14 @@ $aParams = array(
 class Geko_Image_Thumb extends Geko_Image_CachedAbstract
 {
 	
-	protected $sImageSrc;
-	protected $bZoomOrCrop = TRUE;
-	protected $sCropVerticalAlign = 'm';
-	protected $sCropHorizontalAlign = 'c';
-	protected $iQuality = 80;
-	protected $iScale;
-	protected $iModifiedTimestamp;
-	protected $bIsRemote = FALSE;
+	protected $_sImageSrc;
+	protected $_bZoomOrCrop = TRUE;
+	protected $_sCropVerticalAlign = 'm';
+	protected $_sCropHorizontalAlign = 'c';
+	protected $_iQuality = 80;
+	protected $_iScale;
+	protected $_iModifiedTimestamp;
+	protected $_bIsRemote = FALSE;
 	
 	
 	
@@ -73,7 +73,7 @@ class Geko_Image_Thumb extends Geko_Image_CachedAbstract
 	
 	//
 	public function setImageSrc( $sImageSrc ) {
-		$this->sImageSrc = $sImageSrc;
+		$this->_sImageSrc = $sImageSrc;
 		return $this;
 	}
 	
@@ -83,7 +83,7 @@ class Geko_Image_Thumb extends Geko_Image_CachedAbstract
 		$bZoomOrCrop = intval( preg_replace( "/[^0-9]/", '', $bZoomOrCrop ) );
 		$bZoomOrCrop = ( $bZoomOrCrop ) ? TRUE : FALSE;
 		
-		$this->bZoomOrCrop = $bZoomOrCrop;
+		$this->_bZoomOrCrop = $bZoomOrCrop;
 		return $this;
 	}
 	
@@ -96,7 +96,7 @@ class Geko_Image_Thumb extends Geko_Image_CachedAbstract
 			$sCropVerticalAlign = 'm';			// default middle
 		}
 		
-		$this->sCropVerticalAlign = $sCropVerticalAlign;
+		$this->_sCropVerticalAlign = $sCropVerticalAlign;
 		return $this;
 	}
 	
@@ -109,7 +109,7 @@ class Geko_Image_Thumb extends Geko_Image_CachedAbstract
 			$sCropHorizontalAlign = 'c';		// default center
 		}
 		
-		$this->sCropHorizontalAlign = $sCropHorizontalAlign;
+		$this->_sCropHorizontalAlign = $sCropHorizontalAlign;
 		return $this;
 	}
 	
@@ -119,26 +119,26 @@ class Geko_Image_Thumb extends Geko_Image_CachedAbstract
 		$iQuality = intval( preg_replace( "/[^0-9]/", '', $iQuality ) );
 		if ( !$iQuality ) $iQuality = 80;
 		
-		$this->iQuality = $iQuality;
+		$this->_iQuality = $iQuality;
 		return $this;
 	}
 	
 	//
 	public function setScale( $iScale ) {
 		$iScale = intval( preg_replace( "/[^0-9]/", '', $iScale ) );
-		$this->iScale = $iScale;
+		$this->_iScale = $iScale;
 		return $this;
 	}
 	
 	//
 	public function setModifiedTimestamp( $iModifiedTimestamp ) {
-		$this->iModifiedTimestamp = $iModifiedTimestamp;
+		$this->_iModifiedTimestamp = $iModifiedTimestamp;
 		return $this;
 	}
 	
 	//
 	public function setIsRemote( $bIsRemote ) {
-		$this->bIsRemote = $bIsRemote;
+		$this->_bIsRemote = $bIsRemote;
 		return $this;
 	}
 	
@@ -155,11 +155,11 @@ class Geko_Image_Thumb extends Geko_Image_CachedAbstract
 			'image/gif'
 		);
 		
-		$sMime = Geko_File_MimeType::get( $this->sImageSrc );
+		$sMime = Geko_File_MimeType::get( $this->_sImageSrc );
 		
 		// if mime type was not determined, use the file extension
 		if ( !$sMime ) {
-			$sExt = strtolower( pathinfo( $this->sImageSrc, PATHINFO_EXTENSION ) );
+			$sExt = strtolower( pathinfo( $this->_sImageSrc, PATHINFO_EXTENSION ) );
 			if ( 'jpg' == $sExt || 'jpeg' == $sExt ) $sMime = 'image/jpeg';
 			elseif ( 'png' == $sExt ) $sMime = 'image/png';
 			elseif ( 'gif' == $sExt ) $sMime = 'image/gif';
@@ -169,7 +169,7 @@ class Geko_Image_Thumb extends Geko_Image_CachedAbstract
 			return $sMime;
 		} else {
 			// mime type not allowed
-			Geko_Debug::out( sprintf( 'Mime type not allowed: %s', $this->sImageSrc ), __METHOD__ );
+			Geko_Debug::out( sprintf( 'Mime type not allowed: %s', $this->_sImageSrc ), __METHOD__ );
 			return '';
 		}
 	}
@@ -214,53 +214,53 @@ class Geko_Image_Thumb extends Geko_Image_CachedAbstract
 		
 		// check if image is remote or local, then open it
 		
-		if ( TRUE == $this->bIsRemote ) {
+		if ( TRUE == $this->_bIsRemote ) {
 			
 			// image is remote
-			$rImage = imagecreatefromstring( Geko_RemoteFile::getContents( $this->sImageSrc ) );
+			$rImage = imagecreatefromstring( Geko_RemoteFile::getContents( $this->_sImageSrc ) );
 			
 		} else {
 			
 			// image is local
 			if ( TRUE == stristr( $sMimeType, 'gif' ) ) {
-				$rImage = imagecreatefromgif( $this->sImageSrc );
+				$rImage = imagecreatefromgif( $this->_sImageSrc );
 			} elseif ( TRUE == stristr( $sMimeType, 'png' ) ) {
-				$rImage = imagecreatefrompng( $this->sImageSrc );
+				$rImage = imagecreatefrompng( $this->_sImageSrc );
 			} else {
 				// jpeg is default
-				$rImage = imagecreatefromjpeg( $this->sImageSrc );
+				$rImage = imagecreatefromjpeg( $this->_sImageSrc );
 			}		
 		}
 		
 		if ( FALSE == $rImage ) {
-			Geko_Debug::out( sprintf( 'GD failed to open image: %s', $this->sImageSrc ), __METHOD__ );
+			Geko_Debug::out( sprintf( 'GD failed to open image: %s', $this->_sImageSrc ), __METHOD__ );
 			return FALSE;
 		}
 		
-		Geko_Debug::out( sprintf( 'Attempting to create thumbnail file from source: %s', $this->sImageSrc ), __METHOD__ );
+		Geko_Debug::out( sprintf( 'Attempting to create thumbnail file from source: %s', $this->_sImageSrc ), __METHOD__ );
 		
 		// Get original width and height
 		$iCurWidth = imagesx( $rImage );
 		$iCurHeight = imagesy( $rImage );
 		
 		// calculate width/height values if not provided
-		if ( ( '' == $this->iWidth ) || ( '' == $this->iHeight ) ) {
+		if ( ( '' == $this->_iWidth ) || ( '' == $this->_iHeight ) ) {
 			
-			if ( ( '' != $this->iHeight ) && ( '' == $this->iWidth ) ) {
+			if ( ( '' != $this->_iHeight ) && ( '' == $this->_iWidth ) ) {
 				// height value given, but not width
-				$iHeight = $this->iHeight;
-				$iWidth = $iCurWidth * ( $this->iHeight / $iCurHeight );
-			} elseif ( ( '' != $this->iWidth ) && ( '' == $this->iHeight ) ) {
+				$iHeight = $this->_iHeight;
+				$iWidth = $iCurWidth * ( $this->_iHeight / $iCurHeight );
+			} elseif ( ( '' != $this->_iWidth ) && ( '' == $this->_iHeight ) ) {
 				// width value given, but not height
-				$iWidth = $this->iWidth;
-				$iHeight = $iCurHeight * ( $this->iWidth / $iCurWidth );
+				$iWidth = $this->_iWidth;
+				$iHeight = $iCurHeight * ( $this->_iWidth / $iCurWidth );
 			} else {
 				// width and height values not given
 				
 				// check if scale factor was given
-				if ( '' != $this->iScale ) {
+				if ( '' != $this->_iScale ) {
 					// scale image width and height
-					$fScale = $this->iScale / 100;
+					$fScale = $this->_iScale / 100;
 					$iWidth = round( $iCurWidth * $fScale );
 					$iHeight = round( $iCurHeight * $fScale );
 				} else {
@@ -272,14 +272,14 @@ class Geko_Image_Thumb extends Geko_Image_CachedAbstract
 			}
 			
 		} else {
-			$iWidth = $this->iWidth;
-			$iHeight = $this->iHeight;
+			$iWidth = $this->_iWidth;
+			$iHeight = $this->_iHeight;
 		}
 		
 		// create a new true color image
 		$rCanvas = imagecreatetruecolor( $iWidth, $iHeight );
 		
-		if ( TRUE == $this->bZoomOrCrop ) {
+		if ( TRUE == $this->_bZoomOrCrop ) {
 			
 			$iSrcX = $iSrcY = 0;
 			$iSrcW = $iCurWidth;
@@ -294,10 +294,10 @@ class Geko_Image_Thumb extends Geko_Image_CachedAbstract
 				// left/right of image will be cropped
 				$iSrcW = round( ( $iCurWidth / $iCmpX * $iCmpY ) );
 				
-				if ( 'l' == $this->sCropHorizontalAlign ) {
+				if ( 'l' == $this->_sCropHorizontalAlign ) {
 					// align top
 					$iSrcX = 0;
-				} elseif ( 'r' == $this->sCropHorizontalAlign ) {
+				} elseif ( 'r' == $this->_sCropHorizontalAlign ) {
 					// align bottom
 					$iSrcX = round( $iCurWidth - ( $iCurWidth / $iCmpX * $iCmpY ) );
 				} else {
@@ -310,10 +310,10 @@ class Geko_Image_Thumb extends Geko_Image_CachedAbstract
 				// top/bottom of image will be cropped
 				$iSrcH = round( ( $iCurHeight / $iCmpY * $iCmpX ) );
 				
-				if ( 't' == $this->sCropVerticalAlign ) {
+				if ( 't' == $this->_sCropVerticalAlign ) {
 					// align left
 					$iSrcY = 0;
-				} elseif ( 'b' == $this->sCropVerticalAlign ) {
+				} elseif ( 'b' == $this->_sCropVerticalAlign ) {
 					// align right
 					$iSrcY = round( $iCurHeight - ( $iCurHeight / $iCmpY * $iCmpX ) );
 				} else {
@@ -336,10 +336,10 @@ class Geko_Image_Thumb extends Geko_Image_CachedAbstract
 		if ( TRUE == stristr( $sMimeType, 'gif' ) ) {
 			imagegif( $rCanvas, $sCacheFilePath );
 		} elseif( TRUE == stristr( $sMimeType, 'png' ) ) {
-			imagepng( $rCanvas, $sCacheFilePath, ceil( $this->iQuality / 10 ) );
+			imagepng( $rCanvas, $sCacheFilePath, ceil( $this->_iQuality / 10 ) );
 		} else {
 			// jpeg is default
-			imagejpeg( $rCanvas, $sCacheFilePath, $this->iQuality );
+			imagejpeg( $rCanvas, $sCacheFilePath, $this->_iQuality );
 		}
 		
 		Geko_Debug::out( sprintf( 'Cache image created: %s', $sCacheFilePath ), __METHOD__ );
@@ -354,7 +354,7 @@ class Geko_Image_Thumb extends Geko_Image_CachedAbstract
 	//
 	public function getCacheFileKey() {
 		
-		if ( '' == $this->sImageSrc ) {
+		if ( '' == $this->_sImageSrc ) {
 			
 			// image source given is empty
 			Geko_Debug::out( 'Image source given is empty.', __METHOD__ );
@@ -363,41 +363,46 @@ class Geko_Image_Thumb extends Geko_Image_CachedAbstract
 		} else {
 
 			// this should create a unique "signature" for the cached file
-			return md5(
-				$this->sImageSrc . '_' .
-				$this->iWidth . '_' .
-				$this->iHeight . '_' .
-				intval( $this->bZoomOrCrop ) . '_' .
-				$this->sCropVerticalAlign . '_' .
-				$this->sCropHorizontalAlign . '_' .
-				$this->iQuality . '_' .
-				$this->iScale . '_' .
-				$this->iModifiedTimestamp . '_' .
-				intval( $this->bIsRemote )
-			);
+			return md5( sprintf(
+				'%s_%d_%d_%d_%s_%s_%d_%d_%d_%d',
+				$this->_sImageSrc,
+				$this->_iWidth,
+				$this->_iHeight,
+				intval( $this->_bZoomOrCrop ),
+				$this->_sCropVerticalAlign,
+				$this->_sCropHorizontalAlign,
+				$this->_iQuality,
+				$this->_iScale,
+				$this->_iModifiedTimestamp,
+				intval( $this->_bIsRemote )
+			) );
 			
 		}
 	}
 	
 	
 	//
-	public function buildThumbUrl( $sThumbUrl, $bRetObj = FALSE ) {
+	public function buildThumbUrl( $sThumbUrl = '', $bRetObj = FALSE ) {
+		
+		if ( !$sThumbUrl ) {
+			$sThumbUrl = Geko_Uri::getUrl( 'geko_thumb' );
+		}
 		
 		$oUrl = new Geko_Uri( $sThumbUrl );
 		$oUrl
-			->setVar( 'src', $this->sImageSrc, FALSE )
-			->setVar( 'w', $this->iWidth, FALSE )
-			->setVar( 'h', $this->iHeight, FALSE )
-			->setVar( 'zc', intval( $this->bZoomOrCrop ), FALSE )
-			->setVar( 'cva', $this->sCropVerticalAlign, FALSE )
-			->setVar( 'cha', $this->sCropHorizontalAlign, FALSE )
-			->setVar( 'q', $this->iQuality, FALSE )
-			->setVar( 'scl', $this->iScale, FALSE )
-			->setVar( 'mtime', $this->iModifiedTimestamp, FALSE )
-			->setVar( 'rmt', intval( $this->bIsRemote ), FALSE )
+			->setVar( 'src', $this->_sImageSrc, FALSE )
+			->setVar( 'w', $this->_iWidth, FALSE )
+			->setVar( 'h', $this->_iHeight, FALSE )
+			->setVar( 'zc', intval( $this->_bZoomOrCrop ), FALSE )
+			->setVar( 'cva', $this->_sCropVerticalAlign, FALSE )
+			->setVar( 'cha', $this->_sCropHorizontalAlign, FALSE )
+			->setVar( 'q', $this->_iQuality, FALSE )
+			->setVar( 'scl', $this->_iScale, FALSE )
+			->setVar( 'mtime', $this->_iModifiedTimestamp, FALSE )
+			->setVar( 'rmt', intval( $this->_bIsRemote ), FALSE )
 		;
 		
-		return ( $bRetObj ) ? $oUrl : strval( $oUrl );
+		return ( $bRetObj ) ? $oUrl : strval( $oUrl ) ;
 	}
 	
 		

@@ -22,13 +22,13 @@ $aParams = array(
 class Geko_Image_Crop extends Geko_Image_CachedAbstract
 {
 	
-	protected $sImageSrc;
-	protected $iXOffset = 0;
-	protected $iYOffset = 0;
-	protected $sOffsetMethod = 'p';
-	protected $iQuality = 80;
-	protected $iModifiedTimestamp;
-	protected $bIsRemote = FALSE;
+	protected $_sImageSrc;
+	protected $_iXOffset = 0;
+	protected $_iYOffset = 0;
+	protected $_sOffsetMethod = 'p';
+	protected $_iQuality = 80;
+	protected $_iModifiedTimestamp;
+	protected $_bIsRemote = FALSE;
 	
 	
 	
@@ -65,21 +65,21 @@ class Geko_Image_Crop extends Geko_Image_CachedAbstract
 	
 	//
 	public function setImageSrc( $sImageSrc ) {
-		$this->sImageSrc = $sImageSrc;
+		$this->_sImageSrc = $sImageSrc;
 		return $this;
 	}
 	
 	//
 	public function setXOffset( $iXOffset ) {
 		$iXOffset = intval( preg_replace( "/[^0-9-]/", '', $iXOffset ) );		
-		$this->iXOffset = $iXOffset;
+		$this->_iXOffset = $iXOffset;
 		return $this;
 	}
 	
 	//
 	public function setYOffset( $iYOffset ) {
 		$iYOffset = intval( preg_replace( "/[^0-9-]/", '', $iYOffset ) );		
-		$this->iYOffset = $iYOffset;
+		$this->_iYOffset = $iYOffset;
 		return $this;
 	}
 	
@@ -95,7 +95,7 @@ class Geko_Image_Crop extends Geko_Image_CachedAbstract
 	public function setOffsetMethod( $sOffsetMethod ) {
 		$sOffsetMethod = strtolower( $sOffsetMethod );
 		if ( in_array( $sOffsetMethod, array( 'p', 'u' ) ) ) {
-			$this->sOffsetMethod = $sOffsetMethod;		
+			$this->_sOffsetMethod = $sOffsetMethod;		
 		}
 		return $this;
 	}
@@ -106,19 +106,19 @@ class Geko_Image_Crop extends Geko_Image_CachedAbstract
 		$iQuality = intval( preg_replace( "/[^0-9]/", '', $iQuality ) );
 		if ( !$iQuality ) $iQuality = 80;
 		
-		$this->iQuality = $iQuality;
+		$this->_iQuality = $iQuality;
 		return $this;
 	}
 	
 	//
 	public function setModifiedTimestamp( $iModifiedTimestamp ) {
-		$this->iModifiedTimestamp = $iModifiedTimestamp;
+		$this->_iModifiedTimestamp = $iModifiedTimestamp;
 		return $this;
 	}
 	
 	//
 	public function setIsRemote( $bIsRemote ) {
-		$this->bIsRemote = $bIsRemote;
+		$this->_bIsRemote = $bIsRemote;
 		return $this;
 	}
 	
@@ -135,11 +135,11 @@ class Geko_Image_Crop extends Geko_Image_CachedAbstract
 			'image/gif'
 		);
 		
-		$sMime = Geko_File_MimeType::get( $this->sImageSrc );
+		$sMime = Geko_File_MimeType::get( $this->_sImageSrc );
 		
 		// if mime type was not determined, use the file extension
 		if ( !$sMime ) {
-			$sExt = strtolower( pathinfo( $this->sImageSrc, PATHINFO_EXTENSION ) );
+			$sExt = strtolower( pathinfo( $this->_sImageSrc, PATHINFO_EXTENSION ) );
 			if ( 'jpg' == $sExt || 'jpeg' == $sExt ) $sMime = 'image/jpeg';
 			elseif ( 'png' == $sExt ) $sMime = 'image/png';
 			elseif ( 'gif' == $sExt ) $sMime = 'image/gif';
@@ -149,7 +149,7 @@ class Geko_Image_Crop extends Geko_Image_CachedAbstract
 			return $sMime;
 		} else {
 			// mime type not allowed
-			Geko_Debug::out( sprintf( 'Mime type not allowed: %s', $this->sImageSrc ), __METHOD__ );
+			Geko_Debug::out( sprintf( 'Mime type not allowed: %s', $this->_sImageSrc ), __METHOD__ );
 			return '';
 		}
 	}
@@ -193,46 +193,46 @@ class Geko_Image_Crop extends Geko_Image_CachedAbstract
 		
 		// check if image is remote or local, then open it
 		
-		if ( TRUE == $this->bIsRemote ) {
+		if ( TRUE == $this->_bIsRemote ) {
 			
 			// image is remote
-			$rImage = imagecreatefromstring( Geko_RemoteFile::getContents( $this->sImageSrc ) );
+			$rImage = imagecreatefromstring( Geko_RemoteFile::getContents( $this->_sImageSrc ) );
 			
 		} else {
 			
 			// image is local
 			if ( TRUE == stristr( $sMimeType, 'gif' ) ) {
-				$rImage = imagecreatefromgif( $this->sImageSrc );
+				$rImage = imagecreatefromgif( $this->_sImageSrc );
 			} elseif ( TRUE == stristr( $sMimeType, 'png' ) ) {
-				$rImage = imagecreatefrompng( $this->sImageSrc );
+				$rImage = imagecreatefrompng( $this->_sImageSrc );
 			} else {
 				// jpeg is default
-				$rImage = imagecreatefromjpeg( $this->sImageSrc );
+				$rImage = imagecreatefromjpeg( $this->_sImageSrc );
 			}		
 		}
 		
 		if ( FALSE == $rImage ) {
-			Geko_Debug::out( sprintf( 'GD failed to open image: %s', $this->sImageSrc ), __METHOD__ );
+			Geko_Debug::out( sprintf( 'GD failed to open image: %s', $this->_sImageSrc ), __METHOD__ );
 			return FALSE;
 		}
 		
-		Geko_Debug::out( sprintf( 'Attempting to create cropped file from source: %s', $this->sImageSrc ), __METHOD__ );
+		Geko_Debug::out( sprintf( 'Attempting to create cropped file from source: %s', $this->_sImageSrc ), __METHOD__ );
 		
 		// Get original width and height
 		$iCurWidth = imagesx( $rImage );
 		$iCurHeight = imagesy( $rImage );
 
-		$iWidth = ( $this->iWidth ) ? $this->iWidth : $this->iHeight;
-		$iHeight = ( $this->iHeight ) ? $this->iHeight : $this->iWidth;
+		$iWidth = ( $this->_iWidth ) ? $this->_iWidth : $this->_iHeight;
+		$iHeight = ( $this->_iHeight ) ? $this->_iHeight : $this->_iWidth;
 		
-		if ( 'u' == $this->sOffsetMethod ) {
+		if ( 'u' == $this->_sOffsetMethod ) {
 			// use width/height as offset units
-			$iXOffset = $iWidth * $this->iXOffset;
-			$iYOffset = $iHeight * $this->iYOffset;			
+			$iXOffset = $iWidth * $this->_iXOffset;
+			$iYOffset = $iHeight * $this->_iYOffset;			
 		} else {
 			// default, offset is in pixel values
-			$iXOffset = $this->iXOffset;
-			$iYOffset = $this->iYOffset;		
+			$iXOffset = $this->_iXOffset;
+			$iYOffset = $this->_iYOffset;		
 		}
 		
 		// if offsets go beyond width/height then throw an exception
@@ -254,10 +254,10 @@ class Geko_Image_Crop extends Geko_Image_CachedAbstract
 		if ( TRUE == stristr( $sMimeType, 'gif' ) ) {
 			imagegif( $rCanvas, $sCacheFilePath );
 		} elseif( TRUE == stristr( $sMimeType, 'png' ) ) {
-			imagepng( $rCanvas, $sCacheFilePath, ceil( $this->iQuality / 10 ) );
+			imagepng( $rCanvas, $sCacheFilePath, ceil( $this->_iQuality / 10 ) );
 		} else {
 			// jpeg is default
-			imagejpeg( $rCanvas, $sCacheFilePath, $this->iQuality );
+			imagejpeg( $rCanvas, $sCacheFilePath, $this->_iQuality );
 		}
 		
 		Geko_Debug::out( sprintf( 'Cache image created: %s', $sCacheFilePath ), __METHOD__ );
@@ -274,7 +274,7 @@ class Geko_Image_Crop extends Geko_Image_CachedAbstract
 	//
 	public function getCacheFileKey() {
 		
-		if ( '' == $this->sImageSrc ) {
+		if ( '' == $this->_sImageSrc ) {
 			
 			// image source given is empty
 			Geko_Debug::out( 'Image source given is empty.', __METHOD__ );
@@ -285,15 +285,15 @@ class Geko_Image_Crop extends Geko_Image_CachedAbstract
 			// this should create a unique "signature" for the cached file
 			return md5(
 				'%s_%d_%d_%d_%d_%s_%d_%d_%d',
-				$this->sImageSrc,
-				$this->iWidth,
-				$this->iHeight,
-				$this->iXOffset,
-				$this->iYOffset,
-				$this->sOffsetMethod,
-				$this->iQuality,
-				$this->iModifiedTimestamp,
-				intval( $this->bIsRemote )
+				$this->_sImageSrc,
+				$this->_iWidth,
+				$this->_iHeight,
+				$this->_iXOffset,
+				$this->_iYOffset,
+				$this->_sOffsetMethod,
+				$this->_iQuality,
+				$this->_iModifiedTimestamp,
+				intval( $this->_bIsRemote )
 			);
 			
 		}
@@ -305,15 +305,15 @@ class Geko_Image_Crop extends Geko_Image_CachedAbstract
 		
 		$oUrl = new Geko_Uri( $sThumbUrl );
 		$oUrl
-			->setVar( 'src', $this->sImageSrc, FALSE )
-			->setVar( 'w', $this->iWidth, FALSE )
-			->setVar( 'h', $this->iHeight, FALSE )
-			->setVar( 'x', $this->iXOffset, FALSE )
-			->setVar( 'y', $this->iYOffset, FALSE )
-			->setVar( 's', $this->sOffsetMethod, FALSE )
-			->setVar( 'q', $this->iQuality, FALSE )
-			->setVar( 'mtime', $this->iModifiedTimestamp, FALSE )
-			->setVar( 'rmt', intval( $this->bIsRemote ), FALSE )
+			->setVar( 'src', $this->_sImageSrc, FALSE )
+			->setVar( 'w', $this->_iWidth, FALSE )
+			->setVar( 'h', $this->_iHeight, FALSE )
+			->setVar( 'x', $this->_iXOffset, FALSE )
+			->setVar( 'y', $this->_iYOffset, FALSE )
+			->setVar( 's', $this->_sOffsetMethod, FALSE )
+			->setVar( 'q', $this->_iQuality, FALSE )
+			->setVar( 'mtime', $this->_iModifiedTimestamp, FALSE )
+			->setVar( 'rmt', intval( $this->_bIsRemote ), FALSE )
 		;
 		
 		return ( $bRetObj ) ? $oUrl : strval( $oUrl );

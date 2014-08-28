@@ -1,5 +1,10 @@
 <?php
 
+require_once( sprintf(
+	'%s/external/libs/moneris/mpgClasses.php',
+	dirname( dirname( dirname( dirname( dirname( dirname( __FILE__ ) ) ) ) ) )
+) );
+
 //
 class Geko_Wp_Payment_Moneris_Transaction extends Geko_Wp_Payment_Transaction
 {

@@ -18,6 +18,9 @@ abstract class Geko_Image_CachedAbstract
 	
 	protected static $sCacheDir;
 	
+	protected $_iWidth;
+	protected $_iHeight;
+	
 	
 	
 	////// static methods
@@ -26,17 +29,22 @@ abstract class Geko_Image_CachedAbstract
 	
 	//
 	public static function setCacheDir( $sCacheDir ) {
-		
-		if ( DIRECTORY_SEPARATOR != substr( $sCacheDir, strlen( $sCacheDir ) - 1 ) ) {
-			// add a trailing '/'
-			$sCacheDir .= DIRECTORY_SEPARATOR;
-		}
-		
-		self::$sCacheDir = $sCacheDir;
+		self::$sCacheDir = self::addTrailingDirSep( $sCacheDir );
 	}
 	
 	
 	//// utility methods
+	
+	//
+	protected static function addTrailingDirSep( $sPath ) {
+		
+		if ( DIRECTORY_SEPARATOR != substr( $sPath, strlen( $sPath ) - 1 ) ) {
+			// add a trailing '/'
+			$sPath .= DIRECTORY_SEPARATOR;
+		}
+		
+		return $sPath;
+	}
 	
 	//
 	public static function resolveLocalImageSrc( $sPath ) {
@@ -133,14 +141,14 @@ abstract class Geko_Image_CachedAbstract
 	//
 	public function setWidth( $iWidth ) {
 		$iWidth = intval( preg_replace( "/[^0-9]/", '', $iWidth ) );		
-		$this->iWidth = $iWidth;
+		$this->_iWidth = $iWidth;
 		return $this;
 	}
 	
 	//
 	public function setHeight( $iHeight ) {
 		$iHeight = intval( preg_replace( "/[^0-9]/", '', $iHeight ) );		
-		$this->iHeight = $iHeight;
+		$this->_iHeight = $iHeight;
 		return $this;
 	}
 	
@@ -217,8 +225,8 @@ abstract class Geko_Image_CachedAbstract
 		header( 'Content-Type: image/gif' );
 		
 		/* /
-		$iWidth = ( '' == $this->iWidth ) ? 10 : $this->iWidth;
-		$iHeight = ( '' == $this->iHeight ) ? 10 : $this->iHeight;
+		$iWidth = ( '' == $this->_iWidth ) ? 10 : $this->_iWidth;
+		$iHeight = ( '' == $this->_iHeight ) ? 10 : $this->_iHeight;
 		
 		$rCanvas = imagecreate( $iWidth, $iHeight );
 		
@@ -235,8 +243,8 @@ abstract class Geko_Image_CachedAbstract
 		/* */
 		
 		/* */
-		$iWidth = ( '' == $this->iWidth ) ? 10 : $this->iWidth;
-		$iHeight = ( '' == $this->iHeight ) ? 10 : $this->iHeight;
+		$iWidth = ( '' == $this->_iWidth ) ? 10 : $this->_iWidth;
+		$iHeight = ( '' == $this->_iHeight ) ? 10 : $this->_iHeight;
 		
 		$rCanvas = imagecreate( $iWidth, $iHeight );
 		imagefill( $rCanvas, 0, 0, imagecolorallocate( $rCanvas, 0x77, 0x77, 0x77 ) );
@@ -391,8 +399,11 @@ abstract class Geko_Image_CachedAbstract
 			
 			// attempt to call set*() method if it exists
 			$sCall = substr_replace( $sMethod, 'set', 0, 6 );
+			
 			if ( method_exists( $this, $sCall ) ) {
+				
 				$mRes = self::paramCoalesce( $aArgs[ 0 ], $aArgs[ 1 ] );
+				
 				if ( NULL !== $mRes ) {
 					return $this->$sCall( $mRes );
 				} else {

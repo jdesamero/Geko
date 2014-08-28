@@ -14,15 +14,22 @@ class Geko_Image_Margin
 		$aMargin = explode( '|', $mMargin );
 		
 		if ( count( $aMargin ) == 1 ) {
-			$i = $aMargin[0];
+			
+			$i = $aMargin[ 0 ];
 			$aMargin = array( $i, $i, $i, $i );
+		
 		} elseif ( count( $aMargin ) == 2 ) {
-			$i = $aMargin[0];
-			$j = $aMargin[1];
+			
+			$i = $aMargin[ 0 ];
+			$j = $aMargin[ 1 ];
 			$aMargin = array( $i, $j, $i, $j );
+		
 		} elseif ( count( $aMargin ) == 4 ) {
+			
 			// do nothing
+		
 		} else {
+			
 			$aMargin = array( 0, 0, 0, 0 );
 		}
 		

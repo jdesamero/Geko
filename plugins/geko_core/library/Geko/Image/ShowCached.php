@@ -3,7 +3,7 @@
 //
 class Geko_Image_ShowCached extends Geko_Image_CachedAbstract
 {
-	private $sCacheFileKey;
+	protected $_sCacheFileKey;
 	
 	
 	//
@@ -15,14 +15,14 @@ class Geko_Image_ShowCached extends Geko_Image_CachedAbstract
 	//
 	public function setCacheFileKey( $sCacheFileKey ) {
 		
-		$this->sCacheFileKey = $sCacheFileKey;
+		$this->_sCacheFileKey = $sCacheFileKey;
 	}
 	
 	
 	//
 	public function getCacheFileKey() {
 		
-		return $this->sCacheFileKey;
+		return $this->_sCacheFileKey;
 	}
 	
 	

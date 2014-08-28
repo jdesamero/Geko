@@ -1,5 +1,10 @@
 <?php
 
+require_once( sprintf(
+	'%s/external/libs/mime_types-0.1/Mime_Types.php',
+	dirname( dirname( dirname( dirname( __FILE__ ) ) ) )
+) );
+
 //
 class Geko_File_MimeType
 {
