@@ -244,19 +244,20 @@
 					//
 					var eImageContent = eMap.find( '.imgContent' );
 					
-					var mapTimeout, restartTimeout;
-					var mapLock = false;						
-					
-					var leftOffset = -1;
-					var topOffset = 1;
-					
 					var fnStopMap, fnStopMapDelay;
 					
 					
 					//// map animation stuff
 					
 					if ( oMoveOpts ) {
+
+						var mapTimeout, restartTimeout;
+						var mapLock = false;						
 						
+						var leftOffset = -1;
+						var topOffset = 1;
+						
+						// move
 						eMap.on( 'move', function() {
 							
 							mapLock = true;
@@ -291,6 +292,7 @@
 							
 						} );
 						
+						// stop
 						eMap.on( 'stop', function( e, delay ) {
 							
 							var fnMoveMap = function() {
@@ -318,8 +320,6 @@
 							
 						} );
 						
-						
-						// $( '.imgContent, #viewer' )
 						
 						fnStopMap = function() {
 							eMap.trigger( 'stop' );
