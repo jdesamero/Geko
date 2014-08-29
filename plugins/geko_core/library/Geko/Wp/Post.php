@@ -210,9 +210,11 @@ class Geko_Wp_Post extends Geko_Wp_Entity
 	
 	//
 	public function getEntityFromId( $iEntityId ) {
+		
 		if ( !is_array( $this->_aQueryParams ) ) {
 			return get_post( $iEntityId );
 		}
+		
 		return parent::getEntityFromId( $iEntityId );
 	}
 	
@@ -414,10 +416,13 @@ class Geko_Wp_Post extends Geko_Wp_Entity
 		
 		// image groups
 		if ( $sKey = $aParams[ 'file_group' ] ) {
+			
 			$aParams[ 'has_file_ids' ] = TRUE;		// Hack!!!
+			
 			if ( !is_array( $aFileIds = $this->getMetaMemberIds( $sKey ) ) ) {
 				$aFileIds = $this->getMetaFromJson( $sKey );
 			}
+			
 			$aParams[ 'file_ids' ] = $aFileIds;
 		}
 		

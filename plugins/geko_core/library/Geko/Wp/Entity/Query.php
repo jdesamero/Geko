@@ -130,7 +130,9 @@ abstract class Geko_Wp_Entity_Query extends Geko_Entity_Query
 	
 	//
 	public function getFoundRows() {
+		
 		global $wpdb;
+		
 		return $wpdb->get_var( 'SELECT FOUND_ROWS()' );
 	}
 	
@@ -140,9 +142,12 @@ abstract class Geko_Wp_Entity_Query extends Geko_Entity_Query
 		global $wpdb;
 		
 		if ( $this->_bProfileQuery ) {
+			
 			echo $this->getEntityQuery( $mParam );
 			return array();
+			
 		} else {
+			
 			return $wpdb->get_results(
 				$this->getEntityQuery( $mParam )
 			);
@@ -151,7 +156,9 @@ abstract class Geko_Wp_Entity_Query extends Geko_Entity_Query
 	
 	//
 	public function getSingleEntity( $mParam ) {
+		
 		global $wpdb;
+		
 		return $wpdb->get_row(
 			$this->getEntityQuery( $mParam )
 		);
@@ -165,10 +172,13 @@ abstract class Geko_Wp_Entity_Query extends Geko_Entity_Query
 	
 	//
 	public function renderListing() {
+		
 		if ( $this->_sManageClass ) {
+			
 			$oMng = Geko_Singleton_Abstract::getInstance( $this->_sManageClass );
 			$oMng->renderListing( $this );
 		}
+		
 	}
 	
 	
