@@ -53,6 +53,8 @@ class Geko_Image_Thumb extends Geko_Image_CachedAbstract
 			$aParams = array_merge( $aParams, $aResolveParams );
 		}
 		
+		$aParams = Geko_Hooks::applyFilter( __METHOD__, $aParams, $this );
+		
 		$this
 			->arrSetImageSrc( $aParams, 'src|source' )
 			->arrSetWidth( $aParams, 'w|wdt|width' )
@@ -401,6 +403,8 @@ class Geko_Image_Thumb extends Geko_Image_CachedAbstract
 			->setVar( 'mtime', $this->_iModifiedTimestamp, FALSE )
 			->setVar( 'rmt', intval( $this->_bIsRemote ), FALSE )
 		;
+		
+		$oUrl = Geko_Hooks::applyFilter( __METHOD__, $oUrl, $this );
 		
 		return ( $bRetObj ) ? $oUrl : strval( $oUrl ) ;
 	}

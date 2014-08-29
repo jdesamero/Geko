@@ -12,9 +12,12 @@ class Geko_Wp_Category_Alias extends Geko_Wp_Category_Meta
 	
 	//
 	public function addTheme() {
+		
 		parent::addTheme();
+		
 		add_action( 'pre_get_posts', array( $this, 'resolveTheme' ) );
 		add_filter( 'Geko_Wp_NavigationManagement_Page_Category::isCurrentCategory::category', array( $this, 'isNavCurrentCategory' ), 10, 2 );
+		
 		return $this;
 	}
 	
@@ -70,12 +73,12 @@ class Geko_Wp_Category_Alias extends Geko_Wp_Category_Meta
 						$aQuery->parse_tax_query( $aQuery->query_vars );
 						
 					} else {
+						
 						$oActualCat = $oApparentCat;
 						$this->oActualCat = $oActualCat;
 					}
-										
-					$bDefaultQuery = TRUE;
 					
+					$bDefaultQuery = TRUE;
 				}
 				
 			}
@@ -92,7 +95,7 @@ class Geko_Wp_Category_Alias extends Geko_Wp_Category_Meta
 	
 	// get the actual category, if one is specified
 	public function getCatId( $iCatId ) {
-		return $this->getMeta( $iCatId, $this->getPrefixWithSep() . 'category_alias' );
+		return $this->getMeta( $iCatId, sprintf( '%scategory_alias', $this->getPrefixWithSep() ) );
 	}
 	
 	

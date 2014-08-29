@@ -73,6 +73,10 @@ Geko_Loader::registerNamespaces(
 );
 
 
+// set-up path (url-to-path/path-to-url) conversion
+Geko_String_Path::setRoots( Geko_Wp::getUrl(), ABSPATH );
+
+
 // register external files (js/css)
 Geko_Wp::setStandardPlaceholders( array(
 	'geko_core_root' => GEKO_CORE_ROOT,

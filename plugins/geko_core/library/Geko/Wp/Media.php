@@ -103,8 +103,11 @@ class Geko_Wp_Media extends Geko_Wp_Post
 	
 	// generates class string for use with jQuery metadata plugin
 	protected function formatMeta( $aMeta ) {
+		
 		$aFmt = array();
+		
 		foreach ( $aMeta as $sKey => $mValue ) {
+			
 			if ( $mValue ) {
 				if ( preg_match( '/[0-9]/', $mValue ) ) {
 					$aFmt[] = sprintf( '%s: %d', $sKey, $mValue );
@@ -113,6 +116,7 @@ class Geko_Wp_Media extends Geko_Wp_Post
 				}
 			}
 		}
+		
 		return sprintf( '{%s}', implode( ', ', $aFmt ) );
 	}
 
@@ -125,13 +129,8 @@ class Geko_Wp_Media extends Geko_Wp_Post
 			( $sImage = $this->getUrl() ) && 
 			( $this->isImage() )
 		) {
-			
-			// remove the http:// portion of the image path
-			$sSrcDir = Geko_PhpQuery_FormTransform_Plugin_File::getDefaultFileDocRoot();
-			$sImage = str_replace( Geko_Wp::getUrl(), '', $sImage );
-			$sImage = sprintf( '%s/%s', $sSrcDir, trim( $sImage, '/' ) );
-			
-			$aParams[ 'src' ] = $sImage;
+			// resolve image url to absolute file system path
+			$aParams[ 'src' ] = Geko_String_Path::getUrlToFile( $sImage );
 		}
 		
 		return Geko_Wp::getThumbUrl( $aParams );

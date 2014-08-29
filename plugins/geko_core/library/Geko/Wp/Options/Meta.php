@@ -50,19 +50,19 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 					
 					if ( $aPathDetails[ 'auto_resolve' ] ) {
 						
-						$sFullDocRoot = sprintf( '%s%s', Geko_PhpQuery_FormTransform_Plugin_File::getDefaultFileDocRoot(), $sPath );
-						$sFullUrlRoot = sprintf( '%s%s', Geko_PhpQuery_FormTransform_Plugin_File::getDefaultFileUrlRoot(), $sPath );
+						$sFullFileRoot = sprintf( '%s%s', Geko_String_Path::getFileRoot(), $sPath );
+						$sFullUrlRoot = sprintf( '%s%s', Geko_String_Path::getUrlRoot(), $sPath );
 						
-						$this->_aUploadPaths[ $sPath ][ 'full_doc_root' ] = $sFullDocRoot;
+						$this->_aUploadPaths[ $sPath ][ 'full_doc_root' ] = $sFullFileRoot;
 						$this->_aUploadPaths[ $sPath ][ 'full_url_root' ] = $sFullUrlRoot;
 					
 					} else {
 						
-						$this->_aUploadPaths[ $sPath ][ 'full_doc_root' ] = $sFullDocRoot = $sPath;
+						$this->_aUploadPaths[ $sPath ][ 'full_doc_root' ] = $sFullFileRoot = $sPath;
 						$sFullUrlRoot = $aPathDetails[ 'full_url_root' ];
 					}
 					
-					$this->uploadPathsCallback( $aPathDetails, $sFullDocRoot, $sFullUrlRoot );
+					$this->uploadPathsCallback( $aPathDetails, $sFullFileRoot, $sFullUrlRoot );
 				}
 				
 				// track the keys numerically

@@ -400,6 +400,18 @@ class Geko_Wp extends Geko
 		
 		$sSrc = $aParams[ 'file' ];
 		
+		//// handle scss
+		
+		if ( 'scss' == pathinfo( $sSrc, PATHINFO_EXTENSION ) ) {
+			
+			$oScss = new Geko_Scss( array(
+				'fullpath' => Geko_String_Path::getUrlToFile( $sSrc )
+			) );
+			
+			$sSrc = $oScss->buildCssUrl();
+		}
+		
+		
 		if ( !$aDeps = $aParams[ 'dependencies' ] ) {
 			$aDeps = array();
 		}
@@ -502,10 +514,12 @@ class Geko_Wp extends Geko
 		$oUrl = Geko_Uri::getGlobal();
 		
 		$aRet = array(
-
+			
 			'export' => Geko_Uri::getUrl( 'geko_export' ),
+			'gmap_overlay' => Geko_Uri::getUrl( 'geko_gmap_overlay' ),
 			'pdf' => Geko_Uri::getUrl( 'geko_pdf' ),
 			'process' => Geko_Uri::getUrl( 'geko_process' ),
+			'scss' => Geko_Uri::getUrl( 'geko_scss' ),
 			'thumb' => Geko_Uri::getUrl( 'geko_thumb' ),
 			'upload' => Geko_Uri::getUrl( 'geko_upload' ),
 			

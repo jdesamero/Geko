@@ -13,6 +13,11 @@ class Geko_Hooks
 	private static $aCalledFilters = array();
 	
 	
+	
+	// NOTE: $mSubjectIndex is how arguments from doAction or applyFilter is mapped to
+	//		 $aParams in addAction or addFilter
+	
+	
 	//// actions
 	
 	//
@@ -21,25 +26,50 @@ class Geko_Hooks
 	}
 	
 	//
-	public static function addAction( $sActionName, $mCallback, $aParams = array(), $iPriority = 500 ) {
+	public static function addAction( $sActionName, $mCallback, $aParams = array(), $mSubjectIndex = 0, $iPriority = 500 ) {
+		
 		$sActionName = strtolower( $sActionName );
+		
 		$iIndex = count( self::$aActions[ $sActionName ] );
+		
 		self::$aActions[ $sActionName ][] = array(
 			'callback' => $mCallback,
 			'params' => $aParams,
+			'subj_idx' => Geko_Array::wrap( $mSubjectIndex ),
 			'priority' => $iPriority,
 			'index' => $iIndex
 		);
 	}
 	
 	//
-	public static function doAction( $sActionName ) {
-		$sActionName = strtolower( $sActionName );
+	public static function doAction() {
+		
+		$aArgs = func_get_args();
+		
+		$sActionName = strtolower( array_shift( $aArgs ) );
+		
 		$aActions = ( is_array( self::$aActions[ $sActionName ] ) ) ? self::$aActions[ $sActionName ] : array() ;
 		$aActions = self::sortParamsByPriority( $aActions );
+		
 		foreach ( $aActions as $aAction ) {
-			call_user_func_array( $aAction[ 'callback' ], $aAction[ 'params' ] );
+			
+			$aParams = $aAction[ 'params' ];
+			$aSubjIdx = $aAction[ 'subj_idx' ];
+			
+			// merge $aArgs with $aParams
+			foreach ( $aArgs as $i => $mArg ) {
+				
+				if ( isset( $aSubjIdx[ $i ] ) ) {
+					$aParams[ $aSubjIdx[ $i ] ] = $mArg;
+				} else {
+					$aParams[ $i ] = $mArg;
+				}
+				
+			}
+			
+			call_user_func_array( $aAction[ 'callback' ], $aParams );
 		}
+		
 		self::$aCalledActions[] = $sActionName;
 	}
 	
@@ -51,7 +81,9 @@ class Geko_Hooks
 	
 	//
 	public static function removeAction( $sActionName, $mMatchCallback = NULL ) {
+		
 		$sActionName = strtolower( $sActionName );
+		
 		if ( NULL == $mMatchCallback ) {
 			unset( self::$aActions[ $sActionName ] );
 		} else {
@@ -68,41 +100,77 @@ class Geko_Hooks
 	}
 	
 	//
-	public static function addFilter( $sFilterName, $mCallback, $aParams = array(), $iSubjectIndex = 0, $iPriority = 500 ) {
+	public static function addFilter( $sFilterName, $mCallback, $aParams = array(), $mSubjectIndex = 0, $iPriority = 500 ) {
+		
 		$sFilterName = strtolower( $sFilterName );
+		
 		$iIndex = count( self::$aFilters[ $sFilterName ] );
+		
 		self::$aFilters[ $sFilterName ][] = array(
 			'callback' => $mCallback,
 			'params' => $aParams,
-			'subj_idx' => $iSubjectIndex,
+			'subj_idx' => Geko_Array::wrap( $mSubjectIndex ),
 			'priority' => $iPriority,
 			'index' => $iIndex
 		);
 	}
 
 	//
-	public static function applyFilter( $sFilterName, $mSubject ) {
-		$sFilterName = strtolower( $sFilterName );
+	public static function applyFilter() {
+		
+		$aArgs = func_get_args();
+		
+		$sFilterName = strtolower( array_shift( $aArgs ) );
+		
+		$mSubject = $aArgs[ 0 ];
+		
 		$aFilters = ( is_array( self::$aFilters[ $sFilterName ] ) ) ? self::$aFilters[ $sFilterName ] : array();
 		$aFilters = self::sortParamsByPriority( $aFilters );
+		
 		foreach ( $aFilters as $aFilter ) {
+			
 			$aParams = $aFilter[ 'params' ];
-			$aParams[ $aFilter[ 'subj_idx' ] ] = $mSubject;
+			$aSubjIdx = $aFilter[ 'subj_idx' ];
+			
+			$bFirst = TRUE;
+			
+			// merge $aArgs with $aParams
+			foreach ( $aArgs as $i => $mArg ) {
+				
+				if ( $bFirst ) {
+					$mArg = $mSubject;			// always pass the filtered value
+					$bFirst = FALSE;
+				}
+				
+				if ( isset( $aSubjIdx[ $i ] ) ) {
+					$aParams[ $aSubjIdx[ $i ] ] = $mArg;
+				} else {
+					$aParams[ $i ] = $mArg;
+				}
+				
+			}
+			
 			$mSubject = call_user_func_array( $aFilter[ 'callback' ], $aParams );
 		}
+		
 		self::$aCalledFilters[] = $sFilterName;
+		
 		return $mSubject;
 	}
 
 	//
 	public static function appliedFilter( $sFilterName ) {
+		
 		$sFilterName = strtolower( $sFilterName );
+		
 		return in_array( $sFilterName, self::$aCalledFilters );
 	}
 	
 	//
 	public static function removeFilter( $sFilterName, $mMatchCallback = NULL ) {
+		
 		$sFilterName = strtolower( $sFilterName );
+		
 		if ( NULL == $mMatchCallback ) {
 			unset( self::$aFilters[ $sFilterName ] );
 		} else {
@@ -117,7 +185,9 @@ class Geko_Hooks
 	
 	//
 	private static function removeCallback( $aHooks, $mMatchCallback ) {
+		
 		if ( is_array( $aHooks ) ) {
+			
 			$aRes = $aHooks;
 			foreach ( $aHooks as $i => $aCallback ) {
 				

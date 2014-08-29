@@ -326,20 +326,10 @@ abstract class Geko_Wp_Entity extends Geko_Entity
 		$bPermalink = $aParams[ 'permalink' ];
 		$sMetaKey = $aParams[ 'meta_key' ];
 		
-		// resolve url to path, if we can
-		$sSrcUrl = Geko_PhpQuery_FormTransform_Plugin_File::getDefaultFileUrlRoot();
 		
-		if ( 0 === strpos( $sPhoto, $sSrcUrl ) ) {
-			
-			// get root dir
-			$sSrcDir = Geko_PhpQuery_FormTransform_Plugin_File::getDefaultFileDocRoot();
-			
-			$sPhoto = str_replace( $sSrcUrl, '', $sPhoto );
-			$sPhoto = sprintf( '%s/%s', $sSrcDir, trim( $sPhoto, '/' ) );
-		}
+		// resolve image url to absolute file system path
+		$aParams[ 'src' ] = Geko_String_Path::getUrlToFile( $sPhoto );
 		
-		
-		$aParams[ 'src' ] = $sPhoto;
 		
 		$oThumb = new Geko_Image_Thumb( $aParams );
 		

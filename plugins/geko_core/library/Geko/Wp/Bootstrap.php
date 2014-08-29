@@ -167,10 +167,79 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 		}
 		
 		
-		// form transformation hooks
 		
-		Geko_PhpQuery_FormTransform_Plugin_File::setDefaultFileDocRoot( substr( ABSPATH, 0, strlen( ABSPATH ) - 1 ) );
-		Geko_PhpQuery_FormTransform_Plugin_File::setDefaultFileUrlRoot( Geko_Wp::getUrl() );
+		//// for Geko_Scss
+		
+		Geko_Hooks::addFilter( 'Geko_Scss::__construct', function( $aParams ) {
+			
+			if (
+				( $iDirId = $aParams[ 'dirid' ] ) && 
+				( !$aParams[ 'd' ] )
+			) {
+				unset( $aParams[ 'dirid' ] );
+				$aParams[ 'd' ] = Geko_Wp_Options_MetaKey::getKey( $iDirId );
+			}
+			
+			return $aParams;
+		} );
+		
+		Geko_Hooks::addFilter( 'Geko_Scss::buildCssUrl', function( $oUrl ) {
+			
+			if ( $sDir = $oUrl->getVar( 'd' ) ) {
+				
+				$iDirId = Geko_Wp_Options_MetaKey::getId( $sDir );
+				
+				$oUrl
+					->unsetVar( 'd' )
+					->setVar( 'dirid', $iDirId )
+				;
+			}
+			
+			return $oUrl;
+		} );		
+		
+
+		//// for Geko_Image_Thumb
+		
+		Geko_Hooks::addFilter( 'Geko_Image_Thumb::__construct', function( $aParams ) {
+			
+			if (
+				( $iDirId = $aParams[ 'dirid' ] ) && 
+				( $sFileName = $aParams[ 'fn' ] ) && 
+				( !$aParams[ 'src' ] )
+			) {
+				
+				unset( $aParams[ 'dirid' ] );
+				unset( $aParams[ 'fn' ] );
+				
+				$aParams[ 'src' ] = sprintf( '%s/%s', Geko_Wp_Options_MetaKey::getKey( $iDirId ), $sFileName );
+			}
+			
+			return $aParams;
+		} );
+		
+		Geko_Hooks::addFilter( 'Geko_Image_Thumb::buildThumbUrl', function( $oUrl ) {
+			
+			if ( $sFull = $oUrl->getVar( 'src' ) ) {
+				
+				$sFileName = basename( $sFull );
+				$sDirName = dirname( $sFull );
+				
+				$iDirId = Geko_Wp_Options_MetaKey::getId( $sDirName );
+				
+				$oUrl
+					->unsetVar( 'src' )
+					->setVar( 'dirid', $iDirId )
+					->setVar( 'fn', $sFileName )
+				;
+			}
+			
+			return $oUrl;
+		} );		
+
+		
+		
+		// form transformation hooks
 		
 		Geko_PhpQuery_FormTransform::registerPlugin( 'Geko_PhpQuery_FormTransform_Plugin_File' );
 		Geko_PhpQuery_FormTransform::registerPlugin( 'Geko_PhpQuery_FormTransform_Plugin_RowTemplate' );
@@ -224,6 +293,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 			'admin_page_source'
 		);
 		
+				
 	}
 	
 	

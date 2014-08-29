@@ -53,7 +53,7 @@ class GekoTest_Hooks extends Geko_PhpUnit_TestCase
 		
 		// 500 is default priority
 		Geko_Hooks::addAction( $sAction, array( $this, 'doStuff' ) );
-		Geko_Hooks::addAction( $sAction, array( $this, 'doBeforeStuff' ), array(), 400 );
+		Geko_Hooks::addAction( $sAction, array( $this, 'doBeforeStuff' ), array(), 0, 400 );
 		
 		Geko_Hooks::doAction( $sAction );
 		
@@ -160,9 +160,9 @@ class GekoTest_Hooks extends Geko_PhpUnit_TestCase
 		Geko_Hooks::removeFilter( $sFilter );
 
 		Geko_Hooks::addFilter( $sFilter, array( $this, 'decorate' ), array( 'em' ), 1 );
-		Geko_Hooks::addFilter( $sFilter, array( $this, 'decorate' ), array( 'span', null, 'word' ), 1 );
-		Geko_Hooks::addFilter( $sFilter, array( $this, 'decorate' ), array( 'div', null, 'cool' ), 1 );
-
+		Geko_Hooks::addFilter( $sFilter, array( $this, 'decorate' ), array( 'span', NULL, 'word' ), 1 );
+		Geko_Hooks::addFilter( $sFilter, array( $this, 'decorate' ), array( 'div', NULL, 'cool' ), 1 );
+		
 		$sSubject = 'Cool';
 		$sSubject = Geko_Hooks::applyFilter( $sFilter, $sSubject );
 		
@@ -196,24 +196,25 @@ class GekoTest_Hooks extends Geko_PhpUnit_TestCase
 	
 	//
 	public function applyStuff( $sValue ) {
-		return '<span class="stuff">' . $sValue . '</span>';
+		return sprintf( '<span class="stuff">%s</span>', $sValue );
 	}
 	
 	//
 	public function applyBeforeStuff( $sValue ) {
-		return '<div class="before_stuff">' . $sValue . '</div>';
+		return sprintf( '<div class="before_stuff">%s</div>', $sValue );
 	}	
 	
 	//
 	public function wrapStuff( $sClass, $sValue ) {
-		return '<div class="' . $sClass . '">' . $sValue . '</div>';
+		return sprintf( '<div class="%s">%s</div>', $sClass, $sValue );
 	}
 	
 	//
 	public function decorate( $sTag, $sValue, $sClass = '' ) {
-		if ( $sClass ) $sClass = ' class="' . $sClass . '"';
-		return '<' . $sTag . $sClass . '>' . $sValue . '</' . $sTag . '>';
+		if ( $sClass ) $sClass = sprintf( ' class="%s"', $sClass );
+		return sprintf( '<%s%s>%s</%s>', $sTag, $sClass, $sValue, $sTag );
 	}
 	
 }
+
 

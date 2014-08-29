@@ -149,11 +149,7 @@ class Geko_Wp_Hooks
 				
 				add_action(
 					$sAction,
-					
-					function() use( $sAction ) {
-						Geko_Hooks::doAction( $sAction );
-					},
-					
+					create_function( '', "Geko_Hooks::doAction('" . $sAction . "');" ),
 					$iPriority,
 					$iAcceptedArgs
 				);
@@ -190,21 +186,19 @@ class Geko_Wp_Hooks
 				
 				add_filter(
 					$sFilter,
-					
-					function() use( $sFilter ) {
-
-						$aSubject = func_get_args();
-						
-						if ( count( $aSubject ) == 1 ) {
-							$sRes = Geko_Hooks::applyFilter( $sFilter, $aSubject[ 0 ] );
-						} else {
-							$aRes = Geko_Hooks::applyFilter( $sFilter, $aSubject );
-							$sRes = $aRes[ 0 ];
-						}
-						
-						return $sRes;
-					},
-					
+					create_function(
+						'',
+						'
+							$aSubject = func_get_args();
+							if ( count( $aSubject ) == 1 ) {
+								$sRes = Geko_Hooks::applyFilter( \'' . $sFilter . '\', $aSubject[ 0 ] );
+							} else {
+								$aRes = Geko_Hooks::applyFilter( \'' . $sFilter . '\', $aSubject );
+								$sRes = $aRes[ 0 ];
+							}
+							return $sRes;
+						'
+					),
 					$iPriority,
 					$iAcceptedArgs
 				);

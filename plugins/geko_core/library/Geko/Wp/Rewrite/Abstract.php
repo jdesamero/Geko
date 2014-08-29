@@ -69,7 +69,7 @@ abstract class Geko_Wp_Rewrite_Abstract
 		global $wp_rewrite;
 		// add rewrite tokens
 		
-		$fnGenerateRule = function( $sVarName, $sTag ) {
+		$fnGenerateRule = function( $sVarName, $sTag ) use ( $wp_rewrite ) {
 		
 			if ( $sVarName ) {
 				

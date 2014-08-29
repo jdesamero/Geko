@@ -62,6 +62,8 @@ class Geko_Scss
 	//
 	public function __construct( $aParams = array() ) {
 		
+		$aParams = Geko_Hooks::applyFilter( __METHOD__, $aParams, $this );
+		
 		$this
 			->arrSetFullPath( $aParams, 'fp|full|fullpath' )
 			->arrSetFileName( $aParams, 'fn|fname|filename' )
@@ -140,6 +142,8 @@ class Geko_Scss
 			->setVar( 'd', $this->_sDirName, FALSE )
 			->setVar( 'acd', $this->_sAltCacheDir, FALSE )
 		;
+		
+		$oUrl = Geko_Hooks::applyFilter( __METHOD__, $oUrl, $this );
 		
 		return ( $bRetObj ) ? $oUrl : strval( $oUrl ) ;
 	}

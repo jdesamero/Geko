@@ -3,30 +3,6 @@
 //
 class Geko_PhpQuery_FormTransform_Plugin_File extends Geko_PhpQuery_FormTransform_Plugin_Abstract
 {
-	protected static $sDefaultFileDocRoot = '';
-	protected static $sDefaultFileUrlRoot = '';
-	
-	
-	//
-	public static function setDefaultFileDocRoot( $sDefaultFileDocRoot ) {
-		self::$sDefaultFileDocRoot = $sDefaultFileDocRoot;
-	}
-
-	//
-	public static function getDefaultFileDocRoot() {
-		return self::$sDefaultFileDocRoot;
-	}	
-	
-	//
-	public static function setDefaultFileUrlRoot( $sDefaultFileUrlRoot ) {
-		self::$sDefaultFileUrlRoot = $sDefaultFileUrlRoot;
-	}
-	
-	//
-	public static function getDefaultFileUrlRoot() {
-		return self::$sDefaultFileUrlRoot;
-	}	
-	
 	
 	
 	//
@@ -39,12 +15,12 @@ class Geko_PhpQuery_FormTransform_Plugin_File extends Geko_PhpQuery_FormTransfor
 		
 		if ( 'input:file' == $sElemType ) {
 			
-			$aElem[ 'doc_root' ] = Geko_String::coalesce( $oPq->attr( '_file_doc_root' ), self::$sDefaultFileDocRoot );
-			$aElem[ 'url_root' ] = Geko_String::coalesce( $oPq->attr( '_file_url_root' ), self::$sDefaultFileUrlRoot );
+			$aElem[ 'doc_root' ] = Geko_String::coalesce( $oPq->attr( '_file_doc_root' ), Geko_String_Path::getFileRoot() );
+			$aElem[ 'url_root' ] = Geko_String::coalesce( $oPq->attr( '_file_url_root' ), Geko_String_Path::getUrlRoot() );
 			$aElem[ 'upload_dir' ] = $oPq->attr( '_file_upload_dir' );
 			
-			$aElem[ 'full_doc_root' ] = $aElem[ 'doc_root' ] . $aElem[ 'upload_dir' ];
-			$aElem[ 'full_url_root' ] = $aElem[ 'url_root' ] . $aElem[ 'upload_dir' ];
+			$aElem[ 'full_doc_root' ] = sprintf( '%s%s', $aElem[ 'doc_root' ], $aElem[ 'upload_dir' ] );
+			$aElem[ 'full_url_root' ] = sprintf( '%s%s', $aElem[ 'url_root' ], $aElem[ 'upload_dir' ] );
 			
 		}
 		
@@ -65,7 +41,7 @@ class Geko_PhpQuery_FormTransform_Plugin_File extends Geko_PhpQuery_FormTransfor
 			$oDoc = $oPq->toRoot();
 			
 			// clean up
-			$oDoc->find( '*[_bind_to=' . $sName . ']' )->remove();			
+			$oDoc->find( sprintf( '*[_bind_to=%s]', $sName ) )->remove();			
 			
 		}
 	}
@@ -91,9 +67,9 @@ class Geko_PhpQuery_FormTransform_Plugin_File extends Geko_PhpQuery_FormTransfor
 			$sName = $oPq->attr( 'name' );
 			$oDoc = $oPq->toRoot();
 			
-			if ( is_file( $sFullDocFile = $sFullDocRoot . '/' . $mOptionVal ) ) {
+			if ( is_file( $sFullDocFile = sprintf( '%s/%s', $sFullDocRoot, $mOptionVal ) ) ) {
 				
-				$sFullUrlFile = $sFullUrlRoot . '/' . $mOptionVal;
+				$sFullUrlFile = sprintf( '%s/%s', $sFullUrlRoot, $mOptionVal );
 				
 				if ( $aImgInfo = getimagesize( $sFullDocFile ) ) {
 					
@@ -105,7 +81,7 @@ class Geko_PhpQuery_FormTransform_Plugin_File extends Geko_PhpQuery_FormTransfor
 					$sMimeType = Geko_File_MimeType::get( $sFullDocFile );
 				}
 				
-				$aBindElems = $oDoc->find( '*[_bind_to=' . $sName . ']' );
+				$aBindElems = $oDoc->find( sprintf( '*[_bind_to=%s]', $sName ) );
 				
 				foreach ( $aBindElems as $oElem ) {
 					
@@ -113,10 +89,10 @@ class Geko_PhpQuery_FormTransform_Plugin_File extends Geko_PhpQuery_FormTransfor
 					
 					if ( !$oPpq->html() ) {
 						$sDisplay = ( $bIsImage ) ? '<img class="file_image" />' : '<span class="file_path"></span>';
-						$oPpq->html('
-							' . $sDisplay . '<br />
+						$oPpq->html( sprintf( '
+							%s<br />
 							<input type="checkbox" class="file_delete" /> <span class="delete">Delete</span>
-						');
+						', $sDisplay ) );
 					}
 					
 					$oPpq->find( '.file_path' )->html( $sFullDocFile );
@@ -125,8 +101,8 @@ class Geko_PhpQuery_FormTransform_Plugin_File extends Geko_PhpQuery_FormTransfor
 					
 					$oPpq
 						->find( 'input.file_delete' )
-						->attr( 'id', 'del-' . $sName )
-						->attr( 'name', 'del-' . $sName )
+						->attr( 'id', sprintf( 'del-%s', $sName ) )
+						->attr( 'name', sprintf( 'del-%s', $sName ) )
 					;
 					
 					if ( $bIsImage ) {
@@ -142,7 +118,7 @@ class Geko_PhpQuery_FormTransform_Plugin_File extends Geko_PhpQuery_FormTransfor
 							if ( $iThumbWidth ) $aThumbParams[ 'w' ] = $iThumbWidth;
 							if ( $iThumbHeight ) $aThumbParams[ 'h' ] = $iThumbHeight;
 							
-							$sThumbFile = Geko_Uri::getUrl( 'geko_thumb' ) . '?' . http_build_query( $aThumbParams );
+							$sThumbFile = sprintf( '%s?%s', Geko_Uri::getUrl( 'geko_thumb' ), http_build_query( $aThumbParams ) );
 							
 							$oPpq
 								->find( 'img.file_image' )
@@ -185,7 +161,7 @@ class Geko_PhpQuery_FormTransform_Plugin_File extends Geko_PhpQuery_FormTransfor
 			} else {
 				
 				// clean up
-				$oDoc->find( '*[_bind_to=' . $sName . ']' )->remove();
+				$oDoc->find( sprintf( '*[_bind_to=%s]', $sName ) )->remove();
 				
 			}
 			
@@ -193,12 +169,15 @@ class Geko_PhpQuery_FormTransform_Plugin_File extends Geko_PhpQuery_FormTransfor
 		
 	}
 	
+	
 	// clean-up non-html tags
 	public static function cleanUpNonHtml( $oDoc ) {
+		
 		$oDoc->find( 'input[_file_doc_root]' )->removeAttr( '_file_doc_root' );
 		$oDoc->find( 'input[_file_url_root]' )->removeAttr( '_file_url_root' );
 		$oDoc->find( 'input[_file_upload_dir]' )->removeAttr( '_file_upload_dir' );
 	}
+	
 	
 }
 

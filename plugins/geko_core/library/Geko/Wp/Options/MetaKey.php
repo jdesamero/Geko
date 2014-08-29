@@ -13,6 +13,7 @@ class Geko_Wp_Options_MetaKey
 	
 	//
 	public static function init() {
+		
 		if ( !self::$bCalledInit ) {	
 			
 			global $wpdb;
@@ -35,7 +36,9 @@ class Geko_Wp_Options_MetaKey
 	
 	// create table
 	public static function install() {
+		
 		if ( !self::$bCalledInstall && is_admin() ) {
+			
 			Geko_Wp_Db::createTable( self::$oSqlTable );			
 			self::$bCalledInstall = TRUE;
 		}
@@ -44,6 +47,8 @@ class Geko_Wp_Options_MetaKey
 	
 	//
 	public static function loadFromDb() {
+		
+		self::init();
 		
 		global $wpdb;
 		
@@ -54,7 +59,8 @@ class Geko_Wp_Options_MetaKey
 		foreach ( $aRes as $oItem ) {
 			self::$aMetaKeyCache[ $oItem->meta_key ] = $oItem->mkey_id;
 			self::$aMetaKeyHash[ $oItem->mkey_id ] = $oItem->meta_key;
-		}	
+		}
+		
 	}
 	
 	
@@ -78,7 +84,7 @@ class Geko_Wp_Options_MetaKey
 			self::$aMetaKeyCache[ $sMetaKey ] = $iMkeyId;
 			self::$aMetaKeyHash[ $iMkeyId ] = $sMetaKey;
 		}
-		
+				
 		return self::$aMetaKeyCache[ $sMetaKey ];
 	}
 	
