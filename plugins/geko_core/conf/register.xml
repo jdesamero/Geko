@@ -19,6 +19,7 @@
 		<file id="geko-flash-loader" src="##geko_core_uri##/external/js/flash_loader.js" />
 		<file id="geko-get_scroll_xy" src="##geko_core_uri##/external/js/get_scroll_xy.js" />
 		<file id="geko-googlemaps" src="//maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=##GOOGLEMAPS_API_KEY##" />
+		<file id="geko-googlemaps3" src="//maps.googleapis.com/maps/api/js?sensor=false" />
 		<file id="geko-sharethis" src="//w.sharethis.com/button/buttons.js" />
 		<file id="geko-string_format" src="##geko_core_uri##/external/js/string_format.min.js" />
 		<file id="geko-swf-object" src="##geko_core_uri##/external/js/swfobject.js" />
@@ -197,7 +198,7 @@
 		<file id="geko-jquery-fixboxmodel" src="##geko_core_uri##/external/js/jquery.fixBoxModel.js" dependencies="jquery" />
 		<file id="geko-jquery-flexslider" src="##geko_core_uri##/external/js/jquery.flexslider-min.js" dependencies="jquery" />
 		<file id="geko-jquery-form" src="##geko_core_uri##/external/js/jquery.form.js" dependencies="jquery" />
-		<file id="geko-jquery-googlemaps" src="##geko_core_uri##/external/js/jquery.googlemaps-1.01.1.js" dependencies="geko-googlemaps jquery" />
+		<file id="geko-jquery-googlemaps" src="##geko_core_uri##/external/js/jquery.googlemaps-1.01.1.js" dependencies="geko-string_format geko-googlemaps jquery" />
 		<file id="geko-jquery-greensock" src="##geko_core_uri##/external/js/greensock.js" dependencies="jquery" />
 		<file id="geko-jquery-hammer" src="##geko_core_uri##/external/js/jquery.hammer.js" dependencies="jquery" />
 		<file id="geko-jquery-layerslider" src="##geko_core_uri##/external/js/layerslider.kreaturamedia.jquery.js" dependencies="geko-jquery-layerslider-transitions" />
@@ -249,6 +250,7 @@
 		<file id="geko-jquery-geko-facebook" src="##geko_core_uri##/js/jquery.geko_facebook.js" dependencies="jquery geko-facebook-connect" />
 		<file id="geko-jquery-geko_get_class_from_list" src="##geko_core_uri##/js/jquery.geko_get_class_from_list.js" dependencies="jquery" />
 		<file id="geko-jquery-geko_get_multi" src="##geko_core_uri##/js/jquery.geko_get_multi.js" dependencies="jquery" />
+		<file id="geko-jquery-geko_googlemaps3" src="##geko_core_uri##/js/jquery.geko_googlemaps3.js" dependencies="geko-string_format geko-googlemaps3 jquery" />
 		<file id="geko-jquery-geko_horizontal_scroll" src="##geko_core_uri##/js/jquery.geko_horizontal_scroll.js" dependencies="jquery geko-jquery-ui-slider" />
 		<file id="geko-jquery-geko_hovermenu" src="##geko_core_uri##/js/jquery.geko_hovermenu.js" dependencies="geko-string_format jquery" />
 		<file id="geko-jquery-geko_image_picker" src="##geko_core_uri##/js/jquery.geko_image_picker.js" dependencies="geko-jquery-geko_util" />

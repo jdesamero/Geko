@@ -341,6 +341,29 @@
 			return gIcon;
 		}
 		
+		
+		var newGMarker = function( lat, lng, center, draggable, icon ) {
+			
+			if ( !center ) {
+				center = new GLatLng( lat, lng );
+			}
+			
+			var markerOpts = {};
+			
+			if ( draggable ) {
+				markerOpts.draggable = draggable;
+			}
+
+			if ( icon ) {
+				markerOpts.icon = icon;
+			}
+			
+			var gMarker = new GMarker( center, markerOpts );
+			
+			return gMarker;
+		}
+		
+		
 		this.mapMarkers = function( markers ) {
 			
 			if ( typeof( markers.length ) == 'undefined' ) {
@@ -352,22 +375,21 @@
 				
 				var params = markers[ i ];
 				
+				
+				var gIcon;
 				if ( params.icon ) {
+					gIcon = jMap.mapMarkersOptions( params.icon );
+				}	
+				
+				
+				if ( params.geocode ) {
 					
-					params.idx = i;
-					var gIcon = jMap.mapMarkersOptions( params.icon );
+					this.addGeocodeMarker( gIcon, params );
 					
-					if ( params.geocode ) {
-						
-						this.addGeocodeMarker( gIcon, params );
-						
-					} else if ( params.latitude && params.longitude ) {
-						// Latitude & Longitude Center Point
-						var center = new GLatLng( params.latitude, params.longitude );
-						var gMarker = new GMarker( center, { draggable: params.draggable, icon: gIcon } );
-						this.addMapMarkerOverlay( gMarker, params );
-					}
+				} else if ( params.latitude && params.longitude ) {
 					
+					var gMarker = newGMarker( params.latitude, params.longitude, null, params.draggable, gIcon );
+					this.addMapMarkerOverlay( gMarker, params );
 				}
 								
 			}
@@ -375,74 +397,77 @@
 		}
 		
 		this.addGeocodeMarker = function( gIcon, params ) {
+			
 			var geocoder = new GClientGeocoder();
+			
 			geocoder.getLatLng( params.geocode, function( center ) {
+				
 				if ( !center ) {
-					alert( address + ' not found' );
+					alert( '%s not found'.printf( address ) );
 				} else {
-					var gMarker = new GMarker( center, { draggable: params.draggable, icon: gIcon } );
+					var gMarker = newGMarker( null, null, center, params.draggable, gIcon );
 					jMap.addMapMarkerOverlay( gMarker, params );
 				}
-			} );			
+				
+			} );
+			
 		}
+		
+		var iMarkerIdx = 0;
 		
 		this.addMapMarkerOverlay = function ( gMarker, params ) {
 
 			gMap.addOverlay( gMarker );
 			
-			if ( params.info ) {
+			if ( params.info && params.info.layer ) {
 				
-				if ( params.info.layer ) {
+				var infoLayerId = params.info.layer;
+				
+				// Hide Div Layer With Info Window HTML
+				$( infoLayerId ).hide();
+				
+				// Marker Div Layer Exists
+				if ( params.info.customStyle ) {
 					
-					var infoLayerId = params.info.layer;
+					var customStyle = params.info.customStyle;
+					var showEvent = null;
+					var hideEvent = null;
 					
-					// Hide Div Layer With Info Window HTML
-					$( infoLayerId ).hide();
+					gMarker.infoLayerId = infoLayerId;
 					
-					// Marker Div Layer Exists
-					if ( params.info.customStyle ) {
-						
-						var customStyle = params.info.customStyle;
-						var showEvent = null;
-						var hideEvent = null;
-						
-						gMarker.infoLayerId = infoLayerId;
-						
-						if ( 'hover' == params.info.event ) {
-							showEvent = 'mouseover';
-							hideEvent = 'mouseout';
-						} else {
-							showEvent = 'click';
-						}
-						
-						// show custom info window
-						if ( showEvent ) {
-							GEvent.addListener( gMarker, showEvent, function() {
-								if ( gMap.customInfo ) gMap.removeOverlay( gMap.customInfo );
-								gMap.customInfo = new customStyle( this.getLatLng(), $( this.infoLayerId ).html() );
-								gMap.addOverlay( gMap.customInfo );
-							} );
-						}
-						
-						// hide custom info window
-						if ( hideEvent ) {
-							GEvent.addListener( gMarker, hideEvent, function() {
-								if ( gMap.customInfo ) gMap.removeOverlay( gMap.customInfo );
-							} );
-						}
-						
-						//
-						if ( params.info.popup ) GEvent.trigger( gMarker, showEvent );
-						
+					if ( 'hover' == params.info.event ) {
+						showEvent = 'mouseover';
+						hideEvent = 'mouseout';
 					} else {
-						
-						if ( params.info.popup ) {
-							// Map Marker Shows an Info Box on Load
-							gMarker.openInfoWindowHtml( $( infoLayerId ).html() );
-						} else {
-							gMarker.bindInfoWindowHtml( $( infoLayerId ).html() );
-						}
-						
+						showEvent = 'click';
+					}
+					
+					// show custom info window
+					if ( showEvent ) {
+						GEvent.addListener( gMarker, showEvent, function() {
+							if ( gMap.customInfo ) gMap.removeOverlay( gMap.customInfo );
+							gMap.customInfo = new customStyle( this.getLatLng(), $( this.infoLayerId ).html() );
+							gMap.addOverlay( gMap.customInfo );
+						} );
+					}
+					
+					// hide custom info window
+					if ( hideEvent ) {
+						GEvent.addListener( gMarker, hideEvent, function() {
+							if ( gMap.customInfo ) gMap.removeOverlay( gMap.customInfo );
+						} );
+					}
+					
+					//
+					if ( params.info.popup ) GEvent.trigger( gMarker, showEvent );
+					
+				} else {
+					
+					if ( params.info.popup ) {
+						// Map Marker Shows an Info Box on Load
+						gMarker.openInfoWindowHtml( $( infoLayerId ).html() );
+					} else {
+						gMarker.bindInfoWindowHtml( $( infoLayerId ).html() );
 					}
 					
 				}
@@ -451,11 +476,17 @@
 			
 			jMap.marker[ params.idx ] = gMarker;
 			
-			// create hash for use with getMarker()
-			if ( params.icon.id ) {
-				jMap.markerHash[ params.icon.id ] = params.idx;
+			//// create hash for use with getMarker()
+			
+			if ( params.icon && params.icon.id ) {
+				jMap.markerHash[ params.icon.id ] = iMarkerIdx;
 			}
 			
+			if ( params.id ) {
+				jMap.markerHash[ params.id ] = iMarkerIdx;
+			}
+			
+			iMarkerIdx++;
 		}
 		
 		this.mapControlsLocation = function ( location ) {
