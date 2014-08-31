@@ -35,55 +35,39 @@ class Geko_Wp_Category_Alias extends Geko_Wp_Category_Meta
 	
 	
 	//
-	public function resolveTheme( $aQuery ) {
+	public function resolveTheme( $oWpQuery ) {
 		
-		if ( is_category() ) {
+		if ( is_category() && $oWpQuery->is_main_query() ) {
 			
-			static $bDefaultQuery = FALSE;
-			
-			if ( !$bDefaultQuery ) {
-				
-				// use backtrace to determine if this is the default query
-				
-				$aBt = debug_backtrace( FALSE );
-				if (
-					( 'WP_Query' == $aBt[ 4 ][ 'class' ] ) && 
-					( 'query' == $aBt[ 4 ][ 'function' ] )
-				) {
-					
-					$iCatId = $aQuery->query_vars[ 'cat' ];
-					if ( !$iCatId ) {
-						$iCatId = Geko_Wp_Category::get_ID( $aQuery->query_vars[ 'category_name' ] );
-					}
+			$iCatId = $oWpQuery->query_vars[ 'cat' ];
+			if ( !$iCatId ) {
+				$iCatId = Geko_Wp_Category::get_ID( $oWpQuery->query_vars[ 'category_name' ] );
+			}
 
-					$oApparentCat = new Geko_Wp_Category( $iCatId );
-					$this->oApparentCat = $oApparentCat;
-					
-					$iAliasCatId = $this->getCatId( $iCatId );
-					
-					if ( $iAliasCatId ) {
-						
-						$oActualCat = new Geko_Wp_Category( $iAliasCatId );
-						$this->oActualCat = $oActualCat;
-						
-						// set these properties to force the page to render as the original
-						$aQuery->queried_object_id = $iAliasCatId;
-						$aQuery->query_vars[ 'category_name' ] = $oActualCat->getSlug();
-						$aQuery->query_vars[ 'cat' ] = $iAliasCatId;
-						$aQuery->parse_tax_query( $aQuery->query_vars );
-						
-					} else {
-						
-						$oActualCat = $oApparentCat;
-						$this->oActualCat = $oActualCat;
-					}
-					
-					$bDefaultQuery = TRUE;
-				}
+			$oApparentCat = new Geko_Wp_Category( $iCatId );
+			$this->oApparentCat = $oApparentCat;
+			
+			$iAliasCatId = $this->getCatId( $iCatId );
+			
+			if ( $iAliasCatId ) {
 				
+				$oActualCat = new Geko_Wp_Category( $iAliasCatId );
+				$this->oActualCat = $oActualCat;
+				
+				// set these properties to force the page to render as the original
+				$oWpQuery->queried_object_id = $iAliasCatId;
+				$oWpQuery->query_vars[ 'category_name' ] = $oActualCat->getSlug();
+				$oWpQuery->query_vars[ 'cat' ] = $iAliasCatId;
+				$oWpQuery->parse_tax_query( $oWpQuery->query_vars );
+				
+			} else {
+				
+				$oActualCat = $oApparentCat;
+				$this->oActualCat = $oActualCat;
 			}
 			
 		}
+		
 	}
 	
 	

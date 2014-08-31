@@ -37,7 +37,11 @@
 	var castToPair = function( value, type ) {
 		
 		var pair;
-		var type = type.toLowerCase();
+		var type;
+		
+		
+		if ( type ) type.toLowerCase();
+		
 		
 		// format value if it is a string
 		if ( 'string' === $.type( value ) ) {

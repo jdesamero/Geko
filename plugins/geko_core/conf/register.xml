@@ -193,6 +193,7 @@
 		<file id="geko-jquery-color" src="##geko_core_uri##/external/js/jquery.color.js" dependencies="jquery" />
 		<file id="geko-jquery-color_svg_names" src="##geko_core_uri##/external/js/jquery.color.svg-names.js" dependencies="geko-jquery-color" />
 		<file id="geko-jquery-cookie" src="##geko_core_uri##/external/js/jquery.cookie.js" dependencies="jquery" />
+		<file id="geko-jquery-crspline" src="##geko_core_uri##/external/js/jquery.crspline.js" dependencies="jquery" />
 		<file id="geko-jquery-cycle_all" src="##geko_core_uri##/external/js/jquery.cycle.all.js" dependencies="geko-jquery-easing" />
 		<file id="geko-jquery-easing" src="##geko_core_uri##/external/js/jquery.easing.1.3.js" dependencies="jquery" />
 		<file id="geko-jquery-fixboxmodel" src="##geko_core_uri##/external/js/jquery.fixBoxModel.js" dependencies="jquery" />

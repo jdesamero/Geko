@@ -20,6 +20,10 @@
 		}, options );
 		
 		
+		//// initial center offsets, super hacky
+		var iInitXOffset = 0;
+		var iInitYOffset = 0;
+		
 		
 		//// minimap opts
 		
@@ -68,10 +72,16 @@
 			}
 			
 			oMoveOpts = $.extend( {
-				restartDelay: 5000
+				restartDelay: 4000,
+				mode: 'basic',
+				stopOnMarkerMousedown: true,
+				initXOffset: 400,
+				initYOffset: 50
 			}, oMoveOpts );
+			
+			iInitXOffset = oMoveOpts.initXOffset;
+			iInitYOffset = oMoveOpts.initYOffset;
 		}
-		
 		
 		
 		//// helpers
@@ -140,93 +150,101 @@
 			
 			//// process markers
 			
-			if ( oGeoOpts && $.gekoMapProjection ) {
+			if ( oGeoOpts ) {
 				
-				// map position
-				
-				var iCenterLat = null;
-				if ( oGeoOpts.center_lat ) {
-					iCenterLat = oGeoOpts.center_lat;
-					delete oGeoOpts.center_lat;
-				}
-
-				var iCenterLng = null;
-				if ( oGeoOpts.center_lng ) {
-					iCenterLng = oGeoOpts.center_lng;				
-					delete oGeoOpts.center_lng;
-				}
-				
-				// set up projection
-				var oMapProj = new $.gekoMapProjection( oGeoOpts );
-				
-				
-				// calculate center
-				if ( ( !opts.position ) && iCenterLat && iCenterLng ) {
+				if ( $.gekoMapProjection ) {
 					
-					var oCenPos = oMapProj.getCoords( iCenterLat, iCenterLng );
+					// map position
 					
-					var iMapWinWdt = opts.viewPortWidth;
-					if ( !iMapWinWdt ) iMapWinWdt = eMap.width();
-					
-					var iMapWinHgt = opts.viewPortHeight;
-					if ( !iMapWinHgt ) iMapWinHgt = eMap.height();
-					
-					var iCenXpos = parseInt( oCenPos.x - ( iMapWinWdt / 2 ) );
-					var iCenYpos = parseInt( oCenPos.y - ( iMapWinHgt / 2 ) );
-					
-					var iMapWdt = eMapImg.width();
-					var iMapHgt = eMapImg.height();
-					
-					if ( iCenXpos < 0 ) iCenXpos = 0;
-					else if ( iCenXpos > iMapWdt ) iCenXpos = iMapWdt;
-					
-					if ( iCenYpos < 0 ) iCenYpos = 0;
-					else if ( iCenYpos > iMapHgt ) iCenYpos = iMapHgt;
-					
-					opts.position = '%d %d'.printf( iCenXpos, iCenYpos );
-				}
-				
-				// pointers
-				
-				eMap.find( '.point' ).each( function() {
-					
-					var eMarker = $( this );
-					
-					var sCoords = eMarker.attr( 'data-coords' );
-					
-					if ( !eMarker.attr( 'id' ) && sCoords ) {
-						
-						var aCoords = sCoords.split( ',' );
-
-						var oPos = oMapProj.getCoords( parseFloat( aCoords[ 0 ] ), parseFloat( aCoords[ 1 ] ) );
-						var iXpos = parseInt( oPos.x + parseInt( aCoords[ 2 ] ) );
-						var iYpos = parseInt( oPos.y + parseInt( aCoords[ 3 ] ) );
-						
-						eMarker.attr( 'id', 'p-%d-%d'.printf( iXpos, iYpos ) );
+					var iCenterLat = null;
+					if ( oGeoOpts.center_lat ) {
+						iCenterLat = oGeoOpts.center_lat;
+						delete oGeoOpts.center_lat;
+					}
+	
+					var iCenterLng = null;
+					if ( oGeoOpts.center_lng ) {
+						iCenterLng = oGeoOpts.center_lng;				
+						delete oGeoOpts.center_lng;
 					}
 					
+					// set up projection
+					var oMapProj = new $.gekoMapProjection( oGeoOpts );
 					
-					if ( iScaleFactor && sMiniMarkerClass ) {
+					
+					// calculate center
+					if ( ( !opts.position ) && iCenterLat && iCenterLng ) {
 						
-						var aMmPoint = eMarker.attr( 'id' ).split( '-' );
-
-						var eMiniMarker = $( '<div></div>' );
+						var oCenPos = oMapProj.getCoords( iCenterLat, iCenterLng );
 						
-						eMiniMarker.addClass( sMiniMarkerClass );
+						var iMapWinWdt = opts.viewPortWidth;
+						if ( !iMapWinWdt ) iMapWinWdt = eMap.width();
 						
-						eMiniMarker.css( {
-							left: '%dpx'.printf( parseInt( aMmPoint[ 1 ] ) / iScaleFactor ),
-							top: '%dpx'.printf( parseInt( aMmPoint[ 2 ] ) / iScaleFactor )
-						} );
+						var iMapWinHgt = opts.viewPortHeight;
+						if ( !iMapWinHgt ) iMapWinHgt = eMap.height();
 						
-						eMiniMap.prepend( eMiniMarker );
+						var iCenXpos = parseInt( oCenPos.x - ( iMapWinWdt / 2 ) );
+						var iCenYpos = parseInt( oCenPos.y - ( iMapWinHgt / 2 ) );
 						
-						if ( oMmOpts.markerCallback ) {
-							oMmOpts.markerCallback.call( eMap, eMiniMarker, eMarker );
+						var iMapWdt = eMapImg.width();
+						var iMapHgt = eMapImg.height();
+						
+						if ( iCenXpos < 0 ) iCenXpos = 0;
+						else if ( iCenXpos > iMapWdt ) iCenXpos = iMapWdt;
+						
+						if ( iCenYpos < 0 ) iCenYpos = 0;
+						else if ( iCenYpos > iMapHgt ) iCenYpos = iMapHgt;
+						
+						opts.position = '%d %d'.printf( iCenXpos + iInitXOffset, iCenYpos + iInitYOffset );
+					}
+					
+					// pointers
+					
+					eMap.find( '.point' ).each( function() {
+						
+						var eMarker = $( this );
+						
+						var sCoords = eMarker.attr( 'data-coords' );
+						
+						if ( !eMarker.attr( 'id' ) && sCoords ) {
+							
+							var aCoords = sCoords.split( ',' );
+	
+							var oPos = oMapProj.getCoords( parseFloat( aCoords[ 0 ] ), parseFloat( aCoords[ 1 ] ) );
+							var iXpos = parseInt( oPos.x + parseInt( aCoords[ 2 ] ) );
+							var iYpos = parseInt( oPos.y + parseInt( aCoords[ 3 ] ) );
+							
+							eMarker.attr( 'id', 'p-%d-%d'.printf( iXpos, iYpos ) );
 						}
-					}
-											
-				} );
+						
+						
+						if ( iScaleFactor && sMiniMarkerClass ) {
+							
+							var aMmPoint = eMarker.attr( 'id' ).split( '-' );
+	
+							var eMiniMarker = $( '<div></div>' );
+							
+							eMiniMarker.addClass( sMiniMarkerClass );
+							
+							eMiniMarker.css( {
+								left: '%dpx'.printf( parseInt( aMmPoint[ 1 ] ) / iScaleFactor ),
+								top: '%dpx'.printf( parseInt( aMmPoint[ 2 ] ) / iScaleFactor )
+							} );
+							
+							eMiniMap.prepend( eMiniMarker );
+							
+							if ( oMmOpts.markerCallback ) {
+								oMmOpts.markerCallback.call( eMap, eMiniMarker, eMarker );
+							}
+						}
+												
+					} );
+					
+				} else {
+					
+					console.log( 'Warning: To use "geoproj" option, the $.gekoMapProjection (geko-jquery-geko_map_projection) plugin must be enabled!' );
+					oGeoOpts = null;
+				}
 				
 			}
 			
@@ -250,76 +268,160 @@
 					//// map animation stuff
 					
 					if ( oMoveOpts ) {
-
-						var mapTimeout, restartTimeout;
-						var mapLock = false;						
 						
-						var leftOffset = -1;
-						var topOffset = 1;
-						
-						// move
-						eMap.on( 'move', function() {
+						if ( 'crspline' === oMoveOpts.mode ) {
 							
-							mapLock = true;
-							
-							var pos = eImageContent.position();
-							
-							var bottom = -( eImageContent.height() - eMap.height() );
-							var right = -( eImageContent.width() - eMap.width() );
-							
-							if ( pos.top == 0 ) {
-								topOffset = -1;
-							} else if ( pos.top == bottom ) {
-								topOffset = 1;
-							}
-							
-							if ( pos.left == 0 ) {
-								leftOffset = -1;
-							} else if ( pos.left == right ) {
-								leftOffset = 1;
-							}
-							
-							var checkPos = mapCheck( pos.left + leftOffset, pos.top + topOffset, eMap, eImageContent );
-													
-							eImageContent.css( { 'left': checkPos.x + 'px', 'top': checkPos.y + 'px' } );
-							
-							
-							eMap.trigger( 'reposition', [ pos.left, pos.top, xRFactor, yRFactor ] );
-							
-							mapTimeout = setTimeout( function() {
-								eMap.trigger( 'move' );
-							}, 30 );
-							
-						} );
-						
-						// stop
-						eMap.on( 'stop', function( e, delay ) {
-							
-							var fnMoveMap = function() {
-								eMap.trigger( 'move' );					
-							};
-							
-							if ( mapLock ) {
+							if ( $.crSpline ) {
 								
-								clearTimeout( mapTimeout );
-								mapLock = false;
+								// move
+								eMap.on( 'move', function() {
+									
+									//// no animation restart at the moment
+									
+									//
+									var fnMapHover = function() {
+												
+										eImageContent.animate( { 
+											crSpline: $.crSpline.buildSequence( [
+												[ pos.left + iInitXOffset, pos.top + iInitYOffset ],
+												[ pos.left + 300, pos.top ],
+												[ pos.left + 200, pos.top + 50 ],
+												[ pos.left + 300, pos.top + 100 ],
+												[ pos.left + iInitXOffset, pos.top + iInitYOffset ],
+												[ pos.left + 500, pos.top ],
+												[ pos.left + 600, pos.top + 50 ],
+												[ pos.left + 500, pos.top + 100 ],
+												[ pos.left + iInitXOffset, pos.top + iInitYOffset ]
+											] )
+										}, {
+											duration: 180000,
+											easing: 'linear',
+											done: fnMapHover,
+											step: function() {
+												var pos = eImageContent.position();
+												eMap.trigger( 'reposition', [ pos.left, pos.top, xRFactor, yRFactor ] );
+											}
+										} );
+									};
+									
+									//
+									var fnMapBounce = function() {
+										eImageContent.animate( { 
+											crSpline: $.crSpline.buildSequence( [
+												[ pos.left, pos.top ],
+												[ pos.left + iInitXOffset, pos.top + iInitYOffset ]
+											] ) 
+										}, { 
+											duration: 45000, 
+											easing: 'linear',
+											done: fnMapHover,
+											step: function() {
+												var pos = eImageContent.position();
+												eMap.trigger( 'reposition', [ pos.left, pos.top, xRFactor, yRFactor ] );
+											}
+										} );
+										
+									};
+									
+									fnMapBounce();
+									
+								} );
 								
-								if ( delay ) {
-									restartTimeout = setTimeout( fnMoveMap, delay );
-								}
+								// stop
+								eMap.on( 'stop', function( e, delay ) {
+									eImageContent.stop();
+								} );
+								
 								
 							} else {
-								
-								clearTimeout( restartTimeout );
-								
-								if ( delay ) {
-									restartTimeout = setTimeout( fnMoveMap, delay );
-								}
-								
+							
+								console.log( 'Warning: To use "movemap.mode = \'crspline\'" option, the $.crSpline (geko-jquery-crspline) plugin must be enabled!' );
+								oMoveOpts = null;
 							}
 							
-						} );
+						} else {
+							
+							// default, basic mode
+							
+							var mapTimeout, restartTimeout;
+							var mapLock = false;						
+							
+							var leftOffset = -1;
+							var topOffset = 1;
+							
+							// move
+							eMap.on( 'move', function() {
+								
+								mapLock = true;
+								
+								var pos = eImageContent.position();
+								
+								var bottom = -( eImageContent.height() - eMap.height() );
+								var right = -( eImageContent.width() - eMap.width() );
+								
+								if ( pos.top == 0 ) {
+									topOffset = -1;
+								} else if ( pos.top == bottom ) {
+									topOffset = 1;
+								}
+								
+								if ( pos.left == 0 ) {
+									leftOffset = -1;
+								} else if ( pos.left == right ) {
+									leftOffset = 1;
+								}
+								
+								
+								
+								var checkPos = mapCheck( pos.left + leftOffset, pos.top + topOffset, eMap, eImageContent );
+														
+								eImageContent.css( {
+									'left': '%dpx'.printf( checkPos.x ),
+									'top': '%dpx'.printf( checkPos.y )
+								} );
+								
+								
+								eMap.trigger( 'reposition', [ pos.left, pos.top, xRFactor, yRFactor ] );
+								
+								mapTimeout = setTimeout( function() {
+									eMap.trigger( 'move' );
+								}, 80 );
+								
+							} );
+							
+							// stop
+							eMap.on( 'stop', function( e, delay ) {
+								
+								var fnMoveMap = function() {
+									eMap.trigger( 'move' );					
+								};
+								
+								if ( mapLock ) {
+									
+									clearTimeout( mapTimeout );
+									mapLock = false;
+									
+									if ( delay ) {
+										restartTimeout = setTimeout( fnMoveMap, delay );
+									}
+									
+								} else {
+									
+									clearTimeout( restartTimeout );
+									
+									if ( delay ) {
+										restartTimeout = setTimeout( fnMoveMap, delay );
+									}
+									
+								}
+								
+							} );
+							
+							
+						}
 						
+						
+						//// define event handlers
 						
 						fnStopMap = function() {
 							eMap.trigger( 'stop' );
@@ -327,12 +429,19 @@
 						
 						fnStopMapDelay = function() {
 							eMap.trigger( 'stop', [ oMoveOpts.restartDelay ] );
-						};
+						};						
 						
+						
+						// apply event handlers
 						eImageContent
 							.on( 'mousedown', fnStopMap )
 							.on( 'mouseup', fnStopMapDelay )
 						;
+						
+						//
+						if ( oMoveOpts.stopOnMarkerMousedown ) {
+							eMap.find( '.point' ).on( 'mousedown', fnStopMap );
+						}
 						
 					}
 					
@@ -351,7 +460,10 @@
 											
 								var checkPos = mapCheck( pos.left, pos.top, eMap, eImageContent );
 													
-								eImageContent.css( { 'left': checkPos.x + 'px', 'top': checkPos.y + 'px' } );
+								eImageContent.css( {
+									'left': '%dpx'.printf( checkPos.x ),
+									'top': '%dpx'.printf( checkPos.y )
+								} );
 								
 								eViewer
 									.css( 'width', eMap.width() / iScaleFactor )
@@ -400,7 +512,7 @@
 								var newY = parseInt( ui.position.top * yFactor );
 								
 								// console.log( ui.position );
-								// console.log( newX + ' : ' + newY );
+								// console.log( '%d : %d'.printf( newX, newY ) );
 								
 								//sets map image left and top according to newX and newY
 								eImageContent.css( {
@@ -448,12 +560,11 @@
 						if ( isDragging ) {
 							
 							if ( oMmOpts ) {
-																
-								// console.log( e.pageX + ' : ' + e.pageY );
+								
+								// console.log( '%d : %d'.printf( e.pageX, e.pageY ) );
 								// console.log( eImageContent.position() );
 								
 								var pos = eImageContent.position();
-								//fnReposViewer( eViewer, pos.left, pos.top, xRFactor, yRFactor );
 								
 								eMap.trigger( 'reposition', [ pos.left, pos.top, xRFactor, yRFactor ] );
 								
@@ -468,11 +579,11 @@
 					} );
 						
 					
-					
 					// animate map
 					if ( oMoveOpts ) {
 						eMap.trigger( 'move' );
 					}
+					
 					
 				}
 				
