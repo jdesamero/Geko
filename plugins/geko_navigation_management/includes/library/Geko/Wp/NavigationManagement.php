@@ -20,53 +20,46 @@ class Geko_Wp_NavigationManagement
 	//// initialize
 	
 	//
-	public function init() {
+	public function start() {
 		
-		static $bCalled = FALSE;
+		parent::start();
 		
-		if ( !$bCalled ) {
-			
-			parent::init();
-			
-			//
-			if ( !is_array(
-				$aRegisteredPlugins = Zend_Json::decode( $this->getOption( 'plugins' ) )
-			) ) {
-				$aRegisteredPlugins = array();
-			}
-			
-			foreach ( $this->aActivePlugins as $sClass => $b ) {
-				if ( !$aRegisteredPlugins[ $sClass ] ) {
-					if (
-						is_subclass_of( $sClass, 'Geko_Singleton_Abstract' ) && 
-						method_exists( $sClass, 'pluginHookActivate' )
-					) {
-						$oPlugin = Geko_Singleton_Abstract::getInstance( $sClass );
-						$oPlugin->pluginHookActivate();
-					}
-					$aRegisteredPlugins[ $sClass ] = TRUE;
-				}
-			}
-			
-			foreach ( $aRegisteredPlugins as $sClass => $b ) {
-				if ( !$this->aActivePlugins[ $sClass ] ) {
-					if (
-						is_subclass_of( $sClass, 'Geko_Singleton_Abstract' ) && 
-						method_exists( $sClass, 'pluginHookDeactivate' )
-					) {
-						$oPlugin = Geko_Singleton_Abstract::getInstance( $sClass );
-						$oPlugin->pluginHookDeactivate();
-					}
-					unset( $aRegisteredPlugins[ $sClass ] );
-				}
-			}
-			
-			$this->updateOption( 'plugins', Zend_Json::encode( $aRegisteredPlugins ) );
-			
-			
-			$bCalled = TRUE;
+		//
+		if ( !is_array(
+			$aRegisteredPlugins = Zend_Json::decode( $this->getOption( 'plugins' ) )
+		) ) {
+			$aRegisteredPlugins = array();
 		}
 		
+		foreach ( $this->aActivePlugins as $sClass => $b ) {
+			if ( !$aRegisteredPlugins[ $sClass ] ) {
+				if (
+					is_subclass_of( $sClass, 'Geko_Singleton_Abstract' ) && 
+					method_exists( $sClass, 'pluginHookActivate' )
+				) {
+					$oPlugin = Geko_Singleton_Abstract::getInstance( $sClass );
+					$oPlugin->pluginHookActivate();
+				}
+				$aRegisteredPlugins[ $sClass ] = TRUE;
+			}
+		}
+		
+		foreach ( $aRegisteredPlugins as $sClass => $b ) {
+			if ( !$this->aActivePlugins[ $sClass ] ) {
+				if (
+					is_subclass_of( $sClass, 'Geko_Singleton_Abstract' ) && 
+					method_exists( $sClass, 'pluginHookDeactivate' )
+				) {
+					$oPlugin = Geko_Singleton_Abstract::getInstance( $sClass );
+					$oPlugin->pluginHookDeactivate();
+				}
+				unset( $aRegisteredPlugins[ $sClass ] );
+			}
+		}
+		
+		$this->updateOption( 'plugins', Zend_Json::encode( $aRegisteredPlugins ) );
+			
+					
 		return $this;
 	}
 	
@@ -80,7 +73,7 @@ class Geko_Wp_NavigationManagement
 			$this->aGroups = Zend_Json::decode( $this->getOption( 'groups' ) );
 			
 			foreach ( $this->aGroups as $i => $aGroup ) {
-				$this->aCodeHash[ $aGroup[ 'code' ] ] = 'gp_' . $i;
+				$this->aCodeHash[ $aGroup[ 'code' ] ] = sprintf( 'gp_%d', $i );
 			}
 			
 			$bCalled = TRUE;

@@ -23,7 +23,9 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 					
 			if ( isset( $_GET[ 'grp' ] ) ) {
 				
-				$aNavParams = Zend_Json::decode( $this->getOption( 'gp_' . intval( $_GET[ 'grp' ] ) ) );
+				$iGrpId = intval( $_GET[ 'grp' ] );
+				
+				$aNavParams = Zend_Json::decode( $this->getOption( sprintf( 'gp_%d', $iGrpId ) ) );
 				$aNavParams = apply_filters(
 					'admin_geko_wp_nav_load_group',
 					$aNavParams,
@@ -207,9 +209,9 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 		$this->outputInit();
 		
 		$this->oPageManager->setInjectParam( array(
-			'form_action' => $this->getPluginUrl() . '/proc.php',
-			'transparent_img' => $this->getPluginUrl() . '/styles/img/trans.png',
-			'loader_img' => $this->getPluginUrl() . '/styles/img/ajax-loader.gif'
+			'form_action' => sprintf( '%s/proc.php', $this->getPluginUrl() ),
+			'transparent_img' => sprintf( '%s/styles/img/trans.png', $this->getPluginUrl() ),
+			'loader_img' => sprintf( '%s/styles/img/ajax-loader.gif', $this->getPluginUrl() )
 		) );
 		
 		?>
@@ -232,20 +234,28 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 
 		if ( isset( $_GET[ 'grp' ] ) ) {
 			
-			$sAjaxUrl = $this->getPluginUrl() . '/ajax.js.php?grp=' . intval( $_GET[ 'grp' ] );
+			$iGrpId = intval( $_GET[ 'grp' ] );
+			
+			$sAjaxUrl = sprintf( '%s/ajax.js.php?grp=%d', $this->getPluginUrl(), $iGrpId );
 			$sAjaxUrl = apply_filters( 'admin_geko_wp_nav_ajax_url', $sAjaxUrl );
+			
+			$aJsonParams = array(
+				'ajax_url' => $sAjaxUrl
+			);
 			
 			?>
 			<script type="text/javascript">
 				
 				jQuery( document ).ready( function( $ ) {
 					
+					var oParams = <?php echo Zend_Json::encode( $aJsonParams ); ?>;
+					
 					$( '#ops_delete' ).click( function () {
 						return confirm( 'Are you sure?' );
 					} );
 					
 					$.getScript(
-						'<?php echo $sAjaxUrl; ?>',
+						oParams.ajax_url,
 						function () {
 							$( '#gnp_form .gnp_ld' ).hide();
 							$( '#gnp_form .gnp_main' ).css( 'visibility', 'visible' );
@@ -264,12 +274,17 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 			jQuery( document ).ready( function( $ ) {
 				
 				$( '#nav_gs_toggle' ).click( function () {
+					
+					var eToggle = $( this );
+					
 					$( '#nav_form_div' ).toggle( 500 );
-					if ( $(this).hasClass( 'exp' ) ) {
-						$(this).addClass( 'ctd' ).removeClass( 'exp' );
+					
+					if ( eToggle.hasClass( 'exp' ) ) {
+						eToggle.addClass( 'ctd' ).removeClass( 'exp' );
 					} else {
-						$(this).addClass( 'exp' ).removeClass( 'ctd' );					
+						eToggle.addClass( 'exp' ).removeClass( 'ctd' );					
 					}
+					
 				} );
 			
 			} );
@@ -403,7 +418,7 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 		$this->setMenuPlacement( self::MANAGEMENT );
 		
 		$iNavGrpIdx = $_POST[ 'nav_group_idx' ];
-		$sNavGrpIdxPfx = 'gp_' . $iNavGrpIdx;
+		$sNavGrpIdxPfx = sprintf( 'gp_%d', $iNavGrpIdx );
 		
 		if ( isset( $_POST[ 'nav_group_label' ] ) ) {
 			
@@ -443,7 +458,7 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 				);
 				
 				$this->updateOption(
-					'gp_' . $iIndex,
+					sprintf( 'gp_%d', $iIndex ),
 					Zend_Json::encode( $aDefaultEntry )
 				);
 				

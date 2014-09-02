@@ -4,11 +4,14 @@
 // error_reporting( E_ALLÊ^ÊE_NOTICE );
 // error_reporting( E_ALL );
 
-if ( !file_exists( '../../../wp-config.php' ) ) die ( 'wp-config.php not found' );
-require_once( '../../../wp-config.php' );
+if ( !file_exists( '../../../wp-load.php' ) ) die ( 'wp-load.php not found' );
+
+require_once( realpath( '../../../wp-load.php' ) );
+require_once( realpath( '../../../wp-admin/includes/admin.php' ) );
 
 $oPluginAdmin = Geko_Wp_NavigationManagement_PluginAdmin::getInstance();
 $oPluginAdmin->procSave();
 
-header( 'Location: ' . $oPluginAdmin->getRedirect() );
+header( sprintf( 'Location: %s', $oPluginAdmin->getRedirect() ) );
+
 
