@@ -118,7 +118,7 @@
 			
 			var eMapImg = eMap.find( opts.mapImgSel );
 			
-			var iScaleFactor = null;
+			var fScaleFactor = null;
 			var sMiniMarkerClass = null;
 			
 			if ( oMmOpts ) {
@@ -139,7 +139,7 @@
 				eViewer.hide();
 				
 				if ( oMmOpts.dynamicViewerScale ) {
-					iScaleFactor = oMmOpts.dynamicViewerScale;
+					fScaleFactor = oMmOpts.dynamicViewerScale;
 				}
 
 				if ( oMmOpts.markerClass ) {
@@ -218,7 +218,7 @@
 						}
 						
 						
-						if ( iScaleFactor && sMiniMarkerClass ) {
+						if ( fScaleFactor && sMiniMarkerClass ) {
 							
 							var aMmPoint = eMarker.attr( 'id' ).split( '-' );
 	
@@ -227,8 +227,8 @@
 							eMiniMarker.addClass( sMiniMarkerClass );
 							
 							eMiniMarker.css( {
-								left: '%dpx'.printf( parseInt( aMmPoint[ 1 ] ) / iScaleFactor ),
-								top: '%dpx'.printf( parseInt( aMmPoint[ 2 ] ) / iScaleFactor )
+								left: '%dpx'.printf( parseInt( aMmPoint[ 1 ] ) / fScaleFactor ),
+								top: '%dpx'.printf( parseInt( aMmPoint[ 2 ] ) / fScaleFactor )
 							} );
 							
 							eMiniMap.prepend( eMiniMarker );
@@ -294,7 +294,8 @@
 												[ pos.left + iInitXOffset, pos.top + iInitYOffset ]
 											] )
 										}, {
-											duration: 180000,
+											duration: 45000,
+											//300000
 											easing: 'linear',
 											done: fnMapHover,
 											step: function() {
@@ -312,7 +313,8 @@
 												[ pos.left + iInitXOffset, pos.top + iInitYOffset ]
 											] ) 
 										}, { 
-											duration: 45000, 
+											duration: 7000, 
+											//60000
 											easing: 'linear',
 											done: fnMapHover,
 											step: function() {
@@ -450,7 +452,7 @@
 					//
 					if ( oMmOpts ) {
 						
-						if ( iScaleFactor ) {
+						if ( fScaleFactor ) {
 							
 							var fnResize = function(){
 								
@@ -466,8 +468,8 @@
 								} );
 								
 								eViewer
-									.css( 'width', eMap.width() / iScaleFactor )
-									.css( 'height', eMap.height() / iScaleFactor )
+									.css( 'width', parseInt( eMap.width() / fScaleFactor ) )
+									.css( 'height', parseInt( eMap.height() / fScaleFactor ) )
 								;
 								
 							};
