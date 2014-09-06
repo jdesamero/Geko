@@ -40,7 +40,9 @@ class Geko_Wp_Plugin_Admin extends Geko_Wp_Options_Admin
 	//
 	public function retrieveInfo() {
 		
-		if ( FALSE == function_exists( 'get_plugins' ) ) require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+		if ( FALSE == function_exists( 'get_plugins' ) ) {
+			require_once( sprintf( '%swp-admin/includes/plugin.php', ABSPATH ) );
+		}
 		
 		$aPluginInfo = get_plugins( $this->getPluginPath() );
 		$aPluginInfo = current( $aPluginInfo );
@@ -132,7 +134,7 @@ class Geko_Wp_Plugin_Admin extends Geko_Wp_Options_Admin
 			$sScript = 'options-general.php';
 		}
 		
-		return get_settings( 'siteurl' ) . '/wp-admin/' . $sScript . '?page=' . $this->_sInstanceClass;
+		return sprintf( '%s/wp-admin/%s?page=%s', Geko_Wp::getUrl(), $sScript, $this->_sInstanceClass );
 	}
 	
 	//
@@ -142,7 +144,7 @@ class Geko_Wp_Plugin_Admin extends Geko_Wp_Options_Admin
 			
 			$oReflect = new ReflectionClass( $this->_sInstanceClass );
 			
-			$sPluginDir = str_replace( ABSPATH . PLUGINDIR, '', $oReflect->getFileName() );
+			$sPluginDir = str_replace( sprintf( '%s%s', ABSPATH, PLUGINDIR ), '', $oReflect->getFileName() );
 			
 			if ( FALSE !== strpos( $sPluginDir, DIRECTORY_SEPARATOR, 1 ) ) {
 				$sPluginDir = substr( $sPluginDir, 0, strpos( $sPluginDir, DIRECTORY_SEPARATOR, 1 ) );

@@ -37,18 +37,18 @@ class Geko_Wp_Plugin extends Geko_Wp_Initialize
 	
 	
 	//
-	public function init() {
+	public function start() {
 		
-		static $bCalled = FALSE;
+		parent::start();
 		
-		if ( !$bCalled ) {
+		if ( !self::$sThemeName ) {
 			
 			self::$sThemeName = get_option( 'current_theme' );
 			add_action( 'save_post', array( __CLASS__, 'savePostdata' ) );
-			
 		}
 		
 		if ( $this->_sPluginAdminClass ) {
+			
 			$this->_oPluginAdmin = Geko_Singleton_Abstract::getInstance( $this->_sPluginAdminClass );
 			$this->_oPluginAdmin->setShowUpdateMsg( FALSE )->init();
 		}
@@ -57,8 +57,10 @@ class Geko_Wp_Plugin extends Geko_Wp_Initialize
 			call_user_func( array( $this->_sQueryHooksClass, 'register' ) );			
 		}
 		
+		
 		//
 		if ( $this->_bAddTemplatePages ) {
+			
 			add_filter( 'template_redirect', array( $this, 'templateRedirect' ) );		
 			add_filter( 'admin_page_template_select_pq', array( $this, 'addTemplatePagesPq' ) );		
 		}
