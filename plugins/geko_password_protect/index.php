@@ -8,10 +8,13 @@ Author: Joel Desamero
 Author URI: http://geekoracle.com
 */
 
-$sPluginClass = 'Geko_Wp_PasswordProtect';
-
 require_once( 'includes/loader.inc.php' );
 
-add_action( 'plugins_loaded', create_function( '', $sPluginFunc ) );
+$sPluginClass = 'Geko_Wp_PasswordProtect';
+$sFile = __FILE__;
+
+add_action( 'plugins_loaded', function() use( $sPluginClass, $sFile ) {
+	geko_load_plugin( $sPluginClass, $sFile );
+} );
 
 
