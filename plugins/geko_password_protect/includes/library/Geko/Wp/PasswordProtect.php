@@ -48,17 +48,21 @@ class Geko_Wp_PasswordProtect extends Geko_Wp_Plugin
 		
 		@session_start();
 		
-		$sAuthKey = $this->getPrefix() . '-auth';
+		$sAuthKey = sprintf( '%s-auth', $this->getPrefix() );
 		
 		// perform authentication
 		if ( isset( $_POST[ 'user' ] ) && isset( $_POST[ 'pass' ] ) ) {
+			
 			if (
 				( $_POST[ 'user' ] ) && ( $this->getOption( 'user' ) == $_POST[ 'user' ] ) && 
 				( $_POST[ 'pass' ] ) && ( $this->getOption( 'pass' ) == $_POST[ 'pass' ] )
 			) {
+				
 				$_SESSION[ $sAuthKey ] = TRUE;
-				header( 'Location: ' . Geko_Uri::getFullCurrent() );
+				header( sprintf( 'Location: %s', Geko_Uri::getFullCurrent() ) );
+				
 				die();
+				
 			} else {
 				$this->bLoginFailed = $bLoginFailed = TRUE;
 			}
@@ -69,13 +73,27 @@ class Geko_Wp_PasswordProtect extends Geko_Wp_Plugin
 		//
 		if ( !$_SESSION[ $sAuthKey ] ) {
 			
+			$sPath = NULL;
+			
 			if ( $this->getOption( 'use_custom_form' ) ) {
-				include( ( $this->sCustomFormPath ) ? $this->sCustomFormPath : TEMPLATEPATH . '/page_login.php' );
+				
+				if ( $this->sCustomFormPath ) {
+					$sPath = $this->sCustomFormPath;
+				} else {
+					$sPath = sprintf( '%s/page_login.php', TEMPLATEPATH );
+				}
+				
 			} else {
-				include( $this->getPluginDir() . '/login_form.php' );
+				
+				$sPath = sprintf( '%s/login_form.php', $this->getPluginDir() );
 			}
 			
-			exit;
+			//
+			if ( $sPath ) {
+				include( $sPath );
+			}
+			
+			die();
 		}
 	}
 	
