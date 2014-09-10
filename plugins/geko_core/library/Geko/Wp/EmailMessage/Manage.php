@@ -68,18 +68,13 @@ class Geko_Wp_EmailMessage_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
 		Geko_Wp_Enumeration_Manage::getInstance()->add();
 		
-		$sTableName = 'geko_email_message';
-		Geko_Wp_Db::addPrefix( $sTableName );
-		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'e' )
+			->create( '##pfx##geko_email_message', 'e' )
 			->fieldBigInt( 'emsg_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldLongText( 'subject' )
 			->fieldVarChar( 'slug', array( 'size' => 255, 'unq' ) )
@@ -159,17 +154,17 @@ class Geko_Wp_EmailMessage_Manage extends Geko_Wp_Options_Manage
 
 			
 			// view bounces link
-			$sTheAction = 'edit' . $this->_sType;
+			$sTheAction = sprintf( 'edit%s', $this->_sType );
 			$oUrl
 				->setVar( 'action', $sTheAction )
 				->setVar( 'view_bounces', 1 )
 			;
 			
 			$sViewBouncesLink = strval( $oUrl );
-			$sViewBouncesLink = htmlspecialchars_decode( wp_nonce_url( $sViewBouncesLink, $this->_sInstanceClass . $sTheAction ) );
+			$sViewBouncesLink = htmlspecialchars_decode( wp_nonce_url( $sViewBouncesLink, sprintf( '%s%s', $this->_sInstanceClass, $sTheAction ) ) );
 			
 			$aJsonParams = array(
-				'prefix' => $this->_sType . '_',
+				'prefix' => sprintf( '%s_', $this->_sType ),
 				'bounces_link' => $sViewBouncesLink
 			);
 			
@@ -258,15 +253,15 @@ class Geko_Wp_EmailMessage_Manage extends Geko_Wp_Options_Manage
 		
 		// from name/email address help text
 		
-		$sFromNameHelp = 'Defaults to "' . get_bloginfo( 'name' ) . '" if not specified.';
-		$sFromEmailHelp = 'Defaults to "' . get_bloginfo( 'admin_email' ) . '" if not specified.';
+		$sFromNameHelp = sprintf( 'Defaults to "%s" if not specified.', get_bloginfo( 'name' ) );
+		$sFromEmailHelp = sprintf( 'Defaults to "%s" if not specified.', get_bloginfo( 'admin_email' ) );
 		
 		if ( $oEntity ) {
 			if (
 				( $iTrptId = $oEntity->getTrptId() ) && 
 				( $oCurTrpt = $aTransports->subsetId( $iTrptId )->getOne() )
 			) {
-				$sFromNameHelp = 'Handled by "' . $oCurTrpt->getTitle() . '" transport if not specified.';
+				$sFromNameHelp = sprintf( 'Handled by "%s" transport if not specified.', $oCurTrpt->getTitle() );
 				$sFromEmailHelp = $sFromNameHelp;
 			}
 		}

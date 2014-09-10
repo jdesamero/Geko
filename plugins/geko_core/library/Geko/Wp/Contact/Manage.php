@@ -59,9 +59,8 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
+		
 		
 		Geko_Wp_Options_MetaKey::init();
 		
@@ -69,12 +68,9 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 		
 		// address
 		
-		$sTableName = 'geko_contact';
-		Geko_Wp_Db::addPrefix( $sTableName );
-	
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'c' )
+			->create( '##pfx##geko_contact', 'c' )
 			->fieldBigInt( 'contact_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldBigInt( 'object_id' )
 			->fieldSmallInt( 'objtype_id' )
@@ -100,6 +96,7 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 		;
 		
 		$this->addTable( $oSqlTable );
+		
 		
 		return $this;
 	}

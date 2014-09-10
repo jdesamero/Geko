@@ -17,18 +17,14 @@ class Geko_Wp_Generic_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
+		
 		
 		Geko_Wp_Options_MetaKey::init();
 		
-		$sTable = 'geko_generic';
-		Geko_Wp_Db::addPrefix( $sTable );
-		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTable, 'g' )
+			->create( '##pfx##geko_generic', 'g' )
 			->fieldBigInt( 'generic_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldSmallInt( 'gentype_id', array( 'unsgnd', 'key' ) )
 			->fieldBigInt( 'object_id', array( 'unsgnd' ) )
@@ -40,6 +36,7 @@ class Geko_Wp_Generic_Manage extends Geko_Wp_Options_Manage
 		;
 		
 		$this->addTable( $oSqlTable );
+		
 		
 		return $this;
 	}

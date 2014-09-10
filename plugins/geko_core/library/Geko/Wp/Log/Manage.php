@@ -95,7 +95,7 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 		
 		parent::add();
 		
-		global $current_user, $wpdb;
+		global $current_user;
 		
 		////
 		
@@ -110,12 +110,9 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 			
 			//// main log table
 			
-			$sTableName = $this->_sTableName;
-			Geko_Wp_Db::addPrefix( $sTableName );
-			
 			$oSqlTable = new Geko_Sql_Table();
 			$oSqlTable
-				->create( $wpdb->$sTableName, 'l' )
+				->create( sprintf( '##pfx##%s', $this->_sTableName ), 'l' )
 				->fieldBigInt( 'log_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 				->fieldInt( 'remote_ip', array( 'unsgnd' ) )
 				->fieldLongText( 'url' )
@@ -129,6 +126,7 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 				$oSqlTable->fieldVarChar( 'session_id', array( 'size' => 32 ) );
 			}
 			
+			$oSqlTable->getTableName();						// HACKISH!!!
 			$this->_oPrimaryTable = $this->modifyPrimaryTable( $oSqlTable );
 			
 			
@@ -137,12 +135,9 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 			
 			if ( $this->_bUseMetaTable ) {
 				
-				$sMetaTableName = $this->_sMetaTableName;
-				Geko_Wp_Db::addPrefix( $this->_sMetaTableName );
-				
 				$oSqlTable1 = new Geko_Sql_Table();
 				$oSqlTable1
-					->create( $wpdb->$sMetaTableName, 'lm' )
+					->create( sprintf( '##pfx##%s', $this->_sMetaTableName ), 'lm' )
 					->fieldBigInt( 'log_id', array( 'unsgnd' ) )
 					->fieldSmallInt( 'mkey_id', array( 'unsgnd' ) )
 					->fieldLongText( 'meta_value' )
@@ -153,6 +148,7 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 					$oSqlTable1->fieldSmallInt( 'type_id', array( 'unsgnd' ) );
 				}
 				
+				$oSqlTable1->getTableName();						// HACKISH!!!
 				$this->_oMetaTable = $this->modifyMetaTable( $oSqlTable1 );
 				
 			}
@@ -250,6 +246,7 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 		
 		// assign management capabilities to the admin role
 		$oWpRole = get_role( 'administrator' );
+		
 		if ( !$oWpRole->has_cap( self::$sManagementCapability ) ) {
 			$oWpRole->add_cap( self::$sManagementCapability );
 			// $oWpRole->remove_cap( 'manage_geko_wp_log_manage' );
@@ -282,11 +279,13 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 		
 		if ( $this->_sTableName && !$this->_bReportOnly ) {
 			
+			$oDb = Geko_Wp::get( 'db' );
+			
 			Geko_Wp_Options_MetaKey::install();
-			Geko_Wp_Db::createTable( $this->_oPrimaryTable );
+			$oDb->tableCreateIfNotExists( $this->_oPrimaryTable );
 			
 			if ( $this->_bUseMetaTable && $this->_oMetaTable ) {
-				Geko_Wp_Db::createTable( $this->_oMetaTable );
+				$oDb->tableCreateIfNotExists( $this->_oMetaTable );
 			}
 		}
 		

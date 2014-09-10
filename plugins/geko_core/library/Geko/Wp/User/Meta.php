@@ -19,20 +19,14 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
-		
 		
 		
 		//// database stuff
 		
-		$sTableName = 'geko_user_meta_members';
-		Geko_Wp_Db::addPrefix( $sTableName );
-		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'umm' )
+			->create( '##pfx##geko_user_meta_members', 'umm' )
 			->fieldBigInt( 'umeta_id', array( 'unsgnd', 'key' ) )
 			->fieldBigInt( 'member_id', array( 'unsgnd', 'key' ) )
 			->fieldLongText( 'member_value' )

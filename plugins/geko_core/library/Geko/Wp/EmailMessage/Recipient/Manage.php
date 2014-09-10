@@ -30,24 +30,21 @@ class Geko_Wp_EmailMessage_Recipient_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
-		$sTableName = 'geko_emsg_recipients';
-		Geko_Wp_Db::addPrefix( $sTableName );
 		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'r' )
+			->create( '##pfx##geko_emsg_recipients', 'r' )
 			->fieldBigInt( 'rcpt_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldLongText( 'name' )
-			->fieldVarChar( 'email', array( 'size' => 255 ) )
+			->fieldVarChar( 'email', array( 'size' => 256 ) )
 			->fieldBool( 'active' )
 			->fieldBigInt( 'emsg_id', array( 'unsgnd', 'key' ) )
 		;
 		
 		$this->addTable( $oSqlTable );
+		
 		
 		return $this;
 		

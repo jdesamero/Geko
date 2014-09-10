@@ -21,16 +21,12 @@ class Geko_Wp_Form_Section_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
-		$sTable = 'geko_form_section';
-		Geko_Wp_Db::addPrefix( $sTable );
 		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTable, 'fs' )
+			->create( '##pfx##geko_form_section', 'fs' )
 			->fieldBigInt( 'fmsec_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldBigInt( 'form_id', array( 'unsgnd', 'notnull', 'key' ) )
 			->fieldLongText( 'title' )
@@ -40,6 +36,7 @@ class Geko_Wp_Form_Section_Manage extends Geko_Wp_Options_Manage
 		;
 		
 		$this->addTable( $oSqlTable );
+		
 		
 		return $this;
 		

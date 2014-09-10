@@ -77,8 +77,6 @@ class Geko_Wp_Booking_Schedule_Time_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
 		
@@ -94,18 +92,17 @@ class Geko_Wp_Booking_Schedule_Time_Manage extends Geko_Wp_Options_Manage
 		
 		//// database stuff
 		
-		$sTableName = 'geko_bkng_schedule_time';
-		Geko_Wp_Db::addPrefix( $sTableName );
-		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'bst' )
+			->create( '##pfx##geko_bkng_schedule_time', 'bst' )
 			->fieldBigInt( 'bksctm_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldBigInt( 'bksch_id', array( 'unsgnd', 'key' ) )
 			->fieldTinyInt( 'weekday_id', array( 'unsgnd' ) )
 			->fieldVarChar( 'time_start', array( 'size' => 16 ) )
 			->fieldVarChar( 'time_end', array( 'size' => 16 ) )
 		;
+		
+		$this->addTable( $oSqlTable );
 		
 		
 		return $this;

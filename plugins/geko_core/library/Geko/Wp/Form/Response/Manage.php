@@ -10,16 +10,12 @@ class Geko_Wp_Form_Response_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
-		$sTable = 'geko_form_response';
-		Geko_Wp_Db::addPrefix( $sTable );
 		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTable, 'fr' )
+			->create( '##pfx##geko_form_response', 'fr' )
 			->fieldBigInt( 'fmrsp_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldBigInt( 'form_id', array( 'unsgnd', 'notnull', 'key' ) )
 			->fieldBool( 'completed' )
@@ -28,6 +24,7 @@ class Geko_Wp_Form_Response_Manage extends Geko_Wp_Options_Manage
 		;
 		
 		$this->addTable( $oSqlTable );
+		
 		
 		return $this;
 		

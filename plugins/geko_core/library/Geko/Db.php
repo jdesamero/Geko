@@ -20,6 +20,10 @@ class Geko_Db
 		'Zend_Db_Adapter_Pdo_Sqlite' => 'Sqlite'
 	);
 	
+	protected $_aTables = array();
+	
+	protected $_bHasRegisterTableMethod = FALSE;
+	protected $_sCreateTableMethod = 'query';
 	
 	
 	
@@ -97,6 +101,29 @@ class Geko_Db
 		$this->_sDbClass = get_class( $oDb );
 		$this->_sVendorClass = sprintf( 'Geko_Db_%s', $this->_aDbVendorMapping[ $this->_sDbClass ] );
 		
+		
+		//// initial setup stuff
+		
+		
+		// get all currently existing tables
+		
+		$aTables = $oDb->listTables();
+		
+		foreach ( $aTables as $sTable ) {
+			$this->_aTables[ $sTable ] = TRUE;
+		}
+		
+		
+		// method overrides
+		
+		if ( method_exists( $oDb, 'registerTableName' ) ) {
+			$this->_bHasRegisterTableMethod = TRUE;
+		}		
+		
+		if ( method_exists( $oDb, 'createTable' ) ) {
+			$this->_sCreateTableMethod = 'createTable';
+		}		
+		
 	}
 	
 	
@@ -141,6 +168,10 @@ class Geko_Db
 		return $this->_sDbClass;
 	}
 	
+	//
+	public function getHasRegisterTableMethod() {
+		return $this->_bHasRegisterTableMethod;
+	}
 	
 	
 	////
@@ -248,6 +279,7 @@ class Geko_Db
 			$sQuery = $aArgs[ 1 ];
 		}
 		
+		
 		//
 		if ( $sTableName && $sQuery ) {
 			
@@ -255,27 +287,32 @@ class Geko_Db
 			
 			$sPrefixedTableName = $this->replacePrefixPlaceholder( $sTableName );
 			
-			if ( method_exists( $oDb, 'registerTableName' ) ) {
-				$oDb->registerTableName( $sPrefixedTableName, $sTableName );
-			}
-			
-			try {
-				
-				// if this fails, table does not exist
-				$oDb->describeTable( $sPrefixedTableName );
-			
-			} catch ( Exception $s ) {
-				
+			// attempt to create table if it does not exist
+			if ( !$this->tableExists( $sPrefixedTableName ) ) {
+
 				// this creates the table
 				$sQuery = $this->replacePrefixPlaceholder( $sQuery );
-				$oDb->query( $sQuery );
+				
+				$sCreateTable = $this->_sCreateTableMethod;
+				$oDb->$sCreateTable( $sQuery );
+				
+				
+				$this->_aTables[ $sPrefixedTableName ] = TRUE;
+				
+				// TO DO: check for failure to create table
 				
 				return TRUE;
 			}
-			
+						
 		}
 		
 		return FALSE;
+	}
+	
+	
+	//
+	public function tableExists( $sTable ) {
+		return ( $this->_aTables[ $sTable ] ) ? TRUE : FALSE ;
 	}
 	
 	

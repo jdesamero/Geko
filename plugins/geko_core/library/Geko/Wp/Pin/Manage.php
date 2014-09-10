@@ -24,18 +24,14 @@ class Geko_Wp_Pin_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
+		
 		
 		// Geko_Wp_Enumeration_Manage::getInstance()->add();
 		
-		$sTableName = 'geko_pin';
-		Geko_Wp_Db::addPrefix( $sTableName );
-		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'p' )
+			->create( '##pfx##geko_pin', 'p' )
 			->fieldBigInt( 'pin_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldVarChar( 'pin', array( 'size' => 256, 'unq' ) )
 			->fieldBool( 'redeemed' )
@@ -48,6 +44,7 @@ class Geko_Wp_Pin_Manage extends Geko_Wp_Options_Manage
 		;
 		
 		$this->addTable( $oSqlTable );
+		
 		
 		return $this;
 		

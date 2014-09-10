@@ -1,64 +1,69 @@
 <?php
 
 //
-class Geko_Wp_EmailMessage_Queue
+class Geko_Wp_EmailMessage_Queue extends Geko_Singleton_Abstract
 {
-	private static $bCalledInit = FALSE;
-	private static $bCalledInstall = FALSE;
+	
+	protected $_bCalledInstall = FALSE;
+	
+	protected $_oQueueTable = NULL;
+	protected $_oQueueMetaTable = NULL;
+	
+	
 	
 	//
-	public static function init() {
+	public function start() {
 		
-		if ( !self::$bCalledInit ) {
+		parent::start();
+	
+		$oSqlTable = new Geko_Sql_Table();
+		$oSqlTable
+			->create( '##pfx##geko_emsg_queue', 'q' )
+			->fieldBigInt( 'queue_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
+			->fieldVarChar( 'email', array( 'size' => 256 ) )
+			->fieldDateTime( 'delivery_date' )
+			->fieldBigInt( 'emsg_id', array( 'unsgnd', 'notnull', 'key' ) )
+			->fieldBigInt( 'batch_id' )
+		;
+		
+		$oSqlTable->getTableName();						// HACKISH!!!
+		$this->_oQueueTable = $oSqlTable;
+		
+		
+		
+		
+		$oSqlTable2 = new Geko_Sql_Table();
+		$oSqlTable2
+			->create( '##pfx##geko_emsg_queue_meta', 'qm' )
+			->fieldInt( 'queue_id', array( 'unsgnd' ) )
+			->fieldVarChar( 'meta_key', array( 'size' => 256 ) )
+			->fieldLongText( 'value' )
+		;
+		
+		$oSqlTable2->getTableName();					// HACKISH!!!
+		$this->_oQueueMetaTable = $oSqlTable2;
+		
+		
+	}
+	
+	//
+	public function install() {
+		
+		if ( !$this->_bCalledInstall ) {
 			
-			// register db functions only once
-			Geko_Wp_Db::addPrefix('geko_emsg_queue');
-			Geko_Wp_Db::addPrefix('geko_emsg_queue_meta');
+			$oDb = Geko_Wp::get( 'db' );
 			
-			self::$bCalledInit = TRUE;
+			$oDb->tableCreateIfNotExists( $this->_oQueueTable );
+			$oDb->tableCreateIfNotExists( $this->_oQueueMetaTable );
 			
+			
+			$this->_bCalledInstall = TRUE;
 		}
 		
 	}
 	
 	//
-	public static function install() {
-		
-		if ( !self::$bCalledInstall ) {
-			
-			$sSql = '
-				CREATE TABLE %s
-				(
-					queue_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-					email VARCHAR(255),
-					delivery_date DATETIME,
-					emsg_id BIGINT UNSIGNED,
-					batch_id BIGINT UNSIGNED,
-					PRIMARY KEY(queue_id),
-					KEY emsg_id(emsg_id)
-				)
-			';
-			
-			Geko_Wp_Db::createTable( 'geko_emsg_queue', $sSql );
-			
-			$sSql = '
-				CREATE TABLE %s
-				(
-					queue_id BIGINT UNSIGNED,
-					meta_key VARCHAR(255),
-					value LONGTEXT
-				)
-			';
-			
-			Geko_Wp_Db::createTable( 'geko_emsg_queue_meta', $sSql );
-			
-			self::$bCalledInstall = TRUE;
-			
-		}	
-	}
-	
-	//
-	public static function cycle( $iInterval = 30, $iLimit = 5 ) {
+	public function cycle( $iInterval = 30, $iLimit = 5 ) {
 		
 		do_action( 'geko_wp_emsg_queue_cycle_start' );
 		
@@ -66,14 +71,14 @@ class Geko_Wp_EmailMessage_Queue
 		
 		do {
 			$iCycles++;
-			$iNumRows = self::process( $iInterval = 30, $iLimit = 5 );
+			$iNumRows = $this->process( $iInterval = 30, $iLimit = 5 );
 		} while ( $iNumRows );
 		
 		do_action( 'geko_wp_emsg_queue_cycle_end', $iCycles );		
 	}
 	
 	//
-	public static function process( $iInterval = 30, $iLimit = 5 ) {
+	public function process( $iInterval = 30, $iLimit = 5 ) {
 		
 		global $wpdb;
 		
@@ -145,7 +150,7 @@ class Geko_Wp_EmailMessage_Queue
 	
 	
 	//
-	public static function add( $aParams ) {
+	public function add( $aParams ) {
 		
 		global $wpdb;
 		

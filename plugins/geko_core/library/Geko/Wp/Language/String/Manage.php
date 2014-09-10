@@ -32,16 +32,12 @@ class Geko_Wp_Language_String_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
-		$sTableName = 'geko_lang_strings';
-		Geko_Wp_Db::addPrefix( $sTableName );
 		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 's' )
+			->create( '##pfx##geko_lang_strings', 's' )
 			->fieldBigInt( 'str_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldLongtext( 'val' )
 			->fieldBigInt( 'trans_str_id', array( 'unsgnd' ) )
@@ -50,6 +46,7 @@ class Geko_Wp_Language_String_Manage extends Geko_Wp_Options_Manage
 		;
 		
 		$this->addTable( $oSqlTable );
+		
 		
 		return $this;	
 	}

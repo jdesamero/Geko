@@ -318,6 +318,7 @@ class Geko_Wp_Db_Adapter extends Zend_Db_Adapter_Abstract
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  //
 	
+	//// custom Geko methods
 	
 	//
 	public function registerTableName( $sPrefixedTableName, $sTableName ) {
@@ -336,6 +337,14 @@ class Geko_Wp_Db_Adapter extends Zend_Db_Adapter_Abstract
 			}
 		}
 		
+	}
+	
+	//
+	public function createTable( $sSql ) {
+		
+		require_once( sprintf( '%swp-admin/includes/upgrade.php', ABSPATH ) );
+		
+		return dbDelta( $sSql );		
 	}
 	
 	

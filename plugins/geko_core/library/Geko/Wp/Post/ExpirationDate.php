@@ -11,8 +11,6 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
 		
@@ -31,12 +29,9 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 		
 		//// install table
 		
-		$sTableName = 'geko_expiry';
-		Geko_Wp_Db::addPrefix( $sTableName );
-		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'e' )
+			->create( '##pfx##geko_expiry', 'e' )
 			->fieldBigInt( 'post_id', array( 'unsgnd', 'key' ) )
 			->fieldDateTime( 'start_date' )
 			->fieldDateTime( 'expiry_date' )

@@ -13,8 +13,8 @@ class Geko_Wp_TermTaxonomy
 		if ( !self::$bCalledInit ) {
 			
 			// register db functions only once
-			Geko_Wp_Db::addPrefix('term_taxonomy_path');
-			Geko_Wp_Db::addPrefix('term_taxonomy_connect');
+			Geko_Wp_Db::addPrefix( 'term_taxonomy_path' );
+			Geko_Wp_Db::addPrefix( 'term_taxonomy_connect' );
 			
 			self::$bCalledInit = TRUE;
 			

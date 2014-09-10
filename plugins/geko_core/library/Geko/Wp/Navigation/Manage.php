@@ -22,18 +22,15 @@ class Geko_Wp_Navigation_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
-		Geko_Wp_Db::addPrefix( 'geko_navigation' );
 		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->geko_navigation, 'n' )
+			->create( '##pfx##geko_navigation', 'n' )
 			->fieldBigInt( 'nav_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldLongText( 'label' )
-			->fieldVarChar( 'code', array( 'size' => 255, 'unq' ) )
+			->fieldVarChar( 'code', array( 'size' => 256, 'unq' ) )
 			->fieldLongText( 'description' )
 			->fieldLongText( 'notes' )
 			->fieldDateTime( 'date_created' )
@@ -41,6 +38,7 @@ class Geko_Wp_Navigation_Manage extends Geko_Wp_Options_Manage
 		;
 		
 		$this->addTable( $oSqlTable );
+		
 		
 		return $this;
 		

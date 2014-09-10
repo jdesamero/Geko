@@ -20,21 +20,18 @@ class Geko_Wp_Booking_Request_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
-		
-		$sTableName = 'geko_bkng_request';
-		Geko_Wp_Db::addPrefix( $sTableName );
 		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'brq' )
+			->create( '##pfx##geko_bkng_request', 'brq' )
 			->fieldBigInt( 'bkreq_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldBigInt( 'bkitm_id', array( 'unsgnd', 'key' ) )
 			->fieldBigInt( 'user_id', array( 'unsgnd', 'key' ) )
 			->fieldDateTime( 'date_created' )
 		;
+		
+		$this->addTable( $oSqlTable );
 		
 		
 		return $this;

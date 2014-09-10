@@ -415,8 +415,10 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	// create database table using the <sql table object> or <table name>
 	public function createTable( $mSqlTable ) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		if ( $oSqlTable = $this->resolveTable( $mSqlTable ) ) {
-			return Geko_Wp_Db::createTable( $oSqlTable );
+			return $oDb->tableCreateIfNotExists( $oSqlTable );
 		}
 		
 		return FALSE;

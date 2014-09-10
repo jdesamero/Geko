@@ -26,24 +26,21 @@ class Geko_Wp_EmailMessage_Header_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
-		$sTableName = 'geko_emsg_header';
-		Geko_Wp_Db::addPrefix( $sTableName );
 		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'h' )
+			->create( '##pfx##geko_emsg_header', 'h' )
 			->fieldBigInt( 'hdr_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
-			->fieldVarChar( 'name', array( 'size' => 255 ) )			// "key" is a reserved MySQL Word
+			->fieldVarChar( 'name', array( 'size' => 256 ) )			// "key" is a reserved MySQL Word
 			->fieldLongText( 'val' )
 			->fieldBool( 'multi' )
 			->fieldBigInt( 'emsg_id', array( 'unsgnd', 'key' ) )
 		;
 		
 		$this->addTable( $oSqlTable );
+		
 		
 		return $this;
 		

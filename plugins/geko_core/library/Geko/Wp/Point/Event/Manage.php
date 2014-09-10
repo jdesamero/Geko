@@ -34,16 +34,12 @@ class Geko_Wp_Point_Event_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
-		$sTableName = 'geko_point_event';
-		Geko_Wp_Db::addPrefix( $sTableName );
 		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'e' )
+			->create( '##pfx##geko_point_event', 'e' )
 			->fieldBigInt( 'pntevt_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldVarChar( 'name', array( 'size' => 256 ) )
 			->fieldVarChar( 'slug', array( 'size' => 256, 'unq' ) )
@@ -63,6 +59,7 @@ class Geko_Wp_Point_Event_Manage extends Geko_Wp_Options_Manage
 		;
 		
 		$this->addTable( $oSqlTable );
+		
 		
 		return $this;
 		

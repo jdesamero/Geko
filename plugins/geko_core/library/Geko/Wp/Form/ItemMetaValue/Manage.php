@@ -21,16 +21,12 @@ class Geko_Wp_Form_ItemMetaValue_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
-		$sTableName = 'geko_form_item_meta_value';
-		Geko_Wp_Db::addPrefix( $sTableName );
 		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'fimv' )
+			->create( '##pfx##geko_form_item_meta_value', 'fimv' )
 			->fieldSmallInt( 'context_id', array( 'unsgnd', 'notnull' ) )
 			->fieldBigInt( 'fmitm_id', array( 'unsgnd', 'notnull', 'key' ) )
 			->fieldSmallInt( 'fmitmval_idx', array( 'unsgnd', 'notnull' ) )
@@ -41,6 +37,7 @@ class Geko_Wp_Form_ItemMetaValue_Manage extends Geko_Wp_Options_Manage
 		;
 		
 		$this->addTable( $oSqlTable );
+		
 		
 		return $this;
 		

@@ -18,8 +18,32 @@ class Geko_Wp_Payment_Cash_Admin extends Geko_Wp_Payment_Admin
 	
 	
 	//
-	public function affix() {
-		Geko_Wp_Db::addPrefix( 'geko_pay_cash_transaction' );
+	public function add() {
+		
+		parent::add();
+		
+		$oSqlTable = new Geko_Sql_Table();
+		$oSqlTable
+			->create( '##pfx##geko_pay_cash_transaction', 't' )
+			->fieldBigInt( 'transaction_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
+			->fieldTinyInt( 'transaction_type_id', array( 'unsgnd' ) )
+			->fieldBigInt( 'receipt_id', array( 'unsgnd' ) )
+			->fieldBigInt( 'orig_receipt_id', array( 'unsgnd' ) )
+			->fieldBigInt( 'customer_id', array( 'unsgnd' ) )
+			->fieldVarChar( 'first_name', array( 'size' => 256 ) )
+			->fieldVarChar( 'last_name', array( 'size' => 256 ) )
+			->fieldVarChar( 'phone_number', array( 'size' => 256 ) )
+			->fieldVarChar( 'email', array( 'size' => 256 ) )
+			->fieldLongText( 'details' )
+			->fieldFloat( 'amount', array( 'size' => '10,2', 'unsgnd' ) )
+			->fieldTinyInt( 'status_id', array( 'unsgnd' ) )
+			->fieldTinyInt( 'application_id', array( 'unsgnd' ) )
+			->fieldBool( 'is_test' )
+			->fieldDateTime( 'date_created' )
+		;
+		
+		$this->addTable( $oSqlTable );
+		
 		return $this;
 	}
 	
@@ -28,31 +52,10 @@ class Geko_Wp_Payment_Cash_Admin extends Geko_Wp_Payment_Admin
 	// create table
 	public function install() {
 		
-		// table structure specific to cash transactions
-		$sSql = '
-			CREATE TABLE %s
-			(
-				transaction_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-				transaction_type_id TINYINT UNSIGNED,
-				receipt_id BIGINT UNSIGNED,
-				orig_receipt_id BIGINT UNSIGNED,
-				customer_id BIGINT UNSIGNED,
-				first_name VARCHAR(255),
-				last_name VARCHAR(255),
-				phone_number VARCHAR(255),
-				email VARCHAR(255),
-				details LONGTEXT,
-				amount FLOAT(10,2) UNSIGNED,
-				status_id TINYINT UNSIGNED,
-				application_id TINYINT UNSIGNED,
-				is_test TINYINT UNSIGNED,
-				date_created DATETIME,
-				PRIMARY KEY(transaction_id)
-			)
-		';
+		parent::install();
 		
-		Geko_Wp_Db::createTable( 'geko_pay_cash_transaction', $sSql );
-				
+		$this->createTableOnce();
+		
 		return $this;
 	}
 	

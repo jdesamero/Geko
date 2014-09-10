@@ -18,16 +18,12 @@ class Geko_Wp_Post_Meta extends Geko_Wp_Options_Meta
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
-		$sTableName = 'geko_post_meta_members';
-		Geko_Wp_Db::addPrefix( $sTableName );
 		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'pmm' )
+			->create( '##pfx##geko_post_meta_members', 'pmm' )
 			->fieldBigInt( 'meta_id', array( 'unsgnd', 'key' ) )
 			->fieldBigInt( 'member_id', array( 'unsgnd', 'key' ) )
 			->fieldLongText( 'member_value' )
@@ -35,6 +31,7 @@ class Geko_Wp_Post_Meta extends Geko_Wp_Options_Meta
 		;
 		
 		$this->addTable( $oSqlTable );
+		
 		
 		return $this;
 	}

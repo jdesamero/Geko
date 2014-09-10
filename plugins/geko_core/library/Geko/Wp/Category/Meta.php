@@ -18,18 +18,14 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
+		
 		
 		Geko_Wp_Options_MetaKey::init();
 		
-		$sTableName = 'geko_term_meta';
-		Geko_Wp_Db::addPrefix( $sTableName );
-		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'tm' )
+			->create( '##pfx##geko_term_meta', 'tm' )
 			->fieldBigInt( 'tmeta_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldBigInt( 'term_id', array( 'unsgnd' ) )
 			->fieldSmallInt( 'mkey_id', array( 'unsgnd' ) )
@@ -41,12 +37,10 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 		$this->addTable( $oSqlTable );
 		
 		
-		$sTableName2 = 'geko_term_meta_members';
-		Geko_Wp_Db::addPrefix( $sTableName2 );
 		
 		$oSqlTable2 = new Geko_Sql_Table();
 		$oSqlTable2
-			->create( $wpdb->$sTableName2, 'tmm' )
+			->create( '##pfx##geko_term_meta_members', 'tmm' )
 			->fieldBigInt( 'tmeta_id', array( 'unsgnd', 'key' ) )
 			->fieldBigInt( 'member_id', array( 'unsgnd', 'key' ) )
 			->fieldLongText( 'member_value' )
@@ -54,6 +48,8 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 		;
 		
 		$this->addTable( $oSqlTable2, FALSE );
+		
+		
 		
 		// register hierarchy functions
 		Geko_Wp_TermTaxonomy::init();

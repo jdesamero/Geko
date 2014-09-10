@@ -20,16 +20,12 @@ class Geko_Wp_Form_ItemType_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
-		$sTable = 'geko_form_item_type';
-		Geko_Wp_Db::addPrefix( $sTable );
 		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTable, 'fit' )
+			->create( '##pfx##geko_form_item_type', 'fit' )
 			->fieldSmallInt( 'fmitmtyp_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldVarChar( 'slug', array( 'size' => 256, 'key' ) )
 			->fieldLongText( 'name' )
@@ -39,6 +35,7 @@ class Geko_Wp_Form_ItemType_Manage extends Geko_Wp_Options_Manage
 		;
 		
 		$this->addTable( $oSqlTable );
+		
 		
 		return $this;
 		

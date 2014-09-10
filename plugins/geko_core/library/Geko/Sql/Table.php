@@ -67,7 +67,13 @@ class Geko_Sql_Table
 	
 	//// constructor
 	public function __construct( $oDb = NULL ) {
+		
+		if ( NULL === $oDb ) {
+			$oDb = Geko::get( 'db' );
+		}
+		
 		$this->_oDb = $oDb;
+		
 	}
 	
 	//
@@ -124,14 +130,28 @@ class Geko_Sql_Table
 		return $this->_aTable[ 0 ];
 	}
 	
-	//
+	// Can be called a number of times!!!
 	public function getTableName() {
 		
 		$sTable = $this->_aTable[ 0 ];
 		
 		// auto-prefix replacement
 		if ( $oDb = $this->_oDb ) {
-			$sTable = $oDb->replacePrefixPlaceholder( $sTable );
+			
+			$sTableOrig = $sTable;
+			$sTable = $oDb->replacePrefixPlaceholder( $sTableOrig );
+			
+			Geko_Once::run( $sTable, function() use( $oDb, $sTable, $sTableOrig ) {
+				
+				if (
+					( $sTableOrig != $sTable ) &&
+					( $oDb->getHasRegisterTableMethod() )
+				) {
+					$oDb->registerTableName( $sTable, $sTableOrig );
+				}
+								
+			} );
+						
 		}
 		
 		return $sTable;

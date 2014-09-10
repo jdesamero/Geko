@@ -28,17 +28,12 @@ class Geko_Wp_Group_Member_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
 		
-		$sTable = 'geko_group_members';
-		Geko_Wp_Db::addPrefix( $sTable );
-		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTable, 'gm' )
+			->create( '##pfx##geko_group_members', 'gm' )
 			->fieldBigInt( 'group_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldBigInt( 'user_id', array( 'unsgnd', 'key' ) )
 			->fieldSmallInt( 'status_id', array( 'unsgnd' ) )
@@ -52,6 +47,7 @@ class Geko_Wp_Group_Member_Manage extends Geko_Wp_Options_Manage
 		
 		return $this;
 	}
+	
 	
 	// create table
 	public function install() {

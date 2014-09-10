@@ -23,8 +23,37 @@ class Geko_Wp_Payment_Moneris_Admin extends Geko_Wp_Payment_Admin
 	
 	
 	//
-	public function affix() {
-		Geko_Wp_Db::addPrefix( 'geko_pay_moneris_transaction' );
+	public function add() {
+		
+		parent::add();
+		
+		$oSqlTable = new Geko_Sql_Table();
+		$oSqlTable
+			->create( '##pfx##geko_pay_moneris_transaction', 'm' )
+			->fieldVarChar( 'receipt_id', array( 'size' => 64 ) )
+			->fieldVarChar( 'card_type', array( 'size' => 16 ) )
+			->fieldVarChar( 'amount', array( 'size' => 32 ) )
+			->fieldVarChar( 'transaction_id', array( 'size' => 32 ) )
+			->fieldVarChar( 'transaction_type', array( 'size' => 32 ) )
+			->fieldVarChar( 'reference_number', array( 'size' => 64 ) )
+			->fieldVarChar( 'response_code', array( 'size' => 16 ) )
+			->fieldVarChar( 'iso_code', array( 'size' => 16 ) )
+			->fieldLongText( 'message' )
+			->fieldVarChar( 'authorization_code', array( 'size' => 32 ) )
+			->fieldLongText( 'complete' )
+			->fieldVarChar( 'transaction_date', array( 'size' => 16 ) )
+			->fieldVarChar( 'transaction_time', array( 'size' => 16 ) )
+			->fieldLongText( 'ticket' )
+			->fieldLongText( 'timed_out' )
+			->fieldBigInt( 'orig_receipt_id', array( 'unsgnd' ) )
+			->fieldTinyInt( 'status_id', array( 'unsgnd' ) )
+			->fieldTinyInt( 'application_id', array( 'unsgnd' ) )
+			->fieldBool( 'is_test' )
+			->fieldDateTime( 'date_created' )
+		;
+		
+		$this->addTable( $oSqlTable );
+		
 		return $this;
 	}
 		
@@ -33,35 +62,10 @@ class Geko_Wp_Payment_Moneris_Admin extends Geko_Wp_Payment_Admin
 	// create table
 	public function install() {
 		
-		// table structure specific to moneris
-		$sSql = '
-			CREATE TABLE %s
-			(
-				receipt_id VARCHAR(64),
-				card_type VARCHAR(16),
-				amount VARCHAR(32),
-				transaction_id VARCHAR(32),
-				transaction_type VARCHAR(32),
-				reference_number VARCHAR(64),
-				response_code VARCHAR(16),
-				iso_code VARCHAR(16),
-				message LONGTEXT,
-				authorization_code VARCHAR(32),
-				complete LONGTEXT,
-				transaction_date VARCHAR(16),
-				transaction_time VARCHAR(16),
-				ticket LONGTEXT,
-				timed_out LONGTEXT,
-				orig_receipt_id BIGINT UNSIGNED,
-				status_id TINYINT UNSIGNED,
-				application_id TINYINT UNSIGNED,
-				is_test TINYINT UNSIGNED,
-				date_created DATETIME
-			)
-		';
+		parent::install();
 		
-		Geko_Wp_Db::createTable( 'geko_pay_moneris_transaction', $sSql );
-				
+		$this->createTableOnce();
+		
 		return $this;
 	}
 	

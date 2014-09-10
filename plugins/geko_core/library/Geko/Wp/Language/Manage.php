@@ -32,19 +32,15 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
 		Geko_Wp_Options_MetaKey::init();
 		
 		
-		$sTableName = 'geko_languages';
-		Geko_Wp_Db::addPrefix( $sTableName );
-
+		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'l' )
+			->create( '##pfx##geko_languages', 'l' )
 			->fieldSmallInt( 'lang_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldVarChar( 'code', array( 'size' => 8, 'unq' ) )
 			->fieldVarChar( 'title', array( 'size' => 256 ) )
@@ -57,12 +53,10 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 		$this->addTable( $oSqlTable );
 		
 		
-		$sTableName2 = 'geko_lang_groups';
-		Geko_Wp_Db::addPrefix( $sTableName2 );
-
+		
 		$oSqlTable2 = new Geko_Sql_Table();
 		$oSqlTable2
-			->create( $wpdb->$sTableName2, 'lg' )
+			->create( '##pfx##geko_lang_groups', 'lg' )
 			->fieldBigInt( 'lgroup_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldSmallInt( 'type_id', array( 'unsgnd', 'key' ) )
 		;
@@ -70,12 +64,10 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 		$this->addTable( $oSqlTable2, FALSE );
 		
 		
-		$sTableName3 = 'geko_lang_group_members';
-		Geko_Wp_Db::addPrefix( $sTableName3 );
 		
 		$oSqlTable3 = new Geko_Sql_Table();
 		$oSqlTable3
-			->create( $wpdb->$sTableName3, 'lgm' )
+			->create( '##pfx##geko_lang_group_members', 'lgm' )
 			->fieldBigInt( 'lgroup_id', array( 'unsgnd' ) )
 			->fieldBigInt( 'obj_id', array( 'unsgnd' ) )
 			->fieldSmallInt( 'lang_id', array( 'unsgnd' ) )

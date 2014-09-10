@@ -33,8 +33,6 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
 		
@@ -50,12 +48,9 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 		
 		//// database stuff
 		
-		$sTableName = 'geko_point';
-		Geko_Wp_Db::addPrefix( $sTableName );
-		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'p' )
+			->create( '##pfx##geko_point', 'p' )
 			->fieldBigInt( 'point_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldBigInt( 'user_id', array( 'unsgnd', 'notnull', 'key' ) )
 			->fieldSmallInt( 'pntevt_id', array( 'unsgnd', 'notnull' ) )
@@ -70,6 +65,7 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 		;
 		
 		$this->addTable( $oSqlTable );
+		
 		
 		return $this;
 		

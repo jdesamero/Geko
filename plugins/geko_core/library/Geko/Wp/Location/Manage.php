@@ -59,8 +59,6 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
 		$this->forceInit( __CLASS__ );
@@ -78,12 +76,9 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		
 		// address
 		
-		$sTableName = 'geko_location_address';
-		Geko_Wp_Db::addPrefix( $sTableName );
-		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'a' )
+			->create( '##pfx##geko_location_address', 'a' )
 			->fieldBigInt( 'address_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldBigInt( 'object_id' )
 			->fieldSmallInt( 'objtype_id' )
@@ -109,12 +104,9 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		
 		// geocache
 		
-		$sTableName2 = 'geko_location_geocache';
-		Geko_Wp_Db::addPrefix( $sTableName2 );
-		
 		$oSqlTable2 = new Geko_Sql_Table();
 		$oSqlTable2
-			->create( $wpdb->$sTableName2, 'g' )
+			->create( '##pfx##geko_location_geocache', 'g' )
 			->fieldVarChar( 'geo_key', array( 'size' => 64, 'notnull', 'prky' ) )
 			->fieldFloat( 'latitude', array( 'size' => '10,7', 'sgnd' ) )
 			->fieldFloat( 'longitude', array( 'size' => '10,7', 'sgnd' ) )

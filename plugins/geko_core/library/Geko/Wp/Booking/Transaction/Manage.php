@@ -32,8 +32,6 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
 		
@@ -45,12 +43,9 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 		
 		//// database stuff
 		
-		$sTableName = 'geko_bkng_transaction';
-		Geko_Wp_Db::addPrefix( $sTableName );
-		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'btr' )
+			->create( '##pfx##geko_bkng_transaction', 'btr' )
 			->fieldBigInt( 'bktrn_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldBigInt( 'orig_trn_id', array( 'unsgnd', 'key' ) )
 			->fieldTinyInt( 'transaction_type_id', array( 'unsgnd' ) )

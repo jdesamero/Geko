@@ -16,17 +16,12 @@ class Geko_Wp_Role_Meta extends Geko_Wp_Options_Meta
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
 		
-		$sTable = 'geko_role_meta';
-		Geko_Wp_Db::addPrefix( $sTable );
-		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTable, 'rm' )
+			->create( '##pfx##geko_role_meta', 'rm' )
 			->fieldBigInt( 'rmeta_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldBigInt( 'role_id', array( 'unsgnd', 'key' ) )
 			->fieldSmallInt( 'mkey_id', array( 'unsgnd', 'key' ) )
@@ -37,12 +32,9 @@ class Geko_Wp_Role_Meta extends Geko_Wp_Options_Meta
 		$this->addTable( $oSqlTable );
 		
 		
-		$sTable2 = 'geko_role_meta_members';
-		Geko_Wp_Db::addPrefix( $sTable2 );
-		
 		$oSqlTable2 = new Geko_Sql_Table();
 		$oSqlTable2
-			->create( $wpdb->$sTable2, 'rmm' )
+			->create( '##pfx##geko_role_meta_members', 'rmm' )
 			->fieldBigInt( 'rmeta_id', array( 'unsgnd', 'key' ) )
 			->fieldBigInt( 'member_id', array( 'unsgnd', 'key' ) )
 			->fieldLongText( 'member_value' )

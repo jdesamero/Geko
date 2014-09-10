@@ -32,19 +32,15 @@ class Geko_Wp_Enumeration_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
-		$sTableName = 'geko_enumeration';
-		Geko_Wp_Db::addPrefix( $sTableName );
 		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'e' )
+			->create( '##pfx##geko_enumeration', 'e' )
 			->fieldInt( 'enum_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
-			->fieldVarChar( 'title', array( 'size' => 255 ) )
-			->fieldVarChar( 'slug', array( 'size' => 255, 'unq' ) )
+			->fieldVarChar( 'title', array( 'size' => 256 ) )
+			->fieldVarChar( 'slug', array( 'size' => 256, 'unq' ) )
 			->fieldLongText( 'value' )
 			->fieldLongText( 'description' )
 			->fieldLongText( 'params' )
@@ -53,6 +49,7 @@ class Geko_Wp_Enumeration_Manage extends Geko_Wp_Options_Manage
 		;
 		
 		$this->addTable( $oSqlTable );
+		
 		
 		return $this;
 		

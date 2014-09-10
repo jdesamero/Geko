@@ -12,19 +12,14 @@ class Geko_Wp_Point_Meta extends Geko_Wp_Options_Meta
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
 		Geko_Wp_Options_MetaKey::init();
 		
 		
-		$sTableName = 'geko_point_meta';
-		Geko_Wp_Db::addPrefix( $sTableName );
-		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'pm' )
+			->create( '##pfx##geko_point_meta', 'pm' )
 			->fieldBigInt( 'pmeta_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldBigInt( $this->_sParentFieldName, array( 'unsgnd', 'notnull' ) )
 			->fieldSmallInt( 'mkey_id', array( 'unsgnd', 'notnull' ) )

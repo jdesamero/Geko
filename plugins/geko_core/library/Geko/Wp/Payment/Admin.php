@@ -49,6 +49,10 @@ class Geko_Wp_Payment_Admin extends Geko_Wp_Options_Admin
 	}
 	
 	
+	// NOTE: Not required anymore???
+	
+	/* /
+	
 	//
 	public function addAdmin() {
 		
@@ -58,6 +62,8 @@ class Geko_Wp_Payment_Admin extends Geko_Wp_Options_Admin
 		
 		return $this;
 	}
+
+	/* */
 	
 	//
 	public function attachPage() {
@@ -69,8 +75,20 @@ class Geko_Wp_Payment_Admin extends Geko_Wp_Options_Admin
 	
 	
 	//
-	public function affix() {
-		Geko_Wp_Db::addPrefix( 'geko_pay_tax_rate' );
+	public function add() {
+		
+		parent::add();
+		
+		$oSqlTable = new Geko_Sql_Table();
+		$oSqlTable
+			->create( '##pfx##geko_pay_tax_rate', 'tx' )
+			->fieldInt( 'province_id', array( 'unsgnd' ) )
+			->fieldVarChar( 'tax_label', array( 'size' => 256 ) )
+			->fieldFloat( 'tax_pct', array( 'size' => '10,6', 'unsgnd' ) )
+		;
+		
+		$this->addTable( $oSqlTable );
+				
 		return $this;
 	}
 	
@@ -78,18 +96,10 @@ class Geko_Wp_Payment_Admin extends Geko_Wp_Options_Admin
 	// create table
 	public function install() {
 		
-		// table structure specific to moneris
-		$sSql = '
-			CREATE TABLE %s
-			(
-				province_id INT UNSIGNED,
-				tax_label VARCHAR(255),
-				tax_pct FLOAT(10,6) UNSIGNED
-			)
-		';
+		parent::install();
 		
-		Geko_Wp_Db::createTable( 'geko_pay_tax_rate', $sSql );
-				
+		$this->createTableOnce();
+		
 		return $this;
 	}
 	
@@ -104,7 +114,7 @@ class Geko_Wp_Payment_Admin extends Geko_Wp_Options_Admin
 	
 	// get the plugin url
 	public function getUrl() {
-		return get_settings( 'siteurl' ) . '/wp-admin/options-general.php?page=' . $this->_sInstanceClass;
+		return sprintf( '%s/wp-admin/options-general.php?page=%s', Geko_Wp::getUrl(), $this->_sInstanceClass );
 	}
 	
 	//

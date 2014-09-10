@@ -27,8 +27,6 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
 		
@@ -43,12 +41,9 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 		
 		//// database stuff
 		
-		$sTableName = 'geko_bkng_item';
-		Geko_Wp_Db::addPrefix( $sTableName );
-		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'bsi' )
+			->create( '##pfx##geko_bkng_item', 'bsi' )
 			->fieldBigInt( 'bkitm_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldBigInt( 'bksch_id', array( 'unsgnd', 'key' ) )
 			->fieldDateTime( 'date_item' )

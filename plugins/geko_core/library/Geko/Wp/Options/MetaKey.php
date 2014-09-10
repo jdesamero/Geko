@@ -16,18 +16,15 @@ class Geko_Wp_Options_MetaKey
 		
 		if ( !self::$bCalledInit ) {	
 			
-			global $wpdb;
-			
-			Geko_Wp_Db::addPrefix( 'geko_meta_key' );
-			
 			// create tables
 			$oSqlTable = new Geko_Sql_Table();
 			$oSqlTable
 				->create( $wpdb->geko_meta_key, 'm' )
 				->fieldMediumInt( 'mkey_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
-				->fieldVarChar( 'meta_key', array( 'size' => 255, 'unq' ) )
+				->fieldVarChar( 'meta_key', array( 'size' => 256, 'unq' ) )
 			;			
 			
+			$oSqlTable->getTableName();						// HACKISH!!!
 			self::$oSqlTable = $oSqlTable;
 			
 			self::$bCalledInit = TRUE;
@@ -39,7 +36,9 @@ class Geko_Wp_Options_MetaKey
 		
 		if ( !self::$bCalledInstall && is_admin() ) {
 			
-			Geko_Wp_Db::createTable( self::$oSqlTable );			
+			$oDb = Geko_Wp::get( 'db' );
+			$oDb->tableCreateIfNotExists( self::$oSqlTable );
+			
 			self::$bCalledInstall = TRUE;
 		}
 	}

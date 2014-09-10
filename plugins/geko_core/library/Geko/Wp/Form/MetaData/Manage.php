@@ -21,19 +21,15 @@ class Geko_Wp_Form_MetaData_Manage extends Geko_Wp_Options_Manage
 	
 	//
 	public function add() {
-
-		global $wpdb;
 		
 		parent::add();
 		
-		Geko_Wp_Enumeration_Manage::getInstance()->add();
 		
-		$sTableName = 'geko_form_meta_data';
-		Geko_Wp_Db::addPrefix( $sTableName );
+		Geko_Wp_Enumeration_Manage::getInstance()->add();
 		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'fmd' )
+			->create( '##pfx##geko_form_meta_data', 'fmd' )
 			->fieldMediumInt( 'fmmd_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldBigInt( 'form_id', array( 'unsgnd', 'notnull', 'key' ) )
 			->fieldSmallInt( 'fmitmtyp_id', array( 'unsgnd', 'notnull' ) )
@@ -45,6 +41,7 @@ class Geko_Wp_Form_MetaData_Manage extends Geko_Wp_Options_Manage
 		;
 		
 		$this->addTable( $oSqlTable );
+		
 		
 		return $this;
 		

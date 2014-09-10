@@ -17,18 +17,14 @@ class Geko_Wp_Group_Meta extends Geko_Wp_Options_Meta
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
+		
 		
 		$this->forceInit( __CLASS__ );
 		
-		$sTableName = 'geko_group_meta';
-		Geko_Wp_Db::addPrefix( $sTableName );
-		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'gm' )
+			->create( '##pfx##geko_group_meta', 'gm' )
 			->fieldBigInt( 'gmeta_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldBigInt( 'group_id', array( 'unsgnd' ) )
 			->fieldSmallInt( 'mkey_id', array( 'unsgnd' ) )
@@ -39,12 +35,10 @@ class Geko_Wp_Group_Meta extends Geko_Wp_Options_Meta
 		$this->addTable( $oSqlTable );
 		
 		
-		$sTableName2 = 'geko_group_meta_members';
-		Geko_Wp_Db::addPrefix( $sTableName2 );
 		
 		$oSqlTable2 = new Geko_Sql_Table();
 		$oSqlTable2
-			->create( $wpdb->$sTableName2, 'gmm' )
+			->create( '##pfx##geko_group_meta_members', 'gmm' )
 			->fieldBigInt( 'gmeta_id', array( 'unsgnd', 'key' ) )
 			->fieldBigInt( 'member_id', array( 'unsgnd', 'key' ) )
 			->fieldLongText( 'member_value' )

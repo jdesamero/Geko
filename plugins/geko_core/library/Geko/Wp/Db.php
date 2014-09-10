@@ -74,30 +74,39 @@ class Geko_Wp_Db
 	}
 	
 	
-	//
-	public static function createTable( $sTableName, $sSql = '' ) {
+	// NOTE: To be deprecated
+	// Use $oDb = Geko_Wp::get( 'db' ); $oDb->tableCreateIfNotExists() instead
+	
+	/* /
+	public static function createTable() {
 		
 		global $wpdb;
 		
 		$aArgs = func_get_args();
 		
 		if ( count( $aArgs ) == 1 ) {
+			
 			$oSqlTable = $aArgs[ 0 ];
 			$sTableName = $oSqlTable->getTableName();
 			$sSql = strval( $oSqlTable );
+		
 		} elseif ( count( $aArgs ) == 2 ) {
+			
 			list( $sTableName, $sSql ) = $aArgs;
 		}
 		
 		$sTableName = ( $wpdb->$sTableName ) ? $wpdb->$sTableName : $sTableName ;
 		
 		if ( $sTableName && $sSql && !self::tableExists( $sTableName ) ) {
+			
 			require_once( sprintf( '%swp-admin/includes/upgrade.php', ABSPATH ) );
-			return dbDelta( sprintf( $sSql, $sTableName ) );
+			
+			return dbDelta( $sSql );
 		}
 		
 		return FALSE;
 	}
+	/* */
 	
 	
 	//

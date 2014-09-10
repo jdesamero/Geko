@@ -29,16 +29,11 @@ class Geko_Wp_Booking_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
-		
-		$sTableName = 'geko_booking';
-		Geko_Wp_Db::addPrefix( $sTableName );
 		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'b' )
+			->create( '##pfx##geko_booking', 'b' )
 			->fieldBigInt( 'bkng_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldLongText( 'name' )
 			->fieldVarChar( 'slug', array( 'size' => 256 ) )

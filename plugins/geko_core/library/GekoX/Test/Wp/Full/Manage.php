@@ -23,22 +23,18 @@ class GekoX_Test_Wp_Full_Manage extends Geko_Wp_Options_Manage
 	
 	//
 	public function add() {
-
-		global $wpdb;
 		
 		parent::add();
 		
-		Geko_Wp_Enumeration_Manage::getInstance()->add();
 		
-		$sTable = 'geko_test_entity';
-		Geko_Wp_Db::addPrefix( $sTable );
+		Geko_Wp_Enumeration_Manage::getInstance()->add();
 		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTable, 't' )
+			->create( '##pfx##geko_test_entity', 't' )
 			->fieldBigInt( 'test_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldLongText( 'title' )
-			->fieldVarChar( 'slug', array( 'size' => 255, 'unq' ) )
+			->fieldVarChar( 'slug', array( 'size' => 256, 'unq' ) )
 			->fieldFloat( 'percent', array( 'size' => '7,4' ) )
 			->fieldLongText( 'description' )
 			->fieldLongText( 'notes' )
@@ -47,6 +43,7 @@ class GekoX_Test_Wp_Full_Manage extends Geko_Wp_Options_Manage
 		;
 		
 		$this->addTable( $oSqlTable );
+		
 		
 		return $this;
 		

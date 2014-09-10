@@ -16,18 +16,15 @@ class Geko_Wp_Generic_Meta extends Geko_Wp_Options_Meta
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
+		
 		
 		Geko_Wp_Options_MetaKey::init();
 		
-		$sTableName = 'geko_generic_meta';
-		Geko_Wp_Db::addPrefix( $sTableName );
 		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'jm' )
+			->create( '##pfx##geko_generic_meta', 'jm' )
 			->fieldBigInt( 'jmeta_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldBigInt( $this->_sParentFieldName, array( 'unsgnd', 'notnull' ) )
 			->fieldSmallInt( 'mkey_id', array( 'unsgnd', 'notnull' ) )
@@ -39,12 +36,10 @@ class Geko_Wp_Generic_Meta extends Geko_Wp_Options_Meta
 		$this->addTable( $oSqlTable );
 		
 		
-		$sTableName2 = 'geko_generic_meta_members';
-		Geko_Wp_Db::addPrefix( $sTableName2 );
 		
 		$oSqlTable2 = new Geko_Sql_Table();
 		$oSqlTable2
-			->create( $wpdb->$sTableName2, 'jmm' )
+			->create( '##pfx##geko_generic_meta_members', 'jmm' )
 			->fieldBigInt( 'jmeta_id', array( 'unsgnd', 'key' ) )
 			->fieldBigInt( 'member_id', array( 'unsgnd', 'key' ) )
 			->fieldLongText( 'member_value' )

@@ -24,16 +24,12 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 	
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
-		$sTableName = 'geko_roles';
-		Geko_Wp_Db::addPrefix( $sTableName );
 		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'r' )
+			->create( '##pfx##geko_roles', 'r' )
 			->fieldSmallInt( 'role_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldVarChar( 'title', array( 'size' => 256 ) )
 			->fieldVarChar( 'slug', array( 'size' => 256, 'unq' ) )
@@ -42,6 +38,7 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 		;
 		
 		$this->addTable( $oSqlTable );
+		
 		
 		return $this;
 	}

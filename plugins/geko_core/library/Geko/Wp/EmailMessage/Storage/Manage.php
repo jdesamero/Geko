@@ -43,30 +43,26 @@ class Geko_Wp_EmailMessage_Storage_Manage extends Geko_Wp_Options_Manage
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
+		
 		
 		Geko_Wp_Enumeration_Manage::getInstance()->add();
 		
-		$sTableName = 'geko_emsg_storage';
-		Geko_Wp_Db::addPrefix( $sTableName );
-		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 't' )
+			->create( '##pfx##geko_emsg_storage', 't' )
 			->fieldBigInt( 'strg_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldLongText( 'label' )
-			->fieldVarChar( 'slug', array( 'size' => 255, 'unq' ) )
+			->fieldVarChar( 'slug', array( 'size' => 256, 'unq' ) )
 			->fieldTinyInt( 'type_id', array( 'unsgnd' ) )
-			->fieldVarChar( 'server', array( 'size' => 255 ) )
+			->fieldVarChar( 'server', array( 'size' => 256 ) )
 			->fieldVarChar( 'security', array( 'size' => 64 ) )					// should be "ssl", but is a MySQL reserved word
 			->fieldInt( 'port', array( 'unsgnd' ) )
-			->fieldVarChar( 'username', array( 'size' => 255 ) )
-			->fieldVarChar( 'password', array( 'size' => 255 ) )
+			->fieldVarChar( 'username', array( 'size' => 256 ) )
+			->fieldVarChar( 'password', array( 'size' => 256 ) )
 			->fieldLongText( 'filename' )
 			->fieldLongText( 'dirname' )
-			->fieldVarChar( 'folder', array( 'size' => 255 ) )
+			->fieldVarChar( 'folder', array( 'size' => 256 ) )
 			->fieldVarChar( 'delim', array( 'size' => 16 ) )
 			->fieldLongText( 'notes' )
 			->fieldDateTime( 'date_created' )
@@ -74,6 +70,7 @@ class Geko_Wp_EmailMessage_Storage_Manage extends Geko_Wp_Options_Manage
 		;
 		
 		$this->addTable( $oSqlTable );
+		
 		
 		return $this;
 	}
