@@ -321,12 +321,15 @@ class Geko_Wp_Db_Adapter extends Zend_Db_Adapter_Abstract
 	//// custom Geko methods
 	
 	//
-	public function registerTableName( $sPrefixedTableName, $sTableName ) {
+	public function registerTableName( $sPrefixedTableName, $sTableName, $oDb = NULL ) {
 		
 		$this->_connect();
 		
 		$wpdb = $this->_connection;
-		$oDb = Geko_Wp::get( 'db' );
+		
+		if ( NULL === $oDb ) {
+			$oDb = Geko_Wp::get( 'db' );
+		}
 		
 		if ( $wpdb && $oDb ) {
 			

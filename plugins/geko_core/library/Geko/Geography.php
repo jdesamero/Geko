@@ -36,8 +36,10 @@ class Geko_Geography extends Geko_Singleton_Abstract
 			
 			$this->_bInitDb = TRUE;
 		}
-	
+		
+		return $this;
 	}
+	
 	
 	// hook method
 	public function runInitDb( $oDb ) {

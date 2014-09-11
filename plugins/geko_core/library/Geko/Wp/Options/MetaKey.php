@@ -19,12 +19,11 @@ class Geko_Wp_Options_MetaKey
 			// create tables
 			$oSqlTable = new Geko_Sql_Table();
 			$oSqlTable
-				->create( $wpdb->geko_meta_key, 'm' )
+				->create( '##pfx##geko_meta_key', 'm' )
 				->fieldMediumInt( 'mkey_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 				->fieldVarChar( 'meta_key', array( 'size' => 256, 'unq' ) )
 			;			
 			
-			$oSqlTable->getTableName();						// HACKISH!!!
 			self::$oSqlTable = $oSqlTable;
 			
 			self::$bCalledInit = TRUE;

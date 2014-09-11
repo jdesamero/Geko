@@ -126,7 +126,6 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 				$oSqlTable->fieldVarChar( 'session_id', array( 'size' => 32 ) );
 			}
 			
-			$oSqlTable->getTableName();						// HACKISH!!!
 			$this->_oPrimaryTable = $this->modifyPrimaryTable( $oSqlTable );
 			
 			
@@ -148,7 +147,6 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 					$oSqlTable1->fieldSmallInt( 'type_id', array( 'unsgnd' ) );
 				}
 				
-				$oSqlTable1->getTableName();						// HACKISH!!!
 				$this->_oMetaTable = $this->modifyMetaTable( $oSqlTable1 );
 				
 			}

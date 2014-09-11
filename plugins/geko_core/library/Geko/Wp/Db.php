@@ -63,6 +63,11 @@ class Geko_Wp_Db
 	}
 	
 	
+	// NOTE: Deprecated
+	// use of $oDb->_p( 'some_table' ) should be used in favour of $wpdb->some_table 
+	// for now, $wpdb->some_table is handled by $oDb->registerTable and $oDbAdapted->registerTableName
+	
+	/* /
 	//
 	public static function addPrefix( $sTableName ) {
 		
@@ -72,9 +77,11 @@ class Geko_Wp_Db
 			$wpdb->$sTableName = sprintf( '%s%s', $wpdb->prefix, $sTableName );
 		}
 	}
+	/* */
 	
 	
-	// NOTE: To be deprecated
+	
+	// NOTE: Deprecated
 	// Use $oDb = Geko_Wp::get( 'db' ); $oDb->tableCreateIfNotExists() instead
 	
 	/* /

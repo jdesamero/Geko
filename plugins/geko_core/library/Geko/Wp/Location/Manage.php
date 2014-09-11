@@ -69,9 +69,9 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		
 		
 		// HACKISH!!!
-		Geko_Wp_Db::addPrefix( 'geko_location_continent' );
-		Geko_Wp_Db::addPrefix( 'geko_location_country' );
-		Geko_Wp_Db::addPrefix( 'geko_location_province' );
+		Geko_Geography_Continent::getInstance()->init()->initDb();
+		Geko_Geography_Country::getInstance()->init()->initDb();
+		Geko_Geography_State::getInstance()->init()->initDb();
 		
 		
 		// address

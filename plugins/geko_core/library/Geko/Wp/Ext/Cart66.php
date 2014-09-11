@@ -33,10 +33,6 @@ class Geko_Wp_Ext_Cart66 extends Geko_Singleton_Abstract
 		
 		if ( class_exists( 'Cart66' ) ) {
 			
-			Geko_Wp_Db::addPrefix( 'cart66_products' );
-			Geko_Wp_Db::addPrefix( 'cart66_orders' );
-			Geko_Wp_Db::addPrefix( 'cart66_order_items' );
-			
 			add_action( 'init', array( $this, 'wpInit' ) );
 			
 			add_action( 'template_redirect', array( $this, 'ajaxTriggerCheck' ), 9 );

@@ -73,6 +73,9 @@ class Geko_Db
 			$oDbWrap->setPrefix( $sPrefix );
 		}
 		
+		$oDbWrap->postConstruct();
+		
+		
 		return $oDbWrap;
 	}
 	
@@ -105,15 +108,6 @@ class Geko_Db
 		//// initial setup stuff
 		
 		
-		// get all currently existing tables
-		
-		$aTables = $oDb->listTables();
-		
-		foreach ( $aTables as $sTable ) {
-			$this->_aTables[ $sTable ] = TRUE;
-		}
-		
-		
 		// method overrides
 		
 		if ( method_exists( $oDb, 'registerTableName' ) ) {
@@ -122,8 +116,27 @@ class Geko_Db
 		
 		if ( method_exists( $oDb, 'createTable' ) ) {
 			$this->_sCreateTableMethod = 'createTable';
-		}		
+		}
 		
+		
+	}
+	
+	
+	// HACKISH!!!
+	public function postConstruct() {
+		
+		$oDb = $this->_oDb;
+		
+		// get all currently existing tables
+		
+		$aTables = $oDb->listTables();
+		
+		foreach ( $aTables as $sTable ) {
+			$this->registerTable( $sTable );
+		}
+		
+		
+		return $this;
 	}
 	
 	
@@ -151,10 +164,15 @@ class Geko_Db
 	}
 	
 	//
-	public function replacePrefixPlaceholder( $sOutput ) {
+	public function replacePrefixPlaceholder( $sOutput, $bRemove = FALSE ) {
+		
 		if ( NULL !== $this->_sPrefix ) {
-			return str_replace( $this->_sPrefixPlaceholder, $this->_sPrefix, $sOutput );
+			
+			$sReplace = ( $bRemove ) ? '' : $this->_sPrefix ;
+			
+			return str_replace( $this->_sPrefixPlaceholder, $sReplace, $sOutput );
 		}
+		
 		return $sOutput;
 	}
 	
@@ -172,6 +190,56 @@ class Geko_Db
 	public function getHasRegisterTableMethod() {
 		return $this->_bHasRegisterTableMethod;
 	}
+	
+	
+	// get the prefixed table name, if it exists
+	public function getPrefixedTableName( $sTableName ) {
+		
+		$sPrefixedTableName = sprintf( '%s%s', $this->_sPrefix, $sTableName );
+		
+		if ( $this->_aTables[ $sPrefixedTableName ] ) {
+			return $sPrefixedTableName;
+		}
+		
+		return '';
+	}
+	
+	// shortcut to getPrefixedTableName()
+	public function _p( $sTableName ) {
+		return $this->getPrefixedTableName( $sTableName );
+	}
+	
+	
+	//
+	public function getUnprefixedTableName( $sPrefixedTableName ) {
+		
+		if ( 0 === strpos( $sPrefixedTableName, $this->_sPrefix ) ) {
+			return substr( $sPrefixedTableName, strlen( $this->_sPrefix ) );
+		}
+		
+		return $sPrefixedTableName;
+	}
+	
+	//
+	public function registerTable( $sTableName ) {
+		
+		$oDb = $this->_oDb;
+		
+		$this->_aTables[ $sTableName ] = TRUE;
+		
+		if ( $this->_bHasRegisterTableMethod ) {
+			
+			$sUnprefixedTableName = $this->getUnprefixedTableName( $sTableName );
+			
+			if ( $sUnprefixedTableName != $sTableName ) {
+				$oDb->registerTableName( $sTableName, $sUnprefixedTableName, $this );
+			}
+			
+		}
+		
+	}
+	
+	
 	
 	
 	////
@@ -297,7 +365,7 @@ class Geko_Db
 				$oDb->$sCreateTable( $sQuery );
 				
 				
-				$this->_aTables[ $sPrefixedTableName ] = TRUE;
+				$this->registerTable( $sPrefixedTableName );
 				
 				// TO DO: check for failure to create table
 				
@@ -350,6 +418,12 @@ class Geko_Db
 		}
 		
 		throw new Exception( sprintf( 'Invalid method %s::%s() called.', get_class( $this ), $sMethod ) );
+	}
+	
+	
+	//
+	public function debug() {
+		print_r( $this->_aTables );
 	}
 	
 	

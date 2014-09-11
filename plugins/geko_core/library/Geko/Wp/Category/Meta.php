@@ -59,15 +59,15 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 	
 	// create table
 	public function install() {
-		
-		global $wpdb;
-		
+
 		parent::install();
+		
+		$oDb = Geko_Wp::get( 'db' );
 		
 		Geko_Wp_Options_MetaKey::install();
 		
 		$this->createTableOnce();
-		$this->createTableOnce( $wpdb->geko_term_meta_members );
+		$this->createTableOnce( $oDb->_p( 'geko_term_meta_members' ) );
 		
 		// create hierarchy functions
 		if ( self::$bUseTermTaxonomy ) {
@@ -349,7 +349,7 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 				
 				// get all ancestors
 				$sQuery = "
-					SELECT		$wpdb->term_taxonomy_path( '/', t.term_id ) AS path
+					SELECT		{$wpdb->prefix}term_taxonomy_path( '/', t.term_id ) AS path
 					FROM		$wpdb->term_taxonomy t
 					WHERE		t.term_id = %d 
 				";

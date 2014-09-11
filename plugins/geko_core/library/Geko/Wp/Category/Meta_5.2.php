@@ -340,7 +340,7 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 				
 				// get all ancestors
 				$sQuery = "
-					SELECT		$wpdb->term_taxonomy_path( '/', t.term_id ) AS path
+					SELECT		{$wpdb->prefix}term_taxonomy_path( '/', t.term_id ) AS path
 					FROM		$wpdb->term_taxonomy t
 					WHERE		t.term_id = %d 
 				";

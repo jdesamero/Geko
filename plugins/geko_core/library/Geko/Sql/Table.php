@@ -78,8 +78,31 @@ class Geko_Sql_Table
 	
 	//
 	public function create( $sKey, $sPrefix = '' ) {
+		
 		$this->_iClause = self::CREATE;
+		
 		$this->table( $sKey, $sPrefix );
+		
+		
+		// auto table registry
+		if (
+			( $oDb = $this->_oDb ) && 
+			( $oDb->getHasRegisterTableMethod() )
+		) {
+			
+			$sUnprefixedTable = $oDb->replacePrefixPlaceholder( $sKey, TRUE );
+			$sTable = $oDb->replacePrefixPlaceholder( $sKey );
+			
+			if (
+				( $sUnprefixedTable != $sTable ) &&
+				( !$oDb->_p( $sUnprefixedTable ) )
+			) {
+				$oDb->registerTableName( $sTable, $sUnprefixedTable );
+			}
+			
+		}
+		
+		
 		return $this;
 	}
 	
@@ -137,21 +160,7 @@ class Geko_Sql_Table
 		
 		// auto-prefix replacement
 		if ( $oDb = $this->_oDb ) {
-			
-			$sTableOrig = $sTable;
-			$sTable = $oDb->replacePrefixPlaceholder( $sTableOrig );
-			
-			Geko_Once::run( $sTable, function() use( $oDb, $sTable, $sTableOrig ) {
-				
-				if (
-					( $sTableOrig != $sTable ) &&
-					( $oDb->getHasRegisterTableMethod() )
-				) {
-					$oDb->registerTableName( $sTable, $sTableOrig );
-				}
-								
-			} );
-						
+			$sTable = $oDb->replacePrefixPlaceholder( $sTable );			
 		}
 		
 		return $sTable;
@@ -226,10 +235,10 @@ class Geko_Sql_Table
 		list( $sTableName, $sTablePrefix ) = $this->_aTable;
 		
 		$sFieldPrefix = '';
-		if ( $sTablePrefix ) $sFieldPrefix = $sTablePrefix . '.';
+		if ( $sTablePrefix ) $sFieldPrefix = sprintf( '%s.', $sTablePrefix );
 		
 		foreach ( $this->_aFields as $sFieldName => $aParams ) {
-			$oSqlSelect->field( $sFieldPrefix . $sFieldName );
+			$oSqlSelect->field( sprintf( '%s%s', $sFieldPrefix, $sFieldName ) );
 		}
 		
 		if ( !$sTablePrefix ) $sTablePrefix = NULL;
@@ -273,7 +282,7 @@ class Geko_Sql_Table
 			}
 		}
 		
-		throw new Exception( 'Invalid method ' . $this->_sEntityClass . '::' . $sMethod . '() called.' );
+		throw new Exception( sprintf( 'Invalid method %s::%s() called.', $this->_sEntityClass, $sMethod ) );
 		
 	}
 	
@@ -285,7 +294,7 @@ class Geko_Sql_Table
 		// main clause
 		
 		if ( self::CREATE == $this->_iClause ) {
-			$sOutput = 'CREATE TABLE ' . $this->_aTable[ 0 ] . ' ( ';
+			$sOutput = sprintf( 'CREATE TABLE %s ( ', $this->_aTable[ 0 ] );
 		}
 		
 		// fields
@@ -298,11 +307,11 @@ class Geko_Sql_Table
 			
 			// field name and type
 			$sFieldType = $aParams[ 0 ];
-			$sOutput .= $sFieldName . ' ' . strtoupper( $sFieldType );
+			$sOutput .= sprintf( '%s %s', $sFieldName, strtoupper( $sFieldType ) );
 			
 			// size, if any
 			if ( $mSize = $aParams[ 'size' ] ) {
-				$sOutput .= '(' . $mSize . ')';
+				$sOutput .= sprintf( '(%s)', $mSize );
 			}
 			
 			// flags: unsgnd, notnull, autoinc
@@ -324,7 +333,7 @@ class Geko_Sql_Table
 			
 			// default value, if any
 			if ( $mDefVal = $aParams[ 'default' ] ) {
-				$sOutput .= " DEFAULT '" . $mDefVal . "' ";
+				$sOutput .= sprintf( " DEFAULT '%s' ", $mDefVal );
 			}
 			
 		}
@@ -335,7 +344,7 @@ class Geko_Sql_Table
 			// prky
 			
 			if ( $this->hasFlag( 'prky', $aParams ) ) {
-				$sOutput .= ' , PRIMARY KEY(' . $sFieldName . ')';
+				$sOutput .= sprintf( ' , PRIMARY KEY(%s)', $sFieldName );
 			}
 			
 			// unq
@@ -343,7 +352,7 @@ class Geko_Sql_Table
 			if ( $this->hasFlag( 'unq', $aParams ) ) $aParams[ 'unq' ] = $sFieldName;
 			
 			if ( $sIndexName = $aParams[ 'unq' ] ) {
-				$sOutput .= ' , UNIQUE KEY ' . $sIndexName . '(' . $sFieldName . ')';			
+				$sOutput .= sprintf( ' , UNIQUE KEY %s(%s)', $sIndexName, $sFieldName );			
 			}
 			
 			// key
@@ -351,19 +360,19 @@ class Geko_Sql_Table
 			if ( $this->hasFlag( 'key', $aParams ) ) $aParams[ 'key' ] = $sFieldName;
 			
 			if ( $sIndexName = $aParams[ 'key' ] ) {
-				$sOutput .= ' , KEY ' . $sIndexName . '(' . $sFieldName . ')';
+				$sOutput .= sprintf( ' , KEY %s(%s)', $sIndexName, $sFieldName );
 			}
 			
 		}
 		
 		//
 		foreach ( $this->_aIndexKey as $sIndexName => $aParams ) {
-			$sOutput .= ' , KEY ' . $sIndexName . '(' . implode( ', ', $aParams ) . ')';
+			$sOutput .= sprintf( ' , KEY %s(%s)', $sIndexName, implode( ', ', $aParams ) );
 		}
 		
 		//
 		foreach ( $this->_aIndexUnq as $sIndexName => $aParams ) {
-			$sOutput .= ' , UNIQUE KEY ' . $sIndexName . '(' . implode( ', ', $aParams ) . ')';
+			$sOutput .= sprintf( ' , UNIQUE KEY %s(%s)', $sIndexName, implode( ', ', $aParams ) );
 		}
 		
 		$sOutput .= ' ) ';
@@ -373,7 +382,7 @@ class Geko_Sql_Table
 			if ( 'engine' == $sOption ) {
 				$sEngine = strtolower( ( is_array( $mParams ) ) ? $mParams[ 0 ] : $mParams );
 				if ( $sEngine = $this->_aEngines[ $sEngine ] ) {
-					$sOutput .= ' ENGINE=' . $sEngine . ' ';
+					$sOutput .= sprintf( ' ENGINE=%s ', $sEngine );
 				}
 			}
 		}

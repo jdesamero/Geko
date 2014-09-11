@@ -26,7 +26,6 @@ class Geko_Wp_EmailMessage_Queue extends Geko_Singleton_Abstract
 			->fieldBigInt( 'batch_id' )
 		;
 		
-		$oSqlTable->getTableName();						// HACKISH!!!
 		$this->_oQueueTable = $oSqlTable;
 		
 		
@@ -40,7 +39,6 @@ class Geko_Wp_EmailMessage_Queue extends Geko_Singleton_Abstract
 			->fieldLongText( 'value' )
 		;
 		
-		$oSqlTable2->getTableName();					// HACKISH!!!
 		$this->_oQueueMetaTable = $oSqlTable2;
 		
 		

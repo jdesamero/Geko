@@ -10,16 +10,12 @@ class Geko_Wp_Form_Response_Meta extends Geko_Wp_Options_Meta
 	//
 	public function add() {
 		
-		global $wpdb;
-		
 		parent::add();
 		
-		$sTableName = 'geko_form_response_meta';
-		Geko_Wp_Db::addPrefix( $sTableName );
 		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
-			->create( $wpdb->$sTableName, 'frm' )
+			->create( '##pfx##geko_form_response_meta', 'frm' )
 			->fieldBigInt( 'fmrsp_meta_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldBigInt( 'fmrsp_id', array( 'unsgnd', 'notnull' ) )
 			->fieldSmallInt( 'mkey_id', array( 'unsgnd', 'notnull' ) )

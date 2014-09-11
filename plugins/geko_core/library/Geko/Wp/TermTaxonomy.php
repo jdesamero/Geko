@@ -8,22 +8,13 @@ class Geko_Wp_TermTaxonomy
 	
 	
 	//
-	public static function init()
-	{
-		if ( !self::$bCalledInit ) {
-			
-			// register db functions only once
-			Geko_Wp_Db::addPrefix( 'term_taxonomy_path' );
-			Geko_Wp_Db::addPrefix( 'term_taxonomy_connect' );
-			
-			self::$bCalledInit = TRUE;
-			
-		}	
+	public static function init() {
+		// do nothing
 	}
 	
 	//
-	public static function install( $sTaxonomy = 'category' )
-	{
+	public static function install( $sTaxonomy = 'category' ) {
+		
 		if ( !self::$bCalledInstall && is_admin() ) {
 			
 			// perform database installations only once
