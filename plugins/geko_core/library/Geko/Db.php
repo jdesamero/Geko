@@ -17,7 +17,8 @@ class Geko_Db
 	
 	protected $_aDbVendorMapping = array(
 		'Zend_Db_Adapter_Pdo_Mysql' => 'Mysql',
-		'Zend_Db_Adapter_Pdo_Sqlite' => 'Sqlite'
+		'Zend_Db_Adapter_Pdo_Sqlite' => 'Sqlite',
+		'Geko_Wp_Db_Adapter' => 'Mysql'					// HACKISH!!! Temporary solution
 	);
 	
 	protected $_aTables = array();
