@@ -123,6 +123,7 @@ class Geko_Wp_Form_ItemValue_Manage extends Geko_Wp_Options_Manage
 	public function updateRelatedEntities( $aQueryParams, $aPostData, $aParams ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$aSubItemIds = $wpdb->aSubItemIds[ 'Geko_Wp_Form_Item_Manage' ];
 		
@@ -148,13 +149,13 @@ class Geko_Wp_Form_ItemValue_Manage extends Geko_Wp_Options_Manage
 		$oQuery
 			->field( 'fiv.fmitm_id' )
 			->field( 'MAX( fiv.fmitmval_idx )', 'fmitmval_max_idx' )
-			->from( $wpdb->geko_form_item_value, 'fiv' )
+			->from( '##pfx##geko_form_item_value', 'fiv' )
 			->where( 'fiv.fmitm_id * ($)', $aSubItemIds )
 			->group( 'fiv.fmitm_id' )
 		;
 		
 		// create a hash of counters
-		$aIdxCounter = Geko_Wp_Db::getPair( strval( $oQuery ) );
+		$aIdxCounter = $oDb->fetchPairs( strval( $oQuery ) );
 		
 		foreach ( $aPostData as $sId => $aRow ) {
 			$iFmItmId = $aRow[ 'fmitm_id' ];			// updated item id
@@ -167,7 +168,7 @@ class Geko_Wp_Form_ItemValue_Manage extends Geko_Wp_Options_Manage
 		
 		parent::updateRelatedEntities( $aQueryParams, $aPostData, $aParams );
 		
-		$sAction = $this->_sInstanceClass . '::' . 'updateRelatedEntities';
+		$sAction = sprintf( '%s::updateRelatedEntities', $this->_sInstanceClass );
 		do_action( $sAction );
 		
 	}
@@ -175,8 +176,6 @@ class Geko_Wp_Form_ItemValue_Manage extends Geko_Wp_Options_Manage
 	
 	//
 	public function updateRelatedInsertId( $aInsertVals ) {
-		
-		global $wpdb;
 		
 		$aValues = $aInsertVals[ 0 ];
 		

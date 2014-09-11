@@ -63,7 +63,9 @@ class Geko_Wp_Form_ItemType_Manage extends Geko_Wp_Options_Manage
 	//
 	public function populateTable( $sTable ) {
 		
-		if ( 0 === Geko_Wp_Db::getTableNumRows( $sTable ) ) {
+		$oDb = Geko_Wp::get( 'db' );
+		
+		if ( 0 === $oDb->getTableNumRows( $sTable ) ) {
 
 			Geko_Wp_Db::insertMulti( $sTable, array(
 				array( 'slug:%s' => 'text', 'name:%s' => 'Text', 'has_multiple_values:%d' => 0, 'has_multiple_response:%d' => 0, 'has_choice_subs:%d' => 0 ),

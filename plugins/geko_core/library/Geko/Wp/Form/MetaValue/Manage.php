@@ -80,6 +80,7 @@ class Geko_Wp_Form_MetaValue_Manage extends Geko_Wp_Options_Manage
 	public function updateRelatedEntities( $aQueryParams, $aPostData, $aParams ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$aSubItemIds = $wpdb->aSubItemIds[ 'Geko_Wp_Form_MetaData_Manage' ];
 		
@@ -107,13 +108,13 @@ class Geko_Wp_Form_MetaValue_Manage extends Geko_Wp_Options_Manage
 			$oQuery
 				->field( 'fmv.fmmd_id' )
 				->field( 'MAX( fmv.fmmv_idx )', 'fmmv_max_idx' )
-				->from( $wpdb->geko_form_meta_value, 'fmv' )
+				->from( '##pfx##geko_form_meta_value', 'fmv' )
 				->where( 'fmv.fmmd_id * ($)', $aSubItemIds )
 				->group( 'fmv.fmmd_id' )
 			;
 			
 			// create a hash of counters
-			$aIdxCounter = Geko_Wp_Db::getPair( strval( $oQuery ) );
+			$aIdxCounter = $oDb->fetchPairs( strval( $oQuery ) );
 		}
 		
 		foreach ( $aPostData as $sId => $aRow ) {

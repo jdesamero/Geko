@@ -96,7 +96,7 @@ class Geko_Wp_Form_ItemMetaValue_Manage extends Geko_Wp_Options_Manage
 			$oSqlDelete->from( $this->_sPrimaryTable );
 			
 			foreach ( $aKeyFields as $sField ) {
-				$oSqlDelete->where( $sField . ' = ?', $oFimv->getEntityPropertyValue( $sField ) );
+				$oSqlDelete->where( sprintf( '%s = ?', $sField ), $oFimv->getEntityPropertyValue( $sField ) );
 			}
 			
 			$wpdb->query( strval( $oSqlDelete ) );
@@ -119,7 +119,7 @@ class Geko_Wp_Form_ItemMetaValue_Manage extends Geko_Wp_Options_Manage
 			
 			$iFmItmValIdx = $aData[ 'fmitmval_idx' ];
 			if ( 0 === strpos( $iFmItmValIdx, '_' ) ) {
-				$aPostData[ $i ][ 'fmitmval_idx' ] = $wpdb->aInsertIds[ 'Geko_Wp_Form_ItemValue_Manage' ][ $iFmItmId . ':' . $iFmItmValIdx ][ 1 ];
+				$aPostData[ $i ][ 'fmitmval_idx' ] = $wpdb->aInsertIds[ 'Geko_Wp_Form_ItemValue_Manage' ][ sprintf( '%s:%s', $iFmItmId, $iFmItmValIdx ) ][ 1 ];
 			}
 			
 		}

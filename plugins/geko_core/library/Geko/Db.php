@@ -385,6 +385,33 @@ class Geko_Db
 	
 	
 	//
+	public function getTableNumRows( $sTable ) {
+		
+		$sTable = $this->replacePrefixPlaceholder( $sTable );
+		
+		if ( !$this->tableExists( $sTable ) ) {
+			
+			$sTable = $this->_p( $sTable );
+			
+			if ( !$this->tableExists( $sTable ) ) {
+				return FALSE;
+			}
+		}
+		
+		if ( $sTable ) {
+			
+			$sQuery = sprintf( 'SELECT COUNT(*) AS num_rows FROM %s', $sTable );
+			
+			$oDb = $this->_oDb;
+			
+			return intval( $oDb->fetchOne( $sQuery ) );
+		}
+		
+		return FALSE;
+	}
+	
+	
+	//
 	public function __call( $sMethod, $aArgs ) {
 		
 		if ( $oDb = $this->_oDb ) {

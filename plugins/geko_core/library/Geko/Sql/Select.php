@@ -49,6 +49,11 @@ class Geko_Sql_Select
 	
 	//// constructor
 	public function __construct( $oDb = NULL ) {
+		
+		if ( NULL === $oDb ) {
+			$oDb = Geko::get( 'db' );
+		}
+		
 		$this->_oDb = $oDb;
 	}
 	
@@ -115,7 +120,7 @@ class Geko_Sql_Select
 	
 	//
 	public function getFields() {
-		return trim( $this->createFieldList( $this->_aFields ) );
+		return trim( $this->replacePrefixPlaceholder( $this->createFieldList( $this->_aFields ) ) );
 	}
 	
 	//
@@ -136,27 +141,27 @@ class Geko_Sql_Select
 			}
 		}
 		
-		return trim( $sOutput );
+		return trim( $this->replacePrefixPlaceholder( $sOutput ) );
 	}
 	
 	//
 	public function getWhere() {
-		return trim( $this->createExpressionList( $this->_aWhere ) );
+		return trim( $this->replacePrefixPlaceholder( $this->createExpressionList( $this->_aWhere ) ) );
 	}
 	
 	//
 	public function getGroup() {
-		return trim( implode( ', ', $this->_aGroup ) );
+		return trim( $this->replacePrefixPlaceholder( implode( ', ', $this->_aGroup ) ) );
 	}
 
 	//
 	public function getHaving() {
-		return trim( $this->createExpressionList( $this->_aHaving ) );
+		return trim( $this->replacePrefixPlaceholder( $this->createExpressionList( $this->_aHaving ) ) );
 	}
 	
 	//
 	public function getOrder() {
-		return trim( implode( ', ', $this->_aOrder ) );
+		return trim( $this->replacePrefixPlaceholder( implode( ', ', $this->_aOrder ) ) );
 	}
 	
 	
@@ -853,7 +858,7 @@ class Geko_Sql_Select
 	
 	
 	//
-	private function encloseExpression( $mValue ) {
+	protected function encloseExpression( $mValue ) {
 		
 		if ( $mValue instanceof Geko_Sql_Select ) {
 			return sprintf( '(%s)', strval( $mValue ) );
@@ -969,7 +974,7 @@ class Geko_Sql_Select
 	}
 	
 	//
-	private function createFieldList( $aFields ) {
+	protected function createFieldList( $aFields ) {
 		
 		$sOutput = '';
 		
@@ -991,7 +996,7 @@ class Geko_Sql_Select
 	}
 	
 	//
-	private function createExpressionList( $aExpressions ) {
+	protected function createExpressionList( $aExpressions ) {
 		
 		$sOutput = '';
 		
@@ -1010,7 +1015,7 @@ class Geko_Sql_Select
 	}
 	
 	//
-	private function createKvpJoinClause( $aKvpJoin, $sKey ) {
+	protected function createKvpJoinClause( $aKvpJoin, $sKey ) {
 		
 		$sOutput = '';
 		$aRegs = array();
@@ -1062,7 +1067,7 @@ class Geko_Sql_Select
 	
 	
 	//
-	private function formatKvpArg( $sFind, $sReplace, $mArg ) {
+	protected function formatKvpArg( $sFind, $sReplace, $mArg ) {
 		if ( is_string( $mArg ) ) {
 			return str_replace( $sFind, $sReplace, $mArg );
 		} elseif ( $mArg instanceof Geko_Sql_Callback ) {
@@ -1076,6 +1081,19 @@ class Geko_Sql_Select
 			return '';
 		}
 	}
+	
+	
+	//
+	protected function replacePrefixPlaceholder( $sOutput ) {
+		
+		// auto-prefix replacement
+		if ( $oDb = $this->_oDb ) {
+			$sOutput = $oDb->replacePrefixPlaceholder( $sOutput );
+		}
+		
+		return $sOutput;
+	}
+	
 	
 	
 	// output the completed query
@@ -1155,12 +1173,7 @@ class Geko_Sql_Select
 			$sOutput .= sprintf( 'OFFSET %s ', $this->_iOffset );
 		}
 		
-		// auto-prefix replacement
-		if ( $oDb = $this->_oDb ) {
-			$sOutput = $oDb->replacePrefixPlaceholder( $sOutput );
-		}
-		
-		return trim( $sOutput );
+		return trim( $this->replacePrefixPlaceholder( $sOutput ) );
 	}
 	
 	
