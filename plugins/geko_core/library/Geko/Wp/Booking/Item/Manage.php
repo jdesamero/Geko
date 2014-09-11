@@ -123,7 +123,7 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 			
 			$aJsonParams = array(
 				'file' => array(
-					'cal_icon' => Geko_Uri::getUrl( 'geko_styles' ) . '/themes/base/images/calendar.gif'
+					'cal_icon' => sprintf( '%s/themes/base/images/calendar.gif', Geko_Uri::getUrl( 'geko_styles' ) )
 				),
 				'date' => array(
 					'year' => date( 'Y' ),
@@ -183,7 +183,7 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 			);
 			
 			$aRet = apply_filters( 'admin_geko_bkitm_getstoredopts', $aRet, $oEntity );
-			$aRet = apply_filters( 'admin_geko_bkitm_getstoredopts' . $oEntity->getSlug(), $aRet, $oEntity );
+			$aRet = apply_filters( sprintf( 'admin_geko_bkitm_getstoredopts%s', $oEntity->getSlug() ), $aRet, $oEntity );
 			
 		}
 		
@@ -269,8 +269,8 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 						$sDeleteLink = strval( $oUrl );
 						
 						if ( function_exists( 'wp_nonce_url' ) ) {
-							$sDeleteLink = wp_nonce_url( $sDeleteLink,  $this->_sInstanceClass . $this->_sDelAction );
-							$sDeleteLink .= '&_wp_http_referer=' . urlencode( $sThisUrl );
+							$sDeleteLink = wp_nonce_url( $sDeleteLink, sprintf( '%s%s', $this->_sInstanceClass, $this->_sDelAction ) );
+							$sDeleteLink .= sprintf( '&_wp_http_referer=%s', urlencode( $sThisUrl ) );
 						}
 						
 						?><tbody>
@@ -329,9 +329,9 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 			$sSubmit = 'Update';
 		}
 		
-		$sAction = $sOp . 'bkitm';
-		$sNonceField = $this->_sInstanceClass . $sAction;
-		$sSubmit .= ' ' . $this->_sSubject;
+		$sAction = sprintf( '%sbkitm', $sOp );
+		$sNonceField = sprintf( '%s%s', $this->_sInstanceClass, $sAction );
+		$sSubmit .= sprintf( ' %s', $this->_sSubject );
 		
 		
 		$oUrl = new Geko_Uri();
@@ -357,7 +357,7 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 				<?php
 					$this->outputForm();
 					do_action( 'admin_geko_bkitm_extra_fields', $oEntity, 'extra' );
-					do_action( 'admin_geko_bkitm_extra_fields_' . $this->_sSlug, $oEntity, 'extra', $this->_sSlug );
+					do_action( sprintf( 'admin_geko_bkitm_extra_fields_%s', $this->_sSlug ), $oEntity, 'extra', $this->_sSlug );
 				?>
 				
 				<p class="submit">
@@ -436,9 +436,9 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 			</tr>
 			<?php
 				do_action( 'admin_geko_bkitm_main_fields', $oEntity, 'pre' );
-				do_action( 'admin_geko_bkitm_main_fields_' . $this->_sSlug, $oEntity, 'pre', $this->_sSlug );
+				do_action( sprintf( 'admin_geko_bkitm_main_fields_%s', $this->_sSlug ), $oEntity, 'pre', $this->_sSlug );
 				do_action( 'admin_geko_bkitm_main_fields', $oEntity, 'main' );
-				do_action( 'admin_geko_bkitm_main_fields_' . $this->_sSlug, $oEntity, 'main', $this->_sSlug );
+				do_action( sprintf( 'admin_geko_bkitm_main_fields_%s', $this->_sSlug ), $oEntity, 'main', $this->_sSlug );
 			?>
 		</table>
 		<?php
@@ -458,10 +458,11 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 	public function doAddAction( $aParams ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$bContinue = TRUE;
 		$iBkschId = intval( $_POST[ 'bkitm_bksch_id' ] );		
-		$sDateItem = Geko_Db_Mysql::getTimestamp( strtotime( $_POST[ 'bkitm_date_item' ] ) );
+		$sDateItem = $oDb->getTimestamp( strtotime( $_POST[ 'bkitm_date_item' ] ) );
 		$sStartTime = $_POST[ 'bkitm_time_start' ];
 		$sEndTime = $_POST[ 'bkitm_time_end' ];
 		
@@ -508,7 +509,7 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 			$oInsertedBkitm = new $sEntityClass( $aParams[ 'entity_id' ] );
 			
 			do_action( 'admin_geko_bkitm_add', $oInsertedBkitm );
-			do_action( 'admin_geko_bkitm_add_' . $this->_sSlug, $oInsertedBkitm );				
+			do_action( sprintf( 'admin_geko_bkitm_add_%s', $this->_sSlug ), $oInsertedBkitm );				
 			
 			$this->triggerNotifyMsg( 'm101' );										// success!!!
 		}
@@ -520,10 +521,11 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 	public function doEditAction( $aParams ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$bContinue = TRUE;
 		$iBkschId = intval( $_POST[ 'bkitm_bksch_id' ] );		
-		$sDateItem = Geko_Db_Mysql::getTimestamp( strtotime( $_POST[ 'bkitm_date_item' ] ) );
+		$sDateItem = $oDb->getTimestamp( strtotime( $_POST[ 'bkitm_date_item' ] ) );
 		$sStartTime = $_POST[ 'bkitm_time_start' ];
 		$sEndTime = $_POST[ 'bkitm_time_end' ];
 		
@@ -548,7 +550,7 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 		
 		if ( $bContinue ) {
 			
-			$sDateTime = Geko_Db_Mysql::getTimestamp();
+			$sDateTime = $oDb->getTimestamp();
 			$aUpdateValues = array(
 				'bksch_id' => $iBkschId,
 				'date_item' => $sDateItem,
@@ -572,7 +574,7 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 			$oUpdatedBkitm = new $sEntityClass( $aParams[ 'entity_id' ] );
 			
 			do_action( 'admin_geko_bkitm_edit', $oEntity, $oUpdatedBkitm );
-			do_action( 'admin_geko_bkitm_edit_' . $this->_sSlug, $oEntity, $oUpdatedBkitm );
+			do_action( sprintf( 'admin_geko_bkitm_edit_%s', $this->_sSlug ), $oEntity, $oUpdatedBkitm );
 			
 			$this->triggerNotifyMsg( 'm102' );										// success!!!
 			
@@ -605,7 +607,7 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 			$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->geko_bkng_item WHERE bkitm_id = %d", $aParams[ 'entity_id' ] ) );
 			
 			do_action( 'admin_geko_bkitm_delete', $oEntity );
-			do_action( 'admin_geko_bkitm_delete' . $this->_sSlug, $oEntity );
+			do_action( sprintf( 'admin_geko_bkitm_delete%s', $this->_sSlug ), $oEntity );
 			
 			$this->triggerNotifyMsg( 'm103' );										// success!!!
 		}
@@ -626,6 +628,8 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 			
 			global $wpdb;
 			global $user_ID;
+			
+			$oDb = Geko_Wp::get( 'db' );
 			
 			if ( $oUpdatedBksch ) $oBksch = $oUpdatedBksch;
 			
@@ -671,9 +675,9 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 				
 				$iWeekdayId = date( 'w', $iStartDate );
 				$sDate = date( 'Y-m-d ', $iStartDate );
-				// $sDateItem = Geko_Db_Mysql::getTimestamp( $iStartDate );
+				// $sDateItem = $oDb->getTimestamp( $iStartDate );
 				$sPrevDateItem = $sDateItem;
-				$sDateItem = $sDate . ' 00:00:00';
+				$sDateItem = sprintf( '%s 00:00:00', $sDate );
 				
 				// daylight savings time check
 				if ( $sPrevDateItem == $sDateItem ) {
@@ -684,8 +688,8 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 				if ( $aTms = $aTimesFmt[ $iWeekdayId ] ) {
 					foreach ( $aTms as $aTm ) {
 						
-						$iStartTime = strtotime( $sDate . $aTm[ 'start' ] );
-						$iEndTime = strtotime( $sDate . $aTm[ 'end' ] );
+						$iStartTime = strtotime( sprintf( '%s%s', $sDate, $aTm[ 'start' ] ) );
+						$iEndTime = strtotime( sprintf( '%s%s', $sDate, $aTm[ 'end' ] ) );
 						
 						// roll over to next day
 						if ( ( '12:00 AM' == $aTm[ 'start' ] ) || ( '12:30 AM' == $aTm[ 'start' ] ) ) {
@@ -795,7 +799,7 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 	public function scheduleHasItems( $iBkschId ) {
 		global $wpdb;
 		return (
-			$wpdb->get_var( "SELECT bksch_id FROM $wpdb->geko_bkng_item WHERE bksch_id = " . $iBkschId )
+			$wpdb->get_var( $wpdb->prepare( "SELECT bksch_id FROM $wpdb->geko_bkng_item WHERE bksch_id = %d", $iBkschId ) )
 		) ? TRUE : FALSE;
 	}
 	
@@ -841,11 +845,11 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 		
 		$oEntity = ( $oEntity ) ? $oEntity : $this->_oCurrentEntity;
 		
-		$wpdb->query( "
+		$wpdb->query( sprintf( "
 			UPDATE				$wpdb->geko_bkng_item
 			SET					user_id = NULL
-			WHERE				bkitm_id = " . $oEntity->getId() . "
-		" );
+			WHERE				bkitm_id = %d
+		", $oEntity->getId() ) );
 		
 		// re-query entity
 		return $this->getItem( $oEntity->getId() );

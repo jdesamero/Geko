@@ -11,7 +11,8 @@ class Geko_Wp_Booking_Item_Query extends Geko_Wp_Entity_Query
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
+		
 		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
@@ -43,9 +44,9 @@ class Geko_Wp_Booking_Item_Query extends Geko_Wp_Entity_Query
 			->field( 'bst.slots_taken' )
 			
 			
-			->joinLeft( $wpdb->geko_bkng_schedule, 'bs' )
+			->joinLeft( '##pfx##geko_bkng_schedule', 'bs' )
 				->on( 'bs.bksch_id = bsi.bksch_id' )
-			->joinLeft( $wpdb->geko_booking, 'b' )
+			->joinLeft( '##pfx##geko_booking', 'b' )
 				->on( 'b.bkng_id = bs.bkng_id' )
 			->joinLeft( $oStQuery, 'bst' )
 				->on( 'bst.bkitm_id = bsi.bkitm_id' )
@@ -73,14 +74,14 @@ class Geko_Wp_Booking_Item_Query extends Geko_Wp_Entity_Query
 		//
 		if ( $sDate = $aParams[ 'date' ] ) {
 			// convert date to MySQL timestamp
-			$sDbTs = Geko_Db_Mysql::getTimestamp( strtotime( $sDate ) );
+			$sDbTs = $oDb->getTimestamp( strtotime( $sDate ) );
 			$oQuery->where( 'bsi.date_item = ?', $sDbTs );
 		}
 
 		//
 		if ( $sDate = $aParams[ 'after_date' ] ) {
 			// convert date to MySQL timestamp
-			$sDbTs = Geko_Db_Mysql::getTimestamp( strtotime( $sDate ) );
+			$sDbTs = $oDb->getTimestamp( strtotime( $sDate ) );
 			$oQuery->where( 'bsi.date_item > ?', $sDbTs );
 		}
 		
@@ -97,7 +98,7 @@ class Geko_Wp_Booking_Item_Query extends Geko_Wp_Entity_Query
 					->on( 'bstpu.user_id = ?', $iUserId )
 				
 				->field( 'IF( brq.user_id IS NOT NULL, 1, 0 )', 'notify_current_user' )
-				->joinLeft( $wpdb->geko_bkng_request, 'brq' )
+				->joinLeft( '##pfx##geko_bkng_request', 'brq' )
 					->on( 'brq.bkitm_id = bsi.bkitm_id' )
 					->on( 'brq.user_id = ?', $iUserId )
 								
@@ -137,14 +138,14 @@ class Geko_Wp_Booking_Item_Query extends Geko_Wp_Entity_Query
 			$iDaySecs = 60 * 60 * 24;
 
 			if ( $bOneWeek ) {
-				$sMetaKey = $sUserMetaPrefix . 'reminder_week_before';
-				$sDate = Geko_Db_Mysql::getTimestamp( $iTodayTs + ( 7 * $iDaySecs ) );
+				$sMetaKey = sprintf( '%sreminder_week_before', $sUserMetaPrefix );
+				$sDate = $oDb->getTimestamp( $iTodayTs + ( 7 * $iDaySecs ) );
 			} elseif ( $bThreeDay ) {
-				$sMetaKey = $sUserMetaPrefix . 'reminder_three_days_before';
-				$sDate = Geko_Db_Mysql::getTimestamp( $iTodayTs + ( 3 * $iDaySecs ) );
+				$sMetaKey = sprintf( '%sreminder_three_days_before', $sUserMetaPrefix );
+				$sDate = $oDb->getTimestamp( $iTodayTs + ( 3 * $iDaySecs ) );
 			} elseif ( $bOneDay ) {
-				$sMetaKey = $sUserMetaPrefix . 'reminder_one_day_before';			
-				$sDate = Geko_Db_Mysql::getTimestamp( $iTodayTs + ( 1 * $iDaySecs ) );
+				$sMetaKey = sprintf( '%sreminder_one_day_before', $sUserMetaPrefix );			
+				$sDate = $oDb->getTimestamp( $iTodayTs + ( 1 * $iDaySecs ) );
 			}
 			
 			$oQuery
@@ -155,16 +156,16 @@ class Geko_Wp_Booking_Item_Query extends Geko_Wp_Entity_Query
 				
 				->joinLeft( $oStPuQuery, 'bstpu' )
 					->on( 'bstpu.bkitm_id = bsi.bkitm_id' )	
-				->joinLeft( $wpdb->users, 'u' )
+				->joinLeft( '##pfx##users', 'u' )
 					->on( 'u.ID = bstpu.user_id' )
-				->joinLeft( $wpdb->usermeta, 'umfn' )
+				->joinLeft( '##pfx##usermeta', 'umfn' )
 					->on( 'umfn.user_id = u.ID' )
 					->on( 'umfn.meta_key = ?', 'first_name' )
-				->joinLeft( $wpdb->usermeta, 'umln' )
+				->joinLeft( '##pfx##usermeta', 'umln' )
 					->on( 'umln.user_id = u.ID' )
 					->on( 'umln.meta_key = ?', 'last_name' )
 					
-				->joinLeft( $wpdb->usermeta, 'um1' )
+				->joinLeft( '##pfx##usermeta', 'um1' )
 					->on( 'um1.user_id = u.ID' )
 					->on( 'um1.meta_key = ?', $sMetaKey )
 				

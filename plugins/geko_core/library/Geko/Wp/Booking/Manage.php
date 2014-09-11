@@ -399,6 +399,7 @@ class Geko_Wp_Booking_Manage extends Geko_Wp_Options_Manage
 	public function doAddAction( $aParams ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$bContinue = TRUE;
 		$sName = stripslashes( $_POST[ 'bkng_name' ] );
@@ -416,9 +417,10 @@ class Geko_Wp_Booking_Manage extends Geko_Wp_Options_Manage
 		//// do operation !!!
 		
 		if ( $bContinue ) {
+			
 			$sSlug = Geko_Wp_Db::generateSlug( $sSlug, 'geko_booking', 'slug' );
 			
-			$sDateTime = Geko_Db_Mysql::getTimestamp();
+			$sDateTime = $oDb->getTimestamp();
 			$aInsertValues = array(
 				'name' => $sName,
 				'slug' => $sSlug,
@@ -464,6 +466,7 @@ class Geko_Wp_Booking_Manage extends Geko_Wp_Options_Manage
 	public function doEditAction( $aParams ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$bContinue = TRUE;
 		$sName = stripslashes( $_POST[ 'bkng_name' ] );
@@ -499,7 +502,7 @@ class Geko_Wp_Booking_Manage extends Geko_Wp_Options_Manage
 				$sSlug = Geko_Wp_Db::generateSlug( $sSlug, 'geko_booking', 'slug' );
 			}
 			
-			$sDateTime = Geko_Db_Mysql::getTimestamp();
+			$sDateTime = $oDb->getTimestamp();
 			$aUpdateValues = array(
 				'name' => $sName,
 				'slug' => $sSlug,
