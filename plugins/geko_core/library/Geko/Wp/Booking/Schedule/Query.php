@@ -18,7 +18,7 @@ class Geko_Wp_Booking_Schedule_Query extends Geko_Wp_Entity_Query
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
@@ -27,7 +27,7 @@ class Geko_Wp_Booking_Schedule_Query extends Geko_Wp_Entity_Query
 			
 			->field( 'b.name', 'booking_name' )
 			
-			->joinLeft( $wpdb->geko_booking, 'b' )
+			->joinLeft( '##pfx##geko_booking', 'b' )
 				->on( 'b.bkng_id = bs.bkng_id' )
 			
 		;
@@ -38,7 +38,7 @@ class Geko_Wp_Booking_Schedule_Query extends Geko_Wp_Entity_Query
 		//
 		if ( $sDate = $aParams[ 'after_date' ] ) {
 			// convert date to MySQL timestamp
-			$sDbTs = Geko_Db_Mysql::getTimestamp( strtotime( $sDate ) );
+			$sDbTs = $oDb->getTimestamp( strtotime( $sDate ) );
 			$oQuery->where( 'bs.date_end > ?', $sDbTs );
 		}
 		

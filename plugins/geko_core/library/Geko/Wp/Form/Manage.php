@@ -344,12 +344,14 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 	//
 	public function modifyInsertPostVals( $aValues ) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		if ( !$aValues[ 'slug' ] ) $aValues[ 'slug' ] = $aValues[ 'title' ];
 		$aValues[ 'slug' ] =  Geko_Wp_Db::generateSlug(
 			$aValues[ 'slug' ], $this->getPrimaryTable(), 'slug'
 		);
 		
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$sDateTime = $oDb->getTimestamp();
 		$aValues[ 'date_created' ] = $sDateTime;
 		$aValues[ 'date_modified' ] = $sDateTime;
 		
@@ -385,6 +387,8 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 	//
 	public function modifyUpdatePostVals( $aValues, $oEntity ) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		if ( !$aValues[ 'slug' ] ) $aValues[ 'slug' ] = $aValues[ 'title' ];
 		if ( $aValues[ 'slug' ] != $oEntity->getSlug() ) {
 			$aValues[ 'slug' ] = Geko_Wp_Db::generateSlug(
@@ -392,7 +396,7 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 			);
 		}
 			
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$sDateTime = $oDb->getTimestamp();
 		$aValues[ 'date_modified' ] = $sDateTime;
 		
 		return $aValues;
@@ -585,6 +589,7 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 	public function importSerialized( $aSerialized ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		//// do checks
 		
@@ -598,7 +603,7 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 		
 		// setup values
 		
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$sDateTime = $oDb->getTimestamp();
 		
 		$aMainValues = array(
 			'title:%s' => $aSerialized[ 'title' ],

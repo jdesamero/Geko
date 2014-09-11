@@ -310,9 +310,10 @@ class Geko_Wp_Payment_Moneris_Admin extends Geko_Wp_Payment_Admin
 		if ( $oPayment->hasValidLibrary() ) {
 			
 			global $wpdb;
+			$oDb = Geko_Wp::get( 'db' );
 			
 			$aResponseData = $oResponse->getResponseData();
-			$sDateTime = Geko_Db_Mysql::getTimestamp();
+			$sDateTime = $oDb->getTimestamp();
 			
 			$aInsertValues = array(
 				

@@ -61,7 +61,9 @@ class Geko_Wp_Form_Response_Manage extends Geko_Wp_Options_Manage
 	//
 	public function modifyInsertPostVals( $aValues ) {
 		
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$oDb = Geko_Wp::get( 'db' );
+		
+		$sDateTime = $oDb->getTimestamp();
 		$aValues[ 'date_created' ] = $sDateTime;
 		$aValues[ 'date_modified' ] = $sDateTime;
 		

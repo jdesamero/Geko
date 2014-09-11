@@ -241,13 +241,15 @@ class Geko_Wp_EmailMessage_Transport_Manage extends Geko_Wp_Options_Manage
 	
 	//
 	public function modifyInsertPostVals( $aValues ) {
-				
+		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		if ( !$aValues[ 'slug' ] ) $aValues[ 'slug' ] = $aValues[ 'label' ];
 		$aValues[ 'slug' ] =  Geko_Wp_Db::generateSlug(
 			$aValues[ 'slug' ], $this->getPrimaryTable(), 'slug'
 		);
 		
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$sDateTime = $oDb->getTimestamp();
 		$aValues[ 'date_created' ] = $sDateTime;
 		$aValues[ 'date_modified' ] = $sDateTime;
 		
@@ -287,7 +289,9 @@ class Geko_Wp_EmailMessage_Transport_Manage extends Geko_Wp_Options_Manage
 	
 	//
 	public function modifyUpdatePostVals( $aValues, $oEntity ) {
-				
+		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		if ( !$aValues[ 'slug' ] ) $aValues[ 'slug' ] = $aValues[ 'label' ];
 		if ( $aValues[ 'slug' ] != $oEntity->getSlug() ) {
 			$aValues[ 'slug' ] = Geko_Wp_Db::generateSlug(
@@ -295,7 +299,7 @@ class Geko_Wp_EmailMessage_Transport_Manage extends Geko_Wp_Options_Manage
 			);
 		}
 		
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$sDateTime = $oDb->getTimestamp();
 		$aValues[ 'date_modified' ] = $sDateTime;
 		
 		return $aValues;

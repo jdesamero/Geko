@@ -155,6 +155,8 @@ class GekoX_Test_Wp_Full_Manage extends Geko_Wp_Options_Manage
 	//
 	public function getInsertData( $aParams ) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		list( $aValues, $aFormat ) = parent::getInsertData( $aParams );
 		
 		if ( !$aValues[ 'slug' ] ) $aValues[ 'slug' ] = $aValues[ 'title' ];
@@ -162,7 +164,7 @@ class GekoX_Test_Wp_Full_Manage extends Geko_Wp_Options_Manage
 			$aValues[ 'slug' ], $this->getPrimaryTable(), 'slug'
 		);
 		
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$sDateTime = $oDb->getTimestamp();
 		$aValues[ 'date_created' ] = $sDateTime;
 		$aValues[ 'date_modified' ] = $sDateTime;
 		
@@ -198,6 +200,8 @@ class GekoX_Test_Wp_Full_Manage extends Geko_Wp_Options_Manage
 	//
 	public function getUpdateData( $aParams, $oEntity ) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		list( $aValues, $aWhere, $aFormat, $aWhereFmt ) = parent::getUpdateData( $aParams, $oEntity );
 		
 		if ( !$aValues[ 'slug' ] ) $aValues[ 'slug' ] = $aValues[ 'title' ];
@@ -206,8 +210,8 @@ class GekoX_Test_Wp_Full_Manage extends Geko_Wp_Options_Manage
 				$aValues[ 'slug' ], $this->getPrimaryTable(), 'slug'
 			);
 		}
-			
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		
+		$sDateTime = $oDb->getTimestamp();
 		$aValues[ 'date_modified' ] = $sDateTime;
 		
 		return array( $aValues, $aWhere, $aFormat, $aWhereFmt );

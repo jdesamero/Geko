@@ -79,6 +79,7 @@ class Geko_Wp_EmailMessage_Queue extends Geko_Singleton_Abstract
 	public function process( $iInterval = 30, $iLimit = 5 ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$sSql = $wpdb->prepare(
 			"	SELECT			*
@@ -88,7 +89,7 @@ class Geko_Wp_EmailMessage_Queue extends Geko_Singleton_Abstract
 				ORDER BY		q.delivery_date ASC
 				LIMIT			%d
 			",
-			Geko_Db_Mysql::getTimestamp(),
+			$oDb->getTimestamp(),
 			$iLimit
 		);
 		
@@ -122,7 +123,7 @@ class Geko_Wp_EmailMessage_Queue extends Geko_Singleton_Abstract
 				
 				$oDelivery
 					->setMode( 'queued' )
-					->addRecipient( $oQueueItem->email, $aMetaFmt[ $iQueueId ]['__recipient_name'] )
+					->addRecipient( $oQueueItem->email, $aMetaFmt[ $iQueueId ][ '__recipient_name' ] )
 					->send()
 				;
 				

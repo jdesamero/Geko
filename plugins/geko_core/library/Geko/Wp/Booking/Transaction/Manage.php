@@ -131,6 +131,7 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 	public function doAddAction( $aParams ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$oItem = $aParams[ 'item_entity' ];
 		$oUser = $aParams[ 'user_entity' ];
@@ -167,7 +168,7 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 			$aRes = $this->calculate( $aParams );			// perform calculation
 			$aParams[ 'calculate_res' ] = $aRes;
 			
-			$sDetails = 'Purchase: ' . $sProductName;
+			$sDetails = sprintf( 'Purchase: %s', $sProductName );
 			$fUnits = $aRes[ 'units' ];
 			$fCost = $aRes[ 'cost' ];
 			$fDiscount = $aRes[ 'discount' ];
@@ -176,16 +177,16 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 			
 		} elseif ( self::TRANSTYPE_REFUND == $iTransTypeId ) {
 			
-			$sDetails = 'Refund: ' . $sProductName;
+			$sDetails = sprintf( 'Refund: %s', $sProductName );
 			$fAmount = $aParams[ 'refund_amount' ];
 			
 		} else {
 
-			$sDetails = 'Unknown: ' . $sProductName;
+			$sDetails = sprintf( 'Unknown: %s', $sProductName );
 			
 		}
 		
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$sDateTime = $oDb->getTimestamp();
 		$aInsertValues = array(
 			
 			'transaction_type_id' => $iTransTypeId,
@@ -469,6 +470,7 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 	public function cleanupStalePendingItems() {
 	
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$wpdb->query( $wpdb->prepare(
 			"
@@ -479,7 +481,7 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 			",
 			$this->getStatusId( 'failed' ),
 			$this->getStatusId( 'pending' ),
-			Geko_Db_Mysql::getTimestamp( time() - ( 60 * 15 ) )			// anything pending for more than 15 mins should be cleaned-up
+			$oDb->getTimestamp( time() - ( 60 * 15 ) )			// anything pending for more than 15 mins should be cleaned-up
 		) );
 		
 	}
@@ -489,8 +491,9 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 	public function recordPrivateTransaction( $aParams ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$sDateTime = $oDb->getTimestamp();
 		$aInsertValues = array(
 			
 			'transaction_type_id' => $this->getTransactionTypeId( 'purchase' ),

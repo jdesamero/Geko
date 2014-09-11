@@ -569,6 +569,9 @@ class Geko_Sysomos_Heartbeat extends Geko_Http
 		// echo sprintf( '%s<br />', $sJsonUrl );
 		
 		/* /
+		
+		$oDb = Geko::get( 'db' );
+		
 		$sHash = md5( $sJsonUrl );
 		
 		$sQuery = sprintf( 'SELECT content FROM twitter WHERE hash = "%s"', $sHash );
@@ -608,7 +611,7 @@ class Geko_Sysomos_Heartbeat extends Geko_Http
 					);
 				} else {
 					// set next poll time value
-					$sMysqlTs = Geko_Db_Mysql::getTimestamp( time() + ( 60 * 62 ) );
+					$sMysqlTs = $oDb->getTimestamp( time() + ( 60 * 62 ) );
 					Geko_Db_Mysql::update(
 						'vars',
 						array( 'val' => $sMysqlTs ),

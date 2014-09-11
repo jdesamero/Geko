@@ -40,8 +40,10 @@ class Geko_Wp_EmailMessage_Storage_Log_Manage extends Geko_Wp_Log_Manage
 	// NOTE!!! Possible collision!!!
 	public function modifyParams( $aParams ) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		if ( $sDate = $aParams[ 'meta' ][ 'header' ][ 'date' ] ) {
-			$aParams[ 'date_parsed' ] = Geko_Db_Mysql::getTimestamp( strtotime( $sDate ) );
+			$aParams[ 'date_parsed' ] = $oDb->getTimestamp( strtotime( $sDate ) );
 		}
 		
 		// re-format meta values

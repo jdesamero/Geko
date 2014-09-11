@@ -263,8 +263,10 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 	
 	//
 	public function modifyUpdatePostVals( $aValues, $oEntity ) {
-			
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		
+		$oDb = Geko_Wp::get( 'db' );
+		
+		$sDateTime = $oDb->getTimestamp();
 		$aValues[ 'date_modified' ] = $sDateTime;
 		
 		return $aValues;
@@ -282,6 +284,7 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 	public function awardPoints( $aValues ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$iUserId = trim( $aValues[ 'user_id' ] );
 		$sEmail = trim( $aValues[ 'email' ] );
@@ -334,7 +337,7 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 		}
 		
 		//// checks are good, award the point
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$sDateTime = $oDb->getTimestamp();
 		$aInsert = array(
 			'user_id' => $iUserId,
 			'pntevt_id' => $iPointEventId,

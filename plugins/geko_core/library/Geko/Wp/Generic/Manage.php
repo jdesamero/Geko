@@ -99,11 +99,13 @@ class Geko_Wp_Generic_Manage extends Geko_Wp_Options_Manage
 	//
 	public function modifyInsertPostVals( $aValues ) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		$aValues[ 'gentype_id' ] = Geko_Wp_Options_MetaKey::getId( $this->_sSlug );
 		//	$aValues[ 'object_id' ] = $iObjectId;		// ???
 		$aValues[ 'objtype_id' ] = Geko_Wp_Options_MetaKey::getId( $this->_sObjectType );
 		
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$sDateTime = $oDb->getTimestamp();
 		$aValues[ 'date_created' ] = $sDateTime;
 		$aValues[ 'date_modified' ] = $sDateTime;
 		
@@ -115,11 +117,13 @@ class Geko_Wp_Generic_Manage extends Geko_Wp_Options_Manage
 	//
 	public function modifyUpdatePostVals( $aValues, $oEntity ) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		$aValues[ 'gentype_id' ] = Geko_Wp_Options_MetaKey::getId( $this->_sSlug );
 		// $aValues[ 'object_id' ] = $iObjectId;		// ???
 		$aValues[ 'objtype_id' ] = Geko_Wp_Options_MetaKey::getId( $this->_sObjectType );
 		
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$sDateTime = $oDb->getTimestamp();
 		$aValues[ 'date_modified' ] = $sDateTime;
 		
 		return $aValues;

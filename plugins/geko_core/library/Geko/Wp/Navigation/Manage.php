@@ -137,6 +137,8 @@ class Geko_Wp_Navigation_Manage extends Geko_Wp_Options_Manage
 	//
 	public function getInsertData( $aParams ) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		list( $aValues, $aFormat ) = parent::getInsertData( $aParams );
 		
 		if ( !$aValues[ 'code' ] ) $aValues[ 'code' ] = $aValues[ 'label' ];
@@ -144,7 +146,7 @@ class Geko_Wp_Navigation_Manage extends Geko_Wp_Options_Manage
 			$aValues[ 'code' ], $this->getPrimaryTable(), 'code'
 		);
 		
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$sDateTime = $oDb->getTimestamp();
 		$aValues[ 'date_created' ] = $sDateTime;
 		$aValues[ 'date_modified' ] = $sDateTime;
 		
@@ -180,6 +182,8 @@ class Geko_Wp_Navigation_Manage extends Geko_Wp_Options_Manage
 	//
 	public function getUpdateData( $aParams, $oEntity ) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		list( $aValues, $aWhere, $aFormat, $aWhereFmt ) = parent::getUpdateData( $aParams, $oEntity );
 		
 		if ( !$aValues[ 'code' ] ) $aValues[ 'code' ] = $aValues[ 'label' ];
@@ -188,8 +192,8 @@ class Geko_Wp_Navigation_Manage extends Geko_Wp_Options_Manage
 				$aValues[ 'code' ], $this->getPrimaryTable(), 'code'
 			);
 		}
-			
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		
+		$sDateTime = $oDb->getTimestamp();
 		$aValues[ 'date_modified' ] = $sDateTime;
 		
 		return array( $aValues, $aWhere, $aFormat, $aWhereFmt );

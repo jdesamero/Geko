@@ -567,14 +567,15 @@ class Geko_Wp_Booking_Schedule_Manage extends Geko_Wp_Options_Manage
 	public function doAddAction( $aParams ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$bContinue = TRUE;
 		$iBookingId = intval( $_POST[ 'parent_id' ] );
 		$sName = stripslashes( $_POST[ 'bksch_name' ] );
 		$sSlug = ( $_POST[ 'bksch_slug' ] ) ? $_POST[ 'bksch_slug' ] : $sName;
 		$sDescription = stripslashes( $_POST[ 'bksch_description' ] );
-		$sDateStart = Geko_Db_Mysql::getTimestamp( strtotime( $_POST[ 'bksch_date_start' ] ) );
-		$sDateEnd = Geko_Db_Mysql::getTimestamp( strtotime( $_POST[ 'bksch_date_end' ] ) );
+		$sDateStart = $oDb->getTimestamp( strtotime( $_POST[ 'bksch_date_start' ] ) );
+		$sDateEnd = $oDb->getTimestamp( strtotime( $_POST[ 'bksch_date_end' ] ) );
 		$iBookingType = intval( $_POST[ 'bksch_booking_type' ] );
 		$fUnit = floatval( $_POST[ 'bksch_unit' ] );
 		$fCost = floatval( $_POST[ 'bksch_cost' ] );
@@ -593,7 +594,7 @@ class Geko_Wp_Booking_Schedule_Manage extends Geko_Wp_Options_Manage
 		if ( $bContinue ) {
 			$sSlug = Geko_Wp_Db::generateSlug( $sSlug, 'geko_bkng_schedule', 'slug' );
 			
-			$sDateTime = Geko_Db_Mysql::getTimestamp();
+			$sDateTime = $oDb->getTimestamp();
 			$aInsertValues = array(
 				'bkng_id' => $iBookingId,
 				'name' => $sName,
@@ -653,14 +654,15 @@ class Geko_Wp_Booking_Schedule_Manage extends Geko_Wp_Options_Manage
 		// -------------------------------------------------------------------------------------- //
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$bContinue = TRUE;
 		$iBookingId = intval( $_POST[ 'parent_id' ] );
 		$sName = stripslashes( $_POST[ 'bksch_name' ] );
 		$sSlug = ( $_POST[ 'bksch_slug' ] ) ? $_POST[ 'bksch_slug' ] : $sName;
 		$sDescription = stripslashes( $_POST[ 'bksch_description' ] );
-		$sDateStart = Geko_Db_Mysql::getTimestamp( strtotime( $_POST[ 'bksch_date_start' ] ) );
-		$sDateEnd = Geko_Db_Mysql::getTimestamp( strtotime( $_POST[ 'bksch_date_end' ] ) );
+		$sDateStart = $oDb->getTimestamp( strtotime( $_POST[ 'bksch_date_start' ] ) );
+		$sDateEnd = $oDb->getTimestamp( strtotime( $_POST[ 'bksch_date_end' ] ) );
 		$iBookingType = intval( $_POST[ 'bksch_booking_type' ] );
 		$fUnit = floatval( $_POST[ 'bksch_unit' ] );
 		$fCost = floatval( $_POST[ 'bksch_cost' ] );
@@ -695,7 +697,7 @@ class Geko_Wp_Booking_Schedule_Manage extends Geko_Wp_Options_Manage
 				$sSlug = Geko_Wp_Db::generateSlug( $sSlug, 'geko_bkng_schedule', 'slug' );
 			}
 			
-			$sDateTime = Geko_Db_Mysql::getTimestamp();
+			$sDateTime = $oDb->getTimestamp();
 			$aUpdateValues = array(
 				'bkng_id' => $iBookingId,
 				'name' => $sName,
@@ -740,10 +742,11 @@ class Geko_Wp_Booking_Schedule_Manage extends Geko_Wp_Options_Manage
 	public function doExtendAction( $aParams ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$bContinue = TRUE;
 		$sDescription = stripslashes( $_POST[ 'bksch_description' ] );
-		$sDateEnd = Geko_Db_Mysql::getTimestamp( strtotime( $_POST[ 'bksch_date_end' ] ) );
+		$sDateEnd = $oDb->getTimestamp( strtotime( $_POST[ 'bksch_date_end' ] ) );
 		
 		//// do checks
 		
@@ -760,7 +763,7 @@ class Geko_Wp_Booking_Schedule_Manage extends Geko_Wp_Options_Manage
 		
 		if ( $bContinue ) {
 			
-			$sDateTime = Geko_Db_Mysql::getTimestamp();
+			$sDateTime = $oDb->getTimestamp();
 			$aUpdateValues = array(
 				'description' => $sDescription,
 				'date_end' => $sDateEnd,

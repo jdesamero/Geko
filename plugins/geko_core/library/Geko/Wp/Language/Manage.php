@@ -471,12 +471,14 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 	//
 	public function modifyInsertPostVals( $aValues ) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		if ( !$aValues[ 'code' ] ) $aValues[ 'code' ] = $aValues[ 'title' ];
 		$aValues[ 'code' ] =  Geko_Wp_Db::generateSlug(
 			$aValues[ 'code' ], $this->getPrimaryTable(), 'code'
 		);
 		
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$sDateTime = $oDb->getTimestamp();
 		$aValues[ 'date_created' ] = $sDateTime;
 		$aValues[ 'date_modified' ] = $sDateTime;
 		
@@ -514,14 +516,16 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 	//
 	public function modifyUpdatePostVals( $aValues, $oEntity ) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		if ( !$aValues[ 'code' ] ) $aValues[ 'code' ] = $aValues[ 'title' ];
 		if ( $aValues[ 'code' ] != $oEntity->getSlug() ) {
 			$aValues[ 'code' ] = Geko_Wp_Db::generateSlug(
 				$aValues[ 'code' ], $this->getPrimaryTable(), 'code'
 			);
 		}
-			
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		
+		$sDateTime = $oDb->getTimestamp();
 		$aValues[ 'date_modified' ] = $sDateTime;
 		
 		if ( !isset( $aValues[ 'is_default' ] ) ) $aValues[ 'is_default' ] = 0;

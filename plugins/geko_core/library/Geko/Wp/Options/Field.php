@@ -317,10 +317,15 @@ class Geko_Wp_Options_Field
 	
 	//
 	public function getSmartFormattedValue( $mValue ) {
+		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		$sField = $this->getName();
+		
 		if ( in_array( $sField, array( 'date_created', 'date_modified' ) ) ) {
-			return Geko_Db_Mysql::getTimestamp();
+			return $oDb->getTimestamp();
 		}
+		
 		return $this->getFormattedValue( $mValue );
 	}
 	

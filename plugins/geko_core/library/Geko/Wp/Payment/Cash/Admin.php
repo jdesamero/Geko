@@ -163,11 +163,12 @@ class Geko_Wp_Payment_Cash_Admin extends Geko_Wp_Payment_Admin
 	) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$oPayment = $this->getPaymentInstance();
 		
 		$aResponseData = $oResponse->getResponseData();
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$sDateTime = $oDb->getTimestamp();
 		
 		$aInsertValues = array(
 			

@@ -262,6 +262,7 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 	public function showBookingsReport( $aParams = NULL ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		if ( NULL === $aParams ) $aParams = $_GET;
 		
@@ -303,7 +304,7 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 		//
 		if ( $sDate = $aParams[ 'min_date' ] ) {
 			// convert date to MySQL timestamp
-			$sDbTs = Geko_Db_Mysql::getTimestamp( strtotime( $sDate ) );
+			$sDbTs = $oDb->getTimestamp( strtotime( $sDate ) );
 			$oPurchasesQuery->where( 'bi.date_item >= ?', $sDbTs );
 			$oQuery->where( 'i.date_item >= ?', $sDbTs );
 		}
@@ -311,7 +312,7 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 		//
 		if ( $sDate = $aParams[ 'max_date' ] ) {
 			// convert date to MySQL timestamp
-			$sDbTs = Geko_Db_Mysql::getTimestamp( strtotime( $sDate ) );
+			$sDbTs = $oDb->getTimestamp( strtotime( $sDate ) );
 			$oPurchasesQuery->where( 'bi.date_item <= ?', $sDbTs );
 			$oQuery->where( 'i.date_item <= ?', $sDbTs );
 		}
@@ -373,6 +374,7 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 	public function showBookingDetailsReport( $aParams = NULL ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		if ( NULL === $aParams ) $aParams = $_GET;
 		
@@ -447,7 +449,7 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 		//
 		if ( $sDate = $aParams[ 'min_date' ] ) {
 			// convert date to MySQL timestamp
-			$sDbTs = Geko_Db_Mysql::getTimestamp( strtotime( $sDate ) );
+			$sDbTs = $oDb->getTimestamp( strtotime( $sDate ) );
 			$oPurchasesQuery->where( 'bi.date_item >= ?', $sDbTs );
 			$oQuery->where( 'i.date_item >= ?', $sDbTs );
 			$oUserQuery->where( 'bi.date_item >= ?', $sDbTs );
@@ -456,7 +458,7 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 		//
 		if ( $sDate = $aParams[ 'max_date' ] ) {
 			// convert date to MySQL timestamp
-			$sDbTs = Geko_Db_Mysql::getTimestamp( strtotime( $sDate ) );
+			$sDbTs = $oDb->getTimestamp( strtotime( $sDate ) );
 			$oPurchasesQuery->where( 'bi.date_item <= ?', $sDbTs );
 			$oQuery->where( 'i.date_item <= ?', $sDbTs );
 			$oUserQuery->where( 'bi.date_item <= ?', $sDbTs );
@@ -545,6 +547,7 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 	public function showSignupsReport( $aParams = NULL ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		if ( NULL === $aParams ) $aParams = $_GET;
 		
@@ -567,14 +570,14 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 		//
 		if ( $sDate = $aParams[ 'min_date' ] ) {
 			// convert date to MySQL timestamp
-			$sDbTs = Geko_Db_Mysql::getTimestamp( strtotime( $sDate ) );
+			$sDbTs = $oDb->getTimestamp( strtotime( $sDate ) );
 			$oQuery->where( 'u.user_registered >= ?', $sDbTs );
 		}
 		
 		//
 		if ( $sDate = $aParams[ 'max_date' ] ) {
 			// convert date to MySQL timestamp
-			$sDbTs = Geko_Db_Mysql::getTimestamp( strtotime( $sDate ) );
+			$sDbTs = $oDb->getTimestamp( strtotime( $sDate ) );
 			$oQuery->where( 'u.user_registered <= ?', $sDbTs );
 		}
 		

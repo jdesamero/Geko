@@ -216,7 +216,9 @@ class Geko_Wp_Pin_Manage extends Geko_Wp_Options_Manage
 	//
 	public function modifyInsertPostVals( $aValues ) {
 		
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$oDb = Geko_Wp::get( 'db' );
+		
+		$sDateTime = $oDb->getTimestamp();
 		$aValues[ 'date_created' ] = $sDateTime;
 		$aValues[ 'date_modified' ] = $sDateTime;
 		
@@ -229,7 +231,9 @@ class Geko_Wp_Pin_Manage extends Geko_Wp_Options_Manage
 	//
 	public function modifyUpdatePostVals( $aValues, $oEntity ) {
 		
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$oDb = Geko_Wp::get( 'db' );
+		
+		$sDateTime = $oDb->getTimestamp();
 		$aValues[ 'date_modified' ] = $sDateTime;
 		
 		return $aValues;

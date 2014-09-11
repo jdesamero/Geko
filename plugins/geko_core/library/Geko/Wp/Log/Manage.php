@@ -708,11 +708,13 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 		if ( $sTb = $this->_sTableName ) {
 
 			global $wpdb, $user_ID;
+			$oDb = Geko_Wp::get( 'db' );
+			
 			get_currentuserinfo();
 			
 			$aParams[ 'remote_ip' ] = ip2long( $_SERVER[ 'REMOTE_ADDR' ] );
 			$aParams[ 'user_agent' ] = $_SERVER[ 'HTTP_USER_AGENT' ];
-			$aParams[ 'date_created' ] = Geko_Db_Mysql::getTimestamp();
+			$aParams[ 'date_created' ] = $oDb->getTimestamp();
 			$aParams[ 'url' ] = strval( Geko_Uri::getGlobal() );
 			if ( $user_ID ) $aParams[ 'user_id' ] = $user_ID;
 			

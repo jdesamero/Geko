@@ -257,6 +257,8 @@ class Geko_Wp_Group_Manage extends Geko_Wp_Options_Manage
 	//
 	public function modifyInsertPostVals( $aValues ) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		if ( !$aValues[ 'slug' ] ) $aValues[ 'slug' ] = $aValues[ 'title' ];
 		$aValues[ 'slug' ] =  Geko_Wp_Db::generateSlug(
 			$aValues[ 'slug' ], $this->getPrimaryTable(), 'slug'
@@ -264,7 +266,7 @@ class Geko_Wp_Group_Manage extends Geko_Wp_Options_Manage
 		
 		$aValues[ 'grptype_id' ] = Geko_Wp_Options_MetaKey::getId( $aValues[ 'type' ] );
 		
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$sDateTime = $oDb->getTimestamp();
 		$aValues[ 'date_created' ] = $sDateTime;
 		$aValues[ 'date_modified' ] = $sDateTime;
 		
@@ -304,6 +306,8 @@ class Geko_Wp_Group_Manage extends Geko_Wp_Options_Manage
 	//
 	public function modifyUpdatePostVals( $aValues, $oEntity ) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		if ( !$aValues[ 'slug' ] ) $aValues[ 'slug' ] = $aValues[ 'title' ];
 		if ( $aValues[ 'slug' ] != $oEntity->getSlug() ) {
 			$aValues[ 'slug' ] =  Geko_Wp_Db::generateSlug(
@@ -313,7 +317,7 @@ class Geko_Wp_Group_Manage extends Geko_Wp_Options_Manage
 		
 		$aValues[ 'grptype_id' ] = Geko_Wp_Options_MetaKey::getId( $aValues[ 'type' ] );
 		
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$sDateTime = $oDb->getTimestamp();
 		$aValues[ 'date_modified' ] = $sDateTime;
 		
 		return $aValues;

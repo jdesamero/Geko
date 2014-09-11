@@ -26,7 +26,10 @@ class Geko_Wp_EmailMessage_Log_Plugin_Delivery extends Geko_Wp_Log_Plugin
 	
 	//
 	public function logGekoWpEmsgDelivery( $oEmsg, $aMergeParams, $sStatus ) {
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		
+		$oDb = Geko_Wp::get( 'db' );
+		
+		$sDateTime = $oDb->getTimestamp();
 		
 		if ( !$aMergeParams[ '__scheduled_delivery_date' ] ) {
 			$aMergeParams[ '__scheduled_delivery_date' ] = $sDateTime;

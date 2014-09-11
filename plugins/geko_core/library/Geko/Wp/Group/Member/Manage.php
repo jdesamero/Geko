@@ -406,6 +406,7 @@ class Geko_Wp_Group_Member_Manage extends Geko_Wp_Options_Manage
 		) {
 			
 			global $wpdb;
+			$oDb = Geko_Wp::get( 'db' );
 			
 			// check if entry exists
 			$oSql = new Geko_Sql_Select();
@@ -416,7 +417,7 @@ class Geko_Wp_Group_Member_Manage extends Geko_Wp_Options_Manage
 				->where( 'user_id = ?', $iUserId )
 			;
 			
-			$sDateTime = Geko_Db_Mysql::getTimestamp();
+			$sDateTime = $oDb->getTimestamp();
 			
 			$aVals = array();
 			$aVals['status_id'] = Geko_Wp_Options_MetaKey::getId( $sStatus );

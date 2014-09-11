@@ -66,11 +66,12 @@ class Geko_Wp_Booking_Request_Manage extends Geko_Wp_Options_Manage
 	public function doAddAction( $aParams ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$oItem = $aParams[ 'item_entity' ];
 		$oUser = $aParams[ 'user_entity' ];
 		
-		$sDateTime = Geko_Db_Mysql::getTimestamp();
+		$sDateTime = $oDb->getTimestamp();
 		
 		$aInsertValues = array(
 			'bkitm_id' => $oItem->getId(),
