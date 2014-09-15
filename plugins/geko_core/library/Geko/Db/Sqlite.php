@@ -12,6 +12,22 @@ class Geko_Db_Sqlite
 	// deal with vendor specific functionality
 	
 	//
+	public static function getUserRoutines( $oDb = NULL ) {
+		
+		throw new Exception( sprintf( 'Method not yet implemented: %s', __METHOD__ ) );
+		
+		return FALSE;
+	}
+	
+	//
+	public static function getRoutineExistsQuery( $sRoutineName, $sDbName ) {
+		
+		throw new Exception( sprintf( 'Method not yet implemented: %s', __METHOD__ ) );
+		
+		return FALSE;
+	}
+	
+	//
 	public static function getTimestamp( $iTimestamp = NULL ) {
 		if ( NULL == $iTimestamp ) $iTimestamp = time();
 		return @date( 'Y-m-d H:i:s', $iTimestamp );

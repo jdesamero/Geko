@@ -3,23 +3,7 @@
 //
 class Geko_Db_Mysql
 {
-	
-	//
-	public static function getRoutineExistsQuery( $sRoutineName, $sDbName ) {
 		
-		//
-		return sprintf(
-			
-			"SELECT			*
-			FROM 			information_schema.routines
-			WHERE			( SPECIFIC_NAME = '%s' ) AND 
-							( ROUTINE_SCHEMA = '%s' )",
-			
-			$sRoutineName,
-			$sDbName
-		);
-	}
-	
 	//
 	public static function getHierarchyPathQuery(
 		$sFuncName, $sTableName, $sIdFieldName, $sParentFieldName, $sWhereCondition = ''
@@ -390,6 +374,39 @@ class Geko_Db_Mysql
 	
 	// deal with vendor specific functionality
 	
+	//
+	public static function getUserRoutines( $oDb = NULL ) {
+		
+		if ( !$oDb ) {
+			$oDb = Geko::get( 'db' );
+		}
+		
+		if ( $oDb ) {
+			return $oDb->fetchCol( "
+				SELECT			SPECIFIC_NAME
+				FROM 			information_schema.routines
+				WHERE			( ROUTINE_SCHEMA = '%s' )
+			", $oDb->getDbName() );
+		}
+		
+		return FALSE;
+	}
+	
+	//
+	public static function getRoutineExistsQuery( $sRoutineName, $sDbName ) {
+		
+		//
+		return sprintf(
+			
+			"SELECT			1 AS routine_exists
+			FROM 			information_schema.routines
+			WHERE			( SPECIFIC_NAME = '%s' ) AND 
+							( ROUTINE_SCHEMA = '%s' )",
+			
+			$sRoutineName,
+			$sDbName
+		);
+	}
 	
 	//
 	public static function getTimestamp( $iTimestamp = NULL ) {

@@ -68,20 +68,19 @@ class Geko_Wp_Db
 	public static function createHierarchyPathFunction(
 		$sTable, $sIdField, $sParentIdField, $sWhereCondition = ''
 	) {
-		global $wpdb;
 		
-		$sTablePrefixed = sprintf( '%s%s', $wpdb->prefix, $sTable );
+		$oDb = Geko_Wp::get( 'db' );
+		
+		$sTablePrefixed = $oDb->_p( $sTable );
 		$sFuncName = sprintf( '%s_path', $sTablePrefixed );
-		$sSql = Geko_Db_Mysql::getRoutineExistsQuery( $sFuncName, DB_NAME );
 		
-		if ( !$wpdb->get_var( $sSql ) ) {
+		if ( !$oDb->routineExists( $sFuncName ) ) {
 			
 			$sQuery = Geko_Db_Mysql::getHierarchyPathQuery(
 				$sFuncName, $sTablePrefixed, $sIdField, $sParentIdField, $sWhereCondition
 			);
 			
-			$bRes = $wpdb->query( $sQuery );
-			return $bRes;
+			return $oDb->routineCreateIfNotExists( $sFuncName, $sQuery );
 			
 		} else {
 			return TRUE;
@@ -94,20 +93,19 @@ class Geko_Wp_Db
 	public static function createHierarchyConnectFunction(
 		$sTable, $sIdField, $sParentIdField, $sWhereCondition = ''
 	) {
-		global $wpdb;
 		
-		$sTablePrefixed = sprintf( '%s%s', $wpdb->prefix, $sTable );
+		$oDb = Geko_Wp::get( 'db' );
+		
+		$sTablePrefixed = $oDb->_p( $sTable );
 		$sFuncName = sprintf( '%s_connect', $sTablePrefixed );
-		$sSql = Geko_Db_Mysql::getRoutineExistsQuery( $sFuncName, DB_NAME );
 		
-		if ( !$wpdb->get_var( $sSql ) ) {
+		if ( !$oDb->routineExists( $sFuncName ) ) {
 			
 			$sQuery = Geko_Db_Mysql::getHierarchyConnectQuery(
 				$sFuncName, $sTablePrefixed, $sIdField, $sParentIdField, $sWhereCondition
 			);
 			
-			$bRes = $wpdb->query( $sQuery );
-			return $bRes;
+			return $oDb->routineCreateIfNotExists( $sFuncName, $sQuery );
 			
 		} else {
 			return TRUE;

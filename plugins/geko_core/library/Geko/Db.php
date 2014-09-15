@@ -22,9 +22,13 @@ class Geko_Db
 	);
 	
 	protected $_aTables = array();
+	protected $_aRoutines = array();
 	
 	protected $_bHasRegisterTableMethod = FALSE;
+	protected $_bHasRegisterRoutineMethod = FALSE;
 	protected $_sCreateTableMethod = 'query';
+	
+	protected $_sDbName = '';
 	
 	
 	
@@ -105,14 +109,21 @@ class Geko_Db
 		$this->_sDbClass = get_class( $oDb );
 		$this->_sVendorClass = sprintf( 'Geko_Db_%s', $this->_aDbVendorMapping[ $this->_sDbClass ] );
 		
+		$aConfig = $oDb->getConfig();
+		
 		
 		//// initial setup stuff
 		
+		$this->_sDbName = $aConfig[ 'dbname' ];
 		
 		// method overrides
 		
 		if ( method_exists( $oDb, 'registerTableName' ) ) {
 			$this->_bHasRegisterTableMethod = TRUE;
+		}		
+		
+		if ( method_exists( $oDb, 'registerRoutineName' ) ) {
+			$this->_bHasRegisterRoutineMethod = TRUE;
 		}		
 		
 		if ( method_exists( $oDb, 'createTable' ) ) {
@@ -128,12 +139,19 @@ class Geko_Db
 		
 		$oDb = $this->_oDb;
 		
-		// get all currently existing tables
+		// get all currently existing tables and routines
 		
 		$aTables = $oDb->listTables();
 		
 		foreach ( $aTables as $sTable ) {
 			$this->registerTable( $sTable );
+		}
+		
+		
+		$aRoutines = $this->getUserRoutines();
+		
+		foreach ( $aRoutines as $sRoutine ) {
+			$this->registerRoutine( $sRoutine );
 		}
 		
 		
@@ -188,6 +206,11 @@ class Geko_Db
 	}
 	
 	//
+	public function getDbName() {
+		return $this->_sDbName;
+	}
+	
+	//
 	public function getHasRegisterTableMethod() {
 		return $this->_bHasRegisterTableMethod;
 	}
@@ -222,9 +245,12 @@ class Geko_Db
 	}
 	
 	//
+	public function getUnprefixedRoutineName( $sPrefixedRoutineName ) {
+		return $this->getUnprefixedTableName( $sPrefixedRoutineName );
+	}
+	
+	//
 	public function registerTable( $sTableName ) {
-		
-		$oDb = $this->_oDb;
 		
 		$this->_aTables[ $sTableName ] = TRUE;
 		
@@ -233,6 +259,8 @@ class Geko_Db
 			$sUnprefixedTableName = $this->getUnprefixedTableName( $sTableName );
 			
 			if ( $sUnprefixedTableName != $sTableName ) {
+				
+				$oDb = $this->_oDb;
 				$oDb->registerTableName( $sTableName, $sUnprefixedTableName, $this );
 			}
 			
@@ -240,6 +268,24 @@ class Geko_Db
 		
 	}
 	
+	//
+	public function registerRoutine( $sRoutineName ) {
+	
+		$this->_aRoutines[ $sRoutineName ] = TRUE;
+		
+		if ( $this->_bHasRegisterRoutineMethod ) {
+			
+			$sUnprefixedRoutineName = $this->getUnprefixedRoutineName( $sRoutineName );
+			
+			if ( $sUnprefixedRoutineName != $sRoutineName ) {
+				
+				$oDb = $this->_oDb;
+				$oDb->registerRoutineName( $sRoutineName, $sUnprefixedRoutineName, $this );
+			}
+			
+		}
+
+	}
 	
 	
 	
@@ -308,6 +354,11 @@ class Geko_Db
 	//// delegate to matching vendor handler
 	
 	//
+	public function getUserRoutines() {
+		return call_user_func( array( $this->_sVendorClass, 'getUserRoutines' ), $this );
+	}
+
+	//
 	public function getTimestamp() {
 		return call_user_func( array( $this->_sVendorClass, 'getTimestamp' ) );
 	}
@@ -358,10 +409,10 @@ class Geko_Db
 			
 			// attempt to create table if it does not exist
 			if ( !$this->tableExists( $sPrefixedTableName ) ) {
-
-				// this creates the table
+				
 				$sQuery = $this->replacePrefixPlaceholder( $sQuery );
 				
+				// this creates the table
 				$sCreateTable = $this->_sCreateTableMethod;
 				$oDb->$sCreateTable( $sQuery );
 				
@@ -383,6 +434,42 @@ class Geko_Db
 	public function tableExists( $sTable ) {
 		return ( $this->_aTables[ $sTable ] ) ? TRUE : FALSE ;
 	}
+	
+	
+	//
+	public function routineCreateIfNotExists( $sRoutineName, $sQuery ) {
+		
+		if ( $sRoutineName && $sQuery ) {
+			
+			$oDb = $this->_oDb;
+			
+			$sPrefixedRoutineName = $this->replacePrefixPlaceholder( $sRoutineName );
+			
+			// attempt to create routine if it does not exist
+			if ( !$this->routineExists( $sPrefixedRoutineName ) ) {
+				
+				$sQuery = $this->replacePrefixPlaceholder( $sQuery );
+				
+				// this creates the routine
+				$bRes = $oDb->query( $sQuery );
+				
+				$this->registerRoutine( $sPrefixedRoutineName );
+				
+				// TO DO: check for failure to create function
+				
+				return $bRes;
+			}
+		}
+		
+		return FALSE;
+	}
+	
+	
+	//
+	public function routineExists( $sRoutine ) {
+		return ( $this->_aRoutines[ $sRoutine ] ) ? TRUE : FALSE ;
+	}
+	
 	
 	
 	//

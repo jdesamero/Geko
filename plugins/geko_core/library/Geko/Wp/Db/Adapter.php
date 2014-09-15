@@ -341,6 +341,11 @@ class Geko_Wp_Db_Adapter extends Zend_Db_Adapter_Abstract
 		}
 		
 	}
+
+	//
+	public function registerRoutineName( $sPrefixedRoutineName, $sRoutineName, $oDb = NULL ) {
+		$this->registerTableName( $sPrefixedRoutineName, $sRoutineName, $oDb );
+	}
 	
 	//
 	public function createTable( $sSql ) {
