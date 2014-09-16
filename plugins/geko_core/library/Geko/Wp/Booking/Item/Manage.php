@@ -99,6 +99,7 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 			if ( $this->_oCurrentEntity ) {
 				
 				global $wpdb;
+				$oDb = Geko_Wp::get( 'db' );
 				
 				$oEntity = $this->_oCurrentEntity;
 				
@@ -115,7 +116,7 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 					->where( '( bst.slots_taken IS NOT NULL ) AND ( bst.slots_taken > 0 )' )
 				;
 				
-				$this->iBookedEvents = intval( $wpdb->get_var( $oQuery ) );
+				$this->iBookedEvents = intval( $oDb->lastInsertId() );
 				
 				$bDisable = ( $this->iBookedEvents ) ? TRUE : FALSE;
 
@@ -494,7 +495,7 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 				$aInsertFormat
 			);
 			
-			$aParams[ 'entity_id' ] = $wpdb->get_var( 'SELECT LAST_INSERT_ID()' );
+			$aParams[ 'entity_id' ] = $oDb->lastInsertId();
 			
 			// rewrite the referer url
 			$oUrl = new Geko_Uri( $aParams[ 'referer' ] );

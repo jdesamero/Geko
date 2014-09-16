@@ -112,9 +112,10 @@ class Geko_Wp_Post_Clone extends Geko_Wp_Initialize
 	public function getType( $iPostId ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
-		return $wpdb->get_var( $wpdb->prepare(
-			"SELECT post_type FROM $wpdb->posts WHERE ID = %d",
+		return $oDb->fetchOne( $wpdb->prepare(
+			"SELECT post_type FROM ##pfx##posts WHERE ID = %d",
 			$iPostId
 		) );
 	}
@@ -123,6 +124,7 @@ class Geko_Wp_Post_Clone extends Geko_Wp_Initialize
 	public function clonePost( $iPostId ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		//// basic data
 		
@@ -259,7 +261,7 @@ class Geko_Wp_Post_Clone extends Geko_Wp_Initialize
 				}
 				
 				add_post_meta( $iCopyId, $sMetaKey, $sMetaValue );
-				$aOrigMetaIdHash[ $aRow[ 'meta_id' ] ] = $wpdb->insert_id;
+				$aOrigMetaIdHash[ $aRow[ 'meta_id' ] ] = $oDb->lastInsertId();
 			}
 		}
 		

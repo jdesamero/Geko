@@ -152,8 +152,10 @@ class Geko_Wp_EmailMessage_Queue extends Geko_Singleton_Abstract
 	public function add( $aParams ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		if ( $aParams['emsg_slug'] ) {
+			
 			$aParams['emsg_id'] = $wpdb->get_var( $wpdb->prepare(
 				"SELECT emsg_id FROM $wpdb->geko_email_message WHERE slug = %s",
 				$aParams['emsg_slug']
@@ -170,7 +172,7 @@ class Geko_Wp_EmailMessage_Queue extends Geko_Singleton_Abstract
 				)
 			);
 
-			$iQueueId = $wpdb->get_var('SELECT LAST_INSERT_ID()');
+			$iQueueId = $oDb->lastInsertId();
 			
 			if ( $aParams['name'] ) {
 				$wpdb->insert(

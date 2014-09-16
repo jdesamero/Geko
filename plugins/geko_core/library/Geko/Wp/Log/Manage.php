@@ -735,7 +735,7 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 				$aInsertData[ 1 ]
 			);
 			
-			$iInsertId = $wpdb->insert_id;
+			$iInsertId = $oDb->lastInsertId();
 			
 			if ( $bRes && $this->_bUseMetaTable ) {
 				

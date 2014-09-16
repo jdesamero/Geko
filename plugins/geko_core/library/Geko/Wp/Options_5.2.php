@@ -1272,6 +1272,7 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	public function insertDetails( $oPlugin = NULL ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$aPostVals = $_POST;
 		$aPostVals = $this->modifyInsertDetailValues( $aPostVals, $oPlugin );
@@ -1323,7 +1324,7 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 		
 		if ( $bRes ) {
 			
-			if ( $sPkField ) $aAuto[ $sPkField ] = $wpdb->insert_id;
+			if ( $sPkField ) $aAuto[ $sPkField ] = $oDb->lastInsertId();
 			
 			if ( $oEntity = $this->resolveEntity( $aAuto ) ) {
 				$this->setTargetEntity( $oEntity, 'insert' );

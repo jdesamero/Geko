@@ -88,7 +88,7 @@ class Geko_Wp_Booking_Request_Manage extends Geko_Wp_Options_Manage
 			$aInsertFormat
 		);
 		
-		$aParams[ 'entity_id' ] = $wpdb->get_var( 'SELECT LAST_INSERT_ID()' );
+		$aParams[ 'entity_id' ] = $oDb->lastInsertId();
 		
 		return $aParams;
 		

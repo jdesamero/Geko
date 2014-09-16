@@ -622,7 +622,7 @@ class Geko_Wp_EmailMessage_Manage extends Geko_Wp_Options_Manage
 		
 		if ( $bRes ) {
 			
-			$iDupEmsgId = ( $iRestoreEmsgId ) ? $iRestoreEmsgId : $wpdb->insert_id;
+			$iDupEmsgId = ( $iRestoreEmsgId ) ? $iRestoreEmsgId : $oDb->lastInsertId() ;
 			
 			$aEmsgRcpt = $aSerialized[ 'recipients' ];
 			

@@ -66,6 +66,7 @@ class Geko_Wp_Options_MetaKey
 	public static function getId( $sMetaKey ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		if ( NULL === self::$aMetaKeyCache ) {
 			self::loadFromDb();
@@ -78,7 +79,7 @@ class Geko_Wp_Options_MetaKey
 				array( 'meta_key' => $sMetaKey )
 			);
 			
-			$iMkeyId = $wpdb->insert_id;
+			$iMkeyId = $oDb->lastInsertId();
 			self::$aMetaKeyCache[ $sMetaKey ] = $iMkeyId;
 			self::$aMetaKeyHash[ $iMkeyId ] = $sMetaKey;
 		}

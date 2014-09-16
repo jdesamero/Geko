@@ -619,7 +619,7 @@ class Geko_Wp_Booking_Schedule_Manage extends Geko_Wp_Options_Manage
 				$aInsertFormat
 			);
 			
-			$aParams[ 'entity_id' ] = $wpdb->insert_id;
+			$aParams[ 'entity_id' ] = $oDb->lastInsertId();
 			
 			// rewrite the referer url
 			$oUrl = new Geko_Uri( $aParams[ 'referer' ] );

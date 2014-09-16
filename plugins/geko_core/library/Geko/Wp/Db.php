@@ -8,6 +8,7 @@ class Geko_Wp_Db
 	public static function generateSlug( $sTitle, $mTable, $sSlugField ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		if ( is_a( $mTable, 'Geko_Sql_Table' ) ) {
 			$sTable = $mTable->getTableName();
@@ -20,7 +21,7 @@ class Geko_Wp_Db
 		$sName = sanitize_title_with_dashes( $sTitle );
 		$sName = preg_replace( '/-[0-9]+$/', '', $sName );	// strip trailing digits, if any
 		
-		$aMatches = $wpdb->get_col( sprintf(
+		$aMatches = $oDb->fetchCol( sprintf(
 			
 			"SELECT				%s
 			FROM				%s

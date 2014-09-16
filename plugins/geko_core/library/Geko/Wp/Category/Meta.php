@@ -321,6 +321,7 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 	protected function setAncestorMetaCache( $iTermId ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		// perform an ancestry check
 		
@@ -349,12 +350,12 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 				
 				// get all ancestors
 				$sQuery = "
-					SELECT		{$wpdb->prefix}term_taxonomy_path( '/', t.term_id ) AS path
-					FROM		$wpdb->term_taxonomy t
+					SELECT		##pfx##term_taxonomy_path( '/', t.term_id ) AS path
+					FROM		##pfx##term_taxonomy t
 					WHERE		t.term_id = %d 
 				";
 				
-				$sIds = $wpdb->get_var( $wpdb->prepare( $sQuery, $iTermId ) );
+				$sIds = $oDb->fetchOne( $wpdb->prepare( $sQuery, $iTermId ) );
 				
 				// gather ids to be queried
 				$aIds = explode( '/', $sIds );
@@ -362,7 +363,7 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 				
 			} else {
 			
-				$aIds = $wpdb->get_col( "SELECT term_id FROM $wpdb->terms" );
+				$aIds = $oDb->fetchCol( 'SELECT term_id FROM ##pfx##terms' );
 			
 			}
 			

@@ -436,6 +436,7 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 	protected function commitMetaData( $aParams, $aDataVals = NULL, $aFileVals = NULL ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$aElemsGroup = $aParams[ 'elems_group' ];
 		$aMeta = $aParams[ 'meta_data' ];
@@ -549,7 +550,7 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 				
 				$wpdb->insert( $wpdb->$sMetaTable, $aVals );
 				
-				$iSubEntityId = $wpdb->insert_id;
+				$iSubEntityId = $oDb->lastInsertId();
 				
 			} elseif (
 				( $oMeta->meta_value != $sValue ) || 
@@ -753,9 +754,10 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 	public function cleanOrphanFiles( $sFilesDbSql, $sCleanupSql, $sFileDir ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		// get all the files in the database
-		$aFilesDb = $wpdb->get_col( $sFilesDbSql );
+		$aFilesDb = $oDb->fetchCol( $sFilesDbSql );
 		$aFilesDb = array_diff( $aFilesDb, array( '' ) );					// remove empty values
 		
 		// get list of actual files

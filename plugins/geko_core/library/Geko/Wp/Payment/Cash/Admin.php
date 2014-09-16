@@ -204,9 +204,7 @@ class Geko_Wp_Payment_Cash_Admin extends Geko_Wp_Payment_Admin
 			$aInsertFormat
 		);
 		
-		$oResponse->setTransactionId(
-			$wpdb->get_var( 'SELECT LAST_INSERT_ID()' )
-		);
+		$oResponse->setTransactionId( $oDb->lastInsertId() );
 		
 		return $this;
 	}

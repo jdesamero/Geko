@@ -374,7 +374,7 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 		} else {
 			
 			$wpdb->insert( $this->_sPrimaryTable, $aInsert, $aFormat );
-			$iPointId = $wpdb->insert_id;
+			$iPointId = $oDb->lastInsertId();
 			
 			if ( count( $aMetaInsert ) > 0 ) {
 				foreach ( $aMetaInsert as $aVals ) {

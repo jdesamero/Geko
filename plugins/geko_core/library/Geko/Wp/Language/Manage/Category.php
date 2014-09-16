@@ -242,7 +242,8 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 	public function saveCategory( $iTermId, $iTermTaxonomyId ) {
 		
 		global $wpdb;
-				
+		$oDb = Geko_Wp::get( 'db' );
+		
 		if ( $iLangId = intval( $_POST[ 'geko_lang_id' ] ) ) {
 			
 			if ( !$iLangGroupId = intval( $_POST[ 'geko_lgroup_id' ] ) )
@@ -254,7 +255,7 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 				);
 				
 				// create a lang group member
-				$iLangGroupId = $wpdb->insert_id;
+				$iLangGroupId = $oDb->lastInsertId();
 			}
 			
 			$wpdb->insert(
@@ -389,10 +390,11 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 		) {
 			
 			global $wpdb;
+			$oDb = Geko_Wp::get( 'db' );
 			
 			$bLangIsDefault = ( self::$oDefaultLang->getSlug() == $sLangCode );
 			
-			$aCatIds = $wpdb->get_col( "
+			$aCatIds = $oDb->fetchCol( "
 				SELECT			m.obj_id
 				FROM			$wpdb->geko_lang_group_members m
 				LEFT JOIN		$wpdb->geko_lang_groups g

@@ -646,7 +646,7 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 		
 		if ( $bRes ) {
 			
-			$iDupFormId = ( $iRestoreFormId ) ? $iRestoreFormId : $wpdb->insert_id;
+			$iDupFormId = ( $iRestoreFormId ) ? $iRestoreFormId : $oDb->lastInsertId() ;
 			
 			$aFmSecIds = array();
 			$aFmSec = $aSerialized[ 'sections' ];
@@ -666,7 +666,7 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 				
 				if ( !$bRes ) break;
 				
-				$aFmSecIds[ $aSection[ 'id' ] ] = $wpdb->insert_id;
+				$aFmSecIds[ $aSection[ 'id' ] ] = $oDb->lastInsertId();
 			}		
 		}
 		
@@ -699,7 +699,7 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 				
 				if ( !$bRes ) break;
 				
-				$iFmItmId = $wpdb->insert_id;
+				$iFmItmId = $oDb->lastInsertId();
 				$aFmItmIds[ $aItem[ 'id' ] ] = $iFmItmId;
 				$aParItmIds[ $iFmItmId ] = $aItem[ 'parent_itm_id' ];	// re-translate this
 				
@@ -798,7 +798,7 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 				
 				if ( !$bRes ) break;
 				
-				$aFmMetaDataIds[ $aMetaData[ 'id' ] ] = $wpdb->insert_id;
+				$aFmMetaDataIds[ $aMetaData[ 'id' ] ] = $oDb->lastInsertId();
 			}
 		}
 		

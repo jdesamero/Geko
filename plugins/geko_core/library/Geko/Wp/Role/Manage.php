@@ -657,6 +657,7 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 		if ( $this->bSyncWithDb ) {
 		
 			global $wpdb;
+			$oDb = Geko_Wp::get( 'db' );
 			
 			$aBacktrace = debug_backtrace();
 			$sFunc = $aBacktrace[ 4 ][ 'function' ];	// add_role or remove_role
@@ -681,7 +682,7 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 				
 				$wpdb->insert( $wpdb->geko_roles, $aInsertValues, $aInsertFormat );
 				
-				$this->iLastInsertId = $wpdb->insert_id;
+				$this->iLastInsertId = $oDb->lastInsertId();
 				
 			} elseif ( 'remove_role' == $sFunc ) {
 				$sSlug = $aArgs[ 0 ];

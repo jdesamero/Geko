@@ -1740,6 +1740,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	public function doAddAction( $aParams, $aValues = NULL ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$aInsertData = $this->getInsertData( $aParams, $aValues );
 		
@@ -1752,7 +1753,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 				$aInsertData[ 1 ]
 			);
 			
-			$aParams[ 'entity_id' ] = $wpdb->insert_id;
+			$aParams[ 'entity_id' ] = $oDb->lastInsertId();
 			
 			// rewrite the referer url
 			$oUrl = new Geko_Uri( $aParams[ 'referer' ] );
@@ -2548,9 +2549,9 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	//
 	public function updateRelatedInsertId( $aInsertVals ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
-		return $wpdb->insert_id;
+		return $oDb->lastInsertId();
 	}
 	
 	

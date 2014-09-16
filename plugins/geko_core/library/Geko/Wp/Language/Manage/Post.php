@@ -206,6 +206,7 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 	public function savePost( $iPostId, $aVals = NULL ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		// set vals
 		if ( NULL === $aVals ) {
@@ -241,7 +242,7 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 				);
 				
 				// create a lang group member
-				$iLangGroupId = $wpdb->get_var( 'SELECT LAST_INSERT_ID()' );
+				$iLangGroupId = $oDb->lastInsertId();
 			}
 			
 			$wpdb->insert(
@@ -300,10 +301,11 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 		if ( $sLangCode = $aArgs[ 'lang' ] ) {
 			
 			global $wpdb;
+			$oDb = Geko_Wp::get( 'db' );
 			
 			$bLangIsDefault = ( self::$oDefaultLang->getSlug() == $sLangCode );
 			
-			$aPageIds = $wpdb->get_col( "
+			$aPageIds = $oDb->fetchCol( "
 				SELECT			m.obj_id
 				FROM			$wpdb->geko_lang_group_members m
 				LEFT JOIN		$wpdb->geko_lang_groups g

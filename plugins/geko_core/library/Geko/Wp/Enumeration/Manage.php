@@ -311,17 +311,18 @@ class Geko_Wp_Enumeration_Manage extends Geko_Wp_Options_Manage
 		) {
 			
 			global $wpdb;
-						
+			$oDb = Geko_Wp::get( 'db' );
+			
 			$aParent = $aParams[ 0 ];
 			$aChildren = $aParams[ 1 ];
 			
-			if ( !$wpdb->get_var( $wpdb->prepare(
+			if ( !$oDb->fetchOne( $wpdb->prepare(
 				"SELECT enum_id FROM $wpdb->geko_enumeration WHERE slug = %s",
 				$aParent[ 'slug' ]
 			) ) ) {
 				
 				$wpdb->insert( $wpdb->geko_enumeration, $aParent );
-				$iLastInsertId = $wpdb->insert_id;
+				$iLastInsertId = $oDb->lastInsertId();
 				
 				foreach ( $aChildren as $aChild ) {
 					$aChild[ 'parent_id' ] = $iLastInsertId;
