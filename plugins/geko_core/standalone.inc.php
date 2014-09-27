@@ -15,7 +15,7 @@ define( 'GEKO_VIEW_HELPER_PATH', realpath( sprintf( '%s/library', GEKO_CORE_ROOT
 
 // include path
 set_include_path( implode( PATH_SEPARATOR, array_filter( array(
-	realpath( sprintf( '%s/ZendFramework-1.10.6-geko/library', GEKO_CORE_EXTERNAL_LIB_ROOT ) ),
+	realpath( sprintf( '%s/ZendFramework-1.12.9-minimal/library', GEKO_CORE_EXTERNAL_LIB_ROOT ) ),
 	realpath( sprintf( '%s/library', GEKO_CORE_ROOT ) ),
 	get_include_path()
 ) ) ) );

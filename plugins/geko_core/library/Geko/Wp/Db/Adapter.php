@@ -313,8 +313,16 @@ class Geko_Wp_Db_Adapter extends Zend_Db_Adapter_Abstract
 	
 	//
 	public function supportsParameters( $type ) {
-		//
+        
+        switch ( $type ) {
+            case 'positional':
+                return true;
+            case 'named':
+            default:
+                return false;
+        }
 	}
+	
 	
 	//
 	public function getServerVersion() {
