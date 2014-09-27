@@ -10,7 +10,6 @@ class Geko_Wp_Booking_Request_Query extends Geko_Wp_Entity_Query
 	
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
-		global $wpdb;
 		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
@@ -18,12 +17,12 @@ class Geko_Wp_Booking_Request_Query extends Geko_Wp_Entity_Query
 		$oQuery
 						
 			->field( 'u.user_email', 'email' )
-			->joinLeft( $wpdb->users, 'u' )
+			->joinLeft( '##pfx##users', 'u' )
 				->on( 'u.ID = brq.user_id' )
 			
 			->fieldKvp( 'um1.meta_value', 'first_name' )
 			->fieldKvp( 'um2.meta_value', 'last_name' )
-			->joinLeftKvp( $wpdb->usermeta, 'um*' )
+			->joinLeftKvp( '##pfx##usermeta', 'um*' )
 				->on( 'um*.user_id = u.ID' )
 				->on( 'um*.meta_key = ?', '*' )
 			

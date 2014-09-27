@@ -54,12 +54,10 @@ class Geko_Wp_Group_Meta extends Geko_Wp_Options_Meta
 	// create table
 	public function install() {
 		
-		global $wpdb;
-		
 		parent::install();
 		
 		$this->createTableOnce();
-		$this->createTableOnce( $wpdb->geko_group_meta_members );
+		$this->createTableOnce( '##pfx##geko_group_meta_members' );
 		
 		return $this;
 	}
@@ -101,7 +99,7 @@ class Geko_Wp_Group_Meta extends Geko_Wp_Options_Meta
 		$this->setMetaCache( $iGroupId );
 		
 		if ( $sMetaKey ) {
-			return self::$aMetaCache[ $iGroupId ][ $this->getPrefixWithSep() . $sMetaKey ];
+			return self::$aMetaCache[ $iGroupId ][ sprintf( '%s%s', $this->getPrefixWithSep(), $sMetaKey ) ];
 		} else {
 			return self::$aMetaCache[ $iGroupId ];
 		}
@@ -115,22 +113,22 @@ class Geko_Wp_Group_Meta extends Geko_Wp_Options_Meta
 		
 		if ( !isset( self::$aMetaCache[ $iGroupId ] ) ) {
 			
-			global $wpdb;
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				
+				->field( 'g.gmeta_id', 'gmeta_id' )
+				->field( 'h.meta_key', 'meta_key' )
+				->field( 'g.meta_value', 'meta_value' )
+				
+				->from( '##pfx##geko_group_meta', 'g' )
+				
+				->joinLeft( '##pfx##geko_meta_key', 'h' )
+					->on( 'h.mkey_id = g.mkey_id' )
+				
+				->where( 'g.group_id = ?', $iGroupId )
+			;
 			
-			$aFmt = Geko_Wp_Db::getResultsHash(
-				$wpdb->prepare(
-					"	SELECT			g.gmeta_id,
-										h.meta_key,
-										g.meta_value
-						FROM			$wpdb->geko_group_meta g
-						LEFT JOIN		$wpdb->geko_meta_key h
-							ON			h.mkey_id = g.mkey_id
-						WHERE			g.group_id = %d
-					",
-					$iGroupId
-				),
-				'meta_key'
-			);
+			$aFmt = Geko_Wp_Db::getResultsHash( strval( $oQuery ), 'meta_key' );
 			
 			////
 			$aSubVals = $this->gatherSubMetaValues( $aFmt, 'geko_group_meta_members', 'gmeta_id' );
@@ -153,28 +151,32 @@ class Geko_Wp_Group_Meta extends Geko_Wp_Options_Meta
 	
 	//// crud methods
 	
-	//
+	// cleanup all orphaned metadata
 	public function delete( $oGroup ) {
-		// cleanup all orphaned metadata
-		global $wpdb;
+		
+		$oDb = Geko_Wp::get( 'db' );
 		
 		// meta
-		$wpdb->query("
-			DELETE FROM		$wpdb->geko_group_meta
-			WHERE			group_id NOT IN (
-				SELECT			group_id
-				FROM			$wpdb->geko_groups
-			)
-		");
+		$oQuery1 = new Geko_Sql_Select();
+		$oQuery1
+			->field( 'g.group_id', 'group_id' )
+			->from( '##pfx##geko_groups', 'g' )
+		;
+		
+		$oDb->delete( '##pfx##geko_group_meta', array(
+			'group_id NOT IN (?)' => new Zend_Db_Expr( strval( $oQuery1 ) )
+		) );
 		
 		// members
-		$wpdb->query("
-			DELETE FROM		$wpdb->geko_group_meta_members
-			WHERE			gmeta_id NOT IN (
-				SELECT			gmeta_id
-				FROM			$wpdb->geko_group_meta
-			)
-		");
+		$oQuery2 = new Geko_Sql_Select();
+		$oQuery2
+			->field( 'gm.gmeta_id', 'gmeta_id' )
+			->from( '##pfx##geko_group_meta', 'gm' )
+		;
+		
+		$oDb->delete( '##pfx##geko_group_meta_members', array(
+			'gmeta_id NOT IN (?)' => new Zend_Db_Expr( strval( $oQuery2 ) )
+		) );
 		
 	}
 	
@@ -200,8 +202,6 @@ class Geko_Wp_Group_Meta extends Geko_Wp_Options_Meta
 		$oGroup, $sMode = 'insert', $sGroupTypeSlug = '', $aParams = NULL, $aDataVals = NULL, $aFileVals = NULL
 	) {
 		
-		global $wpdb;
-		
 		//
 		$aElemsGroup = isset( $aParams[ 'elems_group' ] ) ?
 			$aParams[ 'elems_group' ] : 
@@ -209,20 +209,24 @@ class Geko_Wp_Group_Meta extends Geko_Wp_Options_Meta
 		;
 		
 		if ( 'update' == $sMode ) {
-			$aMeta = Geko_Wp_Db::getResultsHash(
-				$wpdb->prepare(
-					"	SELECT			g.gmeta_id,
-										h.meta_key,
-										g.meta_value
-						FROM			$wpdb->geko_group_meta g
-						LEFT JOIN		$wpdb->geko_meta_key h
-							ON			h.mkey_id = g.mkey_id
-						WHERE			g.group_id = %d
-					",
-					$oGroup->getId()
-				),
-				'meta_key'
-			);
+			
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				
+				->field( 'g.gmeta_id', 'gmeta_id' )
+				->field( 'h.meta_key', 'meta_key' )
+				->field( 'g.meta_value', 'meta_value' )
+				
+				->from( '##pfx##geko_group_meta', 'g' )
+				
+				->joinLeft( '##pfx##geko_meta_key', 'h' )
+					->on( 'h.mkey_id = g.mkey_id' )
+				
+				->where( 'g.group_id = ?', $oGroup->getId() )
+			;
+			
+			$aMeta = Geko_Wp_Db::getResultsHash( strval( $oQuery ), 'meta_key' );
+			
 		} else {
 			$aMeta = array();
 		}

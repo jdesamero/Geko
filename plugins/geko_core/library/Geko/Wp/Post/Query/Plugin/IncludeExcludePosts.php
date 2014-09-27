@@ -8,7 +8,6 @@ class Geko_Wp_Post_Query_Plugin_IncludeExcludePosts extends Geko_Entity_Query_Pl
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
 		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );

@@ -46,11 +46,11 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 	//
 	public function addAdmin() {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		parent::addAdmin();
 		
-		add_action( sprintf( 'update_option_%suser_roles', $wpdb->prefix ), array( $this, 'updateRole' ), 10, 2 );
+		add_action( $oDb->replacePrefixPlaceholder( 'update_option_##pfx##user_roles' ), array( $this, 'updateRole' ), 10, 2 );
 		
 		// reconcile assigned for the types that need it
 		Geko_Wp_Role_Types::getInstance()->reconcileAssigned();
@@ -219,8 +219,8 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 										$sDeleteLink = strval( $oUrl );
 										
 										if ( function_exists( 'wp_nonce_url' ) ) {
-											$sDeleteLink = wp_nonce_url( $sDeleteLink,  $this->_sInstanceClass . $this->_sDelAction );
-											$sDeleteLink .= '&_wp_http_referer=' . urlencode( $sThisUrl );
+											$sDeleteLink = wp_nonce_url( $sDeleteLink, sprintf( '%s%s', $this->_sInstanceClass, $this->_sDelAction ) );
+											$sDeleteLink .= sprintf( '&_wp_http_referer=%s', urlencode( $sThisUrl ) );
 										}
 										
 										?>
@@ -265,7 +265,7 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 							
 							<form name="<?php echo $sAction; ?>" id="<?php echo $sAction; ?>" method="post" action="<?php echo $sThisUrl; ?>" class="add:the-list: validate">
 								
-								<?php if ( function_exists( 'wp_nonce_field' ) ) wp_nonce_field( $this->_sInstanceClass . $sAction ); ?>
+								<?php if ( function_exists( 'wp_nonce_field' ) ) wp_nonce_field( sprintf( '%s%s', $this->_sInstanceClass, $sAction ) ); ?>
 								
 								<input type="hidden" name="action" value="<?php echo $sAction; ?>" />
 								
@@ -324,7 +324,7 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 			
 			<form name="<?php echo $sAction; ?>" id="<?php echo $sAction; ?>" method="post" action="<?php echo $oUrl; ?>" class="validate">
 				
-				<?php if ( function_exists( 'wp_nonce_field' ) ) wp_nonce_field( $this->_sInstanceClass . $sAction ); ?>
+				<?php if ( function_exists( 'wp_nonce_field' ) ) wp_nonce_field( sprintf( '%s%s', $this->_sInstanceClass, $sAction ) ); ?>
 				
 				<input type="hidden" name="action" value="<?php echo $sAction; ?>">
 				<?php echo Geko_String::sw( '<input type="hidden" name="%s$1" value="%d$0">', $iEntityId, $this->_sEntityIdVarName ); ?>
@@ -407,23 +407,25 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 			$sFieldGroup = Geko_String::sw( '%s<br />', $aPart[ 'field_group' ] );
 			
 			if ( 'edit' == $sMode ) {
-				$sFields .= '
-					<tr class="form-field">
-						<th scope="row" valign="top">' . $sLabel . '</th>
-						<td>
-							' . $sFieldGroup . '
-							' . Geko_String::sw( '<span class="description">%s</span>', $aPart[ 'description' ] ) . '
-						</td>
-					</tr>
-				';
+				
+				$sFields .= sprintf(
+					'<tr class="form-field">
+						<th scope="row" valign="top">%s</th>
+						<td>%s%s</td>
+					</tr>',
+					$sLabel,
+					$sFieldGroup,
+					Geko_String::sw( '<span class="description">%s</span>', $aPart[ 'description' ] )
+				);
+				
 			} else {
-				$sFields .= '
-					<div class="form-field">
-						' . $sLabel . '
-						' . $sFieldGroup . '
-						' . Geko_String::sw( '<p>%s</p>', $aPart[ 'description' ] ) . '
-					</div>
-				';
+				
+				$sFields .= sprintf(
+					'<div class="form-field">%s%s%s</div>',
+					$sLabel,
+					$sFieldGroup,
+					Geko_String::sw( '<p>%s</p>', $aPart[ 'description' ] )
+				);
 			}
 		}
 		
@@ -438,13 +440,15 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 			( 'role_type' == $aPart[ 'name' ] )
 		) {
 			if ( $oEntity->getAssignedCount() ) {
+				
 				// disallow changing types if role has stuff assigned to it
 				$aPart[ 'field_group' ] = str_replace(
 					'id="role_type"',
 					'id="role_type" disabled="disabled"',
 					$aPart['field_group']
 				);
-				$aPart[ 'field_group' ] .= '<input type="hidden" name="role_type" value="' . $oEntity->getType() . '" />';
+				
+				$aPart[ 'field_group' ] .= sprintf( '<input type="hidden" name="role_type" value="%s" />', $oEntity->getType() );
 			}
 		}
 		
@@ -492,7 +496,9 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 	//
 	public function doEditAction( $aParams ) {
 		
-		global $wp_roles, $wpdb;
+		global $wp_roles;
+		
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$bContinue = TRUE;
 		$sName = stripslashes( $_POST[ 'role_title' ] );
@@ -509,8 +515,10 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 		}
 		
 		// check the role id given
+		$iEntityId = intval( $aParams[ 'entity_id' ] );
+		
 		$sEntityClass = $this->_sEntityClass;			
-		$oEntity = new $sEntityClass( $aParams[ 'entity_id' ] );
+		$oEntity = new $sEntityClass( $iEntityId );
 		
 		if ( $bContinue && !$oEntity->isValid() ) {
 			$bContinue = FALSE;
@@ -553,23 +561,19 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 			}
 
 			$aUpdateValues = array( 'title' => $sName, 'slug' => $sSlug, 'description' => $sDesc );
-			$aUpdateFormat = array( '%s', '%s', '%s' );
 			
 			// if $bUpdateType, type change is allowed
 			// if !$sCurType, might as well assign it
 			if ( $bUpdateType || !$sCurType ) {
 				$aUpdateValues[ 'type' ] = $sType;
-				$aUpdateFormat[] = '%s';
 				$bTypeChanged = TRUE;
 			}
 			
 			// update the database first
-			$wpdb->update(
-				$wpdb->geko_roles,
+			$oDb->update(
+				'##pfx##geko_roles',
 				$aUpdateValues,
-				array( 'role_id' => $aParams[ 'entity_id' ] ),
-				$aUpdateFormat,
-				array( '%d' )
+				array( 'role_id = ?' => $iEntityId )
 			);
 			
 			//// simulate $wp_roles->update_role( ... )
@@ -583,7 +587,7 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 			// only trigger reconcialition if the type was not changed, and
 			// if there's something assigned to the role
 			
-			$oUpdatedRole = new $sEntityClass( $aParams[ 'entity_id' ] );
+			$oUpdatedRole = new $sEntityClass( $iEntityId );
 			
 			if ( !$bUpdateType && $oEntity->getAssignedCount() ) {
 				$oEntity->getRoleTypeObject()->reconcileRoleOnUpdate(
@@ -606,8 +610,11 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 		global $wp_roles;
 		
 		$bContinue = TRUE;
+		
+		$iEntityId = intval( $aParams[ 'entity_id' ] );
+		
 		$sEntityClass = $this->_sEntityClass;
-		$oEntity = new $sEntityClass( $aParams[ 'entity_id' ] );
+		$oEntity = new $sEntityClass( $iEntityId );
 		
 		if ( !$oEntity->isValid() ) {
 			$bContinue = FALSE;
@@ -655,40 +662,38 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 	public function updateRole( $mOldValue, $mNewValue ) {
 		
 		if ( $this->bSyncWithDb ) {
-		
-			global $wpdb;
+			
 			$oDb = Geko_Wp::get( 'db' );
 			
 			$aBacktrace = debug_backtrace();
 			$sFunc = $aBacktrace[ 4 ][ 'function' ];	// add_role or remove_role
 			$aArgs = $aBacktrace[ 4 ][ 'args' ];
 			
+			$sSlug = $aArgs[ 0 ];
+			
 			// sync with database
 			if ( 'add_role' == $sFunc ) {
-				$sSlug = $aArgs[ 0 ];
+				
 				list( $sName, $sType ) = $this->roleSplit( $aArgs[ 1 ] );
 				
 				$aInsertValues = array( 'title' => $sName, 'slug' => $sSlug, 'type' => $sType );
-				$aInsertFormat = array( '%s', '%s', '%s' );
-	
+				
 				if (
 					( $this->_sAddAction == $_POST[ 'action' ] ) &&
-					( check_admin_referer( $this->_sInstanceClass . $this->_sAddAction ) )
+					( check_admin_referer( sprintf( '%s%s', $this->_sInstanceClass, $this->_sAddAction ) ) )
 				) {
 					// insert description as well
 					$aInsertValues[ 'description' ] = stripslashes( $_POST[ 'role_description' ] );
-					$aInsertFormat[] = '%s';
 				}
 				
-				$wpdb->insert( $wpdb->geko_roles, $aInsertValues, $aInsertFormat );
+				$oDb->insert( '##pfx##geko_roles', $aInsertValues );
 				
 				$this->iLastInsertId = $oDb->lastInsertId();
 				
 			} elseif ( 'remove_role' == $sFunc ) {
-				$sSlug = $aArgs[ 0 ];
-				$wpdb->query( $wpdb->prepare(
-					"DELETE FROM $wpdb->geko_roles WHERE slug = %s",
-					$sSlug
+				
+				$oDb->delete( '##pfx##geko_roles', array(
+					'slug = ?' => $sSlug
 				) );
 			}
 		
@@ -699,16 +704,19 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 	//
 	protected function insertRolesIntoDb( $aRoleNames ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		foreach ( $aRoleNames as $sSlug => $sRole ) {
+			
 			if ( $sSlug ) {
+				
 				list( $sName, $sType ) = $this->roleSplit( $sRole );
-				$wpdb->insert(
-					$wpdb->geko_roles,
-					array( 'title' => $sName, 'slug' => $sSlug, 'type' => $sType ),
-					array( '%s', '%s', '%s' )
-				);
+				
+				$oDb->insert( '##pfx##geko_roles', array(
+					'title' => $sName,
+					'slug' => $sSlug,
+					'type' => $sType
+				) );
 			}
 		}
 	
@@ -717,7 +725,9 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 	// perform an integrity check on what's in $wp_roles and what we store in the DB
 	protected function runIntegrityCheck() {
 		
-		global $wp_roles, $wpdb;
+		global $wp_roles;
+		
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$sQueryClass = $this->_sQueryClass;
 		$aEntities = new $sQueryClass();
@@ -736,13 +746,13 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 				
 				// compare the names
 				if ( $sName != $aDbRoles[ $sSlug ] ) {
+					
 					list( $sUpdateTitle, $sUpdateType ) = $this->roleSplit( $sName );
-					$wpdb->update(
-						$wpdb->geko_roles,
+					
+					$oDb->update(
+						'##pfx##geko_roles',
 						array( 'title' => $sUpdateTitle, 'type' => $sUpdateType ),
-						array( 'slug' => $sSlug ),
-						array( '%s', '%s' ),
-						array( '%s' )
+						array( 'slug = ?' => $sSlug )
 					);
 				}
 				
@@ -756,9 +766,9 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 		
 		// remove "phantom" roles from the database
 		foreach ( $aDbRoles as $sSlug => $sRole ) {
-			$wpdb->query( $wpdb->prepare(
-				"DELETE FROM $wpdb->geko_roles WHERE slug = %s",
-				$sSlug
+			
+			$oDb->delete( '##pfx##geko_roles', array(
+				'slug = ?' => $sSlug
 			) );
 		}
 		
@@ -773,7 +783,7 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 	protected function roleTypeOptions( $oEntity = NULL ) {
 		$sType = ( $oEntity ) ? $oEntity->getType() : '';
 		foreach ( Geko_Wp_Role_Types::getInstance() as $oRoleType ):
-			$sSelected = ( ( $sType ) && ( $sType == $oRoleType->getName() ) ) ? ' selected="selected" ' : '';
+			$sSelected = ( ( $sType ) && ( $sType == $oRoleType->getName() ) ) ? ' selected="selected" ' : '' ;
 			?><option value="<?php echo $oRoleType->getName(); ?>" <?php echo $sSelected; ?> ><?php echo $oRoleType->getName(); ?></option><?php
 		endforeach;
 	}
@@ -783,14 +793,14 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 		if ( 'User role' == $sType ) {
 			return $sName;
 		} else {
-			return $sName . '|' . $sType;
+			return sprintf( '%s|%s', $sName, $sType );
 		}
 	}
 	
 	//
 	protected function roleSplit( $sRole ) {
 		$aPair = explode( '|', $sRole );
-		if ( !$aPair[1] ) $aPair[1] = 'User role';
+		if ( !$aPair[ 1 ] ) $aPair[ 1 ] = 'User role';
 		return $aPair;
 	}
 	

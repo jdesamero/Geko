@@ -398,7 +398,6 @@ class Geko_Wp_Booking_Manage extends Geko_Wp_Options_Manage
 	//
 	public function doAddAction( $aParams ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		$bContinue = TRUE;
@@ -429,14 +428,8 @@ class Geko_Wp_Booking_Manage extends Geko_Wp_Options_Manage
 				'date_modified' => $sDateTime
 			);
 			
-			$aInsertFormat = array( '%s', '%s', '%s', '%s', '%s' );
-			
 			// update the database first
-			$wpdb->insert(
-				$wpdb->geko_booking,
-				$aInsertValues,
-				$aInsertFormat
-			);
+			$oDb->insert( '##pfx##geko_booking', $aInsertValues );
 			
 			$aParams[ 'entity_id' ] = $oDb->lastInsertId();
 			
@@ -453,7 +446,7 @@ class Geko_Wp_Booking_Manage extends Geko_Wp_Options_Manage
 			$oInsertedBkng = new $sEntityClass( $aParams[ 'entity_id' ] );
 			
 			do_action( 'admin_geko_bkngs_add', $oInsertedBkng );
-			do_action( 'admin_geko_bkngs_add_' . $this->_sSlug, $oInsertedBkng );				
+			do_action( sprintf( 'admin_geko_bkngs_add_%s', $this->_sSlug ), $oInsertedBkng );				
 			
 			$this->triggerNotifyMsg( 'm101' );										// success!!!
 		}
@@ -465,7 +458,6 @@ class Geko_Wp_Booking_Manage extends Geko_Wp_Options_Manage
 	//
 	public function doEditAction( $aParams ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		$bContinue = TRUE;
@@ -482,8 +474,10 @@ class Geko_Wp_Booking_Manage extends Geko_Wp_Options_Manage
 		}
 		
 		// check the enity id given
+		$iEntityId = intval( $aParams[ 'entity_id' ] );
+		
 		$sEntityClass = $this->_sEntityClass;			
-		$oEntity = new $sEntityClass( $aParams[ 'entity_id' ] );
+		$oEntity = new $sEntityClass( $iEntityId );
 		
 		if ( $bContinue && !$oEntity->isValid() ) {
 			$bContinue = FALSE;
@@ -510,23 +504,18 @@ class Geko_Wp_Booking_Manage extends Geko_Wp_Options_Manage
 				'date_modified' => $sDateTime
 			);
 			
-			$aUpdateFormat = array( '%s', '%s', '%s', '%s' );
-			
-			
 			// update the database first
-			$wpdb->update(
-				$wpdb->geko_booking,
+			$oDb->update(
+				'##pfx##geko_booking',
 				$aUpdateValues,
-				array( 'bkng_id' => $aParams[ 'entity_id' ] ),
-				$aUpdateFormat,
-				array( '%d' )
+				array( 'bkng_id = ?' => $iEntityId )
 			);
 			
 			$sEntityClass = $this->_sEntityClass;			
-			$oUpdatedBkng = new $sEntityClass( $aParams[ 'entity_id' ] );
+			$oUpdatedBkng = new $sEntityClass( $iEntityId );
 			
 			do_action( 'admin_geko_bkngs_edit', $oEntity, $oUpdatedBkng );
-			do_action( 'admin_geko_bkngs_edit_' . $this->_sSlug, $oEntity, $oUpdatedBkng );
+			do_action( sprintf( 'admin_geko_bkngs_edit_%s', $this->_sSlug ), $oEntity, $oUpdatedBkng );
 			
 			$this->triggerNotifyMsg( 'm102' );										// success!!!
 			
@@ -539,12 +528,15 @@ class Geko_Wp_Booking_Manage extends Geko_Wp_Options_Manage
 	//
 	public function doDelAction( $aParams ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		// check the bkng id given
 		$bContinue = TRUE;
-		$sEntityClass = $this->_sEntityClass;			
-		$oEntity = new $sEntityClass( $aParams[ 'entity_id' ] );
+		$sEntityClass = $this->_sEntityClass;
+		
+		$iEntityId = intval( $aParams[ 'entity_id' ] );
+		
+		$oEntity = new $sEntityClass( $iEntityId );
 		
 		if ( $bContinue && !$oEntity->isValid() ) {
 			$bContinue = FALSE;
@@ -557,10 +549,12 @@ class Geko_Wp_Booking_Manage extends Geko_Wp_Options_Manage
 
 		if ( $bContinue ) {
 			
-			$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->geko_booking WHERE bkng_id = %d", $aParams[ 'entity_id' ] ) );
+			$oDb->delete( '##pfx##geko_booking', array(
+				'bkng_id = ?' => $iEntityId
+			) );
 			
 			do_action( 'admin_geko_bkngs_delete', $oEntity );
-			do_action( 'admin_geko_bkngs_delete' . $this->_sSlug, $oEntity );
+			do_action( sprintf( 'admin_geko_bkngs_delete_%s', $this->_sSlug ), $oEntity );
 			
 			$this->triggerNotifyMsg( 'm103' );										// success!!!
 		}

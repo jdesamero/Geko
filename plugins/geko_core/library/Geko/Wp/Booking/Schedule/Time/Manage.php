@@ -321,20 +321,17 @@ class Geko_Wp_Booking_Schedule_Time_Manage extends Geko_Wp_Options_Manage
 	//
 	public function doDelAction( $oBksch ) {
 		
-		global $wpdb;
-
-		$wpdb->query( $wpdb->prepare(
-			"	DELETE FROM				$wpdb->geko_bkng_schedule_time
-				WHERE					bksch_id = %d
-			",
-			$oBksch->getId()
+		$oDb = Geko_Wp::get( 'db' );
+		
+		$oDb->delete( '##pfx##geko_bkng_schedule_time', array(
+			'bksch_id = ?' => $oBksch->getId()
 		) );		
 	}
 	
 	//
 	protected function updateTimes( $iBkschId ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$aTimes = new Geko_Wp_Booking_Schedule_Time_Query( array( 'bksch_id' => $iBkschId ) );
 		
@@ -346,18 +343,19 @@ class Geko_Wp_Booking_Schedule_Time_Manage extends Geko_Wp_Options_Manage
 			
 			// update
 			foreach ( $aTimesFmt as $iId => $oTime ) {
+				
 				if ( $aPostTime = $aPostTimes[ $iId ] ) {
-					$wpdb->update(
-						$wpdb->geko_bkng_schedule_time,
+					
+					$oDb->update(
+						'##pfx##geko_bkng_schedule_time',
 						array(
-							'weekday_id' => $aPostTime[ 'weekday_id' ],
+							'weekday_id' => intval( $aPostTime[ 'weekday_id' ] ),
 							'time_start' => $aPostTime[ 'start' ],
 							'time_end' => $aPostTime[ 'end' ]
 						),
-						array( 'bksctm_id' => $iId ),
-						array( '%d', '%s', '%s' ),
-						array( '%d' )
+						array( 'bksctm_id = ?' => $iId )
 					);
+					
 					unset( $aTimesFmt[ $iId ] );
 					unset( $aPostTimes[ $iId ] );
 				}
@@ -365,16 +363,13 @@ class Geko_Wp_Booking_Schedule_Time_Manage extends Geko_Wp_Options_Manage
 			
 			// insert
 			foreach ( $aPostTimes as $aPostTime ) {
-				$wpdb->insert(
-					$wpdb->geko_bkng_schedule_time,
-					array(
-						'weekday_id' => $aPostTime[ 'weekday_id' ],
-						'time_start' => $aPostTime[ 'start' ],
-						'time_end' => $aPostTime[ 'end' ],
-						'bksch_id' => $iBkschId
-					),
-					array( '%d', '%s', '%s', '%d' )
-				);
+				
+				$oDb->insert( '##pfx##geko_bkng_schedule_time', array(
+					'weekday_id' => intval( $aPostTime[ 'weekday_id' ] ),
+					'time_start' => $aPostTime[ 'start' ],
+					'time_end' => $aPostTime[ 'end' ],
+					'bksch_id' => $iBkschId
+				) );
 			}
 			
 		}
@@ -384,12 +379,10 @@ class Geko_Wp_Booking_Schedule_Time_Manage extends Geko_Wp_Options_Manage
 		foreach ( $aTimesFmt as $iId => $oTime ) $aDelIds[] = $iId;
 		
 		if ( count( $aDelIds ) > 0 ) {
-			$wpdb->query( $wpdb->prepare(
-				"	DELETE FROM				$wpdb->geko_bkng_schedule_time
-					WHERE					bksctm_id IN (" . implode( ',', $aDelIds ) . ") AND 
-											bksch_id = %d
-				",
-				$iBkschId
+			
+			$oDb->delete( '##pfx##geko_bkng_schedule_time', array(
+				'bksctm_id IN (?)' => new Zend_Db_Expr( implode( ', ', $aDelIds ) ),
+				'bksch_id = ?' => $iBkschId
 			) );
 		}
 		

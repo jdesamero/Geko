@@ -33,8 +33,6 @@ class Geko_Wp_User_Query extends Geko_Wp_Entity_Query
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
-		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
 		
@@ -52,7 +50,7 @@ class Geko_Wp_User_Query extends Geko_Wp_Entity_Query
 			->field( 'u.user_activation_key' )
 			->field( 'u.user_status' )
 			->field( 'u.display_name' )
-			->from( $wpdb->users, 'u' )
+			->from( '##pfx##users', 'u' )
 			
 			// secondary
 			
@@ -60,10 +58,10 @@ class Geko_Wp_User_Query extends Geko_Wp_Entity_Query
 			->field( 'gr.title', 'role_title' )
 			->field( 'gr.slug', 'role_slug' )
 			
-			->joinLeft( $wpdb->usermeta, 'r' )
+			->joinLeft( '##pfx##usermeta', 'r' )
 				->on( 'r.user_id = u.ID' )
 				->on( 'r.meta_key = ?', '_geko_role_id' )
-			->joinLeft( $wpdb->geko_roles, 'gr' )
+			->joinLeft( '##pfx##geko_roles', 'gr' )
 				->on( 'gr.role_id = CAST( r.meta_value AS UNSIGNED )' )
 			
 			// tertiary
@@ -75,7 +73,7 @@ class Geko_Wp_User_Query extends Geko_Wp_Entity_Query
 			->fieldKvp( 'dum5.meta_value', 'geko_password_reset_key' )
 			->fieldKvp( 'dum6.meta_value', 'geko_has_logged_in' )
 			
-			->joinLeftKvp( $wpdb->usermeta, 'dum*' )
+			->joinLeftKvp( '##pfx##usermeta', 'dum*' )
 				->on( 'dum*.user_id = u.ID' )
 				->on( 'dum*.meta_key = ?', '*' )
 			
@@ -98,7 +96,8 @@ class Geko_Wp_User_Query extends Geko_Wp_Entity_Query
 			( is_array( $aParams[ 'exclude' ] ) ) && 
 			( count( $aParams[ 'exclude' ] ) > 0 )
 		) {
-			$oQuery->where( "u.ID NOT IN ('" . implode( "', '", $aParams[ 'exclude' ] ) . "')" );
+			$sExcludeWhere = sprintf( "u.ID NOT IN ('%s')", implode( "', '", $aParams[ 'exclude' ] ) );
+			$oQuery->where( $sExcludeWhere );
 		}
 		
 		
@@ -112,10 +111,10 @@ class Geko_Wp_User_Query extends Geko_Wp_Entity_Query
 				$sField = '';
 				
 				foreach ( $aIds as $i => $iId ) {
-					$sField .= $wpdb->prepare( ' WHEN %d THEN %d ', $iId, $i );
+					$sField .= sprintf( ' WHEN %d THEN %d ', $iId, $i );
 				}
 				
-				$sField = $wpdb->prepare( 'CAST( ( CASE u.ID ' . $sField . ' ELSE %d END ) AS UNSIGNED )', $i + 1 );
+				$sField = sprintf( 'CAST( ( CASE u.ID %s ELSE %d END ) AS UNSIGNED )', $sField, $i + 1 );
 				
 				$oQuery->field( $sField, $aParams[ 'orderby' ] );
 				
@@ -159,7 +158,7 @@ class Geko_Wp_User_Query extends Geko_Wp_Entity_Query
 			$oSubQuery = new Geko_Sql_Select();
 			$oSubQuery
 				->field( 'role_id' )
-				->from( $wpdb->geko_roles )
+				->from( '##pfx##geko_roles' )
 				->where( 'slug * (?)', $aParams[ 'geko_role_slug' ] )
 			;
 			
@@ -172,12 +171,12 @@ class Geko_Wp_User_Query extends Geko_Wp_Entity_Query
 		
 		//
 		if ( isset( $aParams[ 'first_name' ] ) ) {
-			$oQuery->where( 'fn.meta_value LIKE ?', '%' . $aParams[ 'first_name' ] . '%' );
+			$oQuery->where( 'fn.meta_value LIKE ?', sprintf( '%%%s%%', $aParams[ 'first_name' ] ) );
 		}
 		
 		//
 		if ( isset( $aParams[ 'last_name' ] ) ) {
-			$oQuery->where( 'ln.meta_value LIKE ?', '%' . $aParams[ 'last_name' ] . '%' );
+			$oQuery->where( 'ln.meta_value LIKE ?', sprintf( '%%%s%%', $aParams[ 'last_name' ] ) );
 		}
 		
 		//
@@ -197,7 +196,7 @@ class Geko_Wp_User_Query extends Geko_Wp_Entity_Query
 			$oSubQuery2 = new Geko_Sql_Select();
 			$oSubQuery2
 				->field( 'COUNT(*)' )
-				->from( $wpdb->posts, 'p' )
+				->from( '##pfx##posts', 'p' )
 				->where( 'p.post_author = u.ID' )
 				->where( "p.post_type = 'post'" )
 			;
@@ -217,7 +216,7 @@ class Geko_Wp_User_Query extends Geko_Wp_Entity_Query
 			$oSubQuery3 = new Geko_Sql_Select();
 			$oSubQuery3
 				->field( 'MAX(p.post_date)' )
-				->from( $wpdb->posts, 'p' )
+				->from( '##pfx##posts', 'p' )
 				->where( 'p.post_author = u.ID' )
 				->where( "p.post_type = 'post'" )
 			;			

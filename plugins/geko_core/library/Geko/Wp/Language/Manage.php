@@ -87,15 +87,13 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 	// create table
 	public function install() {
 		
-		global $wpdb;
-		
 		parent::install();
 		
 		Geko_Wp_Options_MetaKey::install();
 		
 		$this->createTableOnce();
-		$this->createTableOnce( $wpdb->geko_lang_groups );
-		$this->createTableOnce( $wpdb->geko_lang_group_members );
+		$this->createTableOnce( '##pfx##geko_lang_groups' );
+		$this->createTableOnce( '##pfx##geko_lang_group_members' );
 		
 		
 		return $this;
@@ -289,7 +287,6 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 	public function getSelectorLinks(
 		$iLangGroupId, $iLangId, $iCurrObjId, $sType, $aParams = array()
 	) {
-		global $wpdb;
 		
 		//// get siblings
 
@@ -540,23 +537,31 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 	// hook method
 	public function postDeleteAction( $aParams, $oEntity ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
-		$wpdb->query( "
-			DELETE FROM			$wpdb->geko_lang_group_members
-			WHERE				lang_id NOT IN (
-				SELECT				lang_id
-				FROM				$wpdb->geko_languages
-								)
-		" );
 		
-		$wpdb->query( "
-			DELETE FROM			$wpdb->geko_lang_groups
-			WHERE				lgroup_id NOT IN (
-				SELECT				lgroup_id
-				FROM				$wpdb->geko_lang_group_members
-								)
-		" );
+		// group members
+		$oQuery1 = new Geko_Sql_Select();
+		$oQuery1
+			->field( 'l.lang_id', 'lang_id' )
+			->from( '##pfx##geko_languages', 'l' )
+		;
+		
+		$oDb->delete( '##pfx##geko_lang_group_members', array(
+			'lang_id NOT IN (?)' => new Zend_Db_Expr( strval( $oQuery1 ) )
+		) );
+		
+		
+		// groups
+		$oQuery2 = new Geko_Sql_Select();
+		$oQuery2
+			->field( 'lgm.lgroup_id', 'lgroup_id' )
+			->from( '##pfx##geko_lang_group_members', 'lgm' )
+		;
+		
+		$oDb->delete( '##pfx##geko_lang_groups', array(
+			'lgroup_id NOT IN (?)' => new Zend_Db_Expr( strval( $oQuery2 ) )
+		) );
 		
 	}
 	
@@ -567,54 +572,59 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 		
 		if ( $bIsDefault ) {
 			
-			global $wpdb;
+			$oDb = Geko_Wp::get( 'db' );
 			
-			$wpdb->query( $wpdb->prepare(
-				"UPDATE $wpdb->geko_languages SET is_default = ( IF( lang_id = %d, 1, NULL ) )",
-				$iLangId
-			) );
-			
+			$oDb->update( '##pfx##geko_languages', array(
+				'is_default = ( IF( lang_id = ?, 1, NULL ) )' => $iLangId
+			) );			
 		}
 	}
 	
 	//
 	public function cleanUpEmptyLangGroups( $sType, $sExcludeIdsSql, $iObjId ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
+		
 		
 		// delete direct
-		$wpdb->query( $sQuery = $wpdb->prepare(
-			"	DELETE FROM				m
-				USING					$wpdb->geko_lang_group_members m
-				INNER JOIN				$wpdb->geko_lang_groups g
-					ON					g.lgroup_id = m.lgroup_id
-				WHERE					( g.type_id = %d ) AND 
-										( m.obj_id = %d )
-			",
-			Geko_Wp_Options_MetaKey::getId( $sType ),
-			$iObjId
-		) );
+		
+		$oDelete1 = new Geko_Sql_Delete();
+		$oDelete1
+			->from( '##pfx##geko_lang_group_members', 'm' )
+			->joinInner( '##pfx##geko_lang_groups', 'g' )
+				->on( 'g.lgroup_id = m.lgroup_id' )
+			->where( 'g.type_id = ?', Geko_Wp_Options_MetaKey::getId( $sType ) )
+			->where( 'm.obj_id = ?', $iObjId )
+		;
+		
+		$oDb->query( strval( $oDelete1 ) );
+		
 		
 		// delete non-existent
-		$wpdb->query( $sQuery = $wpdb->prepare(
-			"	DELETE FROM				m
-				USING					$wpdb->geko_lang_group_members m
-				INNER JOIN				$wpdb->geko_lang_groups g
-					ON					g.lgroup_id = m.lgroup_id
-				WHERE					( g.type_id = %d ) AND 
-										( m.obj_id NOT IN( $sExcludeIdsSql ) )
-			",
-			Geko_Wp_Options_MetaKey::getId( $sType )
-		) );
+		
+		$oDelete2 = new Geko_Sql_Delete();
+		$oDelete2
+			->from( '##pfx##geko_lang_group_members', 'm' )
+			->joinInner( '##pfx##geko_lang_groups', 'g' )
+				->on( 'g.lgroup_id = m.lgroup_id' )
+			->where( 'g.type_id = ?', Geko_Wp_Options_MetaKey::getId( $sType ) )
+			->where( sprintf( 'm.obj_id NOT IN( %s )', $sExcludeIdsSql ) )
+		;
+		
+		$oDb->query( strval( $oDelete2 ) );
+		
 		
 		// clean-up group
-		$wpdb->query( "
-			DELETE FROM				$wpdb->geko_lang_groups
-			WHERE					lgroup_id NOT IN (
-				SELECT					lgroup_id
-				FROM					$wpdb->geko_lang_group_members
-			)
-		" );
+		
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			->field( 'lgm.lgroup_id', 'lgroup_id' )
+			->from( '##pfx##geko_lang_group_members', 'lgm' )
+		;
+		
+		$oDb->delete( '##pfx##geko_lang_groups', array(
+			'lgroup_id NOT IN (?)' => new Zend_Db_Expr( strval( $oQuery ) )
+		) );
 		
 	}
 	

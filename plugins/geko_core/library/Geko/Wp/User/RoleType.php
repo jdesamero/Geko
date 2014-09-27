@@ -9,7 +9,7 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	
 	//
 	public function getRoleAssignedCountUrl( Geko_Wp_Role $oRole ) {
-		return Geko_Wp::getUrl() . '/wp-admin/users.php?role=' . $oRole->getSlug();
+		return sprintf( '%s/wp-admin/users.php?role=%s', Geko_Wp::getUrl(), $oRole->getSlug() );
 	}
 	
 	//
@@ -27,9 +27,13 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 		
 		$iMaxLevel = FALSE;
 		$aCaps = $this->getRoleCapabilities( $oRole );
+		
 		foreach ( $aCaps as $sCap => $bGrant ) {
+			
 			if ( 0 === strpos( $sCap, 'level_' ) ) {
+				
 				$iLevel = intval( str_replace( 'level_', '', $sCap ) );
+				
 				if ( ( FALSE === $iMaxLevel ) || ( $iLevel > $iMaxLevel ) ) {
 					$iMaxLevel = $iLevel;
 				}
@@ -106,16 +110,21 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 							$aCap = $oCapGrid->item( $i, $j );
 							if ( $aCap ):
 								
-								$sKey = $aCap['key'];
-								$sLabel = $aCap['label'];
+								$sKey = $aCap[ 'key' ];
+								$sLabel = $aCap[ 'label' ];
 								
 								if ( $aRoleCaps[ $sKey ] ) {
+									
 									$sChecked = ' checked="checked" disabled="disabled" ';
-									$sLabel = '<em>' . $sLabel . '</em>';
+									$sLabel = sprintf( '<em>%s</em>', $sLabel );
+								
 								} elseif ( isset( $aUserCaps[ $sKey ] ) ) {
-									$sChecked = ( $aUserCaps[ $sKey ] ) ? ' checked="checked" ' : '';
-									$sLabel = ( $aCap['other'] ) ? '<strong>' . $sLabel . '</strong>' : $sLabel;
+									
+									$sChecked = ( $aUserCaps[ $sKey ] ) ? ' checked="checked" ' : '' ;
+									$sLabel = ( $aCap[ 'other' ] ) ? sprintf( '<strong>%s</strong>', $sLabel ) : $sLabel;
+								
 								} else {
+									
 									$sChecked = '';
 								}
 								
@@ -195,10 +204,12 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	//
 	public function updateUser( $iUserId ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
-		$aCaps = get_usermeta( $iUserId, $wpdb->prefix . 'capabilities' );
+		$aCaps = get_usermeta( $iUserId, $oDb->replacePrefixPlaceholder( '##pfx##capabilities' ) );
+		
 		if ( is_array( $aCaps ) ) {
+			
 			update_usermeta(
 				$iUserId,
 				'_geko_role_id',
@@ -214,16 +225,20 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 		global $user_id;
 
 		// deal with capabilities
-		$aRoleCaps = ( $_POST['user_role_caps'] ) ? $_POST['user_role_caps'] : array();
+		$aRoleCaps = ( $_POST[ 'user_role_caps' ] ) ? $_POST[ 'user_role_caps' ] : array() ;
 		
 		$oWpUser = new WP_User( $user_id );
 		$aUserCaps = $oWpUser->caps;
 		
 		foreach ( $aUserCaps as $sCap => $bGrant ) {
+			
 			if ( $aRoleCaps[ $sCap ] ) {
+				
 				$oWpUser->add_cap( $sCap );
 				unset( $aRoleCaps[ $sCap ] );
+			
 			} else {
+				
 				if ( 1 == $user_id ) {
 					$oWpUser->add_cap( $sCap, FALSE );					// never fully remove role if admin
 				} else {
@@ -232,7 +247,7 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 				}
 			}
 		}
-
+		
 		foreach ( $aRoleCaps as $sCap => $bGrant ) {
 			$oWpUser->add_cap( $sCap );		
 		}
@@ -251,11 +266,11 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 			$sSlug = $oNewRole->getSlug();
 			
 			// deal with capabilities
-			$aRoleCaps = ( $_POST['user_role_caps'] ) ? $_POST['user_role_caps'] : array();
+			$aRoleCaps = ( $_POST[ 'user_role_caps' ] ) ? $_POST[ 'user_role_caps' ] : array() ;
 			$aCaps = self::getCapabilitiesList();
 			
 			foreach ( $aCaps as $i => $aCap ) {
-				$sCap = $aCap['key'];
+				$sCap = $aCap[ 'key' ];
 				if ( $aRoleCaps[ $sCap ] ) {
 					$wp_roles->add_cap( $sSlug, $sCap );
 				} else {
@@ -268,11 +283,11 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 			}
 			
 			// deal with user levels
-			if ( 'none' == $_POST['user_role_levels'] ) {
+			if ( 'none' == $_POST[ 'user_role_levels' ] ) {
 				$wp_roles->remove_cap( $sSlug, 'level_0' );
 				$iUserLevel = 0;
 			} else {
-				$iUserLevel = intval( $_POST['user_role_levels'] );
+				$iUserLevel = intval( $_POST[ 'user_role_levels' ] );
 				if ( 0 == $iUserLevel ) {
 					$wp_roles->add_cap( $sSlug, 'level_0' );			
 				}
@@ -280,12 +295,12 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 			
 			for ( $i = 1; $i <= 10; $i++ ) {
 				if ( $i <= $iUserLevel ) {
-					$wp_roles->add_cap( $sSlug, 'level_' . $i );
+					$wp_roles->add_cap( $sSlug, sprintf( 'level_%d', $i ) );
 				} else {
 					if ( FALSE !== strpos( $sSlug, 'admin' ) ) {
-						$wp_roles->add_cap( $sSlug, 'level_' . $i, FALSE );			// never fully remove role if admin	
+						$wp_roles->add_cap( $sSlug, sprintf( 'level_%d', $i ), FALSE );			// never fully remove role if admin	
 					} else {
-						$wp_roles->remove_cap( $sSlug, 'level_' . $i, $sCap );					
+						$wp_roles->remove_cap( $sSlug, sprintf( 'level_%d', $i ), $sCap );					
 					}
 				}
 			}
@@ -300,7 +315,7 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 		
 		$aRoleHash = $this->getRoleHash();		// get role hash
 		
-		foreach ( $oPqSel['option'] as $oElemOption ) {
+		foreach ( $oPqSel[ 'option' ] as $oElemOption ) {
 			$oPqOption = pq( $oElemOption );
 			if ( $sSlug = $oPqOption->val() ) {
 				if ( !isset( $aRoleHash[ $sSlug ] ) ) {
@@ -315,9 +330,9 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	//
 	public function removeWpAdditionalCaps( $oPqForm ) {
 		
-		foreach ( $oPqForm['table.editform'] as $oElemTable ) {
+		foreach ( $oPqForm[ 'table.editform' ] as $oElemTable ) {
 			$oPqTable = pq( $oElemTable );
-			if ( 'Additional Capabilities' == $oPqTable['th']->html() ) {
+			if ( 'Additional Capabilities' == $oPqTable[ 'th' ]->html() ) {
 				$oPqTable->remove();
 			}
 		}
@@ -330,29 +345,38 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	//
 	public function reconcileAssigned() {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
-		$sQuery = "
-			SELECT			c.user_id,
-							c.meta_value AS caps
-			FROM			$wpdb->usermeta c
-			LEFT JOIN		$wpdb->usermeta r
-				ON				( r.user_id = c.user_id ) AND 
-								( r.meta_key = '_geko_role_id' ) AND
-								( r.meta_value IS NULL )
-			WHERE			( c.meta_key = '{$wpdb->prefix}capabilities' ) AND
-							( r.meta_value IS NULL )
-		";
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			
+			->field( 'c.user_id', 'user_id' )
+			->field( 'c.meta_value', 'caps' )
+			
+			->from( '##pfx##usermeta', 'c' )
+			
+			->joinLeft( '##pfx##usermeta', 'r' )
+				->on( 'r.user_id = c.user_id' )
+				->on( 'r.meta_key = ?', '_geko_role_id' )
+				->on( 'r.meta_value IS NULL' )
+			
+			->where( 'c.meta_key = ?', $oDb->replacePrefixPlaceholder( '##pfx##capabilities' ) )
+			->where( 'r.meta_value IS NULL' )
+		;
 		
 		// check for user records to be reconciled
-		$aRes = $wpdb->get_results( $sQuery );
+		$aRes = $oDb->fetchAllObj( strval( $oQuery ) );
+		
 		if ( $aRes ) {
 		
 			$aRoleHash = $this->getRoleHash();		// get role hash
 			
 			foreach ( $aRes as $oMeta ) {
+				
 				$aCaps = maybe_unserialize( $oMeta->caps );
+				
 				if ( is_array( $aCaps ) ) {
+					
 					update_usermeta(
 						$oMeta->user_id,
 						'_geko_role_id',
@@ -376,29 +400,39 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 		
 		if ( $sOldSlug != $sNewSlug ) {
 			
-			// reconcile the {$wpdb->prefix}capabilities for matching users
-			global $wpdb;
-
-			$sQuery = "
-				SELECT			c.user_id,
-								c.meta_value AS caps
-				FROM			$wpdb->usermeta c
-				LEFT JOIN		$wpdb->usermeta r
-					ON				r.user_id = c.user_id
-				WHERE			( c.meta_key = '{$wpdb->prefix}capabilities' ) AND
-								( r.meta_key = '_geko_role_id' ) AND 
-								( r.meta_value = %d )
-			";
+			// reconcile the ##pfx##capabilities for matching users
+			$oDb = Geko_Wp::get( 'db' );
+			
+			$sCapsMetaKey = $oDb->replacePrefixPlaceholder( '##pfx##capabilities' );
+			
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				
+				->field( 'c.user_id', 'user_id' )
+				->field( 'c.meta_value', 'caps' )
+				
+				->from( '##pfx##usermeta', 'c' )
+				
+				->joinLeft( '##pfx##usermeta', 'r' )
+					->on( 'r.user_id = c.user_id' )
+				
+				->where( 'c.meta_key = ?', $sCapsMetaKey )
+				->where( 'r.meta_key = ?', '_geko_role_id' )
+				->where( 'r.meta_value = ?', $iId )
+			;
 			
 			// check for user records to be reconciled
-			$aRes = $wpdb->get_results( $wpdb->prepare( $sQuery, $iId ) );
+			$aRes = $oDb->fetchAllObj( strval( $oQuery ) );
 			
 			foreach ( $aRes as $oMeta ) {
+				
 				$aMeta = maybe_unserialize( $oMeta->caps );
+				
 				if ( is_array( $aMeta ) ) {
+					
 					unset( $aMeta[ $sOldSlug ] );		// unset
 					$aMeta[ $sNewSlug ] = TRUE;			// re-set
-					update_usermeta( $oMeta->user_id, $wpdb->prefix . 'capabilities', $aMeta );
+					update_usermeta( $oMeta->user_id, $sCapsMetaKey, $aMeta );
 				}
 			}
 			
@@ -412,17 +446,18 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	//
 	public function populateCounts() {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
-		$sQuery = "
-			SELECT			c.meta_value AS role_id,
-							COUNT(*) AS num
-			FROM			$wpdb->usermeta c
-			WHERE			( c.meta_key = '_geko_role_id' )
-			GROUP BY		c.meta_value
-		";
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			->field( 'c.meta_value', 'role_id' )
+			->field( 'COUNT(*)', 'num' )
+			->from( '##pfx##usermeta', 'c' )
+			->where( 'c.meta_key = ?', '_geko_role_id' )
+			->group( 'c.meta_value' )
+		;
 		
-		$aRes = $wpdb->get_results( $sQuery );
+		$aRes = $oDb->fetchAllObj( strval( $oQuery ) );
 		
 		if ( $aRes ) {
 			foreach ( $aRes as $oCount ) {
@@ -444,9 +479,11 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 		// create a role hash
 		$aRoles = new Geko_Wp_Role_Query( array( 'role_type' => $this->getName() ) );
 		$aRoleHash = array();
+		
 		foreach ( $aRoles as $oRole ) {
 			$aRoleHash[ $oRole->getSlug() ] = $oRole->getId();
 		}
+		
 		return $aRoleHash;
 	}
 	

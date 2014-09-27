@@ -19,23 +19,21 @@ class Geko_Wp_TermTaxonomy
 			
 			// perform database installations only once
 			
-			global $wpdb;
-			
-			$wpdb->show_errors();
+			// $wpdb->show_errors();
 			
 			$bRes = Geko_Wp_Db::createHierarchyPathFunction(
 				'term_taxonomy', 'term_id', 'parent', " AND ( taxonomy = '$sTaxonomy' ) "
 			);
 			
-			if ( FALSE === $bRes ) $wpdb->print_error();
+			// if ( FALSE === $bRes ) $wpdb->print_error();
 			
 			$bRes = Geko_Wp_Db::createHierarchyConnectFunction(
 				'term_taxonomy', 'term_id', 'parent', " AND ( taxonomy = '$sTaxonomy' ) "
 			);
 			
-			if ( FALSE === $bRes ) $wpdb->print_error();
+			// if ( FALSE === $bRes ) $wpdb->print_error();
 			
-			$wpdb->hide_errors();
+			// $wpdb->hide_errors();
 			
 			self::$bCalledInstall = TRUE;
 			

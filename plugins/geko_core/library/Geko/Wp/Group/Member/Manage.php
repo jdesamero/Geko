@@ -405,14 +405,13 @@ class Geko_Wp_Group_Member_Manage extends Geko_Wp_Options_Manage
 			( $iGroupId = $this->getGroupId( $mGroup ) )
 		) {
 			
-			global $wpdb;
 			$oDb = Geko_Wp::get( 'db' );
 			
 			// check if entry exists
 			$oSql = new Geko_Sql_Select();
 			$oSql
 				->field( 1, 'test' )
-				->from( $wpdb->geko_group_members )
+				->from( '##pfx##geko_group_members' )
 				->where( 'group_id = ?', $iGroupId )
 				->where( 'user_id = ?', $iUserId )
 			;
@@ -420,25 +419,27 @@ class Geko_Wp_Group_Member_Manage extends Geko_Wp_Options_Manage
 			$sDateTime = $oDb->getTimestamp();
 			
 			$aVals = array();
-			$aVals['status_id'] = Geko_Wp_Options_MetaKey::getId( $sStatus );
-			if ( self::STAT_ACT == $sStatus ) $aVals['date_joined'] = $sDateTime;
+			$aVals[ 'status_id' ] = Geko_Wp_Options_MetaKey::getId( $sStatus );
+			if ( self::STAT_ACT == $sStatus ) $aVals[ 'date_joined' ] = $sDateTime;
 			
-			if ( $wpdb->get_var( strval( $oSql ) ) ) {
+			if ( $oDb->fetchOne( strval( $oSql ) ) ) {
 				
 				// update
-				$aKeys['group_id'] = $iGroupId;
-				$aKeys['user_id'] = $iUserId;
-								
-				$wpdb->update( $wpdb->geko_group_members, $aVals, $aKeys );
+				$aKeys = array(
+					'group_id => ?' => $iGroupId,
+					'user_id => ?' => $iUserId
+				);
+				
+				$oDb->update( '##pfx##geko_group_members', $aVals, $aKeys );
 				
 			} else {
 				
 				// insert
-				$aVals['group_id'] = $iGroupId;
-				$aVals['user_id'] = $iUserId;
-				$aVals['date_requested'] = $sDateTime;
+				$aVals[ 'group_id' ] = $iGroupId;
+				$aVals[ 'user_id' ] = $iUserId;
+				$aVals[ 'date_requested' ] = $sDateTime;
 				
-				$wpdb->insert( $wpdb->geko_group_members, $aVals );
+				$oDb->insert( '##pfx##geko_group_members', $aVals );
 				
 			}
 			
@@ -474,12 +475,12 @@ class Geko_Wp_Group_Member_Manage extends Geko_Wp_Options_Manage
 			( $iUserId = $this->getUserId( $mUser ) ) && 
 			( $iGroupId = $this->getGroupId( $mGroup ) )
 		) {
-			global $wpdb;
 			
-			$wpdb->query( $wpdb->prepare(
-				"DELETE FROM $wpdb->geko_group_members WHERE group_id = %d AND user_id = %d",
-				$iGroupId,
-				$iUserId
+			$oDb = Geko_Wp::get( 'db' );
+			
+			$oDb->delete( '##pfx##geko_group_members', array(
+				'group_id = ?' => $iGroupId,
+				'user_id = ?' => $iUserId
 			) );
 		}
 		
@@ -547,7 +548,7 @@ class Geko_Wp_Group_Member_Manage extends Geko_Wp_Options_Manage
 	//
 	public function doAddAction( $aParams ) {
 		
-		$this->join( $_REQUEST['user_id'], $_REQUEST['status'], $_REQUEST['group_id'] );
+		$this->join( $_REQUEST[ 'user_id' ], $_REQUEST[ 'status' ], $_REQUEST[ 'group_id' ] );
 		
 		$this->triggerNotifyMsg( 'm101' );										// success!!!
 		
@@ -558,7 +559,7 @@ class Geko_Wp_Group_Member_Manage extends Geko_Wp_Options_Manage
 	//
 	public function doEditAction( $aParams ) {
 		
-		$this->join( $_REQUEST['user_id'], $_REQUEST['status'], $_REQUEST['group_id'] );
+		$this->join( $_REQUEST[ 'user_id' ], $_REQUEST[ 'status' ], $_REQUEST[ 'group_id' ] );
 		
 		$this->triggerNotifyMsg( 'm102' );										// success!!!
 		
@@ -569,7 +570,7 @@ class Geko_Wp_Group_Member_Manage extends Geko_Wp_Options_Manage
 	//
 	public function doDelAction( $aParams ) {
 		
-		$this->leave( $_REQUEST['user_id'], $_REQUEST['group_id'] );
+		$this->leave( $_REQUEST[ 'user_id' ], $_REQUEST[ 'group_id' ] );
 		
 		$this->triggerNotifyMsg( 'm103' );
 		

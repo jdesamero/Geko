@@ -8,8 +8,6 @@ class Geko_Wp_Post_Query_Plugin_Comment extends Geko_Entity_Query_Plugin
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
-		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
 		
@@ -30,7 +28,7 @@ class Geko_Wp_Post_Query_Plugin_Comment extends Geko_Entity_Query_Plugin
 			$oCommentQuery = new Geko_Sql_Select();
 			$oCommentQuery
 				->field( 'MAX( c.comment_date )' )
-				->from( $wpdb->comments, 'c' )
+				->from( '##pfx##comments', 'c' )
 				->where( 'c.comment_approved = 1' )
 				->where( 'c.comment_post_ID = p.ID' )
 			;

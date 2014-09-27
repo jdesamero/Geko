@@ -6,9 +6,21 @@ class Geko_Sql_Delete
 	
 	//// constants
 	
+	// query
+	const FROM = 1;
+	const JOIN = 2;
+	const ON = 3;
+	const WHERE = 4;
+	
+	// special flags
+	const KVP = 1;			// key-value pair
+	
 	
 	// properties
 	protected $_aFrom = array();
+	protected $_aJoins = array();
+	protected $_aOn = array();
+	protected $_mCurrentJoinKey = '';
 	protected $_aWhere = array();
 	
 	protected $_oDb = NULL;
@@ -17,6 +29,11 @@ class Geko_Sql_Delete
 	
 	//// constructor
 	public function __construct( $oDb = NULL ) {
+		
+		if ( NULL === $oDb ) {
+			$oDb = Geko::get( 'db' );
+		}
+		
 		$this->_oDb = $oDb;
 	}
 	
@@ -33,6 +50,62 @@ class Geko_Sql_Delete
 	}
 	
 	//
+	public function join( $mValue, $sKey = NULL, $sType = 'JOIN', $iFlag = NULL ) {
+		
+		if ( NULL === $sKey ) {
+			$this->_aJoins[] = array( $mValue, $sType, $iFlag );
+			end( $this->_aJoins );
+			$this->_mCurrentJoinKey = key( $this->_aJoins );
+			reset( $this->_aJoins );
+		} else {
+			$this->_aJoins[ $sKey ] = array( $mValue, $sType, $iFlag );
+			$this->_mCurrentJoinKey = $sKey;
+		}
+		
+		return $this;
+	}
+	
+	//
+	public function joinLeft( $mValue, $sKey = NULL ) {
+		return $this->join( $mValue, $sKey, 'LEFT JOIN' );
+	}
+	
+	//
+	public function joinInner( $mValue, $sKey = NULL ) {
+		return $this->join( $mValue, $sKey, 'INNER JOIN' );
+	}
+	
+	//
+	public function joinOuter( $mValue, $sKey = NULL ) {
+		return $this->join( $mValue, $sKey, 'OUTER JOIN' );
+	}
+	
+	//
+	public function joinStraight( $mValue, $sKey = NULL ) {
+		return $this->join( $mValue, $sKey, 'STRAIGHT_JOIN' );
+	}
+	
+	
+	
+	// IMPORTANT: This binds to the last join method that was called
+	public function on( $sExpression, $mArgs = NULL, $sKey = NULL, $sConjunction = 'AND' ) {
+		
+		if ( NULL !== $sKey ) {
+			// supply an associative index
+			$this->_aOn[ $this->_mCurrentJoinKey ][ $sKey ] = array( array( $sExpression, $mArgs ), $sConjunction );
+		} else {
+			$this->_aOn[ $this->_mCurrentJoinKey ][] = array( array( $sExpression, $mArgs ), $sConjunction );
+		}
+		
+		return $this;
+	}
+	
+	// IMPORTANT: This binds to the last join method that was called
+	public function orOn( $sExpression, $mArgs = NULL, $sKey = NULL ) {		
+		return $this->on( $sExpression, $mArgs, $sKey, 'OR' );
+	}
+	
+	//
 	public function where( $sExpression, $mArgs = NULL, $sKey = NULL, $sConjunction = 'AND' ) {
 		
 		if ( NULL !== $sKey ) {
@@ -45,6 +118,181 @@ class Geko_Sql_Delete
 		return $this;
 	}
 	
+	
+	
+	//// unset
+	
+	//
+	public function unsetClause( $iClause = NULL, $mIndex = NULL, $mSubIndex = NULL ) {
+		
+		switch ( $iClause ) {
+			
+			case self::FROM :
+				
+				if ( NULL === $mIndex ) {
+					unset( $this->_aFrom );
+					$this->_aFrom = array();
+				} else {
+					unset( $this->_aFrom[ $mIndex ] );	
+				}
+				
+				break;
+				
+			case self::JOIN :
+				
+				if ( NULL === $mIndex ) {
+					unset( $this->_aJoins );
+					$this->_aJoins = array();
+				} else {
+					unset( $this->_aJoins[ $mIndex ] );
+				}
+				
+				break;
+				
+			case self::ON :
+				
+				if ( NULL === $mIndex ) {
+					unset( $this->_aOn );
+					$this->_aOn = array();
+				} else {
+					if ( NULL === $mSubIndex ) {
+						unset( $this->_aOn[ $mIndex ] );
+					} else {
+						unset( $this->_aOn[ $mIndex ][ $mSubIndex ] );
+					}
+				}
+				
+				break;
+				
+			case self::WHERE :
+				
+				if ( NULL === $mIndex ) {
+					unset( $this->_aWhere );
+					$this->_aWhere = array();
+				} else {
+					unset( $this->_aWhere[ $mIndex ] );
+				}
+				
+				break;
+				
+			default :
+				
+				unset( $this->_aFrom );
+				$this->_aFrom = array();
+				
+				unset( $this->_aJoins );
+				$this->_aJoins = array();
+				
+				unset( $this->_aOn );
+				$this->_aOn = array();
+
+				unset( $this->_aWhere );
+				$this->_aWhere = array();
+				
+		}
+		
+		return $this;
+	}
+	
+	
+	//
+	public function unsetFrom( $mIndex = NULL ) {
+		return $this->unsetClause( self::FROM, $mIndex );
+	}
+	
+	//
+	public function unsetJoin( $mIndex = NULL ) {
+		
+		return $this
+			->unsetClause( self::JOIN, $mIndex )
+			->unsetOn( $mIndex )
+		;
+	}
+	
+	//
+	public function unsetOn( $mIndex = NULL, $mSubIndex = NULL ) {
+		return $this->unsetClause( self::ON, $mIndex, $mSubIndex );
+	}
+	
+	//
+	public function unsetWhere( $mIndex = NULL ) {
+		return $this->unsetClause( self::WHERE, $mIndex );
+	}
+	
+	
+	
+	
+	
+	
+	//// has
+	
+	// standard methods
+	
+	//
+	public function hasClause( $iClause = NULL, $mIndex = NULL, $mSubIndex = NULL ) {
+		
+		switch ( $iClause ) {
+			
+			case self::FROM :
+				
+				if ( NULL === $mIndex ) {
+					return ( count( $this->_aFrom ) > 0 ) ? TRUE : FALSE ;
+				} else {
+					return ( $this->_aFields[ $mIndex ] ) ? TRUE : FALSE ;
+				}
+				
+			case self::JOIN :
+				
+				if ( NULL === $mIndex ) {
+					return ( count( $this->_aJoins ) > 0 ) ? TRUE : FALSE ;
+				} else {
+					return ( $this->_aJoins[ $mIndex ] ) ? TRUE : FALSE ;
+				}
+				
+			case self::ON :
+				
+				if ( NULL === $mIndex ) {
+					return ( count( $this->_aOn ) > 0 ) ? TRUE : FALSE ;
+				} else {
+					if ( NULL === $mSubIndex ) {
+						return ( $this->_aOn[ $mIndex ] ) ? TRUE : FALSE ;
+					} else {
+						return ( $this->_aOn[ $mIndex ][ $mSubIndex ] ) ? TRUE : FALSE ;
+					}
+				}
+			
+			case self::WHERE :
+				
+				if ( NULL === $mIndex ) {
+					return ( count( $this->_aWhere ) > 0 ) ? TRUE : FALSE ;
+				} else {
+					return ( $this->_aWhere[ $mIndex ] ) ? TRUE : FALSE ;
+				}
+				
+		}
+		
+		return NULL;
+	}
+	
+	//
+	public function hasFrom( $mIndex = NULL ) {
+		return $this->hasClause( self::FROM, $mIndex );
+	}
+	
+	//
+	public function hasJoin( $mIndex = NULL ) {
+		return $this->hasClause( self::JOIN, $mIndex );
+	}
+	
+	//
+	public function hasOn( $mIndex = NULL, $mSubIndex = NULL ) {
+		return $this->hasClause( self::ON, $mIndex, $mSubIndex );
+	}
+
+	//
+	public function hasWhere( $mIndex = NULL ) {
+		return $this->hasClause( self::WHERE, $mIndex );
+	}
 	
 	
 	
@@ -177,12 +425,12 @@ class Geko_Sql_Delete
 			if ( is_string( $mKey ) ) {
 				$sOutput .= sprintf( '%s AS %s, ', $this->encloseExpression( $aField[ 0 ] ), $mKey );
 			} else {
-				$sOutput .= $this->encloseExpression( $aField[ 0 ] ) . ', ';
+				$sOutput .= sprintf( '%s, ', $this->encloseExpression( $aField[ 0 ] ) );
 			}
 		}
 		
 		// trim the trailing ', ' and re-introduce a ' '
-		$sOutput = rtrim( $sOutput, ', ' ) . ' ';
+		$sOutput = sprintf( '%s ', rtrim( $sOutput, ', ' ) );
 		
 		return $sOutput;
 	}
@@ -206,6 +454,74 @@ class Geko_Sql_Delete
 		return $sOutput;
 	}
 	
+	//
+	protected function createKvpJoinClause( $aKvpJoin, $sKey ) {
+		
+		$sOutput = '';
+		$aRegs = array();
+		
+		list( $sColumn, $sType, $iFlag ) = $aKvpJoin;
+		
+		if (
+			( 'KVP' == $sType ) && 
+			( is_string( $sColumn ) ) && 		// just making sure
+			( preg_match( '/^(([0-9a-zA-Z_-]*[a-zA-Z_-]+)([0-9]+))\./', $sColumn, $aRegs ) ) && 
+			( $sJoinKey = sprintf( '%s*', $aRegs[ 2 ] ) ) && 
+			( $aJoinValue = $this->_aJoins[ $sJoinKey ] )
+		) {
+			
+			$sRealJoinKey = $aRegs[1];
+			
+			list( $mRealTable, $sRealType ) = $aJoinValue;
+			
+			// reformat join expression
+			$sOutput .= sprintf( '%s %s AS %s ON ', $sRealType, $this->encloseExpression( $mRealTable ), $sRealJoinKey );
+			
+			// reformat on expression
+			$aOnFmt = array();
+			foreach ( $this->_aOn[ $sJoinKey ] as $aOn ) {
+				
+				// replace with real join key
+				$aOnItem[ 0 ][ 0 ] = str_replace( $sJoinKey, $sRealJoinKey, $aOn[ 0 ][ 0 ] );
+				$aOnItem[ 1 ] = $aOn[ 1 ];		// and/or
+				
+				// replace * with field key
+				if ( $mArgs = $aOn[ 0 ][ 1 ] ) {
+					if ( is_array( $mArgs ) ) {
+						foreach ( $mArgs as $mJoinArg ) {
+							$aOnItem[ 0 ][ 1 ][] = $this->formatKvpArg( '*', $sKey, $mJoinArg );
+						}
+					} else {
+						$aOnItem[ 0 ][ 1 ] = $this->formatKvpArg( '*', $sKey, $mArgs );
+					}
+				}
+				
+				$aOnFmt[] = $aOnItem;
+			}
+			
+			$sOutput .= $this->createExpressionList( $aOnFmt );
+		}
+		
+		return $sOutput;
+	}
+	
+	
+	//
+	protected function formatKvpArg( $sFind, $sReplace, $mArg ) {
+		if ( is_string( $mArg ) ) {
+			return str_replace( $sFind, $sReplace, $mArg );
+		} elseif ( $mArg instanceof Geko_Sql_Callback ) {
+			$oCb = clone $mArg;
+			$aArgs = $oCb->getArgs();
+			foreach ( $aArgs as $i => $mSubArg ) {
+				if ( is_string( $mSubArg ) ) $aArgs[ $i ] = str_replace( $sFind, $sReplace, $mSubArg );
+			}
+			return $oCb->setArgs( $aArgs );
+		} else {
+			return '';
+		}
+	}
+
 	
 	
 	// output the completed query
@@ -217,12 +533,14 @@ class Geko_Sql_Delete
 
 		// aliases
 		if ( count( $this->_aFrom ) > 0 ) {
+			
 			foreach ( $this->_aFrom as $mKey => $aField ) {
 				if ( is_string( $mKey ) ) {
-					$sOutput .= $mKey . ', ';
+					$sOutput .= sprintf( '%s, ', $mKey );
 				}
 			}
-			$sOutput = rtrim( $sOutput, ', ' ) . ' ';
+			
+			$sOutput = sprintf( '%s ', rtrim( $sOutput, ', ' ) );
 		}
 		
 		// from clause
@@ -231,9 +549,22 @@ class Geko_Sql_Delete
 			$sOutput .= $this->createFieldList( $this->_aFrom );
 		}
 		
+		// join clauses
+		foreach ( $this->_aJoins as $sKey => $aValue ) {
+			
+			list( $mTable, $sType, $iFlag ) = $aValue;
+			
+			if ( self::KVP == $iFlag ) {
+				$sOutput .= $this->createKvpJoinClause( $aValue, $sKey );
+			} else {
+				$sOutput .= sprintf( '%s %s AS %s ON ', $sType, $this->encloseExpression( $mTable ), $sKey );
+				$sOutput .= $this->createExpressionList( $this->_aOn[ $sKey ] );
+			}
+		}
+		
 		// where clauses
 		if ( count( $this->_aWhere ) > 0 ) {
-			$sOutput .= 'WHERE ' . $this->createExpressionList( $this->_aWhere );
+			$sOutput .= sprintf( 'WHERE %s', $this->createExpressionList( $this->_aWhere ) );
 		}
 		
 		// auto-prefix replacement

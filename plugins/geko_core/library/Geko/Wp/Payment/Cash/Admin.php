@@ -162,7 +162,6 @@ class Geko_Wp_Payment_Cash_Admin extends Geko_Wp_Payment_Admin
 		Geko_Wp_Payment_Response $oResponse, Geko_Wp_Payment_Transaction $oTransaction
 	) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		$oPayment = $this->getPaymentInstance();
@@ -172,36 +171,29 @@ class Geko_Wp_Payment_Cash_Admin extends Geko_Wp_Payment_Admin
 		
 		$aInsertValues = array(
 			
-			'transaction_type_id' => $aResponseData[ 'transaction_type_id' ],
-			'receipt_id' => $aResponseData[ 'receipt_id' ],
-			'orig_receipt_id' => $aResponseData[ 'orig_receipt_id' ],
-			'customer_id' => $aResponseData[ 'customer_id' ],
+			'transaction_type_id' => intval( $aResponseData[ 'transaction_type_id' ] ),
+			'receipt_id' => intval( $aResponseData[ 'receipt_id' ] ),
+			'orig_receipt_id' => intval( $aResponseData[ 'orig_receipt_id' ] ),
+			'customer_id' => intval( $aResponseData[ 'customer_id' ] ),
 			'first_name' => $aResponseData[ 'first_name' ],
 			
 			'last_name' => $aResponseData[ 'last_name' ],
 			'phone_number' => $aResponseData[ 'phone_number' ],
 			'email' => $aResponseData[ 'email' ],
 			'details' => $aResponseData[ 'details' ],
-			'amount' => $aResponseData[ 'amount' ],
+			'amount' => floatval( $aResponseData[ 'amount' ] ),
 			
-			'status_id' => $oResponse->getStatusId(),
-			'application_id' => $oTransaction->getApplicationId(),
-			'is_test' => ( $this->useLiveServer() ? FALSE : TRUE ),
+			'status_id' => intval( $oResponse->getStatusId() ),
+			'application_id' => intval( $oTransaction->getApplicationId() ),
+			'is_test' => intval( $this->useLiveServer() ),
 			'date_created' => $sDateTime
 			
 		);
 		
-		$aInsertFormat = array(
-			'%d', '%d', '%d', '%d', '%s',
-			'%s', '%s', '%s', '%s', '%f',
-			'%d', '%d', '%d', '%s'
-		);
-		
 		// update the database first
-		$wpdb->insert(
-			$wpdb->geko_pay_cash_transaction,
-			$aInsertValues,
-			$aInsertFormat
+		$oDb->insert(
+			'##pfx##geko_pay_cash_transaction',
+			$aInsertValues
 		);
 		
 		$oResponse->setTransactionId( $oDb->lastInsertId() );
@@ -214,26 +206,25 @@ class Geko_Wp_Payment_Cash_Admin extends Geko_Wp_Payment_Admin
 	
 	//
 	public function getRefundInfo( $iApplicationId, $iOrigOrderId ) {
-
-		global $wpdb;
-
-		return $wpdb->get_row( $wpdb->prepare(
-			"
-				SELECT				transaction_id,
-									amount
-				FROM				$wpdb->geko_pay_cash_transaction
-				WHERE				( application_id = %d ) AND 
-									( status_id = %d ) AND 
-									( orig_receipt_id = %d )
-				ORDER BY			date_created DESC
-				LIMIT				1
-			",
-			$iApplicationId,
-			self::STATUS_APPROVED,
-			$iOrigOrderId
-		), ARRAY_A );
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
+		$oQuery = new Geko_Sql_Select();
+		
+		$oQuery
+			->field( 't.transaction_id', 'transaction_id' )
+			->field( 't.amount', 'amount' )
+			->from( '##pfx##geko_pay_cash_transaction', 't' )
+			->where( 't.application_id = ?', $iApplicationId )
+			->where( 't.status_id = ?', self::STATUS_APPROVED )
+			->where( 't.orig_receipt_id = ?', $iOrigOrderId )
+			->order( 't.date_created', 'desc' )
+			->limit( 1 )
+		;
+		
+		return $oDb->fetchRowAssoc( strval( $oQuery ) );
 	}
+	
 	
 }
 

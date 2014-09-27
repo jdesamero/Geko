@@ -79,10 +79,9 @@ class Geko_Wp_Form_MetaValue_Manage extends Geko_Wp_Options_Manage
 	//
 	public function updateRelatedEntities( $aQueryParams, $aPostData, $aParams ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
-		$aSubItemIds = $wpdb->aSubItemIds[ 'Geko_Wp_Form_MetaData_Manage' ];
+		$aSubItemIds = $oDb->getSubItemIds( 'Geko_Wp_Form_MetaData_Manage' );
 		
 		unset( $aQueryParams[ 'form_id' ] );
 		$aQueryParams[ 'fmmd_id' ] = $aSubItemIds;
@@ -91,7 +90,7 @@ class Geko_Wp_Form_MetaValue_Manage extends Geko_Wp_Options_Manage
 		$aParams[ 'main_entity_format' ] = '%d';
 		$aParams[ 'main_entity_id' ] = $aSubItemIds;
 		
-		if ( is_array( $aInsIds = $wpdb->aInsertIds[ 'Geko_Wp_Form_MetaData_Manage' ] ) ) {
+		if ( is_array( $aInsIds = $oDb->getInsertIds( 'Geko_Wp_Form_MetaData_Manage' ) ) ) {
 			
 			foreach ( $aPostData as $sId => $aRow ) {
 				
@@ -104,6 +103,7 @@ class Geko_Wp_Form_MetaValue_Manage extends Geko_Wp_Options_Manage
 		
 		$aIdxCounter = array();
 		if ( is_array( $aSubItemIds ) && ( count( $aIdxCounter ) > 0 ) ) {
+			
 			$oQuery = new Geko_Sql_Select();
 			$oQuery
 				->field( 'fmv.fmmd_id' )
@@ -118,8 +118,10 @@ class Geko_Wp_Form_MetaValue_Manage extends Geko_Wp_Options_Manage
 		}
 		
 		foreach ( $aPostData as $sId => $aRow ) {
+			
 			$iFmMdId = $aRow[ 'fmmd_id' ];			// updated item id
 			$iFmMvIdx = $aRow[ 'fmmv_idx' ];
+			
 			if ( 0 === strpos( $iFmMvIdx, '_' ) ) {
 				$aIdxCounter[ $iFmMdId ]++;
 				$aPostData[ $sId ][ 'fmmv_idx' ] = $aIdxCounter[ $iFmMdId ];
@@ -132,8 +134,6 @@ class Geko_Wp_Form_MetaValue_Manage extends Geko_Wp_Options_Manage
 	
 	//
 	public function updateRelatedInsertId( $aInsertVals ) {
-		
-		global $wpdb;
 		
 		$aValues = $aInsertVals[ 0 ];
 		

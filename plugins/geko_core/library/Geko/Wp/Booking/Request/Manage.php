@@ -65,7 +65,6 @@ class Geko_Wp_Booking_Request_Manage extends Geko_Wp_Options_Manage
 	//
 	public function doAddAction( $aParams ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		$oItem = $aParams[ 'item_entity' ];
@@ -79,14 +78,8 @@ class Geko_Wp_Booking_Request_Manage extends Geko_Wp_Options_Manage
 			'date_created' => $sDateTime
 		);
 		
-		$aInsertFormat = array( '%d', '%d', '%s' );
-		
 		// update the database first
-		$wpdb->insert(
-			$wpdb->geko_bkng_request,
-			$aInsertValues,
-			$aInsertFormat
-		);
+		$oDb->insert( '##pfx##geko_bkng_request', $aInsertValues );
 		
 		$aParams[ 'entity_id' ] = $oDb->lastInsertId();
 		
@@ -94,39 +87,25 @@ class Geko_Wp_Booking_Request_Manage extends Geko_Wp_Options_Manage
 		
 	}
 	
+	//
 	public function doEditAction( $aParams ) {
 	
 	}
 	
+	//
 	public function doDelAction( $aParams ) {
 
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$oItem = $aParams[ 'item_entity' ];
-		$oUser = $aParams[ 'user_entity' ];
 		
-		if ( $oUser ) {
-			$sQuery = $wpdb->prepare(
-				"
-					DELETE FROM					$wpdb->geko_bkng_request
-					WHERE						( bkitm_id = %d ) AND 
-												( user_id = %d )
-				",
-				$oItem->getId(),
-				$oUser->getId()
-			);
-		} else {
-			$sQuery = $wpdb->prepare(
-				"
-					DELETE FROM					$wpdb->geko_bkng_request
-					WHERE						( bkitm_id = %d )
-				",
-				$oItem->getId()
-			);		
+		$aWhere = array( 'bkitm_id = ?', $oItem->getId() );
+		
+		if ( $oUser = $aParams[ 'user_entity' ] ) {
+			$aWhere[ 'user_id = ?' ] = $oUser->getId();
 		}
 		
-		$wpdb->query( $sQuery );
-		
+		$oDb->delete( '##pfx##geko_bkng_request', $aWhere );
 	}
 	
 	

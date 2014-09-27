@@ -8,8 +8,6 @@ class Geko_Wp_Post_Query_Plugin_Meta extends Geko_Entity_Query_Plugin
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
-		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
 		
@@ -60,7 +58,7 @@ class Geko_Wp_Post_Query_Plugin_Meta extends Geko_Entity_Query_Plugin
 				//// join
 				
 				$oQuery
-					->joinLeft( $wpdb->postmeta, $sJk )
+					->joinLeft( '##pfx##postmeta', $sJk )
 						->on( sprintf( '%s.post_id = p.ID', $sJk ) )
 						->on( sprintf( '%s.meta_key = ?', $sJk ), $sMetaKey )
 				;

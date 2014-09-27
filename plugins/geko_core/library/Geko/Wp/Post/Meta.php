@@ -121,20 +121,16 @@ class Geko_Wp_Post_Meta extends Geko_Wp_Options_Meta
 		// done one-time for ALL post meta sub-classes
 		if ( !isset( self::$aMetaCache[ $iPostId ] ) ) {
 			
-			global $wpdb;
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				->field( 'pm.meta_id', 'meta_id' )
+				->field( 'pm.meta_key', 'meta_key' )
+				->field( 'pm.meta_value', 'meta_value' )
+				->from( '##pfx##postmeta', 'pm' )
+				->where( 'pm.post_id = ?', $iPostId )
+			;
 			
-			$aFmt = Geko_Wp_Db::getResultsHash(
-				$wpdb->prepare(
-					"	SELECT			meta_id,
-										meta_key,
-										meta_value
-						FROM			$wpdb->postmeta
-						WHERE			post_id = %d
-					",
-					$iPostId
-				),
-				'meta_key'
-			);
+			$aFmt = Geko_Wp_Db::getResultsHash( strval( $oQuery ), 'meta_key' );
 			
 			////
 			$aRet = array();
@@ -251,8 +247,6 @@ class Geko_Wp_Post_Meta extends Geko_Wp_Options_Meta
 		$iPostId, $sMode = 'insert', $aParams = NULL, $aDataVals = NULL, $aFileVals = NULL
 	) {
 		
-		global $wpdb;
-		
 		//
 		$aElemsGroup = isset( $aParams[ 'elems_group' ] ) ? 
 			$aParams[ 'elems_group' ] : 
@@ -261,13 +255,16 @@ class Geko_Wp_Post_Meta extends Geko_Wp_Options_Meta
 		
 		// 
 		if ( 'update' == $sMode ) {
-			$aMeta = Geko_Wp_Db::getResultsHash(
-				$wpdb->prepare(
-					"SELECT * FROM $wpdb->postmeta WHERE post_id = %d",
-					$iPostId
-				),
-				'meta_key'
-			);
+			
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				->field( 'pm.*' )
+				->from( '##pfx##postmeta', 'pm' )
+				->where( 'pm.post_id = ?', $iPostId )
+			;
+			
+			$aMeta = Geko_Wp_Db::getResultsHash( strval( $oQuery ), 'meta_key' );
+			
 		} else {
 			$aMeta = array();
 		}

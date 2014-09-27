@@ -122,10 +122,9 @@ class Geko_Wp_Form_ItemValue_Manage extends Geko_Wp_Options_Manage
 	//
 	public function updateRelatedEntities( $aQueryParams, $aPostData, $aParams ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
-		$aSubItemIds = $wpdb->aSubItemIds[ 'Geko_Wp_Form_Item_Manage' ];
+		$aSubItemIds = $oDb->getSubItemIds( 'Geko_Wp_Form_Item_Manage' );
 		
 		unset( $aQueryParams[ 'form_id' ] );
 		$aQueryParams[ 'fmitm_id' ] = $aSubItemIds;
@@ -134,7 +133,7 @@ class Geko_Wp_Form_ItemValue_Manage extends Geko_Wp_Options_Manage
 		$aParams[ 'main_entity_format' ] = '%d';
 		$aParams[ 'main_entity_id' ] = $aSubItemIds;
 		
-		if ( is_array( $aInsIds = $wpdb->aInsertIds[ 'Geko_Wp_Form_Item_Manage' ] ) ) {
+		if ( is_array( $aInsIds = $oDb->getInsertIds( 'Geko_Wp_Form_Item_Manage' ) ) ) {
 			
 			foreach ( $aPostData as $sId => $aRow ) {
 				

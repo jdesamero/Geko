@@ -153,20 +153,16 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 		// done one-time for ALL user meta sub-classes
 		if ( !isset( self::$aMetaCache[ $iUserId ] ) ) {
 			
-			global $wpdb;
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				->field( 'um.umeta_id', 'umeta_id' )
+				->field( 'um.meta_key', 'meta_key' )
+				->field( 'um.meta_value', 'meta_value' )
+				->from( '##pfx##usermeta', 'um' )
+				->where( 'um.user_id = ?', $iUserId )
+			;
 			
-			$aFmt = Geko_Wp_Db::getResultsHash(
-				$wpdb->prepare(
-					"	SELECT			umeta_id,
-										meta_key,
-										meta_value
-						FROM			$wpdb->usermeta
-						WHERE			user_id = %d
-					",
-					$iUserId
-				),
-				'meta_key'
-			);
+			$aFmt = Geko_Wp_Db::getResultsHash( strval( $oQuery ), 'meta_key' );
 			
 			////
 			$aRet = array();
@@ -327,8 +323,6 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 		$iUserId, $sMode = 'insert', $aParams = NULL, $aDataVals = NULL, $aFileVals = NULL
 	) {
 		
-		global $wpdb;
-		
 		//
 		$aElemsGroup = isset( $aParams[ 'elems_group' ] ) ? 
 			$aParams[ 'elems_group' ] : 
@@ -338,13 +332,16 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 		//
 		
 		if ( 'update' == $sMode ) {
-			$aMeta = Geko_Wp_Db::getResultsHash(
-				$wpdb->prepare(
-					sprintf( 'SELECT * FROM %s WHERE user_id = %%d', $wpdb->usermeta ),
-					$iUserId
-				),
-				'meta_key'
-			);
+			
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				->field( 'um.*' )
+				->from( '##pfx##usermeta', 'um' )
+				->where( 'um.user_id = ?' )
+			;
+			
+			$aMeta = Geko_Wp_Db::getResultsHash( strval( $oQuery ), 'meta_key' );
+			
 		} else {
 			$aMeta = array();
 		}
@@ -371,18 +368,19 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 	public function delete( $iUserId = NULL ) {
 		
 		// cleanup all orphaned metadata
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$iUserId = $this->resolveUserId( $iUserId );
 		
-		// members
-		$wpdb->query( sprintf( '
-			DELETE FROM		%s
-			WHERE			umeta_id NOT IN (
-				SELECT			umeta_id
-				FROM			%s
-			)
-		', $wpdb->geko_user_meta_members, $wpdb->usermeta ) );
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			->field( 'um.*' )
+			->from( '##pfx##usermeta', 'um' )
+		;
+		
+		$oDb->delete( '##geko_user_meta_members##', array(
+			'umeta_id NOT IN (?)' => new Zend_Db_Expr( strval( $oQuery ) )
+		) );
 		
 	}
 	
@@ -391,8 +389,6 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 	
 	//
 	public function cleanOrphanFiles() {
-		
-		global $wpdb;
 		
 		foreach ( self::$_aAllUploadPaths as $sDocRoot => $aDetails ) {
 			
@@ -404,23 +400,20 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 			
 			$sMetaFields = sprintf( '( %s ) ', implode( ' OR ', $aMetaFields ) );
 			
-			parent::cleanOrphanFiles(
-				
-				sprintf( '
-					SELECT				f.meta_value
-					FROM				%s f
-					WHERE				%s
-				', $wpdb->usermeta, $sMetaFields ),
-				
-				sprintf( '
-					DELETE FROM 		%s f
-					WHERE				%s AND
-										( f.meta_value = %%s )
-				', $wpdb->usermeta, $sMetaFields ),
-				
-				sprintf( '%s/', $sDocRoot )
-				
-			);
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				->field( 'f.meta_value', 'meta_value' )
+				->from( '##pfx##usermeta', 'f' )
+				->where( $sMetaFields )
+			;
+			
+			$oDelete = new Geko_Sql_Delete();
+			$oDelete
+				->from( '##pfx##usermeta', 'f' )
+				->where( $sMetaFields )
+			;
+			
+			parent::cleanOrphanFiles( $oQuery, $oDelete, sprintf( '%s/', $sDocRoot ) );
 			
 		}
 		

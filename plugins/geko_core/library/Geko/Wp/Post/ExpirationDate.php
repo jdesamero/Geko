@@ -281,17 +281,18 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 	public function innerCustomBox() {
 		
 		global $post;
-		global $wpdb;
 		
-		$aRes = $wpdb->get_row( "
-			SELECT
-				e.start_date AS start_date,
-				e.expiry_date AS expiry_date
-			FROM
-				$wpdb->geko_expiry e
-			WHERE
-				e.post_id = $post->ID
-		", ARRAY_A );
+		$oDb = Geko_Wp::get( 'db' );
+		
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			->field( 'e.start_date', 'start_date' )
+			->field( 'e.expiry_date', 'expiry_date' )
+			->from( '##pfx##geko_expiry', 'e' )
+			->where( 'e.post_id = ?', $post->ID )
+		;
+		
+		$aRes = $oDb->fetchRowAssoc( strval( $oQuery ) );
 		
 		// var_dump( $aRes );
 		
@@ -353,7 +354,7 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 	// When the post is saved, saves our custom data
 	public function savePostdata( $post_id ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		// verify this came from the our screen and with proper authorization,
 		// because save_post can be triggered at other times
@@ -391,19 +392,21 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 		}
 
 		print '<br /><br /><br />';
-
+		
 		print $wpdb->geko_expiry;
 		/* */
 		
 		//// DB stuff
 		
 		// Clean-up first
-		$wpdb->query( sprintf( 'DELETE FROM %s WHERE post_id = %d', $wpdb->geko_expiry, $post_id ) );
+		$oDb->delete( '##pfx##geko_expiry', array(
+			'post_id = ?', $post_id
+		) );
 		
 		// Insert if present
 		if ( $_POST[ 'gexp-start-check' ] || $_POST[ 'gexp-expiry-check' ] ) {
 			
-			$wpdb->insert( $wpdb->geko_expiry, array(
+			$oDb->insert( '##pfx##geko_expiry', array(
 				'post_id' => $post_id,
 				'start_date' => $this->getMysqlDateInsertValue( 'gexp-start' ),
 				'expiry_date' => $this->getMysqlDateInsertValue( 'gexp-expiry' )
@@ -417,9 +420,11 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 	// When post is deleted
 	public function deletePostdata( $post_id ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
-		$wpdb->query( sprintf( 'DELETE FROM %s WHERE post_id = %d', $wpdb->geko_expiry, $post_id ) );
+		$oDb->delete( '##pfx##geko_expiry', array(
+			'post_id = ?', $post_id
+		) );
 		
 		return TRUE;	// ???
 	}

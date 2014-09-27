@@ -11,7 +11,6 @@ class Geko_Wp_Form_ItemValue_Query extends Geko_Wp_Entity_Query
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
 		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
@@ -43,7 +42,7 @@ class Geko_Wp_Form_ItemValue_Query extends Geko_Wp_Entity_Query
 		if ( $aParams[ 'form_id' ] ) {
 			if ( !$aParams[ 'fmsec_id' ] ) $this->joinItem( $oQuery );
 			$oQuery
-				->joinLeft( $wpdb->geko_form_section, 'fs' )
+				->joinLeft( '##pfx##geko_form_section', 'fs' )
 					->on( 'fs.fmsec_id = fi.fmsec_id' )
 				->where( 'fs.form_id = ?', $aParams[ 'form_id' ] )
 			;
@@ -60,7 +59,7 @@ class Geko_Wp_Form_ItemValue_Query extends Geko_Wp_Entity_Query
 			$this->joinItem( $oQuery );
 			$oQuery
 				->field( 'ft.slug', 'item_type' )
-				->joinLeft( $wpdb->geko_form_item_type, 'ft' )
+				->joinLeft( '##pfx##geko_form_item_type', 'ft' )
 					->on( 'ft.fmitmtyp_id = fi.fmitmtyp_id' )
 			;			
 		}
@@ -73,15 +72,18 @@ class Geko_Wp_Form_ItemValue_Query extends Geko_Wp_Entity_Query
 	
 	// do only once
 	private function joinItem( $oQuery ) {
-		global $wpdb;
+		
 		if ( !$this->bJoinItem ) {
+			
 			$oQuery
 				->field( 'fi.fmsec_id' )
-				->joinLeft( $wpdb->geko_form_item, 'fi' )
+				->joinLeft( '##pfx##geko_form_item', 'fi' )
 					->on( 'fi.fmitm_id = fiv.fmitm_id' )
 			;
+			
 			$this->bJoinItem = TRUE;
 		}
+		
 	}
 	
 }

@@ -48,9 +48,9 @@ class Geko_Wp_Options_MetaKey
 		
 		self::init();
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
-		$aRes = $wpdb->get_results(
+		$aRes = $oDb->fetchAllObj(
 			strval( self::$oSqlTable->getSelect() )
 		);
 		
@@ -65,7 +65,6 @@ class Geko_Wp_Options_MetaKey
 	//
 	public static function getId( $sMetaKey ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		if ( NULL === self::$aMetaKeyCache ) {
@@ -74,8 +73,8 @@ class Geko_Wp_Options_MetaKey
 		
 		if ( !isset( self::$aMetaKeyCache[ $sMetaKey ] ) ) {
 			
-			$wpdb->insert(
-				$wpdb->geko_meta_key,
+			$oDb->insert(
+				'##pfx##geko_meta_key',
 				array( 'meta_key' => $sMetaKey )
 			);
 			

@@ -188,7 +188,7 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 		// manipulate $oPq
 		$oPq->prepend( $this->getNotificationHtml() );
 		
-		$sCatId = ( $_GET[ 'cat_ID' ] ) ? 'editcat' : 'edittag';
+		$sCatId = ( $_GET[ 'cat_ID' ] ) ? 'editcat' : 'edittag' ;
 		
 		$oPq->find( sprintf( 'form#%s > table', $sCatId ) )->prepend( sprintf( '
 			<tr class="form-field">
@@ -241,7 +241,6 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 	//
 	public function saveCategory( $iTermId, $iTermTaxonomyId ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		if ( $iLangId = intval( $_POST[ 'geko_lang_id' ] ) ) {
@@ -249,23 +248,19 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 			if ( !$iLangGroupId = intval( $_POST[ 'geko_lgroup_id' ] ) )
 			{
 				// create a lang group
-				$wpdb->insert(
-					$wpdb->geko_lang_groups,
-					array( 'type_id' => Geko_Wp_Options_MetaKey::getId( 'category' ) )
-				);
+				$oDb->insert( '##pfx##geko_lang_groups', array(
+					'type_id' => Geko_Wp_Options_MetaKey::getId( 'category' )
+				) );
 				
 				// create a lang group member
 				$iLangGroupId = $oDb->lastInsertId();
 			}
 			
-			$wpdb->insert(
-				$wpdb->geko_lang_group_members,
-				array(
-					'lgroup_id' => $iLangGroupId,
-					'obj_id' => $iTermId,
-					'lang_id' => $iLangId
-				)
-			);
+			$oDb->insert( '##pfx##geko_lang_group_members', array(
+				'lgroup_id' => $iLangGroupId,
+				'obj_id' => $iTermId,
+				'lang_id' => $iLangId
+			) );
 			
 		}
 		
@@ -314,11 +309,13 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 	//
 	public function deleteCategory( $iTermId, $iTermTaxonomyId ) {
 		
-		global $wpdb;
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			->field( 't.term_id', 'term_id' )
+			->from( '##pfx##terms', 't' )
+		;
 		
-		$sSql = "SELECT term_id FROM $wpdb->terms";
-		
-		$this->cleanUpEmptyLangGroups( 'category', $sSql, $iTermId );
+		$this->cleanUpEmptyLangGroups( 'category', strval( $oQuery ), $iTermId );
 	}
 	
 	
@@ -389,21 +386,31 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 			( $sLangCode = $aArgs[ 'lang' ] )
 		) {
 			
-			global $wpdb;
 			$oDb = Geko_Wp::get( 'db' );
 			
 			$bLangIsDefault = ( self::$oDefaultLang->getSlug() == $sLangCode );
 			
-			$aCatIds = $oDb->fetchCol( "
-				SELECT			m.obj_id
-				FROM			$wpdb->geko_lang_group_members m
-				LEFT JOIN		$wpdb->geko_lang_groups g
-					ON			g.lgroup_id = m.lgroup_id
-				LEFT JOIN		$wpdb->geko_languages l
-					ON			l.lang_id = m.lang_id
-				WHERE			( g.type_id = ( SELECT mkey_id FROM $wpdb->geko_meta_key WHERE meta_key = 'category' ) ) AND 
-								( l.code " . ( $bLangIsDefault ? '!' : '' ) . "= '$sLangCode' )
-			" );
+			$oMetaQuery = new Geko_Sql_Select();
+			$oMetaQuery
+				->field( 'mk.mkey_id', 'mkey_id' )
+				->from( '##pfx##geko_meta_key', 'mk' )
+				->where( 'meta_key = ?', 'category' )
+			;
+			
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				->field( 'm.obj_id', 'obj_id' )
+				->from( '##pfx##geko_lang_group_members', 'm' )
+				->joinLeft( '##pfx##geko_lang_groups', 'g' )
+					->on( 'g.lgroup_id = m.lgroup_id' )
+				->joinLeft( '##pfx##geko_languages', 'l' )
+					->on( 'l.lang_id = m.lang_id' )
+				->where( 'g.type_id = ?', $oMetaQuery )
+				->where( sprintf( 'l.code %s= ?', ( $bLangIsDefault ? '!' : '' ) ), $sLangCode )
+			;
+			
+			
+			$aCatIds = $oDb->fetchCol( strval( $oQuery ) );
 			
 			$aFiltered = array();
 			

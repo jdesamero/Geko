@@ -16,14 +16,12 @@ class Geko_Wp_EmailMessage_Query extends Geko_Wp_Entity_Query
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
-		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
 		
 		$oQuery
 			->field( 't.strg_id' )
-			->joinLeft( $wpdb->geko_emsg_transport, 't' )
+			->joinLeft( '##pfx##geko_emsg_transport', 't' )
 				->on( 't.trpt_id = e.trpt_id' )			
 		;
 		
@@ -47,7 +45,7 @@ class Geko_Wp_EmailMessage_Query extends Geko_Wp_Entity_Query
 				$sPfx = sprintf( 'h_%d', $i );
 				
 				$oQuery
-					->joinLeft( $wpdb->geko_emsg_header, $sPfx )
+					->joinLeft( '##pfx##geko_emsg_header', $sPfx )
 						->on( sprintf( '%s.emsg_id = e.emsg_id', $sPfx ) )
 						->on( sprintf( '%s.name = ?', $sPfx ), $sKey )
 					->where( sprintf( '%s.val = ?', $sPfx ), $sValue )

@@ -98,7 +98,6 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 			
 			if ( $this->_oCurrentEntity ) {
 				
-				global $wpdb;
 				$oDb = Geko_Wp::get( 'db' );
 				
 				$oEntity = $this->_oCurrentEntity;
@@ -109,14 +108,14 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 				$oQuery = new Geko_Sql_Select();
 				$oQuery
 					->field( 'COUNT(*)', 'num' )
-					->from( $wpdb->geko_bkng_item, 'bsi' )
+					->from( '##pfx##geko_bkng_item', 'bsi' )
 					->joinLeft( $oStQuery, 'bst' )
 						->on( 'bst.bkitm_id = bsi.bkitm_id' )
 					->where( 'bsi.bkitm_id = ?', $oEntity->getId() )
 					->where( '( bst.slots_taken IS NOT NULL ) AND ( bst.slots_taken > 0 )' )
 				;
 				
-				$this->iBookedEvents = intval( $oDb->lastInsertId() );
+				$this->iBookedEvents = intval( $oDb->fetchOne( strval( $oQuery ) ) );
 				
 				$bDisable = ( $this->iBookedEvents ) ? TRUE : FALSE;
 
@@ -458,7 +457,6 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 	//
 	public function doAddAction( $aParams ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		$bContinue = TRUE;
@@ -486,13 +484,10 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 				'time_end' => $sEndTime
 			);
 			
-			$aInsertFormat = array( '%d', '%s', '%s', '%s' );
-			
 			// update the database first
-			$wpdb->insert(
-				$wpdb->geko_bkng_item,
-				$aInsertValues,
-				$aInsertFormat
+			$oDb->insert(
+				'##pfx##geko_bkng_item',
+				$aInsertValues
 			);
 			
 			$aParams[ 'entity_id' ] = $oDb->lastInsertId();
@@ -521,7 +516,6 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 	//
 	public function doEditAction( $aParams ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		$bContinue = TRUE;
@@ -539,8 +533,10 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 		} */
 		
 		// check the enity id given
+		$iEntityId = $aParams[ 'entity_id' ];
+		
 		$sEntityClass = $this->_sEntityClass;			
-		$oEntity = new $sEntityClass( $aParams[ 'entity_id' ] );
+		$oEntity = new $sEntityClass( $iEntityId );
 		
 		if ( $bContinue && !$oEntity->isValid() ) {
 			$bContinue = FALSE;
@@ -559,20 +555,16 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 				'time_end' => $sEndTime
 			);
 			
-			$aUpdateFormat = array( '%d', '%s', '%s', '%s' );
-			
 			
 			// update the database first
-			$wpdb->update(
-				$wpdb->geko_bkng_item,
+			$oDb->update(
+				'##pfx##geko_bkng_item',
 				$aUpdateValues,
-				array( 'bkitm_id' => $aParams[ 'entity_id' ] ),
-				$aUpdateFormat,
-				array( '%d' )
+				array( 'bkitm_id = ?' => $iEntityId )
 			);
 			
 			$sEntityClass = $this->_sEntityClass;			
-			$oUpdatedBkitm = new $sEntityClass( $aParams[ 'entity_id' ] );
+			$oUpdatedBkitm = new $sEntityClass( $iEntityId );
 			
 			do_action( 'admin_geko_bkitm_edit', $oEntity, $oUpdatedBkitm );
 			do_action( sprintf( 'admin_geko_bkitm_edit_%s', $this->_sSlug ), $oEntity, $oUpdatedBkitm );
@@ -586,13 +578,16 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 	
 	//
 	public function doDelAction( $aParams ) {
-
-		global $wpdb;
+		
+		$oDb = Geko_Wp::get( 'db' );
 		
 		// check the bkitm id given
 		$bContinue = TRUE;
+		
+		$iEntityId = intval( $aParams[ 'entity_id' ] );
+		
 		$sEntityClass = $this->_sEntityClass;			
-		$oEntity = new $sEntityClass( $aParams[ 'entity_id' ] );
+		$oEntity = new $sEntityClass( $iEntityId );
 		
 		if ( $bContinue && !$oEntity->isValid() ) {
 			$bContinue = FALSE;
@@ -605,7 +600,9 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 
 		if ( $bContinue ) {
 			
-			$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->geko_bkng_item WHERE bkitm_id = %d", $aParams[ 'entity_id' ] ) );
+			$oDb->delete( '##pfx##geko_bkng_item', array(
+				'bkitm_id = ?' => $iEntityId
+			) );
 			
 			do_action( 'admin_geko_bkitm_delete', $oEntity );
 			do_action( sprintf( 'admin_geko_bkitm_delete%s', $this->_sSlug ), $oEntity );
@@ -627,7 +624,6 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 		
 		if ( $_REQUEST[ 'activate' ] || $_REQUEST[ 'extend' ] ) {
 			
-			global $wpdb;
 			global $user_ID;
 			
 			$oDb = Geko_Wp::get( 'db' );
@@ -636,15 +632,24 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 			
 			// force cleanup of old schedule anyway
 			if ( $_REQUEST[ 'extend' ] ) {
+				
 				// get existing and create comparison hash so there are no duplicates
 				$aItemsFmt = array();
-				$aItems = $wpdb->get_results( $wpdb->prepare(
-					"SELECT date_item, time_start, time_end FROM $wpdb->geko_bkng_item WHERE bksch_id = %d",
-					$oBksch->getId()
-				), ARRAY_A );
+				
+				$oQuery = new Geko_Sql_Select();
+				$oQuery
+					->field( 'bi.date_item', 'date_item' )
+					->field( 'bi.time_start', 'time_start' )
+					->from( '##pfx##geko_bkng_item', 'bi' )
+					->where( 'bi.bksch_id = ?', $oBksch->getId() )
+				;
+				
+				$aItems = $oDb->fetchAllAssoc( strval( $oQuery ) );
+				
 				foreach ( $aItems as $aItem ) {
 					$aItemsFmt[ sprintf( '%s-%s-%s', $aItem[ 'date_item' ], $aItem[ 'time_start' ], $aItem[ 'time_end' ] ) ] = TRUE;
 				}
+				
 			} else {
 				// clean-up existing
 				$this->deleteItems( $oBksch );
@@ -717,26 +722,20 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 							) {
 								
 								$aInsertValues = array(
-									'bksch_id' => $oBksch->getId(),
+									'bksch_id' => intval( $oBksch->getId() ),
 									'date_item' => $sDateItem,
 									'time_start' => $sTimeStart,
 									'time_end' => $sTimeEnd
 								);
 								
-								$aInsertFormat = array( '%d', '%s', '%s', '%s' );
-								
 								//
-								$wpdb->insert(
-									$wpdb->geko_bkng_item,
-									$aInsertValues,
-									$aInsertFormat
-								);
+								$oDb->insert( '##pfx##geko_bkng_item', $aInsertValues );
 								
 								//// record transaction
 								
 								if ( $oBksch->isPrivate() ) {
 									
-									$iItemId = $wpdb->get_var( 'SELECT LAST_INSERT_ID()' );
+									$iItemId = $oDb->lastInsertId();
 									
 									$sDetails = sprintf(
 										'Private Booking Purchase: %s, %s; %s : %s - %s; %s hr(s)',
@@ -787,21 +786,34 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 	
 	//
 	public function deleteItems( $oBksch ) {
-		global $wpdb;
+		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		$iBkschId = $oBksch->getId();
+		
 		if ( $oBksch->isPrivate() ) {
 			$oTrnsMng = Geko_Wp_Booking_Transaction_Manage::getInstance();
 			$oTrnsMng->deletePrivateTransactions( $iBkschId );
 		}
-		$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->geko_bkng_item WHERE bksch_id = %d", $iBkschId ) );
+		
+		$oDb->delete( '##pfx##geko_bkng_item', array(
+			'bksch_id = ?' => intval( $iBkschId )
+		) );
 	}
 	
 	//
 	public function scheduleHasItems( $iBkschId ) {
-		global $wpdb;
-		return (
-			$wpdb->get_var( $wpdb->prepare( "SELECT bksch_id FROM $wpdb->geko_bkng_item WHERE bksch_id = %d", $iBkschId ) )
-		) ? TRUE : FALSE;
+		
+		$oDb = Geko_Wp::get( 'db' );
+		
+		$oQuery
+			->field( 'bi.bksch_id', 'bksch_id' )
+			->from( '##pfx##geko_bkng_item', 'bi' )
+			->where( 'bi.bksch_id = ?', $iBkschId )
+			->limit( 1 )
+		;
+		
+		return ( $oDb->fetchOne( strval( $oQuery ) ) ) ? TRUE : FALSE ;
 	}
 	
 	
@@ -822,16 +834,14 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 	// DEPRACATED ???
 	public function bookItem( $oUser, $oEntity = NULL ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$oEntity = ( $oEntity ) ? $oEntity : $this->_oCurrentEntity;
 		
-		$wpdb->update(
-			$wpdb->geko_bkng_item,
+		$oDb->update(
+			'##pfx##geko_bkng_item',
 			array( 'user_id' => $oUser->getId() ),
-			array( 'bkitm_id' => $oEntity->getId() ),
-			array( '%d' ),
-			array( '%d' )
+			array( 'bkitm_id = ?' => $oEntity->getId() ),
 		);
 		
 		// re-query entity
@@ -842,15 +852,15 @@ class Geko_Wp_Booking_Item_Manage extends Geko_Wp_Options_Manage
 	// $oUser is currently not used
 	public function cancelItem( $oUser, $oEntity = NULL ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$oEntity = ( $oEntity ) ? $oEntity : $this->_oCurrentEntity;
 		
-		$wpdb->query( sprintf( "
-			UPDATE				$wpdb->geko_bkng_item
-			SET					user_id = NULL
-			WHERE				bkitm_id = %d
-		", $oEntity->getId() ) );
+		$oDb->update(
+			'##pfx##geko_bkng_item',
+			array( 'user_id' => new Zend_Db_Expr( 'NULL' ) ),
+			array( 'bkitm_id = ?' => $oEntity->getId() )
+		);
 		
 		// re-query entity
 		return $this->getItem( $oEntity->getId() );

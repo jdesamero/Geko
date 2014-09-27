@@ -130,7 +130,6 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 	//
 	public function doAddAction( $aParams ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		$oItem = $aParams[ 'item_entity' ];
@@ -189,35 +188,25 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 		$sDateTime = $oDb->getTimestamp();
 		$aInsertValues = array(
 			
-			'transaction_type_id' => $iTransTypeId,
-			'gateway_id' => $iGatewayId,
-			'is_test' => $aParams[ 'is_test' ],
-			'bkitm_id' => $oItem->getId(),
+			'transaction_type_id' => intval( $iTransTypeId ),
+			'gateway_id' => intval( $iGatewayId ),
+			'is_test' => intval( $aParams[ 'is_test' ] ),
+			'bkitm_id' => intval( $oItem->getId() ),
 			'details' => $sDetails,
 			
-			'units' => $fUnits,
-			'cost' => $fCost,
-			'discount' => $fDiscount,
-			'tax' => $fTax,
-			'amount' => $fAmount,
+			'units' => floatval( $fUnits ),
+			'cost' => floatval( $fCost ),
+			'discount' => floatval( $fDiscount ),
+			'tax' => floatval( $fTax ),
+			'amount' => floatval( $fAmount ),
 			
-			'user_id' => $oUser->getId(),
+			'user_id' => intval( $oUser->getId() ),
 			'date_created' => $sDateTime
 			
 		);
 		
-		$aInsertFormat = array(
-			'%d', '%d', '%d', '%d', '%s',
-			'%d', '%f', '%f', '%f', '%f',
-			'%d', '%s'
-		);
-		
 		// update the database first
-		$wpdb->insert(
-			$wpdb->geko_bkng_transaction,
-			$aInsertValues,
-			$aInsertFormat
-		);
+		$oDb->insert( '##pfx##geko_bkng_transaction', $aInsertValues );
 		
 		$aParams[ 'entity_id' ] = $oDb->lastInsertId();
 		
@@ -284,22 +273,18 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 	//
 	public function setStatus( $iBktrnId, $sStatus, $iOrigTrnId = 0 ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$aUpdate = array( 'status_id' => $this->getStatusId( $sStatus ) );
-		$aUpdateFmt = array( '%d' );
 		
 		if ( $iOrigTrnId ) {
 			$aUpdate[ 'orig_trn_id' ] = $iOrigTrnId;
-			$aUpdateFmt[] = '%d';
 		}
 		
-		$wpdb->update(
-			$wpdb->geko_bkng_transaction,
+		$oDb->update(
+			'##pfx##geko_bkng_transaction',
 			$aUpdate,
-			array( 'bktrn_id' => $iBktrnId ),
-			$aUpdateFmt,
-			array( '%d' )
+			array( 'bktrn_id = ?' => $iBktrnId )
 		);
 		
 		return $this;
@@ -307,8 +292,8 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 	
 	//
 	public function getRefundInfo( $aParams ) {
-
-		global $wpdb;
+		
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$oItem = $aParams[ 'item_entity' ];
 		$oUser = $aParams[ 'user_entity' ];
@@ -320,8 +305,8 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 			->field( 'btr.date_created' )
 			->field( 'btr.status_id' )
 			->field( 'btr.gateway_id' )
-			->from( $wpdb->geko_bkng_transaction, 'btr' )
-			->joinLeft( $wpdb->geko_bkng_transaction, 'btc' )
+			->from( '##pfx##geko_bkng_transaction', 'btr' )
+			->joinLeft( '##pfx##geko_bkng_transaction', 'btc' )
 				->on( 'btc.orig_trn_id = btr.bktrn_id' )
 				->on( 'btc.status_id = ?', $this->getStatusId( 'success' ) )
 				->on( 'btc.transaction_type_id = ?', $this->getTransactionTypeId( 'refund' ) )
@@ -339,7 +324,7 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 			->order( 'btr.date_created', 'DESC' )
 		;
 		
-		$aRes = $wpdb->get_results( strval( $oQuery ), ARRAY_A );
+		$aRes = $oDb->fetchAllAssoc( strval( $oQuery ) );
 		
 		return ( is_array( $aRes ) ) ? $aRes : array();
 		
@@ -383,8 +368,6 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 	// DEPRACATED ???
 	public function getLatestSuccessfulTransactionQuery( $aParams = array() ) {
 		
-		global $wpdb;
-		
 		// prepare sub-query that determines the latest successful (!)
 		// transaction date made by a user for an event
 		
@@ -392,7 +375,7 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 		$oSubQuery
 			->field( 'btr2.bkitm_id' )
 			->field( 'MAX( btr2.date_created )', 'date_last_transaction' )
-			->from( $wpdb->geko_bkng_transaction, 'btr2' )
+			->from( '##pfx##geko_bkng_transaction', 'btr2' )
 			->where( 'btr2.status_id = ?', $this->getStatusId( 'success' ) )
 			->group( 'btr2.bkitm_id' )
 		;
@@ -405,7 +388,7 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 			->field( 'btr.transaction_type_id' )
 			->field( 'btr.bkitm_id' )
 			->field( 'btr.user_id' )
-			->from( $wpdb->geko_bkng_transaction, 'btr' )
+			->from( '##pfx##geko_bkng_transaction', 'btr' )
 			->joinInner( $oSubQuery, 'blt' )
 				->on( 'blt.bkitm_id = btr.bkitm_id' )
 				->on( 'blt.date_last_transaction = btr.date_created' )
@@ -432,14 +415,12 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 	//
 	public function getSlotsTakenQuery( $aParams = array() ) {
 		
-		global $wpdb;
-		
 		$oQuery = new Geko_Sql_Select();
 		$oQuery
 			->field( 'bsl.bkitm_id' )
 			->field( 'COUNT(*)', 'slots_taken' )
-			->from( $wpdb->geko_bkng_transaction, 'bsl' )
-			->joinLeft( $wpdb->geko_bkng_transaction, 'bsc' )
+			->from( '##pfx##geko_bkng_transaction', 'bsl' )
+			->joinLeft( '##pfx##geko_bkng_transaction', 'bsc' )
 				->on( 'bsc.orig_trn_id = bsl.bktrn_id' )
 				->on( 'bsc.status_id = ?', $this->getStatusId( 'success' ) )
 				->on( 'bsc.transaction_type_id = ?', $this->getTransactionTypeId( 'refund' ) )
@@ -468,29 +449,23 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 	
 	//
 	public function cleanupStalePendingItems() {
-	
-		global $wpdb;
+		
 		$oDb = Geko_Wp::get( 'db' );
 		
-		$wpdb->query( $wpdb->prepare(
-			"
-				UPDATE					$wpdb->geko_bkng_transaction
-				SET						status_id = %d
-				WHERE					( status_id = %d ) AND 
-										( date_created < %s )
-			",
-			$this->getStatusId( 'failed' ),
-			$this->getStatusId( 'pending' ),
-			$oDb->getTimestamp( time() - ( 60 * 15 ) )			// anything pending for more than 15 mins should be cleaned-up
-		) );
-		
+		$oDb->update(
+			'##pfx##geko_bkng_transaction',
+			array( 'status_id' => $this->getStatusId( 'failed' ) ),
+			array(
+				'status_id = ?' => $this->getStatusId( 'pending' ),
+				'date_created < ?' => $oDb->getTimestamp( time() - ( 60 * 15 ) )
+			)
+		);	
 	}
 	
 	
 	//
 	public function recordPrivateTransaction( $aParams ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		$sDateTime = $oDb->getTimestamp();
@@ -510,32 +485,26 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 			
 		);
 		
-		$aInsertFormat = array(
-			'%d', '%d', '%d', '%d', '%d',
-			'%s', '%d', '%f', '%d', '%s'
-		);
 		
 		// update the database first
-		$wpdb->insert(
-			$wpdb->geko_bkng_transaction,
-			$aInsertValues,
-			$aInsertFormat
-		);
+		$oDb->insert( '##pfx##geko_bkng_transaction', $aInsertValues );
 		
 	}
 	
 	//
 	public function deletePrivateTransactions( $iScheduleId ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
-		$wpdb->query( $wpdb->prepare(
-			"DELETE FROM $wpdb->geko_bkng_transaction WHERE bkitm_id IN (
-				SELECT bkitm_id FROM $wpdb->geko_bkng_item WHERE bksch_id = %d
-			)",
-			$iScheduleId
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			->from( '##pfx##geko_bkng_item', 'bi' )
+			->where( 'bksch_id = ?', $iScheduleId )
+		;
+		
+		$oDb->delete( '##pfx##geko_bkng_transaction', array(
+			'bt.bkitm_id IN (?)' => new Zend_Db_Expr( strval( $oQuery ) )
 		) );
-		
 	}
 	
 	//
@@ -573,13 +542,11 @@ class Geko_Wp_Booking_Transaction_Manage extends Geko_Wp_Options_Manage
 
 		if ( $oBkitm->isPrivate() ) {
 			
-			global $wpdb;
+			$oDb = Geko_Wp::get( 'db' );
 			
-			$wpdb->query( $wpdb->prepare(
-				"DELETE FROM $wpdb->geko_bkng_transaction WHERE bkitm_id = %d",
-				$oBkitm->getId()
+			$oDb->delete( '##pfx##geko_bkng_transaction', array(
+				'bkitm_id = ?' => $oBkitm->getId()
 			) );
-			
 		}
 		
 	}

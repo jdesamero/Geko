@@ -85,14 +85,12 @@ class Geko_Wp_Booking_Transaction_User extends Geko_Wp_Options_Manage
 	//
 	public function showTransactionsReport() {
 		
-		global $wpdb;
-		
 		$oQuery = new Geko_Sql_Select();
 		$oQuery
 			->field( 't.details' )
 			->field( "DATE_FORMAT( t.date_created, '%a - %b %e, %Y %l:%i %p' )", 'transaction_date' )
 			->field( 'IF( t.transaction_type_id = 2, t.amount * -1, t.amount )', 'amount' )
-			->from( $wpdb->geko_bkng_transaction, 't' )
+			->from( '##pfx##geko_bkng_transaction', 't' )
 			->where( 't.user_id = ?', $this->_iCurrentParentEntityId )
 			->where( 't.status_id = 1' )
 			->order( 't.date_created', 'DESC' )
@@ -113,7 +111,7 @@ class Geko_Wp_Booking_Transaction_User extends Geko_Wp_Options_Manage
 			)
 		);
 		
-		$sTitle = 'Transactions for ' . $this->_oCurrentParentEntity->getFullName();
+		$sTitle = sprintf( 'Transactions for %s', $this->_oCurrentParentEntity->getFullName() );
 		
 		$sTotalRow = '<tr>
 			<td colspan="2" class="bold right">Total</td>

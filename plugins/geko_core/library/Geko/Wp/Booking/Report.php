@@ -9,17 +9,11 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 	protected $_bHasManagementCapability = FALSE;
 	protected $_sParentManagementClass = 'Geko_Wp_Booking_Manage';
 	
+	
 	//
 	public function add() {
 		
 		parent::add();
-		
-		global $current_user;
-	
-	}
-	
-	//
-	public function affix() {
 		
 		if (
 			is_user_logged_in() && 
@@ -34,9 +28,12 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 	
 	
 	//
-	public function affixAdmin() {
+	public function addAdmin() {
+		
+		parent::addAdmin();
 		
 		$oWpRole = get_role( 'administrator' );
+		
 		if( !$oWpRole->has_cap( $this->_sManagementCapability ) ) {
 			$oWpRole->add_cap( $this->_sManagementCapability );
 		}
@@ -62,17 +59,17 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 	//
 	public function displayPage() {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
-		$aMinMaxDate = $wpdb->get_row( "
+		$aMinMaxDate = $oDb->fetchRowAssoc( "
 			SELECT			MIN( date_item ) AS min_date,
 							MAX( date_item ) AS max_date
-			FROM			$wpdb->geko_bkng_item
-		", ARRAY_A );
+			FROM			##pfx##geko_bkng_item
+		" );
 		
 		$aJsonParams = array(
 			'file' => array(
-				'cal_icon' => Geko_Uri::getUrl( 'geko_styles' ) . '/themes/base/images/calendar.gif'
+				'cal_icon' => sprintf( '%s/themes/base/images/calendar.gif', Geko_Uri::getUrl( 'geko_styles' ) )
 			),
 			'min_date' => date( 'F j, Y G:i:s', strtotime( $aMinMaxDate[ 'min_date' ] ) ),
 			'max_date' => date( 'F j, Y G:i:s', strtotime( $aMinMaxDate[ 'max_date' ] ) )
@@ -261,7 +258,6 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 	//
 	public function showBookingsReport( $aParams = NULL ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		if ( NULL === $aParams ) $aParams = $_GET;
@@ -271,12 +267,12 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 		$oPurchasesQuery
 			->field( 'bp.bkitm_id' )
 			->field( 'bp.amount' )
-			->from( $wpdb->geko_bkng_transaction, 'bp' )
-			->joinLeft( $wpdb->geko_bkng_transaction, 'bc' )
+			->from( '##pfx##geko_bkng_transaction', 'bp' )
+			->joinLeft( '##pfx##geko_bkng_transaction', 'bc' )
 				->on( 'bc.orig_trn_id = bp.bktrn_id' )
 				->on( 'bc.status_id = 1' )
 				->on( 'bc.transaction_type_id = 2' )
-			->joinLeft( $wpdb->geko_bkng_item, 'bi' )
+			->joinLeft( '##pfx##geko_bkng_item', 'bi' )
 				->on( 'bi.bkitm_id = bp.bkitm_id' )
 			->where( 'bp.status_id = 1' )
 			->where( 'bp.transaction_type_id = 1' )
@@ -291,10 +287,10 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 			->field( 'SUM( s.slots )', 'total_slots' )
 			->field( 'COUNT( p.bkitm_id )', 'total_slots_taken' )
 			->field( 'SUM( p.amount )', 'revenue' )
-			->from( $wpdb->geko_bkng_item, 'i' )
-			->joinLeft( $wpdb->geko_bkng_schedule, 's' )
+			->from( '##pfx##geko_bkng_item', 'i' )
+			->joinLeft( '##pfx##geko_bkng_schedule', 's' )
 				->on( 's.bksch_id = i.bksch_id' )
-			->joinLeft( $wpdb->geko_booking, 'b' )
+			->joinLeft( '##pfx##geko_booking', 'b' )
 				->on( 'b.bkng_id = s.bkng_id' )
 			->joinLeft( $oPurchasesQuery, 'p' )
 				->on( 'p.bkitm_id = i.bkitm_id' )
@@ -373,7 +369,6 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 	//
 	public function showBookingDetailsReport( $aParams = NULL ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		if ( NULL === $aParams ) $aParams = $_GET;
@@ -384,12 +379,12 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 			->field( 'bp.bkitm_id' )
 			->field( 'bp.amount' )
 			->field( 'COUNT(*)', 'slots_taken' )
-			->from( $wpdb->geko_bkng_transaction, 'bp' )
-			->joinLeft( $wpdb->geko_bkng_transaction, 'bc' )
+			->from( '##pfx##geko_bkng_transaction', 'bp' )
+			->joinLeft( '##pfx##geko_bkng_transaction', 'bc' )
 				->on( 'bc.orig_trn_id = bp.bktrn_id' )
 				->on( 'bc.status_id = 1' )
 				->on( 'bc.transaction_type_id = 2' )
-			->joinLeft( $wpdb->geko_bkng_item, 'bi' )
+			->joinLeft( '##pfx##geko_bkng_item', 'bi' )
 				->on( 'bi.bkitm_id = bp.bkitm_id' )
 			->where( 'bp.status_id = 1' )
 			->where( 'bp.transaction_type_id = 1' )
@@ -410,12 +405,12 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 			->field( 's.slots' )
 			->field( 'p.slots_taken' )
 			->field( '1', 'occupied_by' )
-			->from( $wpdb->geko_bkng_item, 'i' )
-			->joinLeft( $wpdb->geko_bkng_schedule, 's' )
+			->from( '##pfx##geko_bkng_item', 'i' )
+			->joinLeft( '##pfx##geko_bkng_schedule', 's' )
 				->on( 's.bksch_id = i.bksch_id' )
 			->joinLeft( $oPurchasesQuery, 'p' )
 				->on( 'p.bkitm_id = i.bkitm_id' )
-			->joinLeft( $wpdb->geko_booking, 'b' )
+			->joinLeft( '##pfx##geko_booking', 'b' )
 				->on( 'b.bkng_id = s.bkng_id' )
 			->order( 'datetime_start', 'ASC' )
 		;		
@@ -428,17 +423,17 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 			->field( 'fn.meta_value', 'first_name' )
 			->field( 'ln.meta_value', 'last_name' )
 			->field( "DATE_FORMAT( bp.date_created, '%a - %b %e, %Y %l:%i %p' )", 'date_created' )
-			->from( $wpdb->geko_bkng_transaction, 'bp' )
-			->joinLeft( $wpdb->geko_bkng_transaction, 'bc' )
+			->from( '##pfx##geko_bkng_transaction', 'bp' )
+			->joinLeft( '##pfx##geko_bkng_transaction', 'bc' )
 				->on( 'bc.orig_trn_id = bp.bktrn_id' )
 				->on( 'bc.status_id = 1' )
 				->on( 'bc.transaction_type_id = 2' )
-			->joinLeft( $wpdb->geko_bkng_item, 'bi' )
+			->joinLeft( '##pfx##geko_bkng_item', 'bi' )
 				->on( 'bi.bkitm_id = bp.bkitm_id' )
-			->joinLeft( $wpdb->usermeta, 'fn' )
+			->joinLeft( '##pfx##usermeta', 'fn' )
 				->on( 'fn.user_id = bp.user_id' )
 				->on( 'fn.meta_key = ?', 'first_name' )
-			->joinLeft( $wpdb->usermeta, 'ln' )
+			->joinLeft( '##pfx##usermeta', 'ln' )
 				->on( 'ln.user_id = bp.user_id' )
 				->on( 'ln.meta_key = ?', 'last_name' )
 			->where( 'bp.status_id = 1' )
@@ -479,7 +474,7 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 		// $this->showTable( $oUserQuery, array(), 'Users' );
 		
 		$aResFmt = array();
-		$aRes = $wpdb->get_results( strval( $oUserQuery ), ARRAY_A );
+		$aRes = $oDb->fetchAllAssoc( strval( $oUserQuery ) );
 		
 		// group together
 		foreach ( $aRes as $aItem ) {
@@ -546,7 +541,6 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 	//
 	public function showSignupsReport( $aParams = NULL ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		if ( NULL === $aParams ) $aParams = $_GET;
@@ -557,11 +551,11 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 			->field( 'fn.meta_value', 'first_name' )
 			->field( 'ln.meta_value', 'last_name' )
 			->field( "DATE_FORMAT( u.user_registered, '%a - %b %e, %Y %l:%i %p' )", 'date_registered' )
-			->from( $wpdb->users, 'u' )
-			->joinLeft( $wpdb->usermeta, 'fn' )
+			->from( '##pfx##users', 'u' )
+			->joinLeft( '##pfx##usermeta', 'fn' )
 				->on( 'fn.user_id = u.ID' )
 				->on( 'fn.meta_key = ?', 'first_name' )
-			->joinLeft( $wpdb->usermeta, 'ln' )
+			->joinLeft( '##pfx##usermeta', 'ln' )
 				->on( 'ln.user_id = u.ID' )
 				->on( 'ln.meta_key = ?', 'last_name' )
 			->order( 'u.user_registered', 'ASC' )
@@ -611,14 +605,14 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 	//
 	public function showTable( $oQuery, $aFormat = array(), $aParams = array() ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$sTitle = $aParams[ 'title' ];
 		$sTotalRow = $aParams[ 'total_row' ];
 		$sTitleTag = $aParams[ 'title_tag' ];
 		if ( !$sTitleTag ) $sTitleTag = '<h3>%s</h3>';
 		
-		$aRes = $wpdb->get_results( strval( $oQuery ), ARRAY_A );
+		$aRes = $oDb->fetchAllAssoc( strval( $oQuery ) );
 		
 		$aFields = array_keys( $aRes[ 0 ] );
 		
@@ -666,7 +660,7 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 				if ( $sTotalRow ) {
 					foreach ( $aFormat as $sKey => $aField ) {
 						if ( $aField[ 'sum' ] ) {
-							$sTotalRow = str_replace( '##' . $sKey . '##', $aField[ 'sum_res' ], $sTotalRow );
+							$sTotalRow = str_replace( sprintf( '##%s##', $sKey ), $aField[ 'sum_res' ], $sTotalRow );
 						}
 					}
 					$sTotalRow = str_replace( '##__count##', count( $aRes ), $sTotalRow );					
@@ -717,25 +711,25 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 		
 		// Signups
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$oQuery = new Geko_Sql_Select();
 		$oQuery
 			->field( 'COUNT(*)', 'num' )
-			->from( $wpdb->users, 'u' )
-			->joinLeft( $wpdb->usermeta, 'um' )
+			->from( '##pfx##users', 'u' )
+			->joinLeft( '##pfx##usermeta', 'um' )
 				->on( 'um.user_id = u.ID' )
 				->on( 'um.meta_key = ?', '_geko_role_id' )
-			->joinLeft( $wpdb->geko_roles, 'r' )
+			->joinLeft( '##pfx##geko_roles', 'r' )
 				->on( 'r.role_id = um.meta_value' )
 			->where( 'r.slug = ?', 'customer' )
 		;
 		
-		$iTotalSignups = $wpdb->get_var( strval( $oQuery ) );
+		$iTotalSignups = $oDb->fetchOne( strval( $oQuery ) );
 		
 		$oQuery->where( "DATE_FORMAT( u.user_registered, '%c' ) = ?", date( 'n' ) );
 		
-		$iSignupsForMonth = $wpdb->get_var( strval( $oQuery ) );
+		$iSignupsForMonth = $oDb->fetchOne( strval( $oQuery ) );
 		
 		// -------------------------------------------------------------------------------------- //
 		
@@ -748,32 +742,32 @@ class Geko_Wp_Booking_Report extends Geko_Wp_Initialize
 			->field( 'SUM( IF( ( bs.slots_taken IS NULL ) || ( bs.slots_taken = 0 ), 1, 0 ) )', 'is_empty' )
 			->field( 'SUM( IF( bs.slots_taken = bsc.slots, 1, 0 ) )', 'is_full' )
 			->field( 'SUM( IF( ( bs.slots_taken IS NOT NULL ) && ( bs.slots_taken != 0 ) && ( bs.slots_taken < bsc.slots ), 1, 0 ) )', 'is_partial' )
-			->from( $wpdb->geko_bkng_item, 'bi' )
+			->from( '##pfx##geko_bkng_item', 'bi' )
 			->joinLeft( $oStQuery, 'bs' )
 				->on( 'bs.bkitm_id = bi.bkitm_id' )
-			->joinLeft( $wpdb->geko_bkng_schedule, 'bsc' )
+			->joinLeft( '##pfx##geko_bkng_schedule', 'bsc' )
 				->on( 'bsc.bksch_id = bi.bksch_id' )
 			->where( "DATE_FORMAT( bi.date_item, '%V' ) = ?", date( 'W' ) )
 		;
 		
-		$oWeeklySignups = $wpdb->get_row( strval( $oQuery ) );
+		$oWeeklySignups = $oDb->fetchRowObj( strval( $oQuery ) );
 		
 		$oQuery
 			->unsetWhere()
 			->where( "DATE_FORMAT( bi.date_item, '%c' ) = ?", date( 'n' ) )
 		;
 		
-		$oMonthlySignups = $wpdb->get_row( strval( $oQuery ) );
+		$oMonthlySignups = $oDb->fetchRowObj( strval( $oQuery ) );
 		
 		$oQuery
 			->unsetWhere()
 			->field( 'bk.name' )
-			->joinLeft( $wpdb->geko_booking, 'bk' )
+			->joinLeft( '##pfx##geko_booking', 'bk' )
 				->on( 'bk.bkng_id = bsc.bkng_id' )
 			->group( 'bk.name' )
 		;
 		
-		$aProds = $wpdb->get_results( strval( $oQuery ) );
+		$aProds = $oDb->fetchAllObj( strval( $oQuery ) );
 		
 		// -------------------------------------------------------------------------------------- //
 		

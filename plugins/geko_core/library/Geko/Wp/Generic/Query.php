@@ -28,7 +28,6 @@ class Geko_Wp_Generic_Query extends Geko_Wp_Entity_Query
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
 		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
@@ -65,7 +64,7 @@ class Geko_Wp_Generic_Query extends Geko_Wp_Entity_Query
 				
 				$aMetaParams = ( is_array( $mParams ) ) ? $mParams : array();
 				
-				$sPrefix = '_g' . $i;
+				$sPrefix = sprintf( '_g%d', $i );
 				$aPrefixes[ $sMetaKey ] = $sPrefix;
 				
 				$sCastType = '';
@@ -80,26 +79,26 @@ class Geko_Wp_Generic_Query extends Geko_Wp_Entity_Query
 				}
 				
 				if ( $sCastType ) {
-					$sField = " CAST( $sPrefix.meta_value AS $sCastType ) ";
+					$sField = sprintf( ' CAST( %s.meta_value AS %s ) ', $sPrefix, $sCastType );
 				} else {
-					$sField = " $sPrefix.meta_value ";		
+					$sField = sprintf( ' %s.meta_value ', $sPrefix );		
 				}
-								
+				
 				$oQuery
 					->field( $sField, $sMetaKey )
-					->joinLeft( $wpdb->geko_generic_meta, $sPrefix )
-						->on( $sPrefix . '.generic_id = g.generic_id' )
-						->on( $sPrefix . '.mkey_id = ?', Geko_Wp_Options_MetaKey::getId( $sMetaKey ) )
+					->joinLeft( '##pfx##geko_generic_meta', $sPrefix )
+						->on( sprintf( '%s.generic_id = g.generic_id', $sPrefix ) )
+						->on( sprintf( '%s.mkey_id = ?', $sPrefix ), Geko_Wp_Options_MetaKey::getId( $sMetaKey ) )
 				;
 				
 				$aRawFields[ $sMetaKey ] = $sField;
 				
 				if ( isset( $aMetaParams[ 'searchable' ] ) ) {
-					$aParams[ 'kwsearch_fields' ][] = " $sPrefix.meta_value ";
+					$aParams[ 'kwsearch_fields' ][] = sprintf( ' %s.meta_value ', $sPrefix );
 				}
 				
 				if ( isset( $aMetaParams[ 'order' ] ) ) {
-					$sOrder = ( 'DESC' == strtoupper( $aMetaParams[ 'order' ] ) ) ? 'DESC' : 'ASC';
+					$sOrder = ( 'DESC' == strtoupper( $aMetaParams[ 'order' ] ) ) ? 'DESC' : 'ASC' ;
 					$oQuery->order( $sMetaKey, $sOrder );
 				}
 				

@@ -30,8 +30,6 @@ class Geko_Wp_Enumeration_Query extends Geko_Wp_Entity_Query
 	//
 	public static function getJoinQuery( $sParentSlug, $sAlias, $aFields = NULL ) {
 		
-		global $wpdb;
-		
 		if ( NULL === $aFields ) {
 			$aFields = array( 'enum_id', 'title', 'slug', 'value' );
 		} elseif ( 'ALL' == $aFields ) {
@@ -39,20 +37,20 @@ class Geko_Wp_Enumeration_Query extends Geko_Wp_Entity_Query
 			$aFields = array( 'enum_id', 'title', 'slug', 'value', 'description', 'params', 'rank' );
 		}
 		
-		$sEnAlias = $sAlias . '_en';
-		$sEpAlias = $sAlias . '_ep';
+		$sEnAlias = sprintf( '%s_en', $sAlias );
+		$sEpAlias = sprintf( '%s_ep', $sAlias );
 		
 		$oQuery = new Geko_Sql_Select();
 		
 		foreach ( $aFields as $sField ) {
-			$oQuery->field( $sEnAlias . '.' . $sField );
+			$oQuery->field( sprintf( '%s.%s', $sEnAlias, $sField ) );
 		}
 		
 		$oQuery
-			->from( $wpdb->geko_enumeration, $sEnAlias )
-			->joinLeft( $wpdb->geko_enumeration, $sEpAlias )
-				->on( $sEpAlias . '.enum_id = ' . $sEnAlias . '.parent_id' )
-			->where( $sEpAlias . '.slug = ?', $sParentSlug )
+			->from( '##pfx##geko_enumeration', $sEnAlias )
+			->joinLeft( '##pfx##geko_enumeration', $sEpAlias )
+				->on( sprintf( '%s.enum_id = %s.parent_id', $sEpAlias, $sEnAlias ) )
+			->where( sprintf( '%s.slug = ?', $sEpAlias ), $sParentSlug )
 		;
 		
 		return $oQuery;
@@ -62,7 +60,6 @@ class Geko_Wp_Enumeration_Query extends Geko_Wp_Entity_Query
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
 		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
@@ -89,7 +86,7 @@ class Geko_Wp_Enumeration_Query extends Geko_Wp_Entity_Query
 		// parent_slug
 		if ( $aParams[ 'parent_slug' ] ) {
 			$oQuery
-				->joinLeft( $wpdb->geko_enumeration, 'ep' )
+				->joinLeft( '##pfx##geko_enumeration', 'ep' )
 					->on( 'ep.enum_id = e.parent_id' )
 				->where( 'ep.slug = ?', $aParams[ 'parent_slug' ] )
 			;
@@ -143,7 +140,6 @@ class Geko_Wp_Enumeration_Query extends Geko_Wp_Entity_Query
 			}
 			
 			$aMatchTo = $aNormalize;
-			
 		}
 		
 		return in_array( $mSubject, $aMatchTo );
@@ -178,60 +174,27 @@ class Geko_Wp_Enumeration_Query extends Geko_Wp_Entity_Query
 	}
 	
 	
-	//
-	public function getIdFromTitle( $sTitle ) {
-		return $this->getFrom( $sTitle, 'title', 'id' );
-	}
+	
+	//// magic methods
 	
 	//
-	public function getValueFromTitle( $sTitle ) {
-		return $this->getFrom( $sTitle, 'title', 'value' );
+	public function __call( $sMethod, $aArgs ) {
+		
+		$aRegs = array();
+		
+		if ( preg_match( '/^get([A-Za-z]+)From([A-Za-z]+)/', $sMethod, $aRegs ) ) {
+			
+			$sToFld = strtolower( $aRegs[ 1 ] );
+			$sFromFld = strtolower( $aRegs[ 2 ] );
+			
+			return call_user_func( array( $this, 'getFrom' ), $aArgs[ 0 ], $sFromFld, $sToFld );
+		}
+		
+		throw new Exception( sprintf( 'Invalid method %s::%s() called.', __CLASS__, $sMethod ) );
 	}
 	
-	//
-	public function getIdFromSlug( $sSlug ) {
-		return $this->getFrom( $sSlug, 'slug', 'id' );
-	}
-	
-	//
-	public function getValueFromSlug( $sSlug ) {
-		return $this->getFrom( $sSlug, 'slug', 'value' );
-	}
-	
-	//
-	public function getTitleFromId( $iId ) {
-		return $this->getFrom( $iId, 'id', 'title' );
-	}
-	
-	//
-	public function getTitleFromValue( $mValue ) {
-		return $this->getFrom( $mValue, 'value', 'title' );
-	}
-	
-	//
-	public function getSlugFromId( $iId ) {
-		return $this->getFrom( $iId, 'id', 'slug' );
-	}
-	
-	//
-	public function getSlugFromValue( $mValue ) {
-		return $this->getFrom( $mValue, 'value', 'slug' );
-	}
 
-	//
-	public function getDescriptionFromId( $iId ) {
-		return $this->getFrom( $iId, 'id', 'description' );
-	}
-	
-	//
-	public function getDescriptionFromSlug( $sSlug ) {
-		return $this->getFrom( $sSlug, 'slug', 'description' );
-	}
-	
-	//
-	public function getValueFromId( $sId ) {
-		return $this->getFrom( $sId, 'id', 'value' );
-	}
+
 	
 	
 }

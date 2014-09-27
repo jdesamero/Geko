@@ -43,8 +43,6 @@ class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 	// only kicks in when "use_non_native_query" is set to TRUE
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
-		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
 		
@@ -63,10 +61,10 @@ class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 			->field( 'tx.parent' )
 			->field( 'tx.count' )
 			
-			->from( $wpdb->terms, 't' )
-			->joinLeft( $wpdb->term_taxonomy, 'tx' )
+			->from( '##pfx##terms', 't' )
+			->joinLeft( '##pfx##term_taxonomy', 'tx' )
 				->on( 'tx.term_id = t.term_id' )
-			->joinLeft( $wpdb->term_relationships, 'tr' )
+			->joinLeft( '##pfx##term_relationships', 'tr' )
 				->on( 'tr.term_taxonomy_id = tx.term_taxonomy_id' )
 			
 			->where( 'tx.taxonomy = ?', 'category' )

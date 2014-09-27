@@ -53,16 +53,16 @@ class Geko_Wp_Ext_Cart66 extends Geko_Singleton_Abstract
 			( $sOuid = trim( $_GET[ 'ouid' ] ) )
 		) {
 			
-			global $wpdb;
+			$oDb = Geko_Wp::get( 'db' );
 			
 			$oQuery = new Geko_Sql_Select();
 			$oQuery
 				->field( 'o.id' )
-				->from( $wpdb->cart66_orders, 'o' )
+				->from( '##pfx##cart66_orders', 'o' )
 				->where( 'o.ouid = ?', $sOuid )
 			;
 			
-			$iId = intval( $wpdb->get_var( strval( $oQuery ) ) );
+			$iId = intval( $oDb->fetchOne( strval( $oQuery ) ) );
 			
 			$sHeader = sprintf(
 				'Location: %s/wp-admin/admin.php?page=cart66_admin&task=view&id=%d',
@@ -237,19 +237,19 @@ class Geko_Wp_Ext_Cart66 extends Geko_Singleton_Abstract
 	//
 	public function getProductGroupHash() {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$oQuery = new Geko_Sql_Select();
 		$oQuery
 			->distinct( TRUE )
 			->field( 'p.name' )
 			->field( 'MD5( p.name )', 'name_key' )
-			->from( $wpdb->cart66_products, 'p' )
+			->from( '##pfx##cart66_products', 'p' )
 			->order( 'p.name', 'ASC' )
 		;
 		
 		$aResFmt = array();
-		$aRes = $wpdb->get_results( strval( $oQuery ), ARRAY_A );
+		$aRes = $oDb->fetchAllAssoc( strval( $oQuery ) );
 		
 		foreach ( $aRes as $aRow ) {
 			$aResFmt[ $aRow[ 'name_key' ] ] = $aRow[ 'name' ];
@@ -262,7 +262,7 @@ class Geko_Wp_Ext_Cart66 extends Geko_Singleton_Abstract
 	//
 	public function getProductVarieties( $sProdGroupKey ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$oQuery = new Geko_Sql_Select();
 		$oQuery
@@ -271,11 +271,11 @@ class Geko_Wp_Ext_Cart66 extends Geko_Singleton_Abstract
 			->field( 'p.item_number' )
 			->field( 'p.price_description' )
 			->field( 'p.price' )
-			->from( $wpdb->cart66_products, 'p' )
+			->from( '##pfx##cart66_products', 'p' )
 			->where( 'MD5( p.name ) = ?', $sProdGroupKey )
 		;
 		
-		return $wpdb->get_results( strval( $oQuery ), ARRAY_A );
+		return $oDb->fetchAllAssoc( strval( $oQuery ) );
 	}
 	
 	//
@@ -348,16 +348,16 @@ class Geko_Wp_Ext_Cart66 extends Geko_Singleton_Abstract
 				)
 			) {
 				
-				global $wpdb;
+				$oDb = Geko_Wp::get( 'db' );
 				
 				$oQuery = new Geko_Sql_Select();
 				$oQuery
 					->field( 'COUNT(*)', 'num' )
-					->from( $wpdb->cart66_orders, 'o' )
+					->from( '##pfx##cart66_orders', 'o' )
 					->where( 'o.wp_user_id = ?', $iUserId )
 				;
 				
-				$this->_iNumOrders = intval( $wpdb->get_var( strval( $oQuery ) ) );
+				$this->_iNumOrders = intval( $oDb->fetchOne( strval( $oQuery ) ) );
 			}
 			
 		} else {
@@ -483,7 +483,7 @@ class Geko_Wp_Ext_Cart66 extends Geko_Singleton_Abstract
 		
 		if ( $this->_bCart66PluginActivated && $this->_iUserId ):
 			
-			global $wpdb;
+			$oDb = Geko_Wp::get( 'db' );
 			
 			$oQuery = new Geko_Sql_Select();
 			$oQuery
@@ -492,7 +492,7 @@ class Geko_Wp_Ext_Cart66 extends Geko_Singleton_Abstract
 				->field( 'o.trans_id' )
 				->field( 'o.total' )
 				->field( 'o.status' )
-				->from( $wpdb->cart66_orders, 'o' )
+				->from( '##pfx##cart66_orders', 'o' )
 				->where( 'o.wp_user_id = ?', $this->_iUserId )
 				->order( 'o.ordered_on', 'DESC' )
 			;
@@ -508,7 +508,7 @@ class Geko_Wp_Ext_Cart66 extends Geko_Singleton_Abstract
 
 			}
 			
-			$results = $wpdb->get_results( strval( $oQuery ) );
+			$results = $oDb->fetchAllObj( strval( $oQuery ) );
 			
 			?>
 			<table id="viewCartTable" class="order-history">

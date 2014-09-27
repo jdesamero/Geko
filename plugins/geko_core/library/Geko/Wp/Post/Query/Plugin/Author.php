@@ -8,8 +8,6 @@ class Geko_Wp_Post_Query_Plugin_Author extends Geko_Entity_Query_Plugin
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
-		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
 		
@@ -21,7 +19,7 @@ class Geko_Wp_Post_Query_Plugin_Author extends Geko_Entity_Query_Plugin
 				
 				->field( 'pauth.meta_value', 'author' )
 				
-				->joinLeft( $wpdb->postmeta, 'pauth' )
+				->joinLeft( '##pfx##postmeta', 'pauth' )
 					->on( 'pauth.post_id = p.ID' )
 					->on( 'pauth.meta_key = ?', 'Author' )
 				

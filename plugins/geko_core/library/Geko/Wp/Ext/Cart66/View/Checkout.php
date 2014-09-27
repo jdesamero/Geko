@@ -10,7 +10,7 @@ class Geko_Wp_Ext_Cart66_View_Checkout extends Geko_Wp_Ext_Cart66_View
 		
 		$this->_sThisFile = __FILE__;
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$data = $this->getParam( 'data' );
 		$notices = $this->getParam( 'notices' );
@@ -368,17 +368,21 @@ class Geko_Wp_Ext_Cart66_View_Checkout extends Geko_Wp_Ext_Cart66_View
 							$newOrder = new Cart66Order( $orderId );
           					
           					
+          					$oQuery = new Geko_Sql_Select();
+          					$oQuery
+          						->field( "CONCAT( p.name, ' - ', p.price_description )", 'desc' )
+          						->from( '##pfx##cart66_products', 'p' )
+          						->where( 'p.id = oi.product_id' )
+          					;
           					
           					// correct the product descriptions in the order table
-							$wpdb->query( sprintf( "
-								UPDATE				%s oi
-								SET					oi.description = (
-									SELECT				CONCAT( p.name, ' - ', p.price_description )
-									FROM				%s p
-									WHERE				p.id = oi.product_id
-													)
-								WHERE				oi.order_id = %d
-							", $wpdb->cart66_order_items, $wpdb->cart66_products, $orderId ) );
+							$oDb->query( sprintf(
+								"UPDATE				##pfx##cart66_order_items oi
+								SET					oi.description = (%s)
+								WHERE				oi.order_id = %d",
+								strval( $oQuery ),
+								$orderId
+							) );
 							
 							
 							

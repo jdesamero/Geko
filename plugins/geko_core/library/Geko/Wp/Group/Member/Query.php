@@ -10,8 +10,8 @@ class Geko_Wp_Group_Member_Query extends Geko_Wp_Entity_Query
 		
 		$aRet = array();
 		
-		if ( !$aRet['geko_group_type'] && $this->_sGroupType ) {
-			$aRet['geko_group_type'] = $this->_sGroupType;
+		if ( !$aRet[ 'geko_group_type' ] && $this->_sGroupType ) {
+			$aRet[ 'geko_group_type' ] = $this->_sGroupType;
 		}
 		
 		return $aRet;
@@ -20,8 +20,6 @@ class Geko_Wp_Group_Member_Query extends Geko_Wp_Entity_Query
 	
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
-		
-		global $wpdb;
 		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
@@ -33,21 +31,21 @@ class Geko_Wp_Group_Member_Query extends Geko_Wp_Entity_Query
 			->field( 'gpm.status_id' )
 			->field( 'gpm.date_requested' )
 			->field( 'gpm.date_joined' )
-			->from( $wpdb->geko_group_members, 'gpm' )
+			->from( '##pfx##geko_group_members', 'gpm' )
 			
 			
 			->field( 'g.title', 'group_title' )
-			->joinLeft( $wpdb->geko_group, 'g' )
+			->joinLeft( '##pfx##geko_group', 'g' )
 				->on( 'g.group_id = gpm.group_id' )
 			
 			
 			->field( 'u.display_name', 'user_display_name' )
-			->joinLeft( $wpdb->users, 'u' )
+			->joinLeft( '##pfx##users', 'u' )
 				->on( 'u.ID = gpm.user_id' )
 			
 			->fieldKvp( 'um1.meta_value', 'first_name' )
 			->fieldKvp( 'um2.meta_value', 'last_name' )
-			->joinLeftKvp( $wpdb->usermeta, 'um*' )
+			->joinLeftKvp( '##pfx##usermeta', 'um*' )
 				->on( 'um*.user_id = u.ID' )
 				->on( 'um*.meta_key = ?', '*' )
 			

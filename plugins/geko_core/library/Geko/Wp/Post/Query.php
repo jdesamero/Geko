@@ -129,8 +129,6 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 			return $oQuery;
 		}
 		
-		global $wpdb;
-		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
 		
@@ -160,7 +158,7 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 			->field( 'p.post_mime_type' )
 			->field( 'p.comment_count' )
 			
-			->from( $wpdb->posts, 'p' )
+			->from( '##pfx##posts', 'p' )
 		;
 		
 		if ( isset( $aParams[ 'id' ] ) ) {
@@ -417,8 +415,6 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 	//
 	public static function replaceReferences( $sValue ) {
 		
-		global $wpdb;
-		
 		$sValue = sprintf( ' %s ', $sValue );
 		
 		$aRegs = array();
@@ -428,7 +424,7 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 			$aRegsFmt = Geko_Array::formatPregMatchAll( $aRegs, array( 'full', 'pre', 'post' ) );
 			
 			foreach ( $aRegsFmt as $aRow ) {
-				$sValue = str_replace( $aRow[ 'full' ], sprintf( '%s%s.%s', $aRow[ 'pre' ], $wpdb->posts, $aRow[ 'post' ] ), $sValue );
+				$sValue = str_replace( $aRow[ 'full' ], sprintf( '%s%s.%s', $aRow[ 'pre' ], '##pfx##posts', $aRow[ 'post' ] ), $sValue );
 			}
 		}
 		

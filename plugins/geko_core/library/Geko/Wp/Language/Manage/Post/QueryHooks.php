@@ -8,8 +8,8 @@ class Geko_Wp_Language_Manage_Post_QueryHooks extends Geko_Wp_Query_Hooks_Abstra
 	protected static $sLangCode = '';
 	
 	//
-	public static function where( $sWhere, $aParams = array() )
-	{
+	public static function where( $sWhere, $aParams = array() ) {
+		
 		$q = self::$oWpQuery->query_vars;
 		
 		self::$sLangCode = $q[ 'lang' ];
@@ -43,8 +43,8 @@ class Geko_Wp_Language_Manage_Post_QueryHooks extends Geko_Wp_Query_Hooks_Abstra
 	}
 	
 	//
-	public static function join( $sJoin, $aParams = array() )
-	{
+	public static function join( $sJoin, $aParams = array() ) {
+		
 		if ( self::$bJoin ) {
 			
 			global $wpdb;
@@ -72,8 +72,8 @@ class Geko_Wp_Language_Manage_Post_QueryHooks extends Geko_Wp_Query_Hooks_Abstra
 	}
 	
 	//
-	public static function fields( $sFields, $aParams = array() )
-	{
+	public static function fields( $sFields, $aParams = array() ) {
+		
 		if ( self::$bFields ) {
 			
 			$sJoinKey1 = self::getJoinKey();

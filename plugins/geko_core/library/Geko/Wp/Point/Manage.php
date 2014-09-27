@@ -283,7 +283,6 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 	// award points
 	public function awardPoints( $aValues ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		$iUserId = trim( $aValues[ 'user_id' ] );
@@ -373,18 +372,21 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 			
 		} else {
 			
-			$wpdb->insert( $this->_sPrimaryTable, $aInsert, $aFormat );
+			$oDb->insert( $this->_sPrimaryTable, $aInsert );
+			// $aFormat is unused
+			
 			$iPointId = $oDb->lastInsertId();
 			
 			if ( count( $aMetaInsert ) > 0 ) {
+				
 				foreach ( $aMetaInsert as $aVals ) {
+					
 					$aVals[ 'point_id' ] = $iPointId;
-					$wpdb->insert(
-						$wpdb->geko_point_meta,
-						$aVals,
-						array( '%d', '%s', '%d' )
-					);
+					$oDb->insert( '##pfx##geko_point_meta', $aVals );
+					
+					// array( '%d', '%s', '%d' )
 				}
+				
 			}
 			
 			// send notification, if applicable
@@ -410,7 +412,7 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 	// will return boolean value (TRUE | FALSE) on an affirmative check
 	public function hasPoints( $aValues, &$iErrorCode = NULL ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$iUserId = trim( $aValues[ 'user_id' ] );
 		$sEmail = trim( $aValues[ 'email' ] );
@@ -585,13 +587,13 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 			$oIpChkQuery = new Geko_Sql_Select();
 			$oIpChkQuery
 				->field( 'COUNT(*)' )
-				->from( $wpdb->geko_point, 'p' )
+				->from( '##pfx##geko_point', 'p' )
 				->where( 'p.remote_ip = ?', $iRemoteIp )
 				->where( 'p.pntevt_id = ?', $iPointEventId )
 				->where( "DATE_FORMAT( p.date_created, '%Y-%m-%d' ) = ?", date( 'Y-m-d' ) )
 			;
 			
-			$iIpDayCount = intval( $wpdb->get_var( strval( $oIpChkQuery ) ) );
+			$iIpDayCount = intval( $oDb->fetchCol( strval( $oIpChkQuery ) ) );
 			
 			if ( $iIpDayCount >= $iIpLimit ) {
 				$iErrorCode = Geko_Wp_Point::getErrorCode( 'ip-limit' );
@@ -608,8 +610,6 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 	//
 	public function getPoints( $mUserIdOrEmail ) {
 		
-		global $wpdb;
-		
 		if ( preg_match( '/^[0-9]+$/', $mUserIdOrEmail ) ) {
 			$iUserId = $mUserIdOrEmail;
 			if ( !get_userdata( $iUserId ) ) {
@@ -625,37 +625,33 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 		$oPointsQuery = new Geko_Sql_Select();
 		$oPointsQuery
 			->field( 'SUM( CAST( p.value AS SIGNED ) )' )
-			->from( $wpdb->geko_point, 'p' )
+			->from( '##pfx##geko_point', 'p' )
 			->where( 'p.user_id = ?', $iUserId )
 			->where( 'p.approve_status_id = 1' )		// hard-code for now
 		;
 		
-		return intval( $wpdb->get_var( strval( $oPointsQuery ) ) );
+		return intval( $oDb->fetchCol( strval( $oPointsQuery ) ) );
 	}
 	
 	
 	// delete user
 	public function deleteUser( $iUserId ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
-		// clean up point table
-		$oSqlDelete = new Geko_Sql_Delete();
-		$oSqlDelete
-			->from( $this->_sPrimaryTable )
-			->where( 'user_id = ?', $iUserId )
+		$oDb->delete( $this->_sPrimaryTable, array(
+			'user_id = ?' => $iUserId
+		) );
+		
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			->field( 'p.point_id' )
+			->from( '##pfx##geko_point', 'p' )
 		;
-		$wpdb->query( strval( $oSqlDelete ) );
 		
-		// clean-up meta data table
-		$wpdb->query("
-			DELETE FROM		$wpdb->geko_point_meta
-			WHERE			point_id NOT IN (
-				SELECT			point_id
-				FROM			$wpdb->geko_point
-			)
-		");
-		
+		$oDb->delete( '##pfx##geko_point_meta', array(
+			'point_id NOT IN (?)' => new Zend_Db_Expr( strval( $oQuery ) )
+		) );
 	}
 	
 	

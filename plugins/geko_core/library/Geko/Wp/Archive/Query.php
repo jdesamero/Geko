@@ -21,8 +21,6 @@ class Geko_Wp_Archive_Query extends Geko_Wp_Entity_Query
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
-		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
 		
@@ -30,7 +28,7 @@ class Geko_Wp_Archive_Query extends Geko_Wp_Entity_Query
 		$oQuery
 			->field( 'COUNT(*)', 'archive_count' )
 			->field( "DATE_FORMAT( p.post_date, '%Y' )", 'year' )
-			->from( $wpdb->posts, 'p' )
+			->from( '##pfx##posts', 'p' )
 			->group( 'period' )
 		;
 		
@@ -48,11 +46,11 @@ class Geko_Wp_Archive_Query extends Geko_Wp_Entity_Query
 			$oQuery->field( "DATE_FORMAT( p.post_date, '%m' )", 'month' );
 		}
 		
-		$oQuery->field( "DATE_FORMAT( p.post_date, '" . $sPeriodFormat . "' )", 'period' );
+		$oQuery->field( sprintf( "DATE_FORMAT( p.post_date, '%s' )", $sPeriodFormat ), 'period' );
 		
 		// post type
 		$mPostType = $aParams[ 'post_type' ];
-		$mPostType = ( $mPostType ) ? ( ( 'any' == $mPostType ) ? '' : $mPostType ) : 'post';
+		$mPostType = ( $mPostType ) ? ( ( 'any' == $mPostType ) ? '' : $mPostType ) : 'post' ;
 		
 		if ( $mPostType ) {
 			$oQuery->where( 'p.post_type * (?)', $mPostType );
@@ -60,7 +58,7 @@ class Geko_Wp_Archive_Query extends Geko_Wp_Entity_Query
 		
 		// post status
 		$mPostStatus = $aParams[ 'post_status' ];
-		$mPostStatus = ( $mPostStatus ) ? ( ( 'any' == $mPostStatus ) ? '' : $mPostStatus ) : 'publish';
+		$mPostStatus = ( $mPostStatus ) ? ( ( 'any' == $mPostStatus ) ? '' : $mPostStatus ) : 'publish' ;
 		
 		if ( $mPostStatus ) {
 			$oQuery->where( 'p.post_status * (?)', $mPostStatus );
@@ -70,9 +68,9 @@ class Geko_Wp_Archive_Query extends Geko_Wp_Entity_Query
 		if ( $mCat = $aParams[ 'cat' ] ) {
 			
 			$oQuery
-				->joinLeft( $wpdb->term_relationships, 'tr' )
+				->joinLeft( '##pfx##term_relationships', 'tr' )
 					->on( 'tr.object_id = p.ID' )
-				->joinLeft( $wpdb->term_taxonomy, 'tx' )
+				->joinLeft( '##pfx##term_taxonomy', 'tx' )
 					->on( 'tx.term_taxonomy_id = tr.term_taxonomy_id' )
 				->where( 'tx.term_id * ($)', $mCat )
 			;
@@ -80,7 +78,7 @@ class Geko_Wp_Archive_Query extends Geko_Wp_Entity_Query
 			/* /
 			// TO DO: allow slugs
 			$oQuery
-				->joinLeft( $wpdb->terms, 't' )
+				->joinLeft( '##pfx##terms', 't' )
 					->on( 't.term_id = tx.term_id' )
 			;
 			/* */

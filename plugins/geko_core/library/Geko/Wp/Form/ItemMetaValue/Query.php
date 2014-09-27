@@ -11,7 +11,6 @@ class Geko_Wp_Form_ItemMetaValue_Query extends Geko_Wp_Entity_Query
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
 		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
@@ -23,17 +22,17 @@ class Geko_Wp_Form_ItemMetaValue_Query extends Geko_Wp_Entity_Query
 			->field( $sSecIdExp, 'section_id' )
 			->field( 'fs.form_id' )
 			
-			->joinLeft( $wpdb->geko_form_item, 'fi' )
+			->joinLeft( '##pfx##geko_form_item', 'fi' )
 				->on( 'fi.fmitm_id = fimv.fmitm_id' )
 
-			->joinLeft( $wpdb->geko_form_section, 'fs' )
-				->on( 'fs.fmsec_id = ' . $sSecIdExp )
+			->joinLeft( '##pfx##geko_form_section', 'fs' )
+				->on( sprintf( 'fs.fmsec_id = %s', $sSecIdExp ) )
 				
 		;
 		
 		// fmsec id
 		if ( $aParams[ 'fmsec_id' ] ) {
-			$oQuery->where( $sSecIdExp . ' = ?', $aParams[ 'fmsec_id' ] );
+			$oQuery->where( sprintf( '%s = ?', $sSecIdExp ), $aParams[ 'fmsec_id' ] );
 		}
 
 		// form id

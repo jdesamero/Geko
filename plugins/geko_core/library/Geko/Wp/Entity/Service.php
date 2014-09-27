@@ -45,12 +45,15 @@ class Geko_Wp_Entity_Service extends Geko_Wp_Service
 	
 	//
 	public function addAction( $mAction ) {
+		
 		if ( is_string( $mAction ) && class_exists( $mAction ) ) {
 			$oAction = Geko_Singleton_Abstract::getInstance( $mAction );
 		} else {
 			$oAction = $mAction;
 		}
+		
 		$this->_aActions[ $oAction->getName() ] = $oAction;
+		
 		return $this;
 	}
 	
@@ -121,9 +124,6 @@ class Geko_Wp_Entity_Service extends Geko_Wp_Service
 	
 	//
 	public function process() {
-		
-		global $wpdb;
-		
 		
 		
 		//// set-up vars

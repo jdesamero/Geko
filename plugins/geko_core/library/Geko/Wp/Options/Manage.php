@@ -1618,8 +1618,6 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 			( $this->_sAddAction == $sAction || $this->_sEditAction == $sAction || $this->_sDelAction == $sAction )
 		) {
 			
-			global $wp_roles, $wpdb;
-			
 			$aParams = array();
 			
 			$bContinue = TRUE;
@@ -1739,7 +1737,6 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	//
 	public function doAddAction( $aParams, $aValues = NULL ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		$aInsertData = $this->getInsertData( $aParams, $aValues );
@@ -1747,11 +1744,8 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		if ( $this->getInsertContinue( $aInsertData, $aParams ) ) {
 			
 			// update the database first
-			$wpdb->insert(
-				$this->_sPrimaryTable,
-				$aInsertData[ 0 ],
-				$aInsertData[ 1 ]
-			);
+			$oDb->insert( $this->_sPrimaryTable, $aInsertData[ 0 ] );
+			// $aInsertData[ 1 ] is unused
 			
 			$aParams[ 'entity_id' ] = $oDb->lastInsertId();
 			
@@ -1889,7 +1883,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	//
 	public function doEditAction( $aParams, $oEntity = NULL, $aValues = NULL, $aKeys = NULL ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$bContinue = TRUE;
 		
@@ -1909,14 +1903,15 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		
 		if ( $bContinue && $this->getUpdateContinue( $aUpdateData, $aParams, $oEntity ) ) {
 			
+			$aUpdateKeys = array();
+			
+			foreach ( $aUpdateData[ 1 ] as $sKey => $mVal ) {
+				$aUpdateKeys[ sprintf( '%s = ?', $sKey ) ] = $mVal;
+			}
+			
 			// update the database first
-			$wpdb->update(
-				$this->_sPrimaryTable,
-				$aUpdateData[ 0 ],
-				$aUpdateData[ 1 ],
-				$aUpdateData[ 2 ],
-				$aUpdateData[ 3 ]
-			);
+			$oDb->update( $this->_sPrimaryTable, $aUpdateData[ 0 ], $aUpdateKeys );
+			// $aUpdateData[ 2 ] and $aUpdateData[ 3 ] is unused
 			
 			$sEntityClass = $this->_sEntityClass;			
 			$oUpdatedEntity = new $sEntityClass( $oEntity->getId() );
@@ -2116,7 +2111,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	//
 	public function doDelAction( $aParams, $oEntity = NULL, $aKeys = NULL ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 
 		$bContinue = TRUE;
 		
@@ -2143,14 +2138,14 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 				$aKeys = array( $oPk->getFieldName() => $oEntity->getId() );
 			}
 			
-			$oSqlDelete = new Geko_Sql_Delete();
-			$oSqlDelete->from( $this->_sPrimaryTable );
+			// format delete keys
 			
+			$aDeleteKeys = array();
 			foreach ( $aKeys as $sFieldName => $mFieldValue ) {
-				$oSqlDelete->where( sprintf( '%s = ?', $sFieldName ), $mFieldValue );
+				$aDeleteKeys[ sprintf( '%s = ?', $sFieldName ) ] = $mFieldValue;
 			}
 			
-			$wpdb->query( $oSqlDelete );
+			$oDb->delete( $this->_sPrimaryTable, $aDeleteKeys );
 			
 			// hook method
 			$this->postDeleteAction( $aParams, $oEntity );
@@ -2169,7 +2164,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	// hook method
 	public function postDeleteAction( $aParams, $oEntity ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 
 		if ( $this->_sNestedType ) {
 			
@@ -2177,14 +2172,10 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 			$oSubEntTable = $this->getPrimaryTable();
 			
 			if ( $oSubEntTable->hasField( $sMainEntPkfName ) ) {
-			
-				$oSqlDelete = new Geko_Sql_Delete();
-				$oSqlDelete
-					->from( $this->_sPrimaryTable )
-					->where( sprintf( '%s = ?', $sMainEntPkfName ), $oMainEnt->getId() )
-				;
 				
-				$wpdb->query( strval( $oSqlDelete ) );
+				$oDb->delete( $this->_sPrimaryTable, array(
+					sprintf( '%s = ?', $sMainEntPkfName ) => $oEntity->getId()
+				) );
 			}
 		}
 		
@@ -2227,7 +2218,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	//
 	public function doSubDelAction( $oMainEnt, $aParams, $oPlugin = NULL ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 
 		if ( $oMainMng =  $this->_oSubOptionParent ) {
 			
@@ -2238,14 +2229,10 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 			$oSubEntTable = $this->getPrimaryTable();
 			
 			if ( $oSubEntTable->hasField( $sMainEntPkfName ) ) {
-			
-				$oSqlDelete = new Geko_Sql_Delete();
-				$oSqlDelete
-					->from( $this->_sPrimaryTable )
-					->where( sprintf( '%s = ?', $sMainEntPkfName ), $oMainEnt->getId() )
-				;
 				
-				$wpdb->query( strval( $oSqlDelete ) );
+				$oDb->delete( $this->_sPrimaryTable, array(
+					sprintf( '%s = ?', $sMainEntPkfName ) => $oMainEnt->getId()
+				) );
 			}
 		}
 		
@@ -2389,7 +2376,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	//
 	public function updateRelatedEntities( $aQueryParams, $aPostData, $aParams ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		// Mega hackish!!!
 		// Force skip update if the var below is set
@@ -2419,22 +2406,26 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 			}
 			
 			// Track Ids
-			if ( !is_array( $wpdb->aSubItemIds ) ) $wpdb->aSubItemIds = array();
-			$wpdb->aSubItemIds[ $this->_sInstanceClass ] = array_keys( $aDataFmt );
+			$oDb->setSubItemIds( $this->_sInstanceClass, array_keys( $aDataFmt ) );
 			
 			// update
 			foreach ( $aDataFmt as $mId => $oSubItem ) {
+				
 				if ( $aPostUpd = $aPostData[ $mId ] ) {
+					
 					$aPostUpd = $this->modifySubUpdateData( $aPostUpd, $aParams, $oSubItem );
 					$aUpdateVals = $this->getFormattedPostData( $aParams, $aPostUpd );
 					$aUpdateWhere = $this->updateRelatedWhere( $mId, $aKeyFields );
-					$wpdb->update(
-						$this->_sPrimaryTable,
-						$aUpdateVals[ 0 ],
-						$aUpdateWhere[ 0 ],
-						$aUpdateVals[ 1 ],
-						$aUpdateWhere[ 1 ]
-					);
+					
+					$aUpdateKeys = array();
+					
+					foreach ( $aUpdateWhere[ 0 ] as $sKey => $mValue ) {
+						$aUpdateKeys[ sprintf( '%s = ?', $sKey ) ] = $mValue;
+					}
+					
+					$oDb->update( $this->_sPrimaryTable, $aUpdateVals[ 0 ], $aUpdateKeys );
+					// $aUpdateVals[ 1 ] and $aUpdateWhere[ 1 ] is unused
+					
 					unset( $aDataFmt[ $mId ] );
 					unset( $aPostData[ $mId ] );
 				}
@@ -2449,21 +2440,17 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 				
 				if ( $iMainEntId ) {
 					$aInsertVals[ 0 ][ $sMainEntPkfName ] = $iMainEntId;
-					$aInsertVals[ 1 ][] = $sMainEntPkfFormat;
+					// $aInsertVals[ 1 ][] = $sMainEntPkfFormat;
 				}
 				
-				$wpdb->insert(
-					$this->_sPrimaryTable,
-					$aInsertVals[ 0 ],
-					$aInsertVals[ 1 ]
-				);
+				$oDb->insert( $this->_sPrimaryTable, $aInsertVals[ 0 ] );
+				// $aInsertVals[ 1 ] is not used
 				
 				$aInsIds[ $mId ] = $this->updateRelatedInsertId( $aInsertVals );
 			}
 			
 			// Track Ids
-			if ( !is_array( $wpdb->aInsertIds ) ) $wpdb->aInsertIds = array();
-			$wpdb->aInsertIds[ $this->_sInstanceClass ] = $aInsIds;
+			$oDb->setInsertIds( $this->_sInstanceClass, $aInsIds );
 			
 			// delete
 			$aDelIds = array();
@@ -2479,11 +2466,10 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 				
 				$oSqlDelete = $this->updateRelatedDelete( $oSqlDelete, $aDelIds, $aKeyFields );
 				
-				$wpdb->query( strval( $oSqlDelete ) );
+				$oDb->query( strval( $oSqlDelete ) );
 				
 				// Track Ids
-				if ( !is_array( $wpdb->aDeleteIds ) ) $wpdb->aDeleteIds = array();
-				$wpdb->aDeleteIds[ $this->_sInstanceClass ] = $aDelIds;
+				$oDb->setDeleteIds( $this->_sInstanceClass, $aDelIds );
 				
 			}
 			

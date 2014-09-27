@@ -554,7 +554,6 @@ class Geko_Wp_EmailMessage_Manage extends Geko_Wp_Options_Manage
 	//
 	public function importSerialized( $aSerialized ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		//// do checks
@@ -564,7 +563,7 @@ class Geko_Wp_EmailMessage_Manage extends Geko_Wp_Options_Manage
 		
 		$bRes = FALSE;
 		
-		$wpdb->query( 'START TRANSACTION' );
+		$oDb->beginTransaction();
 		
 		
 		// setup values
@@ -598,15 +597,24 @@ class Geko_Wp_EmailMessage_Manage extends Geko_Wp_Options_Manage
 			$aMainValues[ 'slug:%s' ] = $aSerialized[ 'slug' ];
 			
 			// clean up old values
-			$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->geko_emsg_recipients WHERE emsg_id = %d", $iRestoreEmsgId ) );
-			$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->geko_emsg_header WHERE emsg_id = %d", $iRestoreEmsgId ) );
-			$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->geko_email_message WHERE emsg_id = %d", $iRestoreEmsgId ) );
+			
+			$oDb->delete( '##pfx##geko_emsg_recipients', array(
+				'emsg_id = ?' => $iRestoreEmsgId
+			) );
+
+			$oDb->delete( '##pfx##geko_emsg_header', array(
+				'emsg_id = ?' => $iRestoreEmsgId
+			) );
+
+			$oDb->delete( '##pfx##geko_email_message', array(
+				'emsg_id = ?' => $iRestoreEmsgId
+			) );
 			
 		} else {
 			
 			// generate a new slug, if needed
 			$aMainValues[ 'slug:%s' ] = Geko_Wp_Db::generateSlug(
-				$aSerialized[ 'slug' ], $wpdb->geko_email_message, 'slug'
+				$aSerialized[ 'slug' ], $oDb->_p( 'geko_email_message' ), 'slug'
 			);
 			
 		}
@@ -670,14 +678,17 @@ class Geko_Wp_EmailMessage_Manage extends Geko_Wp_Options_Manage
 		
 		// commit if no errors
 		if ( $bRes ) {
-			$wpdb->query( 'COMMIT' );
+			
+			$oDb->commit();
+			
 			return array(
 				'dup_entity_id' => $iDupEmsgId
 			);
 		}
 		
 		// rollback if there are errors
-		$wpdb->query( 'ROLLBACK' );		
+		$oDb->rollBack();
+		
 		return FALSE;
 	}
 	

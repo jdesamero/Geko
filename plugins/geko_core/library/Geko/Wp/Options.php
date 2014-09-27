@@ -402,10 +402,17 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	public function resolveTableName( $mSqlTable ) {
 
 		if ( is_string( $mSqlTable ) ) {
-			$sTableName = $mSqlTable;
+			
+			$oDb = Geko_Wp::get( 'db' );
+			
+			$sTableName = $oDb->replacePrefixPlaceholder( $mSqlTable );
+			
 		} elseif ( is_a( $mSqlTable, 'Geko_Sql_Table' ) ) {
+			
 			$sTableName = $mSqlTable->getTableName();
+			
 		} else {
+		
 			$sTableName = '';
 		}
 		
@@ -432,6 +439,7 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 		}
 		
 		$oSqlTable = NULL;
+		
 		if ( $mSqlTable instanceof Geko_Sql_Table ) {
 			$oSqlTable = $mSqlTable;
 		} else {
@@ -472,6 +480,11 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	public function getTable( $sTableName = '' ) {
 		
 		if ( $sTableName ) {
+			
+			$oDb = Geko_Wp::get( 'db' );
+			
+			$sTableName = $oDb->replacePrefixPlaceholder( $sTableName );
+			
 			return $this->_aTables[ $sTableName ];
 		}
 		
@@ -493,10 +506,10 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	// drop the provided <sql table object> or <table name> from the database
 	public function dropTable( $mSqlTable ) {
 		
-		global $wpdb;
-				
+		$oDb = Geko_Wp::get( 'db' );
+		
 		if ( $sTableName = $this->resolveTableName( $mSqlTable ) ) {
-			$wpdb->query( sprintf( 'DROP TABLE %s', $sTableName ) );
+			$oDb->query( sprintf( 'DROP TABLE %s', $sTableName ) );
 		}
 		
 		return $this;
@@ -1266,7 +1279,6 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	//
 	public function insertDetails( $oPlugin = NULL ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		$aPostVals = $_POST;
@@ -1310,12 +1322,9 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 			}
 			
 		}
-				
-		$bRes = $wpdb->insert(
-			$this->_sPrimaryTable,
-			$aValues,
-			$aFormat
-		);
+		
+		$bRes = $oDb->insert( $this->_sPrimaryTable, $aValues );
+		// $aFormat is unused
 		
 		if ( $bRes ) {
 			
@@ -1351,7 +1360,7 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	//
 	public function updateDetails( $oPlugin = NULL ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$this->_aUpdateIds = array();
 		
@@ -1365,10 +1374,10 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 		$aFields = $this->getDetailFields( $oPlugin );
 		
 		$aValues = array();
-		$aFormat = array();
+		// $aFormat = array();
 		
 		$aWhere = array();
-		$aWhereFormat = array();
+		// $aWhereFormat = array();
 		
 		$aPlugins = array();
 		foreach ( $aFields as $sField => $oField ) {
@@ -1391,13 +1400,13 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 			if ( $oField->isWhereUpdate() ) {
 				
 				$aWhere[ $sField ] = $oField->getSmartFormattedValue( $mValue );
-				$aWhereFormat[] = $oField->getFormat();
+				// $aWhereFormat[] = $oField->getFormat();
 								
 				continue;
 			} 
 			
-			$aValues[ $sField ] = $oField->getSmartFormattedValue( $mValue );
-			$aFormat[] = $oField->getFormat();
+			$aValues[ sprintf( '%s = ?', $sField ) ] = $oField->getSmartFormattedValue( $mValue );
+			// $aFormat[] = $oField->getFormat();
 			
 		}
 		
@@ -1411,11 +1420,8 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 		$this->setTargetEntity( $oEntity, 'pre_update' );
 		
 		//
-		$bRes = $wpdb->update(
-			$this->_sPrimaryTable,
-			$aValues, $aWhere,
-			$aFormat, $aWhereFormat
-		);
+		$bRes = $oDb->update( $this->_sPrimaryTable, $aValues, $aWhere );
+		// $aFormat, $aWhereFormat is unused
 		
 		if ( $bRes ) {
 			
@@ -1465,12 +1471,12 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	//
 	public function deleteDetails( $oPlugin = NULL ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$aPostVals = $_POST;
 		$aPostVals = $this->modifyDeleteDetailValues( $aPostVals, $oPlugin );
 		
-		print_r( $aPostVals );
+		// print_r( $aPostVals );
 		
 		if ( !$this->checkDeleteDetailValues( $aPostVals, $oPlugin ) ) {
 			return FALSE;
@@ -1479,7 +1485,7 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 		$aFields = $this->getDetailFields( $oPlugin );
 
 		$aWhere = array();
-		$aWhereFormat = array();
+		// $aWhereFormat = array();
 		
 		$aPlugins = array();
 		foreach ( $aFields as $sField => $oField ) {
@@ -1495,11 +1501,12 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 			
 			$mValue = $aPostVals[ $sField ];
 			
-			$aWhere[ $sField ] = $oField->getSmartFormattedValue( $mValue );
-			$aWhereFormat[] = $oField->getFormat();
+			$aWhere[ sprintf( '%s = ?', $sField ) ] = $oField->getSmartFormattedValue( $mValue );
+			// $aWhereFormat[] = $oField->getFormat();
 			
 		}
 		
+		/* /
 		$oSqlDelete = new Geko_Sql_Delete();
 		$oSqlDelete->from( $this->_sPrimaryTable );
 		
@@ -1510,11 +1517,12 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 				$mValue
 			) );
 		}
+		/* */
 		
 		// track the entity before it is deleted
 		$oEntity = $this->resolveEntity( $aWhere );
 		
-		$bRes = $wpdb->query( $oSqlDelete );
+		$bRes = $oDb->delete( $this->_sPrimaryTable, $aWhere );
 		
 		if ( $bRes ) {
 			

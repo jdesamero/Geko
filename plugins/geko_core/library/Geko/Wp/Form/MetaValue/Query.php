@@ -11,8 +11,6 @@ class Geko_Wp_Form_MetaValue_Query extends Geko_Wp_Entity_Query
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
-		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
 		
@@ -29,7 +27,7 @@ class Geko_Wp_Form_MetaValue_Query extends Geko_Wp_Entity_Query
 		// form id
 		if ( $aParams[ 'form_id' ] ) {
 			$oQuery
-				->joinLeft( $wpdb->geko_form_meta_data, 'fmd' )
+				->joinLeft( '##pfx##geko_form_meta_data', 'fmd' )
 					->on( 'fmd.fmmd_id = fmv.fmmd_id' )
 				->where( 'fmd.form_id = ?', $aParams[ 'form_id' ] )
 			;			

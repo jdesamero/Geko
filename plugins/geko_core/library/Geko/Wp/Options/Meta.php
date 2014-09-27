@@ -370,7 +370,7 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 	//
 	public function getMetaData( $aParams = array() ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$sField = $this->_sParentFieldName;
 		
@@ -380,7 +380,7 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 			->field( 'k.meta_key' )
 			->field( 'm.meta_value' )
 			->from( $this->_sPrimaryTable, 'm' )
-			->joinLeft( $wpdb->geko_meta_key, 'k' )
+			->joinLeft( '##pfx##geko_meta_key', 'k' )
 				->on( 'k.mkey_id = m.mkey_id' )
 		;
 		
@@ -388,7 +388,7 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 			$oQuery->where( sprintf( 'm.%s * ($)', $sField ), $aParams[ 'parent_ids' ] );
 		}
 		
-		$aRes = $wpdb->get_results( strval( $oQuery ) );
+		$aRes = $oDb->fetchAllObj( strval( $oQuery ) );
 		
 		$aMetaData = array();
 		foreach ( $aRes as $oRes ) {
@@ -405,20 +405,24 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 	//
 	protected function gatherSubMetaValues( $aItems, $sMetaMemberTable, $sMetaIdFieldName ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$aMetaIds = array();
+		
 		foreach ( $aItems as $oItem ) {
 			$aMetaIds[] = $oItem->$sMetaIdFieldName;
 		}
 		
-		$sMetaMemberTable = $wpdb->$sMetaMemberTable;
-		$aSubFmt = $wpdb->get_results( sprintf( "
-			SELECT			*
-			FROM			$sMetaMemberTable
-			WHERE			%s
-			ORDER BY		member_id, member_value
-		", Geko_Wp_Db::prepare( sprintf( ' ( %s ##d## ) ', $sMetaIdFieldName ), $aMetaIds ) ) );
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			->field( 'mt.*' )
+			->from( $oDb->_p( $sMetaMemberTable ), 'mt' )
+			->where( sprintf( '%s * ($)', $sMetaIdFieldName ), $aMetaIds )
+			->order( 'member_id', 'ASC' )
+			->order( 'member_value', 'ASC' )
+		;
+		
+		$aSubFmt = $oDb->fetchAllObj( strval( $oQuery ) );
 		
 		$aSubVals = array();
 		foreach ( $aSubFmt as $oSubItem ) {
@@ -435,35 +439,40 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 	//
 	protected function commitMetaData( $aParams, $aDataVals = NULL, $aFileVals = NULL ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		$aElemsGroup = $aParams[ 'elems_group' ];
 		$aMeta = $aParams[ 'meta_data' ];
 		$iEntityId = intval( $aParams[ 'entity_id' ] );
-		$bUseMkeyId = $aParams[ 'use_mkey_id' ] ? TRUE : FALSE;
+		$bUseMkeyId = $aParams[ 'use_mkey_id' ] ? TRUE : FALSE ;
 		
 		$sMetaTable = $aParams[ 'meta_table' ];
 		$sMetaMemberTable = $aParams[ 'meta_member_table' ];
 		$sMetaEntityIdFieldName = $aParams[ 'meta_entity_id_field_name' ];
 		$sMetaIdFieldName = $aParams[ 'meta_id_field_name' ];
 		
-		$sMetaMemberTable = $wpdb->$sMetaMemberTable;
+		$sMetaMemberTable = $oDb->_p( $sMetaMemberTable );
 		
 		$aSubEntities = array();
 		
 		// if $aDataVals is not NULL, then flag it
-		$bGetDataKeys = ( NULL !== $aDataVals ) ? TRUE : FALSE;
+		$bGetDataKeys = ( NULL !== $aDataVals ) ? TRUE : FALSE ;
 		
 		//// HACKISH!!!
 		if ( $aDataVals && $aFileVals ) {
+			
 			// reconcile corresponding $_POST values for $_FILES
 			foreach ( $aFileVals as $sKey => $sValue ) {
+				
 				if ( 0 === strpos( $sValue, '_FILES::' ) ) {
+					
 					$sRealKey = str_replace( '_FILES::', '', $sValue );
 					$aFileVals[ $sKey ] = $_FILES[ $sRealKey ];
+					
 					if ( !$aDataVals[ $sKey ] ) {
+						
 						$aDataVals[ $sKey ] = $_POST[ $sRealKey ];
+						
 						if ( $mDel = $_POST[ sprintf( 'del-%s', $sRealKey ) ] ) {
 							$aDataVals[ sprintf( 'del-%s', $sKey ) ] = $mDel;
 						}
@@ -548,7 +557,7 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 					$aVals[ 'meta_key' ] = $sMetaKey;				
 				}
 				
-				$wpdb->insert( $wpdb->$sMetaTable, $aVals );
+				$oDb->insert( $oDb->_p( $sMetaTable ), $aVals );
 				
 				$iSubEntityId = $oDb->lastInsertId();
 				
@@ -560,9 +569,9 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 				
 				// update meta value
 				
-				$aKeys[ $sMetaIdFieldName ] = $oMeta->$sMetaIdFieldName;
+				$aKeys[ sprintf( '%s = ?', $sMetaIdFieldName ) ] = $oMeta->$sMetaIdFieldName;
 				
-				$wpdb->update( $wpdb->$sMetaTable, $aVals, $aKeys );
+				$oDb->update( $oDb->_p( $sMetaTable ), $aVals, $aKeys );
 				
 				$iSubEntityId = $oMeta->$sMetaIdFieldName;
 				
@@ -578,19 +587,16 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 		
 		if ( count( $aSubEntities ) > 0 ) {
 			
-			// clean-up existing
-			$wpdb->query( sprintf( '
-					DELETE FROM			%s
-					WHERE				%s
-				',
-				$sMetaMemberTable,
-				Geko_Wp_Db::prepare( sprintf( ' ( %s ##d## ) ', $sMetaIdFieldName ), array_keys( $aSubEntities ) )
+			$oDb->delete( $sMetaMemberTable, array(
+				sprintf( '%s IN (?)', $sMetaIdFieldName ) => new Zend_Db_Expr(
+					sprintf( "'%s'", implode( "', '", array_keys( $aSubEntities ) ) )
+				)
 			) );
 			
 			// re-insert
 			foreach ( $aSubEntities as $iSubEntityId => $aSubVals ) {
 				foreach ( $aSubVals as $aRowData ) {
-					$wpdb->insert( $sMetaMemberTable, $aRowData );
+					$oDb->insert( $sMetaMemberTable, $aRowData );
 				}
 			}
 			
@@ -750,14 +756,14 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 	}
 	
 	
-	//
-	public function cleanOrphanFiles( $sFilesDbSql, $sCleanupSql, $sFileDir ) {
+	// $oFilesQuery is an instance of Geko_Sql_Select
+	// $oFilesDelete is an instance of Geko_Sql_Delete
+	public function cleanOrphanFiles( $oFilesQuery, $oFilesDelete, $sFileDir ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		// get all the files in the database
-		$aFilesDb = $oDb->fetchCol( $sFilesDbSql );
+		$aFilesDb = $oDb->fetchCol( strval( $oFilesQuery ) );
 		$aFilesDb = array_diff( $aFilesDb, array( '' ) );					// remove empty values
 		
 		// get list of actual files
@@ -769,15 +775,24 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 		// remove files in the db that don't actually exist
 		// go through each file
 		foreach ( $aFilesDb as $i => $sFile ) {
+			
 			$iBefore = count( $aFiles );									// count all actual files
 			$aFiles = array_diff( $aFiles, array( $sFile ) );				// remove matching file
 			$iAfter = count( $aFiles );										// count again
+			
 			if ( $iBefore != $iAfter ) unset( $aFilesDb[ $i ] );			// remove from db file list
 		}
 		
 		// cleanup db with whatever was left over from $aFilesDb (since these do not actually exist)
 		foreach ( $aFilesDb as $sFile ) {
-			$wpdb->query( $wpdb->prepare( $sCleanupSql, $sFile ) );
+			
+			if ( $oFilesDelete->hasWhere( 'file' ) ) {
+				$oFilesDelete->unsetWhere( 'file' );
+			}
+			
+			$oFilesDelete->where( 'f.meta_value = ?', $sFile, 'file' );
+			
+			$oDb->query( strval( $oFilesDelete ) );
 		}
 		
 		// cleanup files with whatever was left over from $aFiles (since these do not exist in the db)

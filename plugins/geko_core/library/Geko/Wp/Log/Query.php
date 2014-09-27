@@ -7,8 +7,6 @@ class Geko_Wp_Log_Query extends Geko_Wp_Entity_Query
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
-		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
 		
@@ -24,7 +22,7 @@ class Geko_Wp_Log_Query extends Geko_Wp_Entity_Query
 			->field( 'u.user_login' )
 			
 			->from( $sTableName, 'l' )			
-			->joinLeft( $wpdb->users, 'u' )
+			->joinLeft( '##pfx##users', 'u' )
 				->on( 'u.ID = l.user_id' )
 			
 		;
@@ -36,7 +34,7 @@ class Geko_Wp_Log_Query extends Geko_Wp_Entity_Query
 			$i = 0;
 			foreach ( $aMeta as $sKey => $aParams ) {
 				
-				$sPfx = '_mt' . $i;
+				$sPfx = sprintf( '_mt%d', $i );
 				
 				$oQuery
 					->field( sprintf( '%s.meta_value', $sPfx ), $sKey )

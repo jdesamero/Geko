@@ -97,7 +97,7 @@ class Geko_Wp_Ext_Cart66_Gateway extends Cart66GatewayAbstract
 	//
 	public function saveOrderExtra( $fDiscount, $total, $tax, $transactionId, $status, $accountId ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$iOrderId = $this->saveOrder( $total, $tax, $transactionId, $status, $accountId );
 		
@@ -113,8 +113,8 @@ class Geko_Wp_Ext_Cart66_Gateway extends Cart66GatewayAbstract
 			}
 		}
 		
-		$wpdb->update( $wpdb->cart66_orders, $aData, array(
-			'id' => $iOrderId
+		$oDb->update( '##pfx##cart66_orders', $aData, array(
+			'id = ?' => $iOrderId
 		) );
 		
 		return $iOrderId;

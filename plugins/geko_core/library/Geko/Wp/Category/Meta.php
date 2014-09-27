@@ -62,12 +62,10 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 
 		parent::install();
 		
-		$oDb = Geko_Wp::get( 'db' );
-		
 		Geko_Wp_Options_MetaKey::install();
 		
 		$this->createTableOnce();
-		$this->createTableOnce( $oDb->_p( 'geko_term_meta_members' ) );
+		$this->createTableOnce( '##pfx##geko_term_meta_members' );
 		
 		// create hierarchy functions
 		if ( self::$bUseTermTaxonomy ) {
@@ -124,8 +122,6 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 	//
 	public function _getMeta( $iTermId, $sMetaKey = '', $bInheritValue = FALSE ) {
 		
-		global $wpdb;
-		
 		if ( !isset( self::$aMetaCache[ $iTermId ] ) ) {
 			$this->setMetaCache( $iTermId );
 		}
@@ -144,13 +140,14 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 			
 			// get an array of values
 			$aPart = array();
+			
 			if ( isset( self::$aMetaCache[ $iTermId ] ) ) {
 				foreach ( self::$aMetaCache[ $iTermId ] as $sKey => $aMeta ) {
 					$aPart[ $sKey ] = $aMeta[ $sValueKey ];
 				}
 			}
-			return $aPart;
 			
+			return $aPart;
 		}
 		
 	}
@@ -253,47 +250,49 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 	//
 	protected function setMetaCache( $aTermIds ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		if ( !is_array( $aTermIds ) ) {
 			$aTermIds = array( intval( $aTermIds ) );		// wrap as array
 		}
 		
-		$sQuery = sprintf(
-			
-			"SELECT			m.term_id,
-							n.meta_key,
-							m.meta_value,
-							m.inherit,
-							m.tmeta_id
-			FROM			%s m
-			
-			LEFT JOIN		%s n
-				ON			n.mkey_id = m.mkey_id
-			
-			WHERE			m.term_id IN (%s)
-			
-			UNION
-			
-			SELECT			t.term_id AS term_id,
-							'_parent_term_id' AS meta_key,
-							t.parent AS meta_value,
-							1 AS inherit,
-							0 AS tmeta_id
-			FROM			%s t
-			
-			WHERE			t.term_id IN (%s) AND 
-							t.taxonomy = 'category'",
-			
-			$wpdb->geko_term_meta,
-			$wpdb->geko_meta_key,
-			implode( ',', $aTermIds ),
-			$wpdb->term_taxonomy,
-			implode( ',', $aTermIds )
 		
-		);
+		$oParentQuery = new Geko_Sql_Select();
+		$oParentQuery
+
+			->field( 't.term_id', 'term_id' )
+			->field( "'_parent_term_id'", 'meta_key' )
+			->field( 't.parent', 'meta_value' )
+			->field( '1', 'inherit' )
+			->field( '0', 'tmeta_id' )
+			
+			->from( '##pfx##term_taxonomy', 't' )
+			->where( 't.term_id * ($)', $aTermIds )
+		;
 		
-		$aFmt = $wpdb->get_results( $sQuery );
+		
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			
+			->field( 'm.term_id', 'term_id' )
+			->field( 'n.meta_key', 'meta_key' )
+			->field( 'm.meta_value', 'meta_value' )
+			->field( 'm.inherit', 'inherit' )
+			->field( 'm.tmeta_id', 'tmeta_id' )
+			
+			->from( '##pfx##geko_term_meta', 'm' )
+			
+			->joinLeft( '##pfx##geko_meta_key', 'n' )
+				->on( 'n.mkey_id = m.mkey_id' )
+			
+			->where( 'm.term_id * ($)', $aTermIds )
+			->where( 't.taxonomy = ?', 'category' )
+			
+			->union( $oParentQuery )
+		;
+		
+		
+		$aFmt = $oDb->fetchAllObj( strval( $oQuery ) );
 		
 		////
 		$aSubVals = $this->gatherSubMetaValues( $aFmt, 'geko_term_meta_members', 'tmeta_id' );
@@ -320,7 +319,6 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 	//
 	protected function setAncestorMetaCache( $iTermId ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		// perform an ancestry check
@@ -329,16 +327,21 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 		$iTermIdCheck = $iTermId;
 		
 		if ( isset( self::$aMetaCache[ $iTermIdCheck ] ) ) {
+			
 			while ( isset( self::$aMetaCache[ $iTermIdCheck ] ) ) {
+				
 				$iParentTermId = self::$aMetaCache[ $iTermIdCheck ][ '_parent_term_id' ][ 'meta_value' ];
+				
 				if ( $iParentTermId ) {
 					if ( !isset( self::$aMetaCache[ $iParentTermId ] ) ) {
 						$bGetAncestors = TRUE;
 						break;
 					}
 				}
+				
 				$iTermIdCheck = $iParentTermId;
 			}
+			
 		} else {
 			$bGetAncestors = TRUE;
 		}
@@ -349,21 +352,28 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 			if ( self::$bUseTermTaxonomy ) {
 				
 				// get all ancestors
-				$sQuery = "
-					SELECT		##pfx##term_taxonomy_path( '/', t.term_id ) AS path
-					FROM		##pfx##term_taxonomy t
-					WHERE		t.term_id = %d 
-				";
+				$oQuery = new Geko_Sql_Select();
+				$oQuery
+					->field( "##pfx##term_taxonomy_path( '/', t.term_id )", 'path' )
+					->from( '##pfx##term_taxonomy', 't' )
+					->where( 't.term_id = ?', $iTermId )
+				;
 				
-				$sIds = $oDb->fetchOne( $wpdb->prepare( $sQuery, $iTermId ) );
+				$sIds = $oDb->fetchOne( strval( $oQuery ) );
 				
 				// gather ids to be queried
 				$aIds = explode( '/', $sIds );
 				$aIdsFiltered = array();
 				
 			} else {
-			
-				$aIds = $oDb->fetchCol( 'SELECT term_id FROM ##pfx##terms' );
+				
+				$oQuery = new Geko_Sql_Select();
+				$oQuery
+					->field( 't.term_id' )
+					->from( '##pfx##terms', 't' )
+				;
+				
+				$aIds = $oDb->fetchCol( strval( $oQuery ) );
 			
 			}
 			
@@ -622,8 +632,6 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 		$iTermId, $iTermTaxonomyId, $sMode = 'insert', $aParams = NULL, $aDataVals = NULL, $aFileVals = NULL
 	) {
 		
-		global $wpdb;
-		
 		//
 		$aElemsGroup = isset( $aParams[ 'elems_group' ] ) ? 
 			$aParams[ 'elems_group' ] : 
@@ -631,26 +639,25 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 		;
 		
 		if ( 'update' == $sMode ) {
-			
-			$aMeta = Geko_Wp_Db::getResultsHash( sprintf(
-					
-				'SELECT			m.term_id,
-								n.meta_key,
-								m.meta_value,
-								m.inherit,
-								m.tmeta_id
-				FROM				%s m
-			
-				LEFT JOIN		%s n
-					ON			n.mkey_id = m.mkey_id
-			
-				WHERE			m.term_id = %d',
+
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
 				
-				$wpdb->geko_term_meta,
-				$wpdb->geko_meta_key,
-				$iTermId
+				->field( 'm.term_id', 'term_id' )
+				->field( 'n.meta_key', 'meta_key' )
+				->field( 'm.meta_value', 'meta_value' )
+				->field( 'm.inherit', 'inherit' )
+				->field( 'm.tmeta_id', 'tmeta_id' )
 				
-			), 'meta_key' );
+				->from( '##pfx##geko_term_meta', 'm' )
+				
+				->joinLeft( '##pfx##geko_meta_key', 'n' )
+					->on( 'n.mkey_id = m.mkey_id' )
+				
+				->where( 'm.term_id = ?', $iTermId )
+			;
+			
+			$aMeta = Geko_Wp_Db::getResultsHash( strval( $oQuery ), 'meta_key' );
 			
 		} else {
 			
@@ -694,25 +701,33 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 	public function delete( $iTermId, $iTermTaxonomyId ) {
 		
 		// cleanup all orphaned metadata
-		global $wpdb;
-				
-		// meta
-		$wpdb->query( "
-			DELETE FROM		$wpdb->geko_term_meta
-			WHERE			term_id NOT IN (
-				SELECT			term_id
-				FROM			$wpdb->terms
-			)
-		" );
+		$oDb = Geko_Wp::get( 'db' );
 		
-		// members
-		$wpdb->query( "
-			DELETE FROM		$wpdb->geko_term_meta_members
-			WHERE			tmeta_id NOT IN (
-				SELECT			tmeta_id
-				FROM			$wpdb->geko_term_meta
-			)
-		" );
+
+		//// meta
+		
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			->field( 't.term_id', 'term_id' )
+			->from( '##pfx##terms', 't' )
+		;
+		
+		$oDb->delete( '##pfx##geko_term_meta', array(
+			'term_id NOT IN (?)' => new Zend_Db_Expr( strval( $oQuery ) )
+		) );
+		
+		
+		//// members
+		
+		$oMetaQuery = new Geko_Sql_Select();
+		$oMetaQuery
+			->field( 'tm.tmeta_id', 'tmeta_id' )
+			->from( '##pfx##geko_term_meta', 'tm' )
+		;
+		
+		$oDb->delete( '##pfx##geko_term_meta_members', array(
+			'tmeta_id NOT IN (?)' => new Zend_Db_Expr( strval( $oMetaQuery ) )
+		) );
 		
 	}
 	

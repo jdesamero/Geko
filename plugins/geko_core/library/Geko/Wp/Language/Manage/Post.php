@@ -14,9 +14,21 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 		
 		parent::add();
 		
-		Geko_Wp_Language_Manage_Post_QueryHooks::register();		
+		// Geko_Wp_Language_Manage_Post_QueryHooks::register();		
+		
+		$aPrefixes = array( 'Gloc_', 'Geko_Wp_' );
+		
+		$sPostQueryClass = Geko_Class::getBestMatch( $aPrefixes, array( 'Post_Query' ) );		
+		add_action( sprintf( '%s::init', $sPostQueryClass ), array( $this, 'initQuery' ) );
+		
 		return $this;
 	}
+	
+	//
+	public function initQuery( $oQuery ) {
+		$oQuery->addPlugin( 'Geko_Wp_Language_Manage_Post_QueryPlugin' );
+	}
+
 	
 	//
 	public function addAdmin() {
@@ -205,7 +217,6 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 	//
 	public function savePost( $iPostId, $aVals = NULL ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		// set vals
@@ -236,23 +247,19 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 			if ( !$iLangGroupId = intval( $aVals[ 'geko_lgroup_id' ] ) ) {
 				
 				// create a lang group
-				$wpdb->insert(
-					$wpdb->geko_lang_groups,
-					array( 'type_id' => Geko_Wp_Options_MetaKey::getId( 'post' ) )
-				);
+				$oDb->insert( '##pfx##geko_lang_groups', array(
+					'type_id' => Geko_Wp_Options_MetaKey::getId( 'post' )
+				) );
 				
 				// create a lang group member
 				$iLangGroupId = $oDb->lastInsertId();
 			}
 			
-			$wpdb->insert(
-				$wpdb->geko_lang_group_members,
-				array(
-					'lgroup_id' => $iLangGroupId,
-					'obj_id' => $iPostId,
-					'lang_id' => $iLangId
-				)
-			);
+			$oDb->insert( '##pfx##geko_lang_group_members', array(
+				'lgroup_id' => $iLangGroupId,
+				'obj_id' => $iPostId,
+				'lang_id' => $iLangId
+			) );
 			
 		}
 		
@@ -262,12 +269,13 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 	// clean-up
 	public function deletePost( $iPostId ) {
 		
-		global $wpdb;
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			->field( 'p.ID', 'ID' )
+			->from( '##pfx##posts', 'p' )
+		;
 		
-		$sSql = "SELECT ID FROM $wpdb->posts";
-		
-		$this->cleanUpEmptyLangGroups( 'post', $sSql, $iPostId );
-		
+		$this->cleanUpEmptyLangGroups( 'post', strval( $oQuery ), $iPostId );
 	}
 	
 	
@@ -280,9 +288,12 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 		$sLangCode = '';
 		
 		if ( $iPostId = $_REQUEST[ 'post' ] ) {
+			
 			$oObj = Geko_Wp_Language_Member::getOne( array( 'obj_id' => $iPostId, 'type' => 'post' ), FALSE );
 			if ( $oObj->isValid() ) $sLangCode = $oObj->getLangCode();
+			
 		} elseif ( $iLangId = $_REQUEST[ 'post_lang_id' ] ) {
+			
 			$sLangCode = $this->getLanguage( $iLangId )->getSlug();
 		}
 		
@@ -300,26 +311,36 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 		
 		if ( $sLangCode = $aArgs[ 'lang' ] ) {
 			
-			global $wpdb;
 			$oDb = Geko_Wp::get( 'db' );
 			
 			$bLangIsDefault = ( self::$oDefaultLang->getSlug() == $sLangCode );
 			
-			$aPageIds = $oDb->fetchCol( "
-				SELECT			m.obj_id
-				FROM			$wpdb->geko_lang_group_members m
-				LEFT JOIN		$wpdb->geko_lang_groups g
-					ON			g.lgroup_id = m.lgroup_id
-				LEFT JOIN		$wpdb->geko_languages l
-					ON			l.lang_id = m.lang_id
-				WHERE			( g.type_id = ( SELECT mkey_id FROM $wpdb->geko_meta_key WHERE meta_key = 'post' ) ) AND 
-								( l.code " . ( $bLangIsDefault ? '!' : '' ) . "= '$sLangCode' )
-			" );
+			$oMetaKeyQuery = new Geko_Sql_Select();
+			$oMetaKeyQuery
+				->field( 'mk.mkey_id', 'mkey_id' )
+				->from( '##pfx##geko_meta_key', 'mk' )
+			;
+			
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				->field( 'm.obj_id', 'obj_id' )
+				->from( '##pfx##geko_lang_group_members', 'm' )
+				->joinLeft( '##pfx##geko_lang_groups', 'g' )
+					->on( 'g.lgroup_id = m.lgroup_id' )
+				->joinLeft( '##pfx##geko_languages', 'l' )
+					->on( 'l.lang_id = m.lang_id' )
+				->where( 'g.type_id = ?', $oMetaKeyQuery )
+				->where( sprintf( 'l.code %s= ?', ( $bLangIsDefault ? '!' : '' ) ), $sLangCode )
+			;
+			
+			$aPageIds = $oDb->fetchCol( strval( $oQuery ) );
 			
 			$aFiltered = array();
 			
 			foreach ( $aPages as $oPage ) {
+				
 				$bInArray = in_array( $oPage->ID, $aPageIds );
+				
 				if (
 					( $bLangIsDefault && !$bInArray ) || 
 					( !$bLangIsDefault && $bInArray )

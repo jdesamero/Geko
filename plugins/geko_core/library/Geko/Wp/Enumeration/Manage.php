@@ -258,18 +258,14 @@ class Geko_Wp_Enumeration_Manage extends Geko_Wp_Options_Manage
 	// hook method
 	public function postDeleteAction( $aParams, $oEntity ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
-		$oPk = $this->getPrimaryTablePrimaryKeyField();
+		// ??? is this supposed to be used for something ???
+		// $oPk = $this->getPrimaryTablePrimaryKeyField();
 		
-		$oSqlDelete = new Geko_Sql_Delete();
-		$oSqlDelete
-			->from( $this->_sPrimaryTable )
-			->where( 'parent_id = ?', $oEntity->getId() )
-		;
-		
-		$wpdb->query( $oSqlDelete );
-		
+		$oDb->delete( $this->_sPrimaryTable, array(
+			'parent_id = ?' => $oEntity->getId()
+		) );
 	}
 	
 	
@@ -310,23 +306,26 @@ class Geko_Wp_Enumeration_Manage extends Geko_Wp_Options_Manage
 			( count( $aParams ) > 0 )
 		) {
 			
-			global $wpdb;
 			$oDb = Geko_Wp::get( 'db' );
 			
 			$aParent = $aParams[ 0 ];
 			$aChildren = $aParams[ 1 ];
 			
-			if ( !$oDb->fetchOne( $wpdb->prepare(
-				"SELECT enum_id FROM $wpdb->geko_enumeration WHERE slug = %s",
-				$aParent[ 'slug' ]
-			) ) ) {
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				->field( 'e.enum_id', 'enum_id' )
+				->from( '##pfx##geko_enumeration', 'e' )
+				->where( 'e.slug = ?', $aParent[ 'slug' ] )
+			;
+			
+			if ( !$oDb->fetchOne( strval( $oQuery ) ) ) {
 				
-				$wpdb->insert( $wpdb->geko_enumeration, $aParent );
+				$oDb->insert( '##pfx##geko_enumeration', $aParent );
 				$iLastInsertId = $oDb->lastInsertId();
 				
 				foreach ( $aChildren as $aChild ) {
 					$aChild[ 'parent_id' ] = $iLastInsertId;
-					$wpdb->insert( $wpdb->geko_enumeration, $aChild );					
+					$oDb->insert( '##pfx##geko_enumeration', $aChild );					
 				}
 				
 			}

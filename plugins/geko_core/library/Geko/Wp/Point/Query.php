@@ -24,8 +24,6 @@ class Geko_Wp_Point_Query extends Geko_Wp_Entity_Query
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
-		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
 		
@@ -34,13 +32,13 @@ class Geko_Wp_Point_Query extends Geko_Wp_Entity_Query
 		$oQuery
 			
 			->field( 'u.user_email' )
-			->joinLeft( $wpdb->users, 'u' )
+			->joinLeft( '##pfx##users', 'u' )
 				->on( 'u.ID = p.user_id' )
 			
 			->field( 'e.name', 'event' )
 			->field( 'e.slug', 'event_slug' )
 			->field( 'e.requires_approval' )
-			->joinLeft( $wpdb->geko_point_event, 'e' )
+			->joinLeft( '##pfx##geko_point_event', 'e' )
 				->on( 'e.pntevt_id = p.pntevt_id' )
 			
 			->field( 'ap.title', 'approve_status' )

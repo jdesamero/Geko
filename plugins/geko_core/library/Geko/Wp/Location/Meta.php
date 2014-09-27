@@ -46,12 +46,10 @@ class Geko_Wp_Location_Meta extends Geko_Wp_Options_Meta
 	// create table
 	public function install() {
 		
-		global $wpdb;
-		
 		parent::install();
 		
 		$this->createTableOnce();
-		$this->createTableOnce( $wpdb->geko_location_meta_members );
+		$this->createTableOnce( '##pfx##geko_location_meta_members' );
 		
 		return $this;
 	}

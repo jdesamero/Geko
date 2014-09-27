@@ -7,8 +7,6 @@ class Geko_Wp_Activity_Query extends Geko_Wp_Log_Query
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
-		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
 		
@@ -16,10 +14,10 @@ class Geko_Wp_Activity_Query extends Geko_Wp_Log_Query
 		$oGetQuery
 			->field( 'm.log_id' )
 			->field( 'GROUP_CONCAT( CONCAT( mk.meta_key, "=", m.meta_value ) SEPARATOR " | " )', 'get_data' )
-			->from( $wpdb->geko_logs_activity_meta, 'm' )
-			->joinLeft( $wpdb->geko_meta_key, 'mt' )
+			->from( '##pfx##geko_logs_activity_meta', 'm' )
+			->joinLeft( '##pfx##geko_meta_key', 'mt' )
 				->on( 'mt.mkey_id = m.type_id' )
-			->joinLeft( $wpdb->geko_meta_key, 'mk' )
+			->joinLeft( '##pfx##geko_meta_key', 'mk' )
 				->on( 'mk.mkey_id = m.mkey_id' )
 			->where( 'mt.meta_key = ?', 'get' )
 			->group( 'm.log_id' )
@@ -29,10 +27,10 @@ class Geko_Wp_Activity_Query extends Geko_Wp_Log_Query
 		$oPostQuery
 			->field( 'm.log_id' )
 			->field( 'GROUP_CONCAT( CONCAT( mk.meta_key, "=", m.meta_value ) SEPARATOR " | " )', 'post_data' )
-			->from( $wpdb->geko_logs_activity_meta, 'm' )
-			->joinLeft( $wpdb->geko_meta_key, 'mt' )
+			->from( '##pfx##geko_logs_activity_meta', 'm' )
+			->joinLeft( '##pfx##geko_meta_key', 'mt' )
 				->on( 'mt.mkey_id = m.type_id' )
-			->joinLeft( $wpdb->geko_meta_key, 'mk' )
+			->joinLeft( '##pfx##geko_meta_key', 'mk' )
 				->on( 'mk.mkey_id = m.mkey_id' )
 			->where( 'mt.meta_key = ?', 'post' )
 			->group( 'm.log_id' )

@@ -11,7 +11,7 @@ class Geko_Wp_Ext_StoreLocatorPlus_AjaxHandler extends SLPlus_AjaxHandler
 	//
 	public function execute_LocationQuery( $optName_HowMany = '' ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		//........
 		// SLP options that tweak the query
@@ -109,22 +109,23 @@ class Geko_Wp_Ext_StoreLocatorPlus_AjaxHandler extends SLPlus_AjaxHandler
 		
 		
 		////// END NEW CODE //////
-
 		
 		
-		$wpdb->hide_errors();
 		
-		$result = $wpdb->get_results( $this->dbQuery, ARRAY_A );
+		// $wpdb->hide_errors();
+		
+		$result = $oDb->fetchAllAssoc( $this->dbQuery );
 		$result = apply_filters( sprintf( '%s::search_result', get_class( $this ) ), $result, $aParams );
 		
 		
 		
 		// Problems?  Oh crap.  Die.
+		// $wpdb->last_error ???
 		//
 		if ( $result === null ) {
 			die ( json_encode( array(
 				'success' => FALSE, 
-				'response' => sprintf( 'Invalid query: %s', $wpdb->last_error ),
+				'response' => sprintf( 'Invalid query: %s', '(unknown)' ),
 				'dbQuery' => $this->dbQuery
 			) ) );
 		}
@@ -138,8 +139,7 @@ class Geko_Wp_Ext_StoreLocatorPlus_AjaxHandler extends SLPlus_AjaxHandler
 	//
 	public function getLocationQuery( $aParams ) {
 		
-		global $wpdb;
-		
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$oQuery = new Geko_Sql_Select();
 		
@@ -173,12 +173,12 @@ class Geko_Wp_Ext_StoreLocatorPlus_AjaxHandler extends SLPlus_AjaxHandler
 			", $aParams[ 'multiplier' ], $aParams[ 'latitude' ], $aParams[ 'longitude' ], $aParams[ 'latitude' ] ), 'sl_distance' )
 			
 			
-			->from( $wpdb->geko_location_address, 'la' )
+			->from( '##pfx##geko_location_address', 'la' )
 			
-			->joinLeft( $wpdb->geko_location_province, 'lp' )
+			->joinLeft( '##pfx##geko_location_province', 'lp' )
 				->on( 'lp.province_id = la.province_id' )
 
-			->joinLeft( $wpdb->geko_location_country, 'lc' )
+			->joinLeft( '##pfx##geko_location_country', 'lc' )
 				->on( 'lc.country_id = lp.country_id' )
 				
 				

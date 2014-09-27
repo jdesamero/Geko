@@ -18,7 +18,7 @@ class Geko_Wp_Ext_Cart66_View_Receipt extends Geko_Wp_Ext_Cart66_View
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$product = new Cart66Product();
 		
@@ -117,13 +117,13 @@ class Geko_Wp_Ext_Cart66_View_Receipt extends Geko_Wp_Ext_Cart66_View
 					);
 					
 					$downloadsTable = Cart66Common::getTableName( 'downloads' );
-					$wpdb->insert( $downloadsTable, $data, array( '%s', '%s', '%s', '%s' ) );
+					$oDb->insert( $downloadsTable, $data );
 					
 					$setting = new Cart66Setting();
 					
 					if ( !empty( $product->s3Bucket ) && !empty( $product->s3File ) ) {
 						
-						require_once( CART66_PATH . '/models/Cart66AmazonS3.php' );
+						require_once( sprintf( '%s/models/Cart66AmazonS3.php', CART66_PATH ) );
 						$link = Cart66AmazonS3::prepareS3Url( $product->s3Bucket, $product->s3File, '1 minute' );
 						wp_redirect( $link );
 						exit;

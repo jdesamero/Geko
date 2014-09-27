@@ -57,14 +57,12 @@ class Geko_Wp_Generic_Meta extends Geko_Wp_Options_Meta
 	// create table
 	public function install() {
 		
-		global $wpdb;
-		
 		parent::install();
 		
 		Geko_Wp_Options_MetaKey::install();
 		
 		$this->createTableOnce();
-		$this->createTableOnce( $wpdb->geko_generic_meta_members );
+		$this->createTableOnce( '##pfx##geko_generic_meta_members' );
 		
 		return $this;
 	}
@@ -120,7 +118,7 @@ class Geko_Wp_Generic_Meta extends Geko_Wp_Options_Meta
 		$this->setMetaCache( $iGenericId );
 		
 		if ( $sMetaKey ) {
-			return self::$aMetaCache[ $iGenericId ][ $this->getPrefixWithSep() . $sMetaKey ];
+			return self::$aMetaCache[ $iGenericId ][ sprintf( '%s%s', $this->getPrefixWithSep(), $sMetaKey ) ];
 		} else {
 			return self::$aMetaCache[ $iGenericId ];
 		}
@@ -135,24 +133,25 @@ class Geko_Wp_Generic_Meta extends Geko_Wp_Options_Meta
 		
 		if ( !isset( self::$aMetaCache[ $iGenericId ] ) ) {
 			
-			global $wpdb;
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				
+				->field( 'm.jmeta_id', 'jmeta_id' )
+				->field( 'm.generic_id', 'generic_id' )
+				->field( 'k.meta_key', 'meta_key' )
+				->field( 'm.meta_value', 'meta_value' )
+				->field( 'm.flags', 'flags' )
+				
+				->from( '##pfx##geko_generic_meta', 'm' )
+				
+				->joinLeft( '##pfx##geko_meta_key', 'k' )
+					->on( 'k.mkey_id = m.mkey_id' )
+					
+				->where( 'm.generic_id = ?', $iGenericId )
+			;
 			
-			$aFmt = Geko_Wp_Db::getResultsHash(
-				$wpdb->prepare(
-					"	SELECT			m.jmeta_id,
-										m.generic_id,
-										k.meta_key,
-										m.meta_value,
-										m.flags
-						FROM			$wpdb->geko_generic_meta m
-						LEFT JOIN		$wpdb->geko_meta_key k
-							ON			k.mkey_id = m.mkey_id
-						WHERE			m.generic_id = %d
-					",
-					$iGenericId
-				),
-				'meta_key'
-			);
+			$aFmt = Geko_Wp_Db::getResultsHash( strval( $oQuery ), 'meta_key' );
+			
 			
 			////
 			$aSubVals = $this->gatherSubMetaValues( $aFmt, 'geko_generic_meta_members', 'jmeta_id' );
@@ -172,7 +171,7 @@ class Geko_Wp_Generic_Meta extends Geko_Wp_Options_Meta
 				
 				if ( $oItem->flags ) {
 					$aFlags = explode( ',', $oItem->flags );
-					foreach ( $aFlags as $sFlag ) $aRet[ $sMetaKey . '--' . $sFlag ] = 1;
+					foreach ( $aFlags as $sFlag ) $aRet[ sprintf( '%s--%s', $sMetaKey, $sFlag ) ] = 1;
 				}
 			}
 			
@@ -186,28 +185,33 @@ class Geko_Wp_Generic_Meta extends Geko_Wp_Options_Meta
 	
 	//// crud methods
 	
-	//
+	// cleanup all orphaned metadata
 	public function delete( $oGeneric ) {
-		// cleanup all orphaned metadata
-		global $wpdb;
+		
+		$oDb = Geko_Wp::get( 'db' );
 		
 		// meta
-		$wpdb->query("
-			DELETE FROM		$wpdb->geko_generic_meta
-			WHERE			generic_id NOT IN (
-				SELECT			generic_id
-				FROM			$wpdb->geko_generic
-			)
-		");
+		$oQuery1 = new Geko_Sql_Select();
+		$oQuery1
+			->field( 'g.generic_id', 'generic_id' )
+			->from( '##pfx##geko_generic', 'g' )
+		;
+		
+		$oDb->delete( '##pfx##geko_generic_meta', array(
+			'generic_id NOT IN (?)' => new Zend_Db_Expr( strval( $oQuery1 ) )
+		) );
+		
 		
 		// members
-		$wpdb->query("
-			DELETE FROM		$wpdb->geko_generic_meta_members
-			WHERE			jmeta_id NOT IN (
-				SELECT			jmeta_id
-				FROM			$wpdb->geko_generic_meta
-			)
-		");
+		$oQuery2 = new Geko_Sql_Select();
+		$oQuery2
+			->field( 'gm.jmeta_id', 'jmeta_id' )
+			->from( '##pfx##geko_generic_meta', 'gm' )		
+		;
+
+		$oDb->delete( '##pfx##geko_generic_meta_members', array(
+			'jmeta_id NOT IN (?)' => new Zend_Db_Expr( strval( $oQuery2 ) )
+		) );
 		
 	}
 		
@@ -219,8 +223,6 @@ class Geko_Wp_Generic_Meta extends Geko_Wp_Options_Meta
 		$oGeneric, $sMode = 'insert', $sGroupTypeSlug = '', $aParams = NULL, $aDataVals = NULL, $aFileVals = NULL
 	) {
 		
-		global $wpdb;
-		
 		//
 		$aElemsGroup = isset( $aParams[ 'elems_group' ] ) ? 
 			$aParams[ 'elems_group' ] : 
@@ -228,22 +230,26 @@ class Geko_Wp_Generic_Meta extends Geko_Wp_Options_Meta
 		;
 		
 		if ( 'update' == $sMode ) {
-			$aMeta = Geko_Wp_Db::getResultsHash(
-				$wpdb->prepare(
-					"	SELECT			m.jmeta_id,
-										m.generic_id,
-										k.meta_key,
-										m.meta_value,
-										m.flags
-						FROM			$wpdb->geko_generic_meta m
-						LEFT JOIN		$wpdb->geko_meta_key k
-							ON			k.mkey_id = m.mkey_id
-						WHERE			m.generic_id = %d
-					",
-					$oGeneric->getId()
-				),
-				'meta_key'
-			);
+			
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				
+				->field( 'm.jmeta_id', 'jmeta_id' )
+				->field( 'm.generic_id', 'generic_id' )
+				->field( 'k.meta_key', 'meta_key' )
+				->field( 'm.meta_value', 'meta_value' )
+				->field( 'm.flags', 'flags' )
+				
+				->from( '##pfx##geko_generic_meta', 'm' )
+				
+				->joinLeft( '##pfx##geko_meta_key', 'k' )
+					->on( 'k.mkey_id = m.mkey_id' )
+				
+				->where( 'm.generic_id = ?', $oGeneric->getId() )
+			;
+			
+			$aMeta = Geko_Wp_Db::getResultsHash( strval( $oQuery ), 'meta_key' );
+			
 		} else {
 			$aMeta = array();
 		}
@@ -381,7 +387,7 @@ class Geko_Wp_Generic_Meta extends Geko_Wp_Options_Meta
 			// obtain the flag values based on $aDataVals
 			foreach ( $aFlagSetup as $sMetaKey => $aFlags ) {
 				foreach ( $aFlags as $sFlag ) {
-					if ( isset( $aDataVals[ $sMetaKey . '--' . $sFlag ] ) ) {
+					if ( isset( $aDataVals[ sprintf( '%s--%s', $sMetaKey, $sFlag ) ] ) ) {
 						$aFlagData[ $sMetaKey ][] = $sFlag;
 					}
 				}

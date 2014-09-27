@@ -104,14 +104,16 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 					
 					$iPostId = $aQuery->query_vars[ 'p' ];
 					if ( !$iPostId ) {
-						global $wpdb;
-						$iPostId = $wpdb->get_var( sprintf( "
+						
+						$oDb = Geko_Wp::get( 'db' );
+						
+						$iPostId = $oDb->fetchOne( sprintf( "
 							SELECT		id
-							FROM		%s p
+							FROM		##pfx##posts p
 							WHERE		( p.post_name = '%s' ) AND 
 										( p.post_status = 'publish' ) AND 
 										( p.post_type = 'post' )
-						", $wpdb->posts, sanitize_title_for_query( $aQuery->query_vars[ 'name' ] ) ) );
+						", sanitize_title_for_query( $aQuery->query_vars[ 'name' ] ) ) );
 					}
 					
 					$aParams = array(

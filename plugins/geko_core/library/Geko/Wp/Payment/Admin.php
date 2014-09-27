@@ -139,17 +139,21 @@ class Geko_Wp_Payment_Admin extends Geko_Wp_Options_Admin
 	// return an array of tax rates, index being the province id
 	public function getTaxRates() {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		if ( NULL == $this->_aRates ) {
 		
 			$aRatesFmt = array();
-			$aRates = $wpdb->get_results( "
-				SELECT				province_id,
-									tax_label,
-									tax_pct
-				FROM				$wpdb->geko_pay_tax_rate
-			" );
+			
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				->field( 'tr.province_id', 'province_id' )
+				->field( 'tr.tax_label', 'tax_label' )
+				->field( 'tr.tax_pct', 'tax_pct' )
+				->from( '##pfx##geko_pay_tax_rate', 'tr' )
+			;
+			
+			$aRates = $oDb->fetchAllObj( strval( $oQuery ) );
 			
 			foreach ( $aRates as $oRate ) {
 				$aRatesFmt[ $oRate->province_id ] = array(

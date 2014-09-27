@@ -133,14 +133,12 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	// create table
 	public function install() {
 		
-		global $wpdb;
-		
 		parent::install();
 		
 		Geko_Wp_Options_MetaKey::install();
 		
 		$this->createTableOnce();
-		$this->createTableOnce( $wpdb->geko_location_geocache );
+		$this->createTableOnce( '##pfx##geko_location_geocache' );
 		
 		
 		return $this;		
@@ -311,18 +309,18 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	//
 	public function getCities( $bUnsetCache = FALSE ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 
 		if ( $bUnsetCache ) {
 			unset( self::$aCache[ 'cities' ] );
 		}
 		
 		if ( !isset( self::$aCache[ 'cities' ] ) ) {
-			self::$aCache[ 'cities' ] = $wpdb->get_results( "
+			self::$aCache[ 'cities' ] = $oDb->fetchAllObj( "
 				SELECT			DISTINCT
 								a.city,
 								a.province_id
-				FROM			$wpdb->geko_location_address a
+				FROM			##pfx##geko_location_address a
 				WHERE			( 0 != a.province_id ) AND 
 								( a.province_id IS NOT NULL ) AND 
 								( '' != TRIM( a.city ) ) AND 
@@ -336,7 +334,7 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	//
 	public function getProvinces( $bUnsetCache = FALSE ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		if ( $bUnsetCache ) {
 			unset( self::$aCache[ 'provinces' ] );
@@ -345,9 +343,9 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		if ( !isset( self::$aCache[ 'provinces' ] ) ) {
 			
 			$aHash = array();
-			$aProvinces = $wpdb->get_results( "
+			$aProvinces = $oDb->fetchAllObj( "
 				SELECT			*
-				FROM			$wpdb->geko_location_province
+				FROM			##pfx##geko_location_province
 				ORDER BY		province_name
 			" );
 			
@@ -431,7 +429,7 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	//
 	public function getCountries( $bUnsetCache = FALSE ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		if ( $bUnsetCache ) {
 			unset( self::$aCache[ 'countries' ] );
@@ -440,9 +438,9 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		if ( !isset( self::$aCache[ 'countries' ] ) ) {
 			
 			$aHash = array();
-			$aCountries = $wpdb->get_results( "
+			$aCountries = $oDb->fetchAllObj( "
 				SELECT			*
-				FROM			$wpdb->geko_location_country
+				FROM			##pfx##geko_location_country
 				ORDER BY		rank,
 								country_name
 			" );
@@ -476,7 +474,7 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	//
 	public function getContinents( $bUnsetCache = FALSE ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		if ( $bUnsetCache ) {
 			unset( self::$aCache[ 'continents' ] );
@@ -485,9 +483,9 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		if ( !isset( self::$aCache[ 'continents' ] ) ) {
 			
 			$aHash = array();			
-			$aContinents = $wpdb->get_results( "
+			$aContinents = $oDb->fetchAllObj( "
 				SELECT			*
-				FROM			$wpdb->geko_location_continent
+				FROM			##pfx##geko_location_continent
 				ORDER BY		continent_name
 			" );
 			
@@ -553,18 +551,18 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	// if not, look it up and store, otherwise retrieve the cached value
 	public function getCoordinates( $sAddress ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$sHash = md5( $sAddress );
 		
-		$sQuery = "
+		$sQuery = sprintf( "
 			SELECT 				g.latitude,
 								g.longitude
-			FROM				$wpdb->geko_location_geocache g
-			WHERE				g.geo_key = '$sHash'
-		";
+			FROM				##pfx##geko_location_geocache g
+			WHERE				g.geo_key = '%s'
+		", $sHash );
 		
-		if ( $oRes = $wpdb->get_row( $sQuery ) ) {
+		if ( $oRes = $oDb->fetchRowObj( $sQuery ) ) {
 			
 			return array( $oRes->latitude, $oRes->longitude );	
 			
@@ -577,8 +575,8 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 			;
 			
 			// insert into cache
-			$wpdb->insert(
-				$wpdb->geko_location_geocache,
+			$oDb->insert(
+				'##pfx##geko_location_geocache',
 				array(
 					'geo_key' => $sHash,
 					'latitude' => $aCoords[ 0 ],
@@ -637,8 +635,6 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	//
 	public function outputCitySelectHtml( $sFormId = 'city_list', $sEmptyValLabel = NULL, $oPlugin ) {
 		
-		global $wpdb;
-		
 		if ( NULL === $sEmptyValLabel ) {
 			$aFieldLabels = $this->getFieldLabels( $oPlugin );
 			$sEmptyValLabel = sprintf( 'Select a %s', $aFieldLabels[ 'city' ] );
@@ -658,8 +654,6 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	
 	//
 	public function outputProvinceSelectHtml( $sFormId = 'province_id', $sEmptyValLabel = NULL, $oPlugin ) {
-		
-		global $wpdb;
 		
 		if ( NULL === $sEmptyValLabel ) {
 			$aFieldLabels = $this->getFieldLabels( $oPlugin );
@@ -681,8 +675,6 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	//
 	public function outputCountrySelectHtml( $sFormId = 'country_id', $sEmptyValLabel = NULL, $oPlugin ) {
 		
-		global $wpdb;
-		
 		if ( NULL === $sEmptyValLabel ) {
 			$aFieldLabels = $this->getFieldLabels( $oPlugin );
 			$sEmptyValLabel = sprintf( 'Select a %s', $aFieldLabels[ 'country_id' ] );
@@ -702,8 +694,6 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	
 	//
 	public function outputContinentSelectHtml( $sFormId = 'continent_id', $sEmptyValLabel = NULL ) {
-		
-		global $wpdb;
 		
 		if ( NULL === $sEmptyValLabel ) {
 			$sEmptyValLabel = sprintf( 'Select a %s', $this->_aFieldLabels[ 'continent_id' ] );
@@ -849,7 +839,7 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	// save the data
 	public function save( $aParams, $sMode = 'insert', $aVals = NULL, $oPlugin = NULL ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$aKeys = array();
 		
@@ -881,35 +871,38 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 			$oSql = new Geko_Sql_Select();
 			$oSql
 				->field( 1, 'test' )
-				->from( $wpdb->geko_location_address )
+				->from( '##pfx##geko_location_address' )
 			;
 			
-			if ( $aParams[ 'subtype_id' ] ) {
-				$oSql->where( 'subtype_id = ?', $aParams[ 'subtype_id' ] );
-				$aKeys[ 'subtype_id' ] = $aParams[ 'subtype_id' ];
+			if ( $iSubTypeId = intval( $aParams[ 'subtype_id' ] ) ) {
+				$oSql->where( 'subtype_id = ?', $iSubTypeId );
+				$aKeys[ 'subtype_id = ?' ] = $iSubTypeId;
 			}
 			
-			if ( $aParams[ 'address_id' ] ) {
+			if ( $iAddressId = intval( $aParams[ 'address_id' ] ) ) {
 				
-				$oSql->where( 'address_id = ?', $aParams[ 'address_id' ] );
+				$oSql->where( 'address_id = ?', $iAddressId );
 				
-				if ( $wpdb->get_var( strval( $oSql ) ) ) {
-					$aKeys[ 'address_id' ] = $aParams[ 'address_id' ];
+				if ( $oDb->fetchOne( strval( $oSql ) ) ) {
+					$aKeys[ 'address_id = ?' ] = $iAddressId;
 					$bUpdate = TRUE;
 				}
 			
 			}
 			
-			if ( $aParams[ 'object_id' ] && $aParams[ 'objtype_id' ] ) {
+			if (
+				$iObjectId = intval( $aParams[ 'object_id' ] ) && 
+				$iObjTypeId = intval( $aParams[ 'objtype_id' ] )
+			) {
 				
 				$oSql
-					->where( 'object_id = ?', $aParams[ 'object_id' ] )
-					->where( 'objtype_id = ?', $aParams[ 'objtype_id' ] )
+					->where( 'object_id = ?', $iObjectId )
+					->where( 'objtype_id = ?', $iObjTypeId )
 				;
 				
-				if ( $wpdb->get_var( strval( $oSql ) ) ) {
-					$aKeys[ 'object_id' ] = $aParams[ 'object_id' ];
-					$aKeys[ 'objtype_id' ] = $aParams[ 'objtype_id' ];
+				if ( $oDb->fetchOne( strval( $oSql ) ) ) {
+					$aKeys[ 'object_id = ?' ] = $iObjectId;
+					$aKeys[ 'objtype_id = ?' ] = $iObjTypeId;
 					$bUpdate = TRUE;
 				}
 				
@@ -1006,7 +999,7 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		
 		if ( $bUpdate ) {
 			
-			$wpdb->update( $wpdb->geko_location_address, $aVals, $aKeys );
+			$oDb->update( '##pfx##geko_location_address', $aVals, $aKeys );
 			
 		} else {
 			
@@ -1015,7 +1008,7 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 			$aVals[ 'objtype_id' ] = $aParams[ 'objtype_id' ];
 			if ( $aParams[ 'subtype_id' ] ) $aVals[ 'subtype_id' ] = $aParams[ 'subtype_id' ];
 			
-			$wpdb->insert( $wpdb->geko_location_address, $aVals );
+			$oDb->insert( '##pfx##geko_location_address', $aVals );
 		}
 		
 	}
@@ -1023,15 +1016,11 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	//
 	public function delete( $oPlugin = NULL ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
-		$wpdb->query( $wpdb->prepare(
-			"	DELETE FROM			$wpdb->geko_location_address
-				WHERE				( object_id = %d ) AND 
-									( objtype_id = %d )
-			",
-			$this->_iObjectId,
-			Geko_Wp_Options_MetaKey::getId( $this->_sObjectType )
+		$oDb->delete( '##pfx##geko_location_address', array(
+			'object_id = ?' => $this->_iObjectId,
+			'objtype_id = ?' => Geko_Wp_Options_MetaKey::getId( $this->_sObjectType )
 		) );
 		
 	}

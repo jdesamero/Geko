@@ -102,7 +102,7 @@ class Geko_Fb_Persist extends Geko_Singleton_Abstract
 					)
 				);
 				
-				$this->_iPersistId = $oDb->fetchOne( 'SELECT LAST_INSERT_ID()' );
+				$this->_iPersistId = $oDb->lastInsertId();
 				
 			}
 		}

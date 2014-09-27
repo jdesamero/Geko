@@ -15,7 +15,7 @@ class Geko_Wp_EmailMessage_Queue extends Geko_Singleton_Abstract
 	public function start() {
 		
 		parent::start();
-	
+		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
 			->create( '##pfx##geko_emsg_queue', 'q' )
@@ -78,35 +78,32 @@ class Geko_Wp_EmailMessage_Queue extends Geko_Singleton_Abstract
 	//
 	public function process( $iInterval = 30, $iLimit = 5 ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
-		$sSql = $wpdb->prepare(
-			"	SELECT			*
-				FROM			$wpdb->geko_emsg_queue q
-				WHERE			( q.delivery_date <= %s ) OR 
-								( q.delivery_date IS NULL )
-				ORDER BY		q.delivery_date ASC
-				LIMIT			%d
-			",
-			$oDb->getTimestamp(),
-			$iLimit
-		);
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			->field( 'q.*' )
+			->from( '##pfx##geko_emsg_queue', 'q' )
+			->where( 'q.delivery_date <= ?', $oDb->getTimestamp() )
+			->orWhere( 'q.delivery_date IS NULL' )
+			->limit( $iLimit )
+		;
 		
-		$aRes = $wpdb->get_results( $sSql );
+		$aRes = $oDb->fetchAllObj( strval( $oQuery ) );
 		
 		if ( $iCount = count( $aRes ) ) {
-		
+			
 			$aIds = array();
 			foreach ( $aRes as $oQueueItem ) $aIds[] = $oQueueItem->queue_id;
 			
-			$sSql = "
-				SELECT			*
-				FROM			$wpdb->geko_emsg_queue_meta m
-				WHERE			" . Geko_Wp_Db::prepare( ' ( m.queue_id ##d## ) ', $aIds ) . "
-			";
+			$oMetaQuery = new Geko_Sql_Select();
+			$oMetaQuery
+				->field( 'm.*' )
+				->from( '##pfx##geko_emsg_queue_meta', 'm' )
+				->where( 'm.queue_id * ($)', $aIds )
+			;
 			
-			$aMeta = $wpdb->get_results( $sSql );
+			$aMeta = $oDb->fetchAllObj( strval( $oMetaQuery ) );
 			$aMetaFmt = array();
 			
 			foreach ( $aMeta as $oMeta ) {
@@ -127,14 +124,12 @@ class Geko_Wp_EmailMessage_Queue extends Geko_Singleton_Abstract
 					->send()
 				;
 				
-				$wpdb->query( $wpdb->prepare(
-					"DELETE FROM $wpdb->geko_emsg_queue WHERE queue_id = %d",
-					$iQueueId
+				$oDb->delete( '##pfx##geko_emsg_queue', array(
+					'queue_id = ?' => $iQueueId
 				) );
-
-				$wpdb->query( $wpdb->prepare(
-					"DELETE FROM $wpdb->geko_emsg_queue_meta WHERE queue_id = %d",
-					$iQueueId
+				
+				$oDb->delete( '##pfx##geko_emsg_queue_meta', array(
+					'queue_id = ?' => $iQueueId
 				) );
 				
 				sleep( $iInterval );
@@ -151,50 +146,47 @@ class Geko_Wp_EmailMessage_Queue extends Geko_Singleton_Abstract
 	//
 	public function add( $aParams ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
-		if ( $aParams['emsg_slug'] ) {
+		if ( $aParams[ 'emsg_slug' ] ) {
 			
-			$aParams['emsg_id'] = $wpdb->get_var( $wpdb->prepare(
-				"SELECT emsg_id FROM $wpdb->geko_email_message WHERE slug = %s",
-				$aParams['emsg_slug']
-			) );
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				->field( 'e.emsg_id', 'emsg_id' )
+				->from( '##pfx##geko_email_message', 'e' )
+				->where( 'e.slug = ?', $aParams[ 'emsg_slug' ] )
+			;
+			
+			$aParams[ 'emsg_id' ] = $oDb->fetchOne( strval( $oQuery ) );
 		}
 		
-		if ( $aParams['email'] && $aParams['emsg_id'] ) {
+		if ( $aParams[ 'email' ] && $aParams[ 'emsg_id' ] ) {
 			
-			$wpdb->insert(
-				$wpdb->geko_emsg_queue,
-				array(
-					'email' => $aParams['email'],
-					'emsg_id' => $aParams['emsg_id']
-				)
-			);
-
+			$oDb->insert( '##pfx##geko_emsg_queue', array(
+				'email = ?' => $aParams[ 'email' ],
+				'emsg_id = ?' => $aParams[ 'emsg_id' ]
+			) );
+			
 			$iQueueId = $oDb->lastInsertId();
 			
-			if ( $aParams['name'] ) {
-				$wpdb->insert(
-					$wpdb->geko_emsg_queue_meta,
-					array(
-						'queue_id' => $iQueueId,
-						'meta_key' => '__recipient_name',
-						'value' => $aParams['name']
-					)
-				);
+			if ( $aParams[ 'name' ] ) {
+				
+				$oDb->insert( '##pfx##geko_emsg_queue_meta', array(
+					'queue_id' => $iQueueId,
+					'meta_key' => '__recipient_name',
+					'value' => $aParams[ 'name' ]
+				) );
 			}
 			
-			if ( is_array( $aParams['meta'] ) ) {
-				foreach ( $aParams['meta'] as $sKey => $sValue ) {
-					$wpdb->insert(
-						$wpdb->geko_emsg_queue_meta,
-						array(
-							'queue_id' => $iQueueId,
-							'meta_key' => $sKey,
-							'value' => $sValue
-						)
-					);					
+			if ( is_array( $aParams[ 'meta' ] ) ) {
+				
+				foreach ( $aParams[ 'meta' ] as $sKey => $sValue ) {
+					
+					$oDb->insert( '##pfx##geko_emsg_queue_meta', array(
+						'queue_id' => $iQueueId,
+						'meta_key' => $sKey,
+						'value' => $sValue
+					) );
 				}
 			}
 			

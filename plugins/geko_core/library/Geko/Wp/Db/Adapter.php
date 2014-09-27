@@ -255,17 +255,23 @@ class Geko_Wp_Db_Adapter extends Zend_Db_Adapter_Abstract
 	
 	//
 	protected function _beginTransaction() {
-		//
+		
+		$wpdb = $this->_connection;
+		$wpdb->query( 'START TRANSACTION' );
 	}
 	
 	//
 	protected function _commit() {
-		//
+		
+		$wpdb = $this->_connection;
+		$wpdb->query( 'COMMIT' );	
 	}
 	
 	//
 	protected function _rollBack() {
-		//
+		
+		$wpdb = $this->_connection;
+		$wpdb->query( 'ROLLBACK' );		
 	}
 	
 	//

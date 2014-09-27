@@ -588,7 +588,6 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 	//
 	public function importSerialized( $aSerialized ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		//// do checks
@@ -598,7 +597,7 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 		
 		$bRes = FALSE;
 		
-		$wpdb->query( 'START TRANSACTION' );
+		$oDb->beginTransaction();
 		
 		
 		// setup values
@@ -606,40 +605,97 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 		$sDateTime = $oDb->getTimestamp();
 		
 		$aMainValues = array(
-			'title:%s' => $aSerialized[ 'title' ],
-			'description:%s' => $aSerialized[ 'description' ],
-			'notes:%s' => $aSerialized[ 'notes' ],
-			'date_created:%s' => $sDateTime,
-			'date_modified:%s' => $sDateTime
+			'title' => $aSerialized[ 'title' ],
+			'description' => $aSerialized[ 'description' ],
+			'notes' => $aSerialized[ 'notes' ],
+			'date_created' => $sDateTime,
+			'date_modified' => $sDateTime
 		);
 		
-		if ( $iRestoreFormId = $aSerialized[ 'entity_id' ] ) {
+		if ( $iRestoreFormId = intval( $aSerialized[ 'entity_id' ] ) ) {
 			
 			// maintain form values
-			$aMainValues[ 'form_id:%d' ] = $iRestoreFormId;
-			$aMainValues[ 'slug:%s' ] = $aSerialized[ 'slug' ];
+			$aMainValues[ 'form_id' ] = $iRestoreFormId;
+			$aMainValues[ 'slug' ] = $aSerialized[ 'slug' ];
 			
-			// clean up old values
-			$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->geko_form_meta_value WHERE fmmd_id IN ( SELECT fmmd_id FROM $wpdb->geko_form_meta_data WHERE form_id = %d )", $iRestoreFormId ) );
-			$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->geko_form_meta_data WHERE form_id = %d", $iRestoreFormId ) );
-			$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->geko_form_item_meta_value WHERE fmsec_id IN ( SELECT fmsec_id FROM $wpdb->geko_form_section WHERE form_id = %d )", $iRestoreFormId ) );
-			$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->geko_form_item_value WHERE fmitm_id IN ( SELECT fmitm_id FROM $wpdb->geko_form_item WHERE fmsec_id IN ( SELECT fmsec_id FROM $wpdb->geko_form_section WHERE form_id = %d ) )", $iRestoreFormId ) );
-			$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->geko_form_item WHERE fmsec_id IN ( SELECT fmsec_id FROM $wpdb->geko_form_section WHERE form_id = %d )", $iRestoreFormId ) );
-			$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->geko_form_section WHERE form_id = %d", $iRestoreFormId ) );
-			$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->geko_form WHERE form_id = %d", $iRestoreFormId ) );
+			
+			//// clean up old values
+			
+			// one
+			$oQuery1 = new Geko_Sql_Select();
+			$oQuery1
+				->field( 'fmd.fmmd_id', 'fmmd_id' )
+				->from( '##pfx##geko_form_meta_data', 'fmd' )
+				->where( 'fmmd_id.form_id = ?', $iRestoreFormId )
+			;
+			
+			$oDb->delete( '##pfx##geko_form_meta_value', array(
+				'fmmd_id IN (?)' => new Zend_Db_Expr( strval( $oQuery1 ) )
+			) );
+			
+			
+			// two
+			$oDb->delete( '##pfx##geko_form_meta_data', array(
+				'form_id = ?' => $iRestoreFormId
+			) );
+			
+			
+			// three
+			$oQuery3 = new Geko_Sql_Select();
+			$oQuery3
+				->field( 'fs.fmsec_id', 'fmsec_id' )
+				->from( '##pfx##geko_form_section', 'fs' )
+				->where( 'form_id = ?', $iRestoreFormId )
+			;
+			
+			$oDb->delete( '##pfx##geko_form_item_meta_value', array(
+				'fmsec_id IN (?)' => new Zend_Db_Expr( strval( $oQuery3 ) )
+			) );
+			
+			
+			// four
+			$oQuery4 = new Geko_Sql_Select();
+			$oQuery4
+				->field( 'fi.fmitm_id', 'fmitm_id' )
+				->from( '##pfx##geko_form_item', 'fi' )
+				->where( 'fmsec_id IN (?)', $oQuery3 )
+			;
+			
+			$oDb->delete( '##pfx##geko_form_item_value', array(
+				'fmitm_id IN (?)' => new Zend_Db_Expr( strval( $oQuery4 ) )
+			) );
+			
+			
+			// five
+			$oDb->delete( '##pfx##geko_form_item', array(
+				'fmsec_id IN (?)' => new Zend_Db_Expr( strval( $oQuery3 ) )
+			) );
+			
+			
+			// six
+			$oDb->delete( '##pfx##geko_form_section', array(
+				'form_id = ?' => $iRestoreFormId
+			) );
+			
+			
+			// seven
+			$oDb->delete( '##pfx##geko_form', array(
+				'form_id = ?' => $iRestoreFormId
+			) );
+			
 			
 		} else {
 			
 			// generate a new slug, if needed
-			$aMainValues[ 'slug:%s' ] = Geko_Wp_Db::generateSlug(
-				$aSerialized[ 'slug' ], $wpdb->geko_form, 'slug'
+			$aMainValues[ 'slug' ] = Geko_Wp_Db::generateSlug(
+				$aSerialized[ 'slug' ], '##pfx##geko_form', 'slug'
 			);
 			
 		}
 		
 		//// geko_form
 		
-		$bRes = Geko_Wp_Db::insert( 'geko_form', $aMainValues );
+		$bRes = $oDb->insert( '##pfx##geko_form', $aMainValues );
 		
 		
 		//// geko_form_section
@@ -653,16 +709,13 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 			
 			foreach ( $aFmSec as $aSection ) {
 				
-				$bRes = Geko_Wp_Db::insert(
-					'geko_form_section',
-					array(
-						'form_id:%s' => $iDupFormId,
-						'title:%s' => $aSection[ 'title' ],
-						'slug:%s' => $aSection[ 'slug' ],
-						'description:%s' => $aSection[ 'description' ],
-						'rank:%s' => $aSection[ 'rank' ]
-					)
-				);
+				$bRes = $oDb->insert( '##pfx##geko_form_section', array(
+					'form_id' => intval( $iDupFormId ),
+					'title' => $aSection[ 'title' ],
+					'slug' => $aSection[ 'slug' ],
+					'description' => $aSection[ 'description' ],
+					'rank' => $aSection[ 'rank' ]
+				) );
 				
 				if ( !$bRes ) break;
 				
@@ -681,21 +734,18 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 			
 			foreach ( $aFmItm as $aItem ) {
 				
-				$bRes = Geko_Wp_Db::insert(
-					'geko_form_item',
-					array(
-						'fmsec_id:%d' => $aFmSecIds[ $aItem[ 'fmsec_id' ] ],
-						'fmitmtyp_id:%d' => $aItem[ 'fmitmtyp_id' ],
-						'slug:%s' => $aItem[ 'slug' ],
-						'title:%s' => $aItem[ 'title' ],
-						'help:%s' => $aItem[ 'help' ],
-						'css:%s' => $aItem[ 'css' ],
-						'rank:%d' => $aItem[ 'rank' ],
-						'validation:%s' => $aItem[ 'validation' ],
-						'parent_itmvalidx_id:%d' => $aItem[ 'parent_itmvalidx_id' ],
-						'hide_subs:%d' => $aItem[ 'hide_subs' ]
-					)
-				);
+				$bRes = $oDb->insert( '##pfx##geko_form_item', array(
+					'fmsec_id' => intval( $aFmSecIds[ $aItem[ 'fmsec_id' ] ] ),
+					'fmitmtyp_id' => intval( $aItem[ 'fmitmtyp_id' ] ),
+					'slug' => $aItem[ 'slug' ],
+					'title' => $aItem[ 'title' ],
+					'help' => $aItem[ 'help' ],
+					'css' => $aItem[ 'css' ],
+					'rank' => intval( $aItem[ 'rank' ] ),
+					'validation' => $aItem[ 'validation' ],
+					'parent_itmvalidx_id' => intval( $aItem[ 'parent_itmvalidx_id' ] ),
+					'hide_subs' => intval( $aItem[ 'hide_subs' ] )
+				) );
 				
 				if ( !$bRes ) break;
 				
@@ -707,11 +757,11 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 			
 			// do parent ids
 			foreach ( $aParItmIds as $iFmItmId => $iParItmId ) {
-
-				$bRes = Geko_Wp_Db::update(
-					'geko_form_item',
-					array( 'parent_itm_id:%d' => $aFmItmIds[ $iParItmId ] ),
-					array( 'fmitm_id:%d' => $iFmItmId )
+				
+				$bRes = $oDb->update(
+					'##pfx##geko_form_item',
+					array( 'parent_itm_id' => intval( $aFmItmIds[ $iParItmId ] ) ),
+					array( 'fmitm_id = ?' => intval( $iFmItmId ) )
 				);
 				
 				if ( !$bRes ) break;
@@ -728,20 +778,17 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 			
 			foreach ( $aFmItmVal as $aItemVal ) {
 				
-				$bRes = Geko_Wp_Db::insert(
-					'geko_form_item_value',
-					array(
-						'fmitmval_idx:%d' => $aItemVal[ 'fmitmval_idx' ],
-						'fmitm_id:%d' => $aFmItmIds[ $aItemVal[ 'fmitm_id' ] ],
-						'label:%s' => $aItemVal[ 'label' ],
-						'slug:%s' => $aItemVal[ 'slug' ],
-						'help:%s' => $aItemVal[ 'help' ],
-						'rank:%d' => $aItemVal[ 'rank' ],
-						'is_default:%d' => $aItemVal[ 'is_default' ],
-						'hide_items:%d' => $aItemVal[ 'hide_items' ],
-						'show_widgets:%d' => $aItemVal[ 'show_widgets' ]
-					)
-				);
+				$bRes = $oDb->insert( '##pfx##geko_form_item_value', array(
+					'fmitmval_idx' => intval( $aItemVal[ 'fmitmval_idx' ] ),
+					'fmitm_id' => intval( $aFmItmIds[ $aItemVal[ 'fmitm_id' ] ] ),
+					'label' => $aItemVal[ 'label' ],
+					'slug' => $aItemVal[ 'slug' ],
+					'help' => $aItemVal[ 'help' ],
+					'rank' => intval( $aItemVal[ 'rank' ] ),
+					'is_default' => intval( $aItemVal[ 'is_default' ] ),
+					'hide_items' => intval( $aItemVal[ 'hide_items' ] ),
+					'show_widgets' => intval( $aItemVal[ 'show_widgets' ] )
+				) );
 				
 				if ( !$bRes ) break;
 			}
@@ -756,18 +803,15 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 			
 			foreach ( $aFmItmMetaVal as $aItemMetaVal ) {
 				
-				$bRes = Geko_Wp_Db::insert(
-					'geko_form_item_meta_value',
-					array(
-						'context_id:%d' => $aItemMetaVal[ 'context_id' ],
-						'fmitm_id:%d' => $aFmItmIds[ $aItemMetaVal[ 'fmitm_id' ] ],
-						'fmitmval_idx:%d' => $aItemMetaVal[ 'fmitmval_idx' ],
-						'fmsec_id:%d' => $aFmSecIds[ $aItemMetaVal[ 'fmsec_id' ] ],
-						'lang_id:%d' => $aItemMetaVal[ 'lang_id' ],
-						'slug:%s' => $aItemMetaVal[ 'slug' ],
-						'value:%s' => $aItemMetaVal[ 'value' ]
-					)
-				);
+				$bRes = $oDb->insert( '##pfx##geko_form_item_meta_value', array(
+					'context_id' => intval( $aItemMetaVal[ 'context_id' ] ),
+					'fmitm_id' => intval( $aFmItmIds[ $aItemMetaVal[ 'fmitm_id' ] ] ),
+					'fmitmval_idx' => intval( $aItemMetaVal[ 'fmitmval_idx' ] ),
+					'fmsec_id' => intval( $aFmSecIds[ $aItemMetaVal[ 'fmsec_id' ] ] ),
+					'lang_id' => intval( $aItemMetaVal[ 'lang_id' ] ),
+					'slug' => $aItemMetaVal[ 'slug' ],
+					'value' => $aItemMetaVal[ 'value' ]
+				) );
 				
 				if ( !$bRes ) break;
 			}
@@ -783,18 +827,15 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 			
 			foreach ( $aFmMetaData as $aMetaData ) {
 				
-				$bRes = Geko_Wp_Db::insert(
-					'geko_form_meta_data',
-					array(
-						'form_id:%d' => $iDupFormId,
-						'fmitmtyp_id:%d' => $aMetaData[ 'fmitmtyp_id' ],
-						'name:%s' => $aMetaData[ 'name' ],
-						'slug:%s' => $aMetaData[ 'slug' ],
-						'rank:%d' => $aMetaData[ 'rank' ],
-						'lang_id:%d' => $aMetaData[ 'lang_id' ],
-						'context_id:%d' => $aMetaData[ 'context_id' ]
-					)
-				);
+				$bRes = $oDb->insert( '##pfx##geko_form_meta_data', array(
+					'form_id' => intval( $iDupFormId ),
+					'fmitmtyp_id' => intval( $aMetaData[ 'fmitmtyp_id' ] ),
+					'name' => $aMetaData[ 'name' ],
+					'slug' => $aMetaData[ 'slug' ],
+					'rank' => intval( $aMetaData[ 'rank' ] ),
+					'lang_id' => intval( $aMetaData[ 'lang_id' ] ),
+					'context_id' => intval( $aMetaData[ 'context_id' ] )
+				) );
 				
 				if ( !$bRes ) break;
 				
@@ -810,18 +851,15 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 			$aFmMetaVal = $aSerialized[ 'meta_values' ];
 			
 			foreach ( $aFmMetaVal as $aMetaValue ) {
-	
-				$bRes = Geko_Wp_Db::insert(
-					'geko_form_meta_value',
-					array(
-						'fmmv_idx:%d' => $aMetaValue[ 'fmmv_idx' ],
-						'fmmd_id:%d' => $aFmMetaDataIds[ $aMetaValue[ 'fmmd_id' ] ],
-						'label:%s' => $aMetaValue[ 'label' ],
-						'slug:%s' => $aMetaValue[ 'slug' ],
-						'rank:%d' => $aMetaValue[ 'rank' ],
-						'is_default:%d' => $aMetaValue[ 'is_default' ]
-					)
-				);
+				
+				$bRes = $oDb->insert( '##pfx##geko_form_meta_value', array(
+					'fmmv_idx' => intval( $aMetaValue[ 'fmmv_idx' ] ),
+					'fmmd_id' => intval( $aFmMetaDataIds[ $aMetaValue[ 'fmmd_id' ] ] ),
+					'label' => $aMetaValue[ 'label' ],
+					'slug' => $aMetaValue[ 'slug' ],
+					'rank' => intval( $aMetaValue[ 'rank' ] ),
+					'is_default' => intval( $aMetaValue[ 'is_default' ] )
+				) );
 				
 				if ( !$bRes ) break;
 			}
@@ -829,14 +867,16 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 		
 		// commit if no errors
 		if ( $bRes ) {
-			$wpdb->query( 'COMMIT' );
-			return array(
-				'dup_entity_id' => $iDupFormId
-			);
+			
+			$oDb->commit();
+			
+			return array( 'dup_entity_id' => $iDupFormId );
 		}
 		
 		// rollback if there are errors
-		$wpdb->query( 'ROLLBACK' );		
+		
+		$oDb->rollBack();	
+		
 		return FALSE;
 	}
 	

@@ -89,10 +89,10 @@ class Geko_Wp_Db
 	/* /
 	public static function tableExists( $sTable ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$sQuery = sprintf( "SHOW TABLES LIKE '%s'", $sTable );
-		return ( $wpdb->get_var( $sQuery ) == $sTable ) ? TRUE : FALSE ;
+		return ( $oDb->fetchOne( $sQuery ) == $sTable ) ? TRUE : FALSE ;
 	}
 	/* */
 	
@@ -104,13 +104,14 @@ class Geko_Wp_Db
 	public static function getTableNumRows( $sTable ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$sTableName = $wpdb->$sTable;
 		
 		$sQuery = sprintf( 'SELECT COUNT(*) AS num_rows FROM %s', $sTableName );
 		
 		if ( self::tableExists( $sTableName ) ) {
-			return intval( $wpdb->get_var( $sQuery ) );
+			return intval( $oDb->fetchOne( $sQuery ) );
 		}
 		
 		return FALSE;

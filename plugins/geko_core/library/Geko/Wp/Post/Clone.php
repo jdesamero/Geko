@@ -111,19 +111,21 @@ class Geko_Wp_Post_Clone extends Geko_Wp_Initialize
 	//
 	public function getType( $iPostId ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
-		return $oDb->fetchOne( $wpdb->prepare(
-			"SELECT post_type FROM ##pfx##posts WHERE ID = %d",
-			$iPostId
-		) );
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			->field( 'p.post_type', 'post_type' )
+			->from( '##pfx##posts', 'p' )
+			->where( 'p.ID = ?', $iPostId )
+		;
+		
+		return $oDb->fetchOne( strval( $oQuery ) );
 	}
 	
 	//
 	public function clonePost( $iPostId ) {
 		
-		global $wpdb;
 		$oDb = Geko_Wp::get( 'db' );
 		
 		//// basic data
@@ -182,11 +184,10 @@ class Geko_Wp_Post_Clone extends Geko_Wp_Initialize
 				$sMetaKey = $aRow[ 'meta_key' ];
 				
 				if ( !in_array( $sMetaKey, $aPostMetaSkip ) ) {
-					$wpdb->delete(
-						$wpdb->postmeta,
-						array( 'post_id' => $iAttId, 'meta_key' => $sMetaKey ),
-						array( '%d', '%s' )
-					);
+					$oDb->delete( '##pfx##postmeta', array(
+						'post_id = ?' => intval( $iAttId ),
+						'meta_key = ?' => $sMetaKey
+					) );
 				}
 			}
 			
@@ -214,11 +215,9 @@ class Geko_Wp_Post_Clone extends Geko_Wp_Initialize
 		//// postmeta
 		
 		// clean-up first
-		$wpdb->delete(
-			$wpdb->postmeta,
-			array( 'post_id' => $iCopyId ),
-			array( '%d' )
-		);
+		$oDb->delete( '##pfx##postmeta', array(
+			'post_id = ?' => $iCopyId
+		) );
 		
 		$aPostMetaSkip = array( '_edit_last', '_edit_lock' );
 		
@@ -234,11 +233,15 @@ class Geko_Wp_Post_Clone extends Geko_Wp_Initialize
 				$sMetaValue = $aRow[ 'meta_value' ];
 				
 				if ( in_array( $sMetaKey, $aImgPckFlds ) ) {
+					
 					// re-assign images
 					try {
+						
 						$aNewVals = array();
 						$aVals = Zend_Json::decode( $sMetaValue );
+						
 						if ( is_array( $aVals ) ) {
+							
 							foreach ( $aVals as $iOldAttId ) {
 								if ( $iNewAttId = $aOrigAttHash[ $iOldAttId ] ) {
 									$aNewVals[] = strval( $iNewAttId );
@@ -247,7 +250,9 @@ class Geko_Wp_Post_Clone extends Geko_Wp_Initialize
 								}
 							}
 						}
+						
 						$sMetaValue = Zend_Json::encode( $aNewVals );
+						
 					} catch ( Exception $e ) {
 					
 					}
@@ -289,16 +294,12 @@ class Geko_Wp_Post_Clone extends Geko_Wp_Initialize
 					}
 				}
 				
-				$wpdb->insert(
-					$wpdb->geko_post_meta_members,
-					array(
-						'meta_id' => $iNewMetaId,
-						'member_id' => $iMemberId,
-						'member_value' => $aRow[ 'member_value' ],
-						'flags' => $aRow[ 'flags' ]
-					),
-					array( '%d', '%d', '%s', '%s' )
-				);
+				$oDb->insert( '##pfx##geko_post_meta_members', array(
+					'meta_id' => intval( $iNewMetaId ),
+					'member_id' => intval( $iMemberId ),
+					'member_value' => $aRow[ 'member_value' ],
+					'flags' => $aRow[ 'flags' ]
+				) );
 			}
 			
 		}
@@ -311,26 +312,35 @@ class Geko_Wp_Post_Clone extends Geko_Wp_Initialize
 	//
 	public function getPostData( $iPostId ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
-		return $wpdb->get_row( $wpdb->prepare(
-			"SELECT * FROM $wpdb->posts WHERE ID = %d",
-			$iPostId
-		), ARRAY_A );
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			->field( 'p.*' )
+			->from( '##pfx##posts', 'p' )
+			->where( 'p.ID = ?', $iPostId )
+		;
+		
+		return $oDb->fetchRowAssoc( strval( $oQuery ) );
 	}
 	
 	//
 	public function getPostAttachments( $iPostId ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$sPath = substr( ABSPATH, 0, strlen( ABSPATH ) - 1 );
 		$sUrl = Geko_Wp::getUrl();
 		
-		$aAtts = $wpdb->get_results( $wpdb->prepare(
-			"SELECT * FROM $wpdb->posts WHERE post_parent = %d AND post_type = 'attachment'",
-			$iPostId
-		), ARRAY_A );
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			->field( 'p.*' )
+			->from( '##pfx##posts', 'p' )
+			->where( 'p.post_parent = ?', $iPostId )
+			->where( 'p.post_type = ?', 'attachment' )
+		;
+		
+		$aAtts = $oDb->fetchAllAssoc( array( $oQuery ) );
 		
 		foreach ( $aAtts as $i => $aRow ) {
 			$aAtts[ $i ][ 'path' ] = str_replace( $sUrl, $sPath, $aRow[ 'guid' ] );
@@ -362,29 +372,39 @@ class Geko_Wp_Post_Clone extends Geko_Wp_Initialize
 	//
 	public function getPostMeta( $iPostId ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
-		return $wpdb->get_results( $wpdb->prepare(
-			"SELECT * FROM $wpdb->postmeta WHERE post_id = %d",
-			$iPostId
-		), ARRAY_A );	
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			->field( 'pm.*' )
+			->from( '##pfx##postmeta', 'pm' )
+			->where( 'pm.post_id = ?', $iPostId )
+		;
+		
+		return $oDb->fetchAllAssoc( strval( $oQuery ) );
 	}
 	
 	//
 	public function getMetaIds( $aMeta ) {
+		
 		$aMetaIds = array();
+		
 		foreach ( $aMeta as $aRow ) {
 			$aMetaIds[] = $aRow[ 'meta_id' ];
 		}
+		
 		return $aMetaIds;
 	}
 	
 	//
 	public function getMetaKeyHash( $aMeta ) {
+		
 		$aMetaKeyHash = array();
+		
 		foreach ( $aMeta as $aRow ) {
 			$aMetaKeyHash[ $aRow[ 'meta_id' ] ] = $aRow[ 'meta_key' ];
 		}
+		
 		return $aMetaKeyHash;
 	}
 	
@@ -392,11 +412,16 @@ class Geko_Wp_Post_Clone extends Geko_Wp_Initialize
 	//
 	public function getPostMetaMembers( $aMetaIds ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
-		return $wpdb->get_results(
-			"SELECT * FROM $wpdb->geko_post_meta_members WHERE meta_id IN ( " . implode( ', ', $aMetaIds ) . " )"
-		, ARRAY_A );
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			->field( 'pmm.*' )
+			->from( '##pfx##geko_post_meta_members', 'pmm' )
+			->where( 'pmm.meta_id * ($)', $aMetaIds )
+		;
+		
+		return $oDb->fetchAllAssoc( strval( $oQuery ) );
 	}
 	
 	

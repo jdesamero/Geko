@@ -34,8 +34,6 @@ class Geko_Wp_Post_Location_QueryPlugin extends Geko_Entity_Query_Plugin
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
-		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
 		
@@ -160,7 +158,7 @@ class Geko_Wp_Post_Location_QueryPlugin extends Geko_Entity_Query_Plugin
 			
 			if ( $bHasAddress ) {
 				$oQuery
-					->joinLeft( $wpdb->geko_location_address, 'gklca' )
+					->joinLeft( '##pfx##geko_location_address', 'gklca' )
 						->on( 'gklca.object_id = p.ID' )
 						->on( 'gklca.objtype_id = ?', Geko_Wp_Options_MetaKey::getId( 'post' ) )
 				;
@@ -168,21 +166,21 @@ class Geko_Wp_Post_Location_QueryPlugin extends Geko_Entity_Query_Plugin
 			
 			if ( $bHasState ) {
 				$oQuery
-					->joinLeft( $wpdb->geko_location_province, 'gklcp' )
+					->joinLeft( '##pfx##geko_location_province', 'gklcp' )
 						->on( 'gklcp.province_id = gklca.province_id' )
 				;
 			}
 						
 			if ( $bHasCountry ) {
 				$oQuery
-					->joinLeft( $wpdb->geko_location_country, 'gklcc' )
+					->joinLeft( '##pfx##geko_location_country', 'gklcc' )
 						->on( 'gklcc.country_id = gklcp.country_id' )
 				;
 			}
-						
+			
 			if ( $bHasContinent ) {
 				$oQuery
-					->joinLeft( $wpdb->geko_location_continent, 'gklct' )
+					->joinLeft( '##pfx##geko_location_continent', 'gklct' )
 						->on( 'gklct.continent_id = gklcc.continent_id' )
 				;
 			}

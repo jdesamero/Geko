@@ -42,8 +42,6 @@ class Geko_Wp_Group_Query extends Geko_Wp_Entity_Query
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
-		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
 		
@@ -51,7 +49,7 @@ class Geko_Wp_Group_Query extends Geko_Wp_Entity_Query
 		$oQuery
 			->field( 'r.role_id' )
 			->field( 'r.title', 'role_title' )
-			->joinLeft( $wpdb->geko_roles, 'r' )
+			->joinLeft( '##pfx##geko_roles', 'r' )
 				->on( 'r.role_id = g.role_id' )
 		;
 		

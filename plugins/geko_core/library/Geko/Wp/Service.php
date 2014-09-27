@@ -226,9 +226,9 @@ class Geko_Wp_Service extends Geko_Service
 		// raw db query
 		if ( count( $aRawDb ) > 0 ) {
 			
-			global $wpdb;
+			$oDb = Geko_Wp::get( 'db' );
 			
-			$wpdb->update( $wpdb->users, $aRawDb, array( 'ID' => $iUserId ) );
+			$oDb->update( '##pfx##users', $aRawDb, array( 'ID = ?' => $iUserId ) );
 		}
 		
 		// update wp_users

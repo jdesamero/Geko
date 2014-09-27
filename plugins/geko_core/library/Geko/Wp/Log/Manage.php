@@ -299,7 +299,7 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 	//
 	public function initDateCreated() {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		if ( !$this->_sMinDateCreated || !$this->_sMaxDateCreated ) {
 			
@@ -309,12 +309,12 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 			$oQuery
 				->field( 'MIN( l.date_created )', 'min_date_created' )
 				->field( 'MAX( l.date_created )', 'max_date_created' )
-				->from( $wpdb->$sTableName, 'l' )
+				->from( $oDb->_p( $sTableName ), 'l' )
 			;
 			
 			$oQuery = $this->modifyDateCreatedQuery( $oQuery );
 			
-			$oRes = $wpdb->get_row( strval( $oQuery ) );
+			$oRes = $oDb->fetchRowObj( strval( $oQuery ) );
 			
 			$this->_sMinDateCreated = $oRes->min_date_created;
 			$this->_sMaxDateCreated = $oRes->max_date_created;
@@ -352,20 +352,18 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 	
 	//
 	public function getPrefixedTableName() {
-		global $wpdb;
-		$sTableName = $this->_sTableName;
-		return $wpdb->$sTableName;
+		$oDb = Geko_Wp::get( 'db' );
+		return $oDb->_p( $this->_sTableName );;
 	}
 
 	//
 	public function getPrefixedMetaTableName() {
-		global $wpdb;
-		$sTableName = $this->_sMetaTableName;
-		return $wpdb->$sTableName;
+		$oDb = Geko_Wp::get( 'db' );
+		return $oDb->_p( $this->_sMetaTableName );;
 	}
-
-
-
+	
+	
+	
 	//
 	public function getPrimaryTable() {
 		return $this->_oPrimaryTable;
@@ -706,8 +704,8 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 	public function insert( $aParams = array() ) {
 		
 		if ( $sTb = $this->_sTableName ) {
-
-			global $wpdb, $user_ID;
+			
+			global $user_ID;
 			$oDb = Geko_Wp::get( 'db' );
 			
 			get_currentuserinfo();
@@ -727,13 +725,10 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 			
 			// start transaction
 			
-			$wpdb->query( 'START TRANSACTION' );
+			$oDb->beginTransaction();
 			
-			$bRes = $wpdb->insert(
-				$wpdb->$sTb,
-				$aInsertData[ 0 ],
-				$aInsertData[ 1 ]
-			);
+			$bRes = $oDb->insert( $oDb->_p( $sTb ), $aInsertData[ 0 ] );
+			// $aInsertData[ 1 ] is unused
 			
 			$iInsertId = $oDb->lastInsertId();
 			
@@ -785,11 +780,8 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 						
 						$aInsertMetaData = $this->getInsertMetaData( $aParams );
 						
-						$bRes = $wpdb->insert(
-							$wpdb->$sMTb,
-							$aInsertMetaData[ 0 ],
-							$aInsertMetaData[ 1 ]
-						);
+						$bRes = $oDb->insert( $oDb->_p( $sMTb ), $aInsertMetaData[ 0 ] );
+						// $aInsertMetaData[ 1 ] is unused
 						
 						if ( !$bRes ) break;
 					}
@@ -798,11 +790,11 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 			}
 			
 			if ( $bRes ) {
-				$wpdb->query( 'COMMIT' );
+				$oDb->commit();
 				return TRUE;
 			}
 			
-			$wpdb->query( 'ROLLBACK' );
+			$oDb->rollBack();
 		}
 		
 		return FALSE;
@@ -824,7 +816,7 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 			
 			$sFieldName = $oField->getFieldName();
 			$sKey = $sFieldName;
-			// $sKey = $this->_sSomePrefix . '_' . $sFieldName; ???
+			// $sKey = sprintf( '%s_%s', $this->_sSomePrefix, $sFieldName );		// ???
 			
 			$bFoundValue = FALSE;
 			$mValue = NULL;
@@ -866,7 +858,7 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 			
 			$sFieldName = $oField->getFieldName();
 			$sKey = $sFieldName;
-			// $sKey = $this->_sSomePrefix . '_' . $sFieldName; ???
+			// $sKey = sprintf( '%s_%s', $this->_sSomePrefix, $sFieldName );		// ???
 			
 			if ( isset( $aParams[ $sKey ] ) ) {
 				$aValues[ $sFieldName ] = $oField->getFormattedValue( $aParams[ $sKey ] );

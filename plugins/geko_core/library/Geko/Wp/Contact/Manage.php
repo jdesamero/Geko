@@ -264,7 +264,7 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 			
 			foreach ( $aFields as $sField ) {
 				if ( $oCurrentEntity->hasEntityProperty( $sField ) ) {
-					$sPostKey = $sPrefix . $sField;
+					$sPostKey = sprintf( '%s%s', $sPrefix, $sField );
 					$aRet[ $sPostKey ] = $oCurrentEntity->getEntityPropertyValue( $sField );
 				}
 			}
@@ -297,7 +297,7 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 				foreach ( $aSubRes as $aRow ) {
 					$iObjectId = $aRow[ 'object_id' ];
 					foreach ( $aFields as $sField ) {
-						$aSubRet[ $iObjectId ][ $sPrefix . $sField ] = $aRow[ $sField ];
+						$aSubRet[ $iObjectId ][ sprintf( '%s%s', $sPrefix, $sField ) ] = $aRow[ $sField ];
 					}
 				}
 				$aRet[ $sType ] = $aSubRet;			// re-assign
@@ -316,11 +316,9 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 	//
 	public function outputLanguageSelectHtml( $sFormId = 'lang_id', $sEmptyValLabel = NULL, $oPlugin = NULL ) {
 		
-		global $wpdb;
-		
 		if ( NULL === $sEmptyValLabel ) {
 			$aFieldLabels = $this->getFieldLabels( $oPlugin );
-			$sEmptyValLabel = 'Select a ' . $aFieldLabels[ 'lang_id' ];
+			$sEmptyValLabel = sprintf( 'Select a %s', $aFieldLabels[ 'lang_id' ] );
 		}
 
 		$aParams = array(
@@ -360,7 +358,7 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 		if ( NULL === $sFieldName ) $sFieldName = $sField;
 		
 		$sClass = 'text';
-		if ( $sFieldClass ) $sClass .= ' ' . $sFieldClass;
+		if ( $sFieldClass ) $sClass .= sprintf( ' %s', $sFieldClass );
 		
 		if ( 'lang_id' == $sField ):
 			$this->outputLanguageSelectHtml( $sFieldName, NULL, $oPlugin );
@@ -428,15 +426,15 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 			$sLabel = Geko_String::sw( '<label for="%s$1">%s$0</label>', $aPart[ 'label' ], $aPart[ 'name' ] );
 			$sFieldGroup = Geko_String::sw( '%s<br />', $aPart[ 'field_group' ] );
 			
-			$sFields .= '
-				<tr class="form-field"' . $sRowId . '>
-					<th>' . $sLabel . '</th>
-					<td>
-						' . $sFieldGroup . '
-						' . Geko_String::sw( '<span class="description">%s</span>', $aPart[ 'description' ] ) . '
-					</td>
-				</tr>
-			';
+			$sFields .= sprintf(
+				'<tr class="form-field">
+					<th>%s</th>
+					<td>%s%s</td>
+				</tr>',
+				$sLabel,
+				$sFieldGroup,
+				Geko_String::sw( '<span class="description">%s</span>', $aPart[ 'description' ] )
+			);
 		}
 		
 		return $sFields;
@@ -471,7 +469,7 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 	// save the data
 	public function save( $aParams, $sMode = 'insert', $aVals = NULL, $oPlugin = NULL ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$aKeys = array();
 		
@@ -504,35 +502,38 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 			$oSql = new Geko_Sql_Select();
 			$oSql
 				->field( 1, 'test' )
-				->from( $wpdb->geko_contact )
+				->from( '##pfx##geko_contact' )
 			;
 			
-			if ( $aParams[ 'subtype_id' ] ) {
-				$oSql->where( 'subtype_id = ?', $aParams[ 'subtype_id' ] );
-				$aKeys[ 'subtype_id' ] = $aParams[ 'subtype_id' ];
+			if ( $iSubType = intval( $aParams[ 'subtype_id' ] ) ) {
+				$oSql->where( 'subtype_id = ?', $iSubType );
+				$aKeys[ 'subtype_id = ?' ] = $iSubType;
 			}
 			
-			if ( $aParams[ 'contact_id' ] ) {
+			if ( $iContactId = intval( $aParams[ 'contact_id' ] ) ) {
 				
-				$oSql->where( 'contact_id = ?', $aParams[ 'contact_id' ] );
+				$oSql->where( 'contact_id = ?', $iContactId );
 				
-				if ( $wpdb->get_var( strval( $oSql ) ) ) {
-					$aKeys[ 'contact_id' ] = $aParams[ 'contact_id' ];
+				if ( $oDb->fetchOne( strval( $oSql ) ) ) {
+					$aKeys[ 'contact_id = ?' ] = $iContactId;
 					$bUpdate = TRUE;
 				}
 			
 			}
 			
-			if ( $aParams[ 'object_id' ] && $aParams[ 'objtype_id' ] ) {
+			if (
+				( $iObjectId = intval( $aParams[ 'object_id' ] ) ) &&
+				( $iObjTypeId = intval( $aParams[ 'objtype_id' ] ) )
+			) {
 				
 				$oSql
-					->where( 'object_id = ?', $aParams[ 'object_id' ] )
-					->where( 'objtype_id = ?', $aParams[ 'objtype_id' ] )
+					->where( 'object_id = ?', $iObjectId )
+					->where( 'objtype_id = ?', $iObjTypeId )
 				;
 				
-				if ( $wpdb->get_var( strval( $oSql ) ) ) {
-					$aKeys[ 'object_id' ] = $aParams[ 'object_id' ];
-					$aKeys[ 'objtype_id' ] = $aParams[ 'objtype_id' ];
+				if ( $oDb->fetchOne( strval( $oSql ) ) ) {
+					$aKeys[ 'object_id = ?' ] = $iObjectId;
+					$aKeys[ 'objtype_id = ?' ] = $iObjTypeId;
 					$bUpdate = TRUE;
 				}
 				
@@ -551,7 +552,9 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 			$aFields = $aFieldList;			// TO DO: Add any auto-field stuff
 			
 			foreach ( $aFields as $sField ) {
-				$sPostKey = $sPrefix . $sField;
+				
+				$sPostKey = sprintf( '%s%s', $sPrefix, $sField );
+				
 				if ( isset( $_POST[ $sPostKey ] ) ) {
 					$aVals[ $sField ] = stripslashes( $_POST[ $sPostKey ] );
 				}
@@ -562,17 +565,19 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 		
 		// if specified, resolve language id
 		if ( $sLangCode = strtolower( $aVals[ 'lang_code' ] ) ) {
+			
 			if ( !$aVals[ 'lang_id' ] ) {
 				$oLangMng = Geko_Wp_Language_Manage::getInstance();
 				$aVals[ 'lang_id' ] = $oLangMng->getLangId( $sLangCode );
 			}
+			
 			unset( $aVals[ 'lang_code' ] );
 		}
 		
 		
 		if ( $bUpdate ) {
 			
-			$wpdb->update( $wpdb->geko_contact, $aVals, $aKeys );
+			$oDb->update( '##pfx##geko_contact', $aVals, $aKeys );
 			
 		} else {
 			
@@ -581,7 +586,7 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 			$aVals[ 'objtype_id' ] = $aParams[ 'objtype_id' ];
 			if ( $aParams[ 'subtype_id' ] ) $aVals[ 'subtype_id' ] = $aParams[ 'subtype_id' ];
 			
-			$wpdb->insert( $wpdb->geko_contact, $aVals );
+			$oDb->insert( '##pfx##geko_contact', $aVals );
 		}
 		
 		
@@ -590,19 +595,14 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 	//
 	public function delete( $oPlugin = NULL ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$sObjectType = $this->getObjectType( $oPlugin );
 		
-		$oSqlDelete = new Geko_Sql_Delete();
-		$oSqlDelete
-			->from( $wpdb->geko_contact )
-			->where( 'object_id = ?', $this->_iObjectId )
-			->where( 'objtype_id = ?', Geko_Wp_Options_MetaKey::getId( $sObjectType ) )
-		;
-		
-		$wpdb->query( strval( $oSqlDelete ) );
-		
+		$oDb->delete( '##pfx##geko_contact', array(
+			'object_id = ?' => $this->_iObjectId,
+			'objtype_id = ?' => Geko_Wp_Options_MetaKey::getId( $sObjectType )
+		) );
 	}
 	
 	
@@ -643,7 +643,7 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 	// updateRelatedEntities( $aQueryParams, $aPostData, $aParams )
 	public function updateRelatedEntities( $oPlugin = NULL ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$sObjectType = $this->getObjectType( $oPlugin );
 		
@@ -652,25 +652,31 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 		
 		if ( is_array( $aSub = $_POST[ $sObjectType ] ) ) {
 			
-			$aInsIds = $wpdb->aInsertIds[ $sManageClass ];
+			$aInsIds = $oDb->getInsertIds( $sManageClass );
 			
 			$sPrefix = $this->getPrefixForDoc( $oPlugin );
 			$sContactSubType = $this->getContactSubType( $oPlugin );
 			$aFieldList = $this->getFields( $oPlugin );
 			
 			foreach ( $aSub as $i => $aRow ) {
+				
 				$aVals = array();
 				$aParams = array( 'object_id' => ( ( $aInsIds[ $i ] ) ? $aInsIds[ $i ] : $i ) );
+				
 				foreach ( $aFieldList as $sField ) {
-					$aVals[ $sField ] = $aRow[ $sPrefix . $sField ];
+					$aVals[ $sField ] = $aRow[ sprintf( '%s%s', $sPrefix, $sField ) ];
 				}
+				
 				$this->save( $aParams, 'update', $aVals, $oPlugin );
 			}
 						
 		}
 		
-		$aDelIds = $wpdb->aDeleteIds[ $sManageClass ];
+		
+		$aDelIds = $oDb->getDeleteIds( $sManageClass );
+		
 		if ( count( $aDelIds ) > 0 ) {
+			
 			foreach ( $aDelIds as $iObjectId ) {
 				$this->_iObjectId = $iObjectId;
 				$this->delete( $oPlugin );
@@ -704,19 +710,17 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 		$aFieldLabels = $this->getFieldLabels( $oPlugin );
 		
 		foreach ( $aFields as $sField ) {
+			
 			$aFieldParams = array( 'title' => $aFieldLabels[ $sField ] );
 			
 			// TO DO: add "salutation"
-			
 			if ( in_array( $sField, array( 'lang_id' ) ) ) {
 				
 				$aFieldParams[ 'type' ] = 'select';
 				
 				$aFieldParams[ 'empty_choice' ] = array(
-					'label' => 'Select a ' . $aFieldLabels[ $sField ],
-					'atts' => array(
-						'class' => 'default'
-					)
+					'label' => sprintf( 'Select a %s', $aFieldLabels[ $sField ] ),
+					'atts' => array( 'class' => 'default' )
 				);
 				
 				if ( 'lang_id' == $sField ) {
@@ -737,6 +741,7 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 				
 				$aFieldParams[ 'choices' ] = $aChoices;
 			}
+			
 			$aDetailFields[ $sField ] = $aFieldParams;
 		}
 				

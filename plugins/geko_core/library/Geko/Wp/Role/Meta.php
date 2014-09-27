@@ -51,12 +51,10 @@ class Geko_Wp_Role_Meta extends Geko_Wp_Options_Meta
 	// create table
 	public function install() {
 		
-		global $wpdb;
-		
 		parent::install();
 		
 		$this->createTableOnce();
-		$this->createTableOnce( $wpdb->geko_role_meta );
+		$this->createTableOnce( '##pfx##geko_role_meta' );
 		
 		return $this;
 	}
@@ -114,7 +112,7 @@ class Geko_Wp_Role_Meta extends Geko_Wp_Options_Meta
 		$this->setMetaCache( $iRoleId );
 		
 		if ( $sMetaKey ) {
-			return self::$aMetaCache[ $iRoleId ][ $this->getPrefixWithSep() . $sMetaKey ];
+			return self::$aMetaCache[ $iRoleId ][ sprintf( '%s%s', $this->getPrefixWithSep(), $sMetaKey ) ];
 		} else {
 			return self::$aMetaCache[ $iRoleId ];
 		}
@@ -128,22 +126,22 @@ class Geko_Wp_Role_Meta extends Geko_Wp_Options_Meta
 		
 		if ( !isset( self::$aMetaCache[ $iRoleId ] ) ) {
 			
-			global $wpdb;
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				
+				->field( 'r.rmeta_id', 'rmeta_id' )
+				->field( 'h.meta_key', 'meta_key' )
+				->field( 'r.meta_value', 'meta_value' )
+				
+				->from( '##pfx##geko_role_meta', 'r' )
+				
+				->joinLeft( '##pfx##geko_meta_key', 'h' )
+					->on( 'h.mkey_id = r.mkey_id' )
+				
+				->where( 'r.role_id = ?', $iRoleId )
+			;
 			
-			$aFmt = Geko_Wp_Db::getResultsHash(
-				$wpdb->prepare(
-					"	SELECT			r.rmeta_id,
-										h.meta_key,
-										r.meta_value
-						FROM			$wpdb->geko_role_meta r
-						LEFT JOIN		$wpdb->geko_meta_key h
-							ON			h.mkey_id = r.mkey_id
-						WHERE			r.role_id = %d
-					",
-					$iRoleId
-				),
-				'meta_key'
-			);
+			$aFmt = Geko_Wp_Db::getResultsHash( strval( $oQuery ), 'meta_key' );
 			
 			////
 			$aSubVals = $this->gatherSubMetaValues( $aFmt, 'geko_role_meta_members', 'rmeta_id' );
@@ -181,23 +179,25 @@ class Geko_Wp_Role_Meta extends Geko_Wp_Options_Meta
 			$sFieldGroup = Geko_String::sw( '%s<br />', $aPart[ 'field_group' ] );
 			
 			if ( 'edit' == $sMode ) {
-				$sFields .= '
-					<tr class="form-field">
-						<th scope="row" valign="top">' . $sLabel . '</th>
-						<td>
-							' . $sFieldGroup . '
-							' . Geko_String::sw( '<span class="description">%s</span>', $aPart[ 'description' ] ) . '
-						</td>
-					</tr>
-				';
+				
+				$sFields .= sprintf(
+					'<tr class="form-field">
+						<th scope="row" valign="top">%s</th>
+						<td>%s%s</td>
+					</tr>',
+					$sLabel,
+					$sFieldGroup,
+					Geko_String::sw( '<span class="description">%s</span>', $aPart[ 'description' ] )
+				);
+				
 			} else {
-				$sFields .= '
-					<div class="form-field">
-						' . $sLabel . '
-						' . $sFieldGroup . '
-						' . Geko_String::sw( '<p>%s</p>', $aPart[ 'description' ] ) . '
-					</div>
-				';
+				
+				$sFields .= sprintf(
+					'<div class="form-field">%s%s%s</div>',
+					$sLabel,
+					$sFieldGroup,
+					Geko_String::sw( '<p>%s</p>', $aPart[ 'description' ] )
+				);
 			}
 		}
 		
@@ -233,25 +233,31 @@ class Geko_Wp_Role_Meta extends Geko_Wp_Options_Meta
 	public function delete( $oRole ) {
 		
 		// cleanup all orphaned metadata
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
+		
 		
 		// meta
-		$wpdb->query("
-			DELETE FROM		$wpdb->geko_role_meta
-			WHERE			role_id NOT IN (
-				SELECT			role_id
-				FROM			$wpdb->geko_roles
-			)
-		");
+		$oQuery1 = new Geko_Sql_Select();
+		$oQuery1
+			->field( 'r.role_id', 'role_id' )
+			->from( '##pfx##geko_roles', 'r' )
+		;
+		
+		$oDb->delete( '##pfx##geko_role_meta', array(
+			'role_id NOT IN (?)' => new Zend_Db_Expr( strval( $oQuery1 ) )
+		) );
+		
 		
 		// members
-		$wpdb->query("
-			DELETE FROM		$wpdb->geko_role_meta_members
-			WHERE			rmeta_id NOT IN (
-				SELECT			rmeta_id
-				FROM			$wpdb->geko_role_meta
-			)
-		");
+		$oQuery2 = new Geko_Sql_Select();
+		$oQuery2
+			->field( 'rm.rmeta_id', 'rmeta_id' )
+			->from( '##pfx##geko_role_meta', 'rm' )
+		;
+		
+		$oDb->delete( '##pfx##geko_role_meta_members', array(
+			'rmeta_id NOT IN (?)' => new Zend_Db_Expr( strval( $oQuery2 ) )
+		) );
 		
 	}
 	
@@ -259,8 +265,6 @@ class Geko_Wp_Role_Meta extends Geko_Wp_Options_Meta
 	public function save(
 		$oRole, $sMode = 'insert', $aParams = NULL, $aDataVals = NULL, $aFileVals = NULL
 	) {
-		
-		global $wpdb;
 		
 		//
 		$aElemsGroup = isset( $aParams[ 'elems_group' ] ) ? 
@@ -271,21 +275,26 @@ class Geko_Wp_Role_Meta extends Geko_Wp_Options_Meta
 		$iRoleId = $oRole->getId();
 		
 		if ( 'update' == $sMode ) {
-			$aMeta = Geko_Wp_Db::getResultsHash(
-				$wpdb->prepare(
-					"	SELECT			r.rmeta_id,
-										h.meta_key,
-										r.meta_value
-						FROM			$wpdb->geko_role_meta r
-						LEFT JOIN		$wpdb->geko_meta_key h
-							ON			h.mkey_id = r.mkey_id
-						WHERE			r.role_id = %d
-					",
-					$iRoleId
-				),
-				'meta_key'
-			);
+			
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				
+				->field( 'r.rmeta_id', 'rmeta_id' )
+				->field( 'h.meta_key', 'meta_key' )
+				->field( 'r.meta_value', 'meta_value' )
+				
+				->from( '##pfx##geko_role_meta', 'r' )
+				
+				->joinLeft( '##pfx##geko_meta_key', 'h' )
+					->on( 'h.mkey_id = r.mkey_id' )
+				
+				->where( 'r.role_id = ?', $iRoleId )
+			;
+			
+			$aMeta = Geko_Wp_Db::getResultsHash( strval( $oQuery ), 'meta_key' );
+			
 		} else {
+			
 			$aMeta = array();
 		}
 		

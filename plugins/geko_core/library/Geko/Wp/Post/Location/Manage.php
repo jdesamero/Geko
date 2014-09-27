@@ -20,6 +20,27 @@ class Geko_Wp_Post_Location_Manage extends Geko_Wp_Location_Manage
 		return $this->_sPostType;
 	}
 	
+	
+	//
+	public function add() {
+		
+		parent::add();
+		
+		$aPrefixes = array( 'Gloc_', 'Geko_Wp_' );
+		
+		$sPostQueryClass = Geko_Class::getBestMatch( $aPrefixes, array( 'Post_Query' ) );		
+		add_action( sprintf( '%s::init', $sPostQueryClass ), array( $this, 'initQuery' ) );
+		
+		return $this;
+	}
+	
+	//
+	public function initQuery( $oQuery ) {
+		$oQuery->addPlugin( 'Geko_Wp_Post_Location_QueryPlugin' );
+	}
+
+	
+	
 	//
 	public function addAdmin() {
 		
@@ -115,8 +136,6 @@ class Geko_Wp_Post_Location_Manage extends Geko_Wp_Location_Manage
 	
 	// When the post is saved, saves our custom data
 	public function savePostdata( $iPostId ) {
-		
-		global $wpdb;
 		
 		// verify this came from the our screen and with proper authorization,
 		// because save_post can be triggered at other times

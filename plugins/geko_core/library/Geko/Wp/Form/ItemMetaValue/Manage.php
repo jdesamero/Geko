@@ -74,7 +74,7 @@ class Geko_Wp_Form_ItemMetaValue_Manage extends Geko_Wp_Options_Manage
 	//
 	public function updateRelatedEntities( $aQueryParams, $aPostData, $aParams ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		// delete existing
 		
@@ -91,16 +91,14 @@ class Geko_Wp_Form_ItemMetaValue_Manage extends Geko_Wp_Options_Manage
 		$aKeyFields = array( 'context_id', 'fmitm_id', 'fmitmval_idx', 'fmsec_id', 'lang_id', 'slug' );
 		
 		foreach ( $aFimv as $oFimv ) {
-
-			$oSqlDelete = new Geko_Sql_Delete();
-			$oSqlDelete->from( $this->_sPrimaryTable );
+			
+			$aDeleteKeys = array();
 			
 			foreach ( $aKeyFields as $sField ) {
-				$oSqlDelete->where( sprintf( '%s = ?', $sField ), $oFimv->getEntityPropertyValue( $sField ) );
+				$aDeleteKeys[ sprintf( '%s = ?', $sField ) ] = $oFimv->getEntityPropertyValue( $sField );
 			}
 			
-			$wpdb->query( strval( $oSqlDelete ) );
-			
+			$oDb->delete( $this->_sPrimaryTable, $aDeleteKeys );
 		}
 		
 		// resolve keys
@@ -109,17 +107,20 @@ class Geko_Wp_Form_ItemMetaValue_Manage extends Geko_Wp_Options_Manage
 			
 			$iFmSecId = $aData[ 'fmsec_id' ];
 			if ( 0 === strpos( $iFmSecId, '_' ) ) {
-				$aPostData[ $i ][ 'fmsec_id' ] = $wpdb->aInsertIds[ 'Geko_Wp_Form_Section_Manage' ][ $iFmSecId ];
+				$aFmSecIds = $oDb->getInsertIds( 'Geko_Wp_Form_Section_Manage' );
+				$aPostData[ $i ][ 'fmsec_id' ] = $aFmSecIds[ $iFmSecId ];
 			}
 			
 			$iFmItmId = $aData[ 'fmitm_id' ];
 			if ( 0 === strpos( $iFmItmId, '_' ) ) {
-				$aPostData[ $i ][ 'fmitm_id' ] = $wpdb->aInsertIds[ 'Geko_Wp_Form_Item_Manage' ][ $iFmItmId ];
+				$aFmItmIds = $oDb->getInsertIds( 'Geko_Wp_Form_Item_Manage' );
+				$aPostData[ $i ][ 'fmitm_id' ] = $aFmItmIds[ $iFmItmId ];
 			}
 			
 			$iFmItmValIdx = $aData[ 'fmitmval_idx' ];
 			if ( 0 === strpos( $iFmItmValIdx, '_' ) ) {
-				$aPostData[ $i ][ 'fmitmval_idx' ] = $wpdb->aInsertIds[ 'Geko_Wp_Form_ItemValue_Manage' ][ sprintf( '%s:%s', $iFmItmId, $iFmItmValIdx ) ][ 1 ];
+				$aFmItmValIdxs = $oDb->getInsertIds( 'Geko_Wp_Form_ItemValue_Manage' );
+				$aPostData[ $i ][ 'fmitmval_idx' ] = $aFmItmValIdxs[ sprintf( '%s:%s', $iFmItmId, $iFmItmValIdx ) ][ 1 ];
 			}
 			
 		}

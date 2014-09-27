@@ -153,9 +153,9 @@ class Geko_Wp_Form_Item_Manage extends Geko_Wp_Options_Manage
 	//
 	public function updateRelatedEntities( $aQueryParams, $aPostData, $aParams ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
-		$aSubItemIds = $wpdb->aSubItemIds[ 'Geko_Wp_Form_Section_Manage' ];
+		$aSubItemIds = $oDb->getSubItemIds( 'Geko_Wp_Form_Section_Manage' );
 		
 		unset( $aQueryParams[ 'form_id' ] );
 		$aQueryParams[ 'fmsec_id' ] = $aSubItemIds;
@@ -164,7 +164,7 @@ class Geko_Wp_Form_Item_Manage extends Geko_Wp_Options_Manage
 		$aParams[ 'main_entity_format' ] = '%d';
 		$aParams[ 'main_entity_id' ] = $aSubItemIds;
 		
-		if ( is_array( $aInsIds = $wpdb->aInsertIds[ 'Geko_Wp_Form_Section_Manage' ] ) ) {
+		if ( is_array( $aInsIds = $oDb->getInsertIds( 'Geko_Wp_Form_Section_Manage' ) ) ) {
 			
 			foreach ( $aPostData as $iId => $aRow ) {
 				$iFmSecId = $aRow[ 'fmsec_id' ];
@@ -177,8 +177,10 @@ class Geko_Wp_Form_Item_Manage extends Geko_Wp_Options_Manage
 		
 		// track parents for conditional questions
 		foreach ( $aPostData as $mId => $aRow ) {
+			
 			$mParItmId = $aRow[ 'parent_itm_id' ];
 			$mParItmValIdx = $aRow[ 'parent_itmvalidx_id' ];
+			
 			if (
 				( 0 === strpos( $mParItmId, '_' ) ) || 
 				( 0 === strpos( $mParItmValIdx, '_' ) )
@@ -194,20 +196,21 @@ class Geko_Wp_Form_Item_Manage extends Geko_Wp_Options_Manage
 	//
 	public function updateParentIds( $aItemValIds ) {
 		
-		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
-		$aItemIds = $wpdb->aInsertIds[ 'Geko_Wp_Form_Item_Manage' ];
-		$aItemValIds = $wpdb->aInsertIds[ 'Geko_Wp_Form_ItemValue_Manage' ];
+		$aItemIds = $oDb->getInsertIds( 'Geko_Wp_Form_Item_Manage' );
+		$aItemValIds = $oDb->getInsertIds( 'Geko_Wp_Form_ItemValue_Manage' );
 		
 		// translate
 		foreach ( $this->aItemParents as $mId => $aIds ) {
 			
 			$iItemId = $aItemIds[ $mId ];
-			$sIvKey = $aIds[ 0 ] . ':' . $aIds[ 1 ];
+			$sIvKey = sprintf( '%s:%s', $aIds[ 0 ], $aIds[ 1 ] );
 			
 			$aIvIds = $aItemValIds[ $sIvKey ];
 			
 			if ( $iItemId && $aIvIds ) {
+				
 				Geko_Wp_Db::update(
 					'geko_form_item',
 					array(

@@ -30,6 +30,10 @@ class Geko_Db
 	
 	protected $_sDbName = '';
 	
+	protected $_aInsertIds = array();
+	protected $_aDeleteIds = array();
+	protected $_aSubItemIds = array();
+	
 	
 	
 	//
@@ -289,6 +293,67 @@ class Geko_Db
 	
 	
 	
+	//// id tracking params
+	
+	//
+	public function setInsertIds( $sKey, $aIds ) {
+		
+		$this->_aInsertIds[ $sKey ] = $aIds;
+		
+		return $this;
+	}
+	
+	//
+	public function getInsertIds( $sKey ) {
+		
+		if ( $aIds = $this->_aInsertIds[ $sKey ] ) {
+			return $aIds;
+		}
+		
+		return NULL;
+	}
+	
+	
+	//
+	public function setDeleteIds( $sKey, $aIds ) {
+		
+		$this->_aDeleteIds[ $sKey ] = $aIds;	
+		
+		return $this;
+	}
+	
+	//
+	public function getDeleteIds( $sKey ) {
+		
+		if ( $aIds = $this->_aDeleteIds[ $sKey ] ) {
+			return $aIds;
+		}
+		
+		return NULL;
+	}
+	
+	
+	//
+	public function setSubItemIds( $sKey, $aIds ) {
+		
+		$this->_aSubItemIds[ $sKey ] = $aIds;	
+		
+		return $this;
+	}
+	
+	//
+	public function getSubItemIds( $sKey ) {
+		
+		if ( $aIds = $this->_aSubItemIds[ $sKey ] ) {
+			return $aIds;
+		}
+		
+		return NULL;
+	}
+	
+	
+	
+	
 	////
 	
 	//
@@ -497,6 +562,54 @@ class Geko_Db
 		
 		return FALSE;
 	}
+	
+	
+	//// fetch convenience
+	
+	//
+	public function _fetch( $sType, $sQuery, $aBind = array(), $iFetchMode = NULL ) {
+		
+		if ( $oDb = $this->_oDb ) {
+			return $this->__call( sprintf( 'fetch%s', $sType ), array( $sQuery, $aBind, $iFetchMode ) );
+		}
+		
+		return NULL;
+	}
+	
+	
+	//
+	public function fetchRowObj( $sQuery, $aBind = array() ) {
+		return $this->_fetch( 'Row', $sQuery, $aBind, Zend_Db::FETCH_OBJ );
+	}
+	
+	//
+	public function fetchRowAssoc( $sQuery, $aBind = array() ) {
+		return $this->_fetch( 'Row', $sQuery, $aBind, Zend_Db::FETCH_ASSOC );
+	}
+	
+	//
+	public function fetchRowNum( $sQuery, $aBind = array() ) {
+		return $this->_fetch( 'Row', $sQuery, $aBind, Zend_Db::FETCH_NUM );
+	}
+	
+	
+	//
+	public function fetchAllObj( $sQuery, $aBind = array() ) {
+		return $this->_fetch( 'All', $sQuery, $aBind, Zend_Db::FETCH_OBJ );
+	}
+	
+	//
+	public function fetchAllAssoc( $sQuery, $aBind = array() ) {
+		return $this->_fetch( 'All', $sQuery, $aBind, Zend_Db::FETCH_ASSOC );
+	}
+	
+	//
+	public function fetchAllNum( $sQuery, $aBind = array() ) {
+		return $this->_fetch( 'All', $sQuery, $aBind, Zend_Db::FETCH_NUM );
+	}
+	
+	
+	
 	
 	
 	//

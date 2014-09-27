@@ -11,8 +11,6 @@ class Geko_Wp_Location_Query extends Geko_Wp_Entity_Query
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
-		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
 		
@@ -22,11 +20,11 @@ class Geko_Wp_Location_Query extends Geko_Wp_Entity_Query
 			->field( 'p.province_name' )
 			->field( 'p.province_abbr' )
 			->field( 'p.country_id' )
-			->joinLeft( $wpdb->geko_location_province, 'p' )
+			->joinLeft( '##pfx##geko_location_province', 'p' )
 				->on( 'p.province_id = a.province_id' )
 
 			->field( 'c.continent_id' )
-			->joinLeft( $wpdb->geko_location_country, 'c' )
+			->joinLeft( '##pfx##geko_location_country', 'c' )
 				->on( 'c.country_id = p.country_id' )
 			
 		;

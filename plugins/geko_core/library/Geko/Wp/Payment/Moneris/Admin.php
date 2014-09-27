@@ -309,7 +309,6 @@ class Geko_Wp_Payment_Moneris_Admin extends Geko_Wp_Payment_Admin
 		
 		if ( $oPayment->hasValidLibrary() ) {
 			
-			global $wpdb;
 			$oDb = Geko_Wp::get( 'db' );
 			
 			$aResponseData = $oResponse->getResponseData();
@@ -335,27 +334,16 @@ class Geko_Wp_Payment_Moneris_Admin extends Geko_Wp_Payment_Admin
 				'ticket' => $aResponseData[ 'ticket' ],
 				'timed_out' => $aResponseData[ 'timed_out' ],
 				
-				'orig_receipt_id' => $oTransaction->getReceiptId(),
-				'status_id' => $oResponse->getStatusId(),
-				'application_id' => $oTransaction->getApplicationId(),
-				'is_test' => ( $this->useLiveServer() ? FALSE : TRUE ),
+				'orig_receipt_id' => intval( $oTransaction->getReceiptId() ),
+				'status_id' => intval( $oResponse->getStatusId() ),
+				'application_id' => intval( $oTransaction->getApplicationId() ),
+				'is_test' => intval( $this->useLiveServer() ),
 				'date_created' => $sDateTime
 				
 			);
 			
-			$aInsertFormat = array(
-				'%s', '%s', '%s', '%s', '%s',
-				'%s', '%s', '%s', '%s', '%s',
-				'%s', '%s', '%s', '%s', '%s',
-				'%d', '%d', '%d', '%d', '%s'
-			);
-			
 			// update the database first
-			$wpdb->insert(
-				$wpdb->geko_pay_moneris_transaction,
-				$aInsertValues,
-				$aInsertFormat
-			);
+			$oDb->insert( '##pfx##geko_pay_moneris_transaction', $aInsertValues );
 			
 		}
 		
@@ -368,26 +356,25 @@ class Geko_Wp_Payment_Moneris_Admin extends Geko_Wp_Payment_Admin
 	//
 	public function getRefundInfo( $iApplicationId, $iOrigOrderId ) {
 
-		global $wpdb;
-
-		return $wpdb->get_row( $wpdb->prepare(
-			"
-				SELECT				transaction_id,
-									reference_number,
-									amount
-				FROM				$wpdb->geko_pay_moneris_transaction
-				WHERE				( application_id = %d ) AND 
-									( status_id = %d ) AND 
-									( orig_receipt_id = %d )
-				ORDER BY			date_created DESC
-				LIMIT				1
-			",
-			$iApplicationId,
-			self::STATUS_APPROVED,
-			$iOrigOrderId
-		), ARRAY_A );
+		$oDb = Geko_Wp::get( 'db' );
 		
+		$oQuery = new Geko_Sql_Select();
+		
+		$oQuery
+			->field( 'mt.transaction_id', 'transaction_id' )
+			->field( 'mt.reference_number', 'reference_number' )
+			->field( 'mt.amount', 'amount' )
+			->from( '##pfx##geko_pay_moneris_transaction', 'mt' )
+			->where( 'mt.application_id = ?', $iApplicationId )
+			->where( 'mt.status_id = ?', self::STATUS_APPROVED )
+			->where( 'mt.orig_receipt_id = ?', $iOrigOrderId )
+			->order( 'mt.date_created', 'desc' )
+			->limit( 1 )
+		;
+		
+		return $oDb->fetchRowAssoc( strval( $oQuery ) );
 	}
+	
 	
 }
 

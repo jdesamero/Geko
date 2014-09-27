@@ -494,8 +494,8 @@ class Geko_Wp extends Geko
 		if ( $bForceDefault ) {
 			
 			if ( !self::$sDefaultUrl ) {
-				global $wpdb;
-				self::$sDefaultUrl = $wpdb->get_var( sprintf( "SELECT option_value FROM %s WHERE option_name = 'siteurl'", $wpdb->options ) );
+				$oDb = Geko_Wp::get( 'db' );
+				self::$sDefaultUrl = $oDb->fetchOne( "SELECT option_value FROM ##pfx##options WHERE option_name = 'siteurl'" );
 			}
 			
 			return self::$sDefaultUrl;

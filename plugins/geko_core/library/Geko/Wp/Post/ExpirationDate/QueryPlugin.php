@@ -6,8 +6,6 @@ class Geko_Wp_Post_ExpirationDate_QueryPlugin extends Geko_Entity_Query_Plugin
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
-		global $wpdb;
-		
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
 		
@@ -50,7 +48,7 @@ class Geko_Wp_Post_ExpirationDate_QueryPlugin extends Geko_Entity_Query_Plugin
 			////// join
 			
 			$oQuery
-				->joinLeft( $wpdb->geko_expiry, 'gpexp' )
+				->joinLeft( '##pfx##geko_expiry', 'gpexp' )
 					->on( 'gpexp.post_id = p.ID' )
 			;
 			
