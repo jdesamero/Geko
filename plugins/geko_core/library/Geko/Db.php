@@ -564,6 +564,21 @@ class Geko_Db
 	}
 	
 	
+	
+	//
+	public function insertMulti( $sTable, $aMultiValues ) {
+		
+		$aRetVals = array();
+		
+		foreach ( $aMultiValues as $aValues ) {
+			$aRetVals[] = $this->__call( 'insert', array( $sTable, $aValues ) );
+		}
+		
+		return $aRetVals;
+	}
+	
+	
+	
 	//// fetch convenience
 	
 	//
@@ -609,6 +624,55 @@ class Geko_Db
 	}
 	
 	
+	//
+	public function fetchHash( $sQuery, $sHashFieldName = NULL, $aBind = array(), $iFetchMode = NULL ) {
+
+		if ( $aRes = $this->fetchAllAssoc( $sQuery, $aBind ) ) {
+			
+			$aResFmt = array();
+			
+			foreach ( $aRes as $i => $aRow ) {
+				
+				if ( NULL === $sHashFieldName ) {
+					reset( $aRow );
+					$sKey = key( $aRow );
+				} else {
+					$sKey = $aRow[ $sHashFieldName ];
+				}
+				
+				if ( !$sKey ) $sKey = sprintf( 'row%d', $i );
+				
+				if ( Zend_Db::FETCH_NUM == $iFetchMode ) {
+					$aRowFmt = array_values( $aRow );
+				} elseif ( Zend_Db::FETCH_OBJ == $iFetchMode ) {
+					$aRowFmt = ( object ) $aRow;
+				} else {
+					$aRowFmt = $aRow;
+				}
+				
+				$aResFmt[ $sKey ] = $aRowFmt;
+			}
+			
+			return $aResFmt;
+		}
+		
+		return NULL;	
+	}
+	
+	//
+	public function fetchHashObj( $sQuery, $sHashFieldName = NULL, $aBind = array() ) {
+		return $this->fetchHash( $sQuery, $sHashFieldName, $aBind, Zend_Db::FETCH_OBJ );
+	}
+	
+	//
+	public function fetchHashAssoc( $sQuery, $sHashFieldName = NULL, $aBind = array() ) {
+		return $this->fetchHash( $sQuery, $sHashFieldName, $aBind, Zend_Db::FETCH_ASSOC );
+	}
+	
+	//
+	public function fetchHashNum( $sQuery, $sHashFieldName = NULL, $aBind = array() ) {
+		return $this->fetchHash( $sQuery, $sHashFieldName, $aBind, Zend_Db::FETCH_NUM );
+	}
 	
 	
 	

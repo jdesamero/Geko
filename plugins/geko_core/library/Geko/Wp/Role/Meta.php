@@ -124,6 +124,8 @@ class Geko_Wp_Role_Meta extends Geko_Wp_Options_Meta
 	//
 	protected function setMetaCache( $iRoleId ) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		if ( !isset( self::$aMetaCache[ $iRoleId ] ) ) {
 			
 			$oQuery = new Geko_Sql_Select();
@@ -141,7 +143,7 @@ class Geko_Wp_Role_Meta extends Geko_Wp_Options_Meta
 				->where( 'r.role_id = ?', $iRoleId )
 			;
 			
-			$aFmt = Geko_Wp_Db::getResultsHash( strval( $oQuery ), 'meta_key' );
+			$aFmt = $oDb->fetchHashObj( strval( $oQuery ), 'meta_key' );
 			
 			////
 			$aSubVals = $this->gatherSubMetaValues( $aFmt, 'geko_role_meta_members', 'rmeta_id' );
@@ -266,6 +268,8 @@ class Geko_Wp_Role_Meta extends Geko_Wp_Options_Meta
 		$oRole, $sMode = 'insert', $aParams = NULL, $aDataVals = NULL, $aFileVals = NULL
 	) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		//
 		$aElemsGroup = isset( $aParams[ 'elems_group' ] ) ? 
 			$aParams[ 'elems_group' ] : 
@@ -291,7 +295,7 @@ class Geko_Wp_Role_Meta extends Geko_Wp_Options_Meta
 				->where( 'r.role_id = ?', $iRoleId )
 			;
 			
-			$aMeta = Geko_Wp_Db::getResultsHash( strval( $oQuery ), 'meta_key' );
+			$aMeta = $oDb->fetchHashObj( strval( $oQuery ), 'meta_key' );
 			
 		} else {
 			

@@ -111,6 +111,8 @@ class Geko_Wp_Group_Meta extends Geko_Wp_Options_Meta
 	//
 	protected function setMetaCache( $iGroupId ) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		if ( !isset( self::$aMetaCache[ $iGroupId ] ) ) {
 			
 			$oQuery = new Geko_Sql_Select();
@@ -128,7 +130,7 @@ class Geko_Wp_Group_Meta extends Geko_Wp_Options_Meta
 				->where( 'g.group_id = ?', $iGroupId )
 			;
 			
-			$aFmt = Geko_Wp_Db::getResultsHash( strval( $oQuery ), 'meta_key' );
+			$aFmt = $oDb->fetchHashObj( strval( $oQuery ), 'meta_key' );
 			
 			////
 			$aSubVals = $this->gatherSubMetaValues( $aFmt, 'geko_group_meta_members', 'gmeta_id' );
@@ -202,6 +204,8 @@ class Geko_Wp_Group_Meta extends Geko_Wp_Options_Meta
 		$oGroup, $sMode = 'insert', $sGroupTypeSlug = '', $aParams = NULL, $aDataVals = NULL, $aFileVals = NULL
 	) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		//
 		$aElemsGroup = isset( $aParams[ 'elems_group' ] ) ?
 			$aParams[ 'elems_group' ] : 
@@ -225,7 +229,7 @@ class Geko_Wp_Group_Meta extends Geko_Wp_Options_Meta
 				->where( 'g.group_id = ?', $oGroup->getId() )
 			;
 			
-			$aMeta = Geko_Wp_Db::getResultsHash( strval( $oQuery ), 'meta_key' );
+			$aMeta = $oDb->fetchHashObj( strval( $oQuery ), 'meta_key' );
 			
 		} else {
 			$aMeta = array();

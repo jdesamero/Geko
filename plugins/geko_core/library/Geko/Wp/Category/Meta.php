@@ -632,6 +632,8 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 		$iTermId, $iTermTaxonomyId, $sMode = 'insert', $aParams = NULL, $aDataVals = NULL, $aFileVals = NULL
 	) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		//
 		$aElemsGroup = isset( $aParams[ 'elems_group' ] ) ? 
 			$aParams[ 'elems_group' ] : 
@@ -657,7 +659,7 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 				->where( 'm.term_id = ?', $iTermId )
 			;
 			
-			$aMeta = Geko_Wp_Db::getResultsHash( strval( $oQuery ), 'meta_key' );
+			$aMeta = $oDb->fetchHashObj( strval( $oQuery ), 'meta_key' );
 			
 		} else {
 			

@@ -46,6 +46,11 @@ class Geko_Wp_Form_Response_Manage extends Geko_Wp_Options_Manage
 	public function attachPage() { }
 	
 	
+	// disable this
+	public function getStoredSubOptions( $aRet, $oMainEnt, $oPlugin = NULL ) {
+		return $aRet;
+	}
+	
 	
 	
 	//// crud methods

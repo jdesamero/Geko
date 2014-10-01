@@ -118,6 +118,8 @@ class Geko_Wp_Post_Meta extends Geko_Wp_Options_Meta
 	//
 	protected function setMetaCache( $iPostId ) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		// done one-time for ALL post meta sub-classes
 		if ( !isset( self::$aMetaCache[ $iPostId ] ) ) {
 			
@@ -130,7 +132,7 @@ class Geko_Wp_Post_Meta extends Geko_Wp_Options_Meta
 				->where( 'pm.post_id = ?', $iPostId )
 			;
 			
-			$aFmt = Geko_Wp_Db::getResultsHash( strval( $oQuery ), 'meta_key' );
+			$aFmt = $oDb->fetchHashObj( strval( $oQuery ), 'meta_key' );
 			
 			////
 			$aRet = array();
@@ -247,6 +249,8 @@ class Geko_Wp_Post_Meta extends Geko_Wp_Options_Meta
 		$iPostId, $sMode = 'insert', $aParams = NULL, $aDataVals = NULL, $aFileVals = NULL
 	) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		//
 		$aElemsGroup = isset( $aParams[ 'elems_group' ] ) ? 
 			$aParams[ 'elems_group' ] : 
@@ -263,7 +267,7 @@ class Geko_Wp_Post_Meta extends Geko_Wp_Options_Meta
 				->where( 'pm.post_id = ?', $iPostId )
 			;
 			
-			$aMeta = Geko_Wp_Db::getResultsHash( strval( $oQuery ), 'meta_key' );
+			$aMeta = $oDb->fetchHashObj( strval( $oQuery ), 'meta_key' );
 			
 		} else {
 			$aMeta = array();

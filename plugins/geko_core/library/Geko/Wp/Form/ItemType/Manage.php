@@ -66,15 +66,57 @@ class Geko_Wp_Form_ItemType_Manage extends Geko_Wp_Options_Manage
 		$oDb = Geko_Wp::get( 'db' );
 		
 		if ( 0 === $oDb->getTableNumRows( $sTable ) ) {
-
-			Geko_Wp_Db::insertMulti( $sTable, array(
-				array( 'slug:%s' => 'text', 'name:%s' => 'Text', 'has_multiple_values:%d' => 0, 'has_multiple_response:%d' => 0, 'has_choice_subs:%d' => 0 ),
-				array( 'slug:%s' => 'textarea', 'name:%s' => 'Textarea', 'has_multiple_values:%d' => 0, 'has_multiple_response:%d' => 0, 'has_choice_subs:%d' => 0 ),
-				array( 'slug:%s' => 'radio', 'name:%s' => 'Radio Buttons', 'has_multiple_values:%d' => 1, 'has_multiple_response:%d' => 0, 'has_choice_subs:%d' => 1 ),
-				array( 'slug:%s' => 'checkbox', 'name:%s' => 'Checkbox', 'has_multiple_values:%d' => 0, 'has_multiple_response:%d' => 0, 'has_choice_subs:%d' => 0 ),
-				array( 'slug:%s' => 'checkbox_multi', 'name:%s' => 'Checkbox (Multiple)', 'has_multiple_values:%d' => 1, 'has_multiple_response:%d' => 1, 'has_choice_subs:%d' => 0 ),
-				array( 'slug:%s' => 'select', 'name:%s' => 'Select', 'has_multiple_values:%d' => 1, 'has_multiple_response:%d' => 0, 'has_choice_subs:%d' => 1 ),
-				array( 'slug:%s' => 'select_multi', 'name:%s' => 'Select (Multiple)', 'has_multiple_values:%d' => 1, 'has_multiple_response:%d' => 1, 'has_choice_subs:%d' => 0 )
+			
+			$oDb->insertMulti( $sTable, array(
+				array(
+					'slug' => 'text',
+					'name' => 'Text',
+					'has_multiple_values' => 0,
+					'has_multiple_response' => 0,
+					'has_choice_subs' => 0
+				),
+				array(
+					'slug' => 'textarea',
+					'name' => 'Textarea',
+					'has_multiple_values' => 0,
+					'has_multiple_response' => 0,
+					'has_choice_subs' => 0
+				),
+				array(
+					'slug' => 'radio',
+					'name' => 'Radio Buttons',
+					'has_multiple_values' => 1,
+					'has_multiple_response' => 0,
+					'has_choice_subs' => 1
+				),
+				array(
+					'slug' => 'checkbox',
+					'name' => 'Checkbox',
+					'has_multiple_values' => 0,
+					'has_multiple_response' => 0,
+					'has_choice_subs' => 0
+				),
+				array(
+					'slug' => 'checkbox_multi',
+					'name' => 'Checkbox (Multiple)',
+					'has_multiple_values' => 1,
+					'has_multiple_response' => 1,
+					'has_choice_subs' => 0
+				),
+				array(
+					'slug' => 'select',
+					'name' => 'Select',
+					'has_multiple_values' => 1,
+					'has_multiple_response' => 0,
+					'has_choice_subs' => 1
+				),
+				array(
+					'slug' => 'select_multi',
+					'name' => 'Select (Multiple)',
+					'has_multiple_values' => 1,
+					'has_multiple_response' => 1,
+					'has_choice_subs' => 0
+				)
 			) );
 		}
 	}

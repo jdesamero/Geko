@@ -150,6 +150,8 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 	//
 	protected function setMetaCache( $iUserId ) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		// done one-time for ALL user meta sub-classes
 		if ( !isset( self::$aMetaCache[ $iUserId ] ) ) {
 			
@@ -162,7 +164,7 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 				->where( 'um.user_id = ?', $iUserId )
 			;
 			
-			$aFmt = Geko_Wp_Db::getResultsHash( strval( $oQuery ), 'meta_key' );
+			$aFmt = $oDb->fetchHashObj( strval( $oQuery ), 'meta_key' );
 			
 			////
 			$aRet = array();
@@ -323,6 +325,8 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 		$iUserId, $sMode = 'insert', $aParams = NULL, $aDataVals = NULL, $aFileVals = NULL
 	) {
 		
+		$oDb = Geko_Wp::get( 'db' );
+		
 		//
 		$aElemsGroup = isset( $aParams[ 'elems_group' ] ) ? 
 			$aParams[ 'elems_group' ] : 
@@ -340,7 +344,7 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 				->where( 'um.user_id = ?' )
 			;
 			
-			$aMeta = Geko_Wp_Db::getResultsHash( strval( $oQuery ), 'meta_key' );
+			$aMeta = $oDb->fetchHashObj( strval( $oQuery ), 'meta_key' );
 			
 		} else {
 			$aMeta = array();

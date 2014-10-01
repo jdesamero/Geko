@@ -226,7 +226,7 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 		
 		////// FIX #2
 		
-		$aSubs = array( 'fmitmtyp', 'fmsec', 'fmitm', 'fmitmval', 'fmmd', 'fmmv', 'fmitmmv', 'fmrv' );
+		$aSubs = array( 'fmitmtyp', 'fmsec', 'fmitm', 'fmitmval', 'fmmd', 'fmmv', 'fmitmmv' );
 		
 		// reset indexing to maintain sorting sequence
 		foreach ( $aValues as $sKey => $mValue ) {

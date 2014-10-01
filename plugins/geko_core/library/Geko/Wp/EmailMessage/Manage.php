@@ -571,30 +571,30 @@ class Geko_Wp_EmailMessage_Manage extends Geko_Wp_Options_Manage
 		$sDateTime = $oDb->getTimestamp();
 		
 		$aMainValues = array(
-			'subject:%s' => $aSerialized[ 'subject' ],
-			'from_name:%s' => $aSerialized[ 'from_name' ],
-			'from_email:%s' => $aSerialized[ 'from_email' ],
-			'type_id:%d' => $aSerialized[ 'type_id' ],
-			'body_text:%s' => $aSerialized[ 'body_text' ],
-			'body_html:%s' => $aSerialized[ 'body_html' ],
-			'body_html_is_raw:%d' => $aSerialized[ 'body_html_is_raw' ],
-			'notes:%s' => $aSerialized[ 'notes' ],
-			'date_created:%s' => $sDateTime,
-			'date_modified:%s' => $sDateTime
+			'subject' => $aSerialized[ 'subject' ],
+			'from_name' => $aSerialized[ 'from_name' ],
+			'from_email' => $aSerialized[ 'from_email' ],
+			'type_id' => intval( $aSerialized[ 'type_id' ] ),
+			'body_text' => $aSerialized[ 'body_text' ],
+			'body_html' => $aSerialized[ 'body_html' ],
+			'body_html_is_raw' => intval( $aSerialized[ 'body_html_is_raw' ] ),
+			'notes' => $aSerialized[ 'notes' ],
+			'date_created' => $sDateTime,
+			'date_modified' => $sDateTime
 		);
 		
 		if ( $sTrptSlug = $aSerialized[ 'trpt_slug' ] ) {
 			$oTrpt = new Geko_Wp_EmailMessage_Transport( $sTrptSlug );
 			if ( $oTrpt->isValid() ) {
-				$aMainValues[ 'trpt_id:%d' ] = $oTrpt->getId();
+				$aMainValues[ 'trpt_id' ] = intval( $oTrpt->getId() );
 			}
 		}
 		
 		if ( $iRestoreEmsgId = $aSerialized[ 'entity_id' ] ) {
 			
 			// maintain email message values
-			$aMainValues[ 'emsg_id:%d' ] = $iRestoreEmsgId;
-			$aMainValues[ 'slug:%s' ] = $aSerialized[ 'slug' ];
+			$aMainValues[ 'emsg_id' ] = intval( $iRestoreEmsgId );
+			$aMainValues[ 'slug' ] = $aSerialized[ 'slug' ];
 			
 			// clean up old values
 			
@@ -613,7 +613,7 @@ class Geko_Wp_EmailMessage_Manage extends Geko_Wp_Options_Manage
 		} else {
 			
 			// generate a new slug, if needed
-			$aMainValues[ 'slug:%s' ] = Geko_Wp_Db::generateSlug(
+			$aMainValues[ 'slug' ] = Geko_Wp_Db::generateSlug(
 				$aSerialized[ 'slug' ], $oDb->_p( 'geko_email_message' ), 'slug'
 			);
 			
@@ -622,7 +622,7 @@ class Geko_Wp_EmailMessage_Manage extends Geko_Wp_Options_Manage
 		
 		//// geko_email_message
 		
-		$bRes = Geko_Wp_Db::insert( 'geko_email_message', $aMainValues );
+		$bRes = $oDb->insert( '##pfx##geko_email_message', $aMainValues );
 		
 		
 		
@@ -636,15 +636,12 @@ class Geko_Wp_EmailMessage_Manage extends Geko_Wp_Options_Manage
 			
 			foreach ( $aEmsgRcpt as $aRecipient ) {
 				
-				$bRes = Geko_Wp_Db::insert(
-					'geko_emsg_recipients',
-					array(
-						'emsg_id:%d' => $iDupEmsgId,
-						'name:%s' => $aRecipient[ 'name' ],
-						'email:%s' => $aRecipient[ 'email' ],
-						'active:%d' => $aRecipient[ 'active' ]
-					)
-				);
+				$bRes = $oDb->insert( '##pfx##geko_emsg_recipients', array(
+					'emsg_id' => intval( $iDupEmsgId ),
+					'name' => $aRecipient[ 'name' ],
+					'email' => $aRecipient[ 'email' ],
+					'active' => intval( $aRecipient[ 'active' ] )
+				) );
 				
 				if ( !$bRes ) break;
 			}		
@@ -660,15 +657,12 @@ class Geko_Wp_EmailMessage_Manage extends Geko_Wp_Options_Manage
 			
 			foreach ( $aEmsgHdr as $aHeader ) {
 				
-				$bRes = Geko_Wp_Db::insert(
-					'geko_emsg_header',
-					array(
-						'emsg_id:%d' => $iDupEmsgId,
-						'name:%s' => $aHeader[ 'name' ],
-						'val:%s' => $aHeader[ 'val' ],
-						'multi:%d' => $aHeader[ 'multi' ]
-					)
-				);
+				$bRes = $oDb->insert( '##pfx##geko_emsg_header', array(
+					'emsg_id' => intval( $iDupEmsgId ),
+					'name' => $aHeader[ 'name' ],
+					'val' => $aHeader[ 'val' ],
+					'multi' => intval( $aHeader[ 'multi' ] )
+				) );
 				
 				if ( !$bRes ) break;
 			}		

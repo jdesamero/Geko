@@ -211,13 +211,13 @@ class Geko_Wp_Form_Item_Manage extends Geko_Wp_Options_Manage
 			
 			if ( $iItemId && $aIvIds ) {
 				
-				Geko_Wp_Db::update(
-					'geko_form_item',
+				$oDb->update(
+					'##pfx##geko_form_item',
 					array(
-						'parent_itm_id:%d' => $aIvIds[ 0 ],
-						'parent_itmvalidx_id:%d' => $aIvIds[ 1 ]
+						'parent_itm_id' => $aIvIds[ 0 ],
+						'parent_itmvalidx_id' => $aIvIds[ 1 ]
 					),
-					array( 'fmitm_id:%d' => $iItemId )
+					array( 'fmitm_id = ?' => $iItemId )
 				);
 			}
 			

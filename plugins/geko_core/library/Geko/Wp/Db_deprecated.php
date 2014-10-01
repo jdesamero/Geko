@@ -119,6 +119,161 @@ class Geko_Wp_Db
 	/* */
 	
 	
+	// NOTE: Deprecated
+	// Use $oDb->fetchHashObj( $sQuery, $sHashKey ), or
+	// Use $oDb->fetchHashAssoc( $sQuery, $sHashKey ), or
+	// Use $oDb->fetchHashNum( $sQuery, $sHashKey ) instead
+	
+	/* /
+	public static function getResultsHash( $sQuery, $sHashKey, $sOutputType = 'OBJECT' ) {
+		
+		global $wpdb;
+		
+		$aRet = array();
+		$aRes = $wpdb->get_results( $sQuery, $sOutputType );
+		
+		foreach ( $aRes as $mItem ) {
+			if ( is_array( $mItem ) ) {
+				$aRet[ $mItem[ $sHashKey ] ] = $mItem;
+			} else {
+				$aRet[ $mItem->$sHashKey ] = $mItem;			
+			}
+		}
+		
+		return $aRet;
+	}
+	/* */
+	
+	
+
+	// NOTE: Deprecated
+	// Use $oDb->insert( $sTable, $aValues )
+	// Use $oDb->insertMulti( $sTable, $aMultiValues )
+	// Use $oDb->update( $sTable, $aValues, $aWhere )
+	// Use $oDb->delete( $sTable, $aWhere )
+	
+	/* /
+	//// wrappers for $wpdb
+	
+	//
+	public static function formatValues( $aValues ) {
+		
+		$aVal = array();
+		$aValFmt = array();
+		
+		foreach ( $aValues as $sKey => $mValue ) {
+			$aKeyFmt = explode( ':', $sKey );
+			$aVal[ $aKeyFmt[ 0 ] ] = $mValue;
+			$aValFmt[] = ( $aKeyFmt[ 1 ] ) ? $aKeyFmt[ 1 ] : '%s' ;
+		}
+		
+		return array( $aVal, $aValFmt );
+	}
+	
+	//
+	public static function insert( $sTable, $aValues ) {
+		
+		global $wpdb;
+		
+		list( $aVal, $aValFmt ) = self::formatValues( $aValues );
+		
+		return $wpdb->insert( $wpdb->$sTable, $aVal, $aValFmt );
+	}
+	
+	//
+	public static function insertMulti( $sTable, $aMultiValues ) {
+		
+		$aRetVals = array();
+		
+		foreach ( $aMultiValues as $aValues ) {
+			$aRetVals[] = self::insert( $sTable, $aValues );
+		}
+		
+		return $aRetVals;
+	}
+	
+	//
+	public static function update( $sTable, $aValues, $aKeys ) {
+		
+		global $wpdb;
+		
+		list( $aVal, $aValFmt ) = self::formatValues( $aValues );
+		list( $aKey, $aKeyFmt ) = self::formatValues( $aKeys );
+		
+		return $wpdb->update( $wpdb->$sTable, $aVal, $aKey, $aValFmt, $aKeyFmt );	
+	}
+	
+	// TO DO: implement later
+	public static function delete( $sTable, $aValues, $aKeys ) {
+		// stub
+	}
+	
+	/* */
+	
+	
+	/* /
+	// takes ##d## and ##s## arguments similar to %d and %s
+	public static function prepare() {
+		
+		global $wpdb;
+		
+		$aArgs = func_get_args();
+		$sExpression = array_shift( $aArgs );
+		
+		$aRegs = array();
+		if ( preg_match_all( '/##([ds])##/', $sExpression, $aRegs ) ) {
+			
+			$aPatterns = $aRegs[0];
+			$aTypes = $aRegs[1];
+			
+			foreach ( $aPatterns as $i => $sPattern ) {
+				
+				$mValue = $aArgs[ $i ];
+				$sType = $aTypes[ $i ];
+				$sReplace = '';
+				
+				if (
+					( is_scalar( $mValue ) ) && 
+					( FALSE !== strpos( $mValue, ',' ) )
+				) {
+					// format as array
+					$mValue = explode( ',', $mValue );
+				}
+				
+				if ( is_array( $mValue ) ) {
+					$mValue = array_map( 'trim', $mValue );
+					
+					if ( 'd' == $sType ) {
+						$mValue = array_map( 'intval', $mValue );
+						$sReplace = implode( ', ', $mValue );
+					} else {
+						$mValue = array_map( array( $wpdb, 'escape' ), $mValue );
+						$sReplace = sprintf( "'%s'", implode( "', '", $mValue ) );					
+					}
+					
+					$sReplace = sprintf( ' IN (%s) ', $sReplace );
+					
+				} else {
+
+					if ( 'd' == $sType ) {
+						$mValue = intval( $mValue );
+					} else {
+						$mValue = sprintf( "'%s'", $wpdb->escape( $mValue ) );					
+					}
+					
+					$sReplace = sprintf( ' = %s ', $mValue );
+				}
+				
+				$sExpression = substr_replace( $sExpression, $sReplace, strpos( $sExpression, $sPattern ), strlen( $sPattern ) );
+				
+			}
+		}
+		
+		return $sExpression;
+	}
+	/* */
+	
+	
 }
 
 
