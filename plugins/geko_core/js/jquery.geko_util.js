@@ -589,4 +589,16 @@
 	};
 	
 	
+	// prevent IE 9 from crapping out
+	if ( !( window.console && console.log ) ) {
+		window.console = {
+			log: function(){},
+			debug: function(){},
+			info: function(){},
+			warn: function(){},
+			error: function(){}
+		};
+	}
+	
+	
 } )( jQuery );

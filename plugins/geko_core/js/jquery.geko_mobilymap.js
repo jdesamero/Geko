@@ -75,8 +75,8 @@
 				restartDelay: 4000,
 				mode: 'basic',
 				stopOnMarkerMousedown: true,
-				initXOffset: 400,
-				initYOffset: 50
+				initXOffset: 0,
+				initYOffset: 0
 			}, oMoveOpts );
 			
 			iInitXOffset = oMoveOpts.initXOffset;
@@ -101,7 +101,10 @@
 				if ( x > 0 ) x = 0;
 			}
 			
+			//console.log( 'x: ' + x + '; y: ' + y );
+			
 			return { x:x, y:y };
+			
 		};
 		
 		
@@ -145,6 +148,8 @@
 				if ( oMmOpts.markerClass ) {
 					sMiniMarkerClass = oMmOpts.markerClass;
 				}
+				
+				
 			}
 			
 			
@@ -198,7 +203,6 @@
 						opts.position = '%d %d'.printf( iCenXpos + iInitXOffset, iCenYpos + iInitYOffset );
 					}
 					
-					// pointers
 					
 					eMap.find( '.point' ).each( function() {
 						
@@ -216,30 +220,10 @@
 							
 							eMarker.attr( 'id', 'p-%d-%d'.printf( iXpos, iYpos ) );
 						}
-						
-						
-						if ( fScaleFactor && sMiniMarkerClass ) {
-							
-							var aMmPoint = eMarker.attr( 'id' ).split( '-' );
-	
-							var eMiniMarker = $( '<div></div>' );
-							
-							eMiniMarker.addClass( sMiniMarkerClass );
-							
-							eMiniMarker.css( {
-								left: '%dpx'.printf( parseInt( aMmPoint[ 1 ] ) / fScaleFactor ),
-								top: '%dpx'.printf( parseInt( aMmPoint[ 2 ] ) / fScaleFactor )
-							} );
-							
-							eMiniMap.prepend( eMiniMarker );
-							
-							if ( oMmOpts.markerCallback ) {
-								oMmOpts.markerCallback.call( eMap, eMiniMarker, eMarker );
-							}
-						}
 												
 					} );
-					
+
+
 				} else {
 					
 					console.log( 'Warning: To use "geoproj" option, the $.gekoMapProjection (geko-jquery-geko_map_projection) plugin must be enabled!' );
@@ -247,6 +231,41 @@
 				}
 				
 			}
+			
+			
+			
+			if ( oMmOpts ) {
+
+				// pointers
+				
+				eMap.find( '.point' ).each( function() {
+					
+					var eMarker = $( this );
+					
+					if ( fScaleFactor && sMiniMarkerClass ) {
+						
+						var aMmPoint = eMarker.attr( 'id' ).split( '-' );
+
+						var eMiniMarker = $( '<div></div>' );
+						
+						eMiniMarker.addClass( sMiniMarkerClass );
+						
+						eMiniMarker.css( {
+							left: '%dpx'.printf( parseInt( aMmPoint[ 1 ] ) / fScaleFactor ),
+							top: '%dpx'.printf( parseInt( aMmPoint[ 2 ] ) / fScaleFactor )
+						} );
+						
+						eMiniMap.prepend( eMiniMarker );
+						
+						if ( oMmOpts.markerCallback ) {
+							oMmOpts.markerCallback.call( eMap, eMiniMarker, eMarker );
+						}
+					}
+											
+				} );
+				
+			}
+			
 			
 			
 			//// function to get called with onMapLoad
@@ -279,6 +298,7 @@
 									//// no animation restart at the moment
 									
 									//
+									/* /
 									var fnMapHover = function() {
 												
 										eImageContent.animate( { 
@@ -304,8 +324,10 @@
 											}
 										} );
 									};
+									/* */
 									
 									//
+									/* /
 									var fnMapBounce = function() {
 										eImageContent.animate( { 
 											crSpline: $.crSpline.buildSequence( [
@@ -313,10 +335,10 @@
 												[ pos.left + iInitXOffset, pos.top + iInitYOffset ]
 											] ) 
 										}, { 
-											duration: 7000, 
+											duration: 2500, 
 											//60000
 											easing: 'linear',
-											done: fnMapHover,
+											//done: fnMapHover,
 											step: function() {
 												var pos = eImageContent.position();
 												eMap.trigger( 'reposition', [ pos.left, pos.top, xRFactor, yRFactor ] );
@@ -326,6 +348,7 @@
 									};
 									
 									fnMapBounce();
+									/* */
 									
 								} );
 								
@@ -504,13 +527,18 @@
 						// console.log( oMmOpts.mainSel );
 						// console.log( eMiniMap.length );
 						
+						// console.log( eMiniMap.width() );
+						// console.log( eMiniMap.height() );
+						
+						
 						// makes viewer draggable and moves map
 						eViewer.draggable( {
 							
 							containment: eMiniMap,
 							drag: function( event, ui ) {
 							
-								var newX = parseInt( ui.position.left * xFactor ); // creates ratio relationship between viewer and map window
+								// creates ratio relationship between viewer and map window
+								var newX = parseInt( ui.position.left * xFactor ); 
 								var newY = parseInt( ui.position.top * yFactor );
 								
 								// console.log( ui.position );
