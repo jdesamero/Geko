@@ -11,7 +11,7 @@ class Geko_Wp_Form_Item_Manage extends Geko_Wp_Options_Manage
 	
 	protected $_bExtraForms = TRUE;
 	protected $_bHasDisplayMode = FALSE;
-	
+	protected $_bDisableAttachPage = TRUE;
 	
 	protected $aItemParents = array();
 	
@@ -92,10 +92,6 @@ class Geko_Wp_Form_Item_Manage extends Geko_Wp_Options_Manage
 	
 	
 	
-	// HACKish, disable this
-	public function attachPage() { }
-	
-	
 	
 	//// front-end display methods
 	
@@ -157,9 +153,6 @@ class Geko_Wp_Form_Item_Manage extends Geko_Wp_Options_Manage
 		
 		$aSubItemIds = $oDb->getSubItemIds( 'Geko_Wp_Form_Section_Manage' );
 		
-		unset( $aQueryParams[ 'form_id' ] );
-		$aQueryParams[ 'fmsec_id' ] = $aSubItemIds;
-		
 		$aParams[ 'main_entity_pk_field' ] = 'fmsec_id';
 		$aParams[ 'main_entity_format' ] = '%d';
 		$aParams[ 'main_entity_id' ] = $aSubItemIds;
@@ -167,7 +160,10 @@ class Geko_Wp_Form_Item_Manage extends Geko_Wp_Options_Manage
 		if ( is_array( $aInsIds = $oDb->getInsertIds( 'Geko_Wp_Form_Section_Manage' ) ) ) {
 			
 			foreach ( $aPostData as $iId => $aRow ) {
+				
 				$iFmSecId = $aRow[ 'fmsec_id' ];
+				$aSubItemIds[] = $iFmSecId;				// track inserted values as well
+				
 				if ( $iInsId = $aInsIds[ $iFmSecId ] ) {
 					$aPostData[ $iId ][ 'fmsec_id' ] = $iInsId;
 				}
@@ -188,6 +184,17 @@ class Geko_Wp_Form_Item_Manage extends Geko_Wp_Options_Manage
 				$this->aItemParents[ $mId ] = array( $mParItmId, $mParItmValIdx );
 			}
 		}
+		
+		
+		// set up query params
+		unset( $aQueryParams[ 'form_id' ] );
+		
+		if ( is_array( $aSubItemIds ) && count( $aSubItemIds ) > 0 ) {
+			$aQueryParams[ 'fmsec_id' ] = $aSubItemIds;
+		} else {
+			$aQueryParams[ 'force_empty' ] = TRUE;
+		}
+		
 		
 		parent::updateRelatedEntities( $aQueryParams, $aPostData, $aParams );
 		

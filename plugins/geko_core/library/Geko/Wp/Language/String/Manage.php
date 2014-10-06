@@ -200,7 +200,7 @@ class Geko_Wp_Language_String_Manage extends Geko_Wp_Options_Manage
 		natcasesort( $aTranslateKeys );
 		// print_r( $aTranslateKeys );
 		
-		if ( $oEntity->getId() != $oMng->getLangId() ): ?>
+		if ( $oEntity && ( $oEntity->getId() != $oMng->getLangId() ) ): ?>
 			
 			<tr>
 				<th><label for="lang_lang-str">Translations</label></th>

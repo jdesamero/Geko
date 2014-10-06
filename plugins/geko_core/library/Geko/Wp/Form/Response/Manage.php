@@ -3,8 +3,13 @@
 // listing
 class Geko_Wp_Form_Response_Manage extends Geko_Wp_Options_Manage
 {
-
-
+	
+	protected $_bDisableAttachPage = TRUE;
+	protected $_bDisableGetStoredSubOptions = TRUE;
+	protected $_bDisableUpdateRelatedEntities = TRUE;
+	
+	
+	
 	//// init
 	
 	//
@@ -42,23 +47,6 @@ class Geko_Wp_Form_Response_Manage extends Geko_Wp_Options_Manage
 	}
 	
 	
-	// HACKish, disable this
-	public function attachPage() { }
-	
-	
-	// disable this
-	public function getStoredSubOptions( $aRet, $oMainEnt, $oPlugin = NULL ) {
-		return $aRet;
-	}
-	
-	
-	
-	//// crud methods
-
-	//
-	public function updateRelatedEntities( $aQueryParams, $aPostData, $aParams ) {
-		
-	}
 	
 	
 	// insert overrides

@@ -69,6 +69,13 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	protected $_bCanDuplicate = FALSE;
 	protected $_bCanRestore = FALSE;
 	
+	protected $_bDisableAttachPage = FALSE;
+	protected $_bDisableGetStoredOptions = FALSE;
+	protected $_bDisableGetStoredSubOptions = FALSE;
+	protected $_bDisableUpdateRelatedEntities = FALSE;
+	
+	
+	
 	
 	
 	//// methods
@@ -551,57 +558,59 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	//
 	public function attachPage() {
 		
-		$this->initEntities();
-		
-		if ( $this->enablePage() ) {
+		if ( !$this->_bDisableAttachPage ) {
 			
-			if ( count( $this->_aTabGroup ) > 0 ) {
-				add_menu_page( $this->_sTabGroupTitle, $this->_sTabGroupTitle, $this->_sManagementCapability, $this->_sInstanceClass, array( $this, 'displayPage' ) );
-			}
+			$this->initEntities();
 			
-			if ( Geko_Wp_Admin_Menu::inTabGroup( $this->_sInstanceClass ) ) {
+			if ( $this->enablePage() ) {
 				
-				// add as sub-items of tab group
-				$sSubmenuHandle = Geko_Wp_Admin_Menu::getTabParent( $this->_sInstanceClass );
-				add_submenu_page( $sSubmenuHandle, $this->_sPageTitle, $this->_sMenuTitle, $this->_sManagementCapability, $this->_sInstanceClass, array( $this, 'displayPage' ) );
-				add_submenu_page( $sSubmenuHandle, '', '', $this->_sManagementCapability, sprintf( '%s%s', $this->_sInstanceClass, $this->_sAddModeSuffix ), array( $this, 'detailsPage' ) );
-				
-			} else {
-			
-				if ( $this->_sParentEntityClass ) {
-					
-					$sSubmenuHandle = $this->_sParentManageClass;
-					$sEditTitle = $sAddTitle = '';
-					
-					$aParams = array();
-					if ( $this->_sInstanceClass == $this->_sCurrentPage ) {
-						$aParams[ 'current' ] = TRUE;
-						self::$aMenuInstanceCurrent[ $this->_sParentManageClass ] = TRUE;
-					}
-					
-					$sUrl = sprintf( '%s?page=%s&%s=%d', Geko_Uri::getUrl( 'wp_admin' ), $this->_sInstanceClass, $this->_sParentEntityIdVarName, $this->_iCurrentParentEntityId );
-					Geko_Wp_Admin_Menu::addMenu( $this->_sParentManageClass, $this->_sMenuTitle, $sUrl, $aParams );
-					
-				} else {
-					
-					if ( $iEntityId = $this->_iCurrentEntityId ) {
-						$sUrl = sprintf( '%s?page=%s&%s=%d', Geko_Uri::getUrl( 'wp_admin' ), $this->_sEntityIdVarName, $iEntityId );
-						Geko_Wp_Admin_Menu::addMenu( $this->_sInstanceClass, 'Details', $sUrl );
-					}
-					
-					$sSubmenuHandle = $this->_sInstanceClass;
-					$sEditTitle = 'Edit';
-					$sAddTitle = 'Add New';
-					
-					add_menu_page( $this->_sPageTitle, $this->_sMenuTitle, $this->_sManagementCapability, $this->_sInstanceClass, array( $this, 'displayPage' ) );
+				if ( count( $this->_aTabGroup ) > 0 ) {
+					add_menu_page( $this->_sTabGroupTitle, $this->_sTabGroupTitle, $this->_sManagementCapability, $this->_sInstanceClass, array( $this, 'displayPage' ) );
 				}
 				
-				add_submenu_page( $sSubmenuHandle, $this->_sPageTitle, $sEditTitle, $this->_sManagementCapability, $this->_sInstanceClass, array( $this, 'displayPage' ) );
-				add_submenu_page( $sSubmenuHandle, $this->_sPageTitle, $sAddTitle, $this->_sManagementCapability, sprintf( '%s%s', $this->_sInstanceClass, $this->_sAddModeSuffix ), array( $this, 'detailsPage' ) );
+				if ( Geko_Wp_Admin_Menu::inTabGroup( $this->_sInstanceClass ) ) {
+					
+					// add as sub-items of tab group
+					$sSubmenuHandle = Geko_Wp_Admin_Menu::getTabParent( $this->_sInstanceClass );
+					add_submenu_page( $sSubmenuHandle, $this->_sPageTitle, $this->_sMenuTitle, $this->_sManagementCapability, $this->_sInstanceClass, array( $this, 'displayPage' ) );
+					add_submenu_page( $sSubmenuHandle, '', '', $this->_sManagementCapability, sprintf( '%s%s', $this->_sInstanceClass, $this->_sAddModeSuffix ), array( $this, 'detailsPage' ) );
+					
+				} else {
+				
+					if ( $this->_sParentEntityClass ) {
+						
+						$sSubmenuHandle = $this->_sParentManageClass;
+						$sEditTitle = $sAddTitle = '';
+						
+						$aParams = array();
+						if ( $this->_sInstanceClass == $this->_sCurrentPage ) {
+							$aParams[ 'current' ] = TRUE;
+							self::$aMenuInstanceCurrent[ $this->_sParentManageClass ] = TRUE;
+						}
+						
+						$sUrl = sprintf( '%s?page=%s&%s=%d', Geko_Uri::getUrl( 'wp_admin' ), $this->_sInstanceClass, $this->_sParentEntityIdVarName, $this->_iCurrentParentEntityId );
+						Geko_Wp_Admin_Menu::addMenu( $this->_sParentManageClass, $this->_sMenuTitle, $sUrl, $aParams );
+						
+					} else {
+						
+						if ( $iEntityId = $this->_iCurrentEntityId ) {
+							$sUrl = sprintf( '%s?page=%s&%s=%d', Geko_Uri::getUrl( 'wp_admin' ), $this->_sEntityIdVarName, $iEntityId );
+							Geko_Wp_Admin_Menu::addMenu( $this->_sInstanceClass, 'Details', $sUrl );
+						}
+						
+						$sSubmenuHandle = $this->_sInstanceClass;
+						$sEditTitle = 'Edit';
+						$sAddTitle = 'Add New';
+						
+						add_menu_page( $this->_sPageTitle, $this->_sMenuTitle, $this->_sManagementCapability, $this->_sInstanceClass, array( $this, 'displayPage' ) );
+					}
+					
+					add_submenu_page( $sSubmenuHandle, $this->_sPageTitle, $sEditTitle, $this->_sManagementCapability, $this->_sInstanceClass, array( $this, 'displayPage' ) );
+					add_submenu_page( $sSubmenuHandle, $this->_sPageTitle, $sAddTitle, $this->_sManagementCapability, sprintf( '%s%s', $this->_sInstanceClass, $this->_sAddModeSuffix ), array( $this, 'detailsPage' ) );
+				}
+				
 			}
-			
 		}
-		
 	}
 	
 	
@@ -613,28 +622,32 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		
 		$aRet = array();
 		
-		if ( $oEntity = $this->_oCurrentEntity ) {
-			
-			$aFields = $this->getPrimaryTableFields();
-			
-			foreach ( $aFields as $oField ) {
-				$sFieldName = $oField->getFieldName();
-				$sRetKey = sprintf( '%s_%s', $this->_sType, $sFieldName );
-				$aRet[ $sRetKey ] = $oEntity->getEntityPropertyValue( $sFieldName );
+		if ( !$this->_bDisableGetStoredOptions ) {
+		
+			if ( $oEntity = $this->_oCurrentEntity ) {
+				
+				$aFields = $this->getPrimaryTableFields();
+				
+				foreach ( $aFields as $oField ) {
+					$sFieldName = $oField->getFieldName();
+					$sRetKey = sprintf( '%s_%s', $this->_sType, $sFieldName );
+					$aRet[ $sRetKey ] = $oEntity->getEntityPropertyValue( $sFieldName );
+				}
+				
+				// hook method
+				$aRet = $this->modifyStoredOptions( $aRet, $oEntity );
+				$sAction = sprintf( '%s_getstoredopts', $this->_sActionPrefix );
+				
+				$aRet = apply_filters( $sAction, $aRet, $oEntity, $this );
+				
+				if ( $oEntity->hasEntityProperty( 'slug' ) ) {
+					$aRet = apply_filters( sprintf( '%s_%s', $sAction, $oEntity->getSlug() ), $aRet, $oEntity );
+				}
+				
+			} else {
+				$aRet = $this->getDefaultOptions( $aRet, $oPlugin );
 			}
-			
-			// hook method
-			$aRet = $this->modifyStoredOptions( $aRet, $oEntity );
-			$sAction = sprintf( '%s_getstoredopts', $this->_sActionPrefix );
-			
-			$aRet = apply_filters( $sAction, $aRet, $oEntity, $this );
-			
-			if ( $oEntity->hasEntityProperty( 'slug' ) ) {
-				$aRet = apply_filters( sprintf( '%s_%s', $sAction, $oEntity->getSlug() ), $aRet, $oEntity );
-			}
-			
-		} else {
-			$aRet = $this->getDefaultOptions( $aRet, $oPlugin );
+		
 		}
 		
 		return $aRet;
@@ -643,15 +656,18 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	// implemented by sub-entities
 	public function getStoredSubOptions( $aRet, $oMainEnt, $oPlugin = NULL ) {
 		
-		if ( $oMainMng = $this->_oSubOptionParent ) {
+		if ( !$this->_bDisableGetStoredSubOptions ) {
 			
-			$aRet[ $this->_sType ] = $this->getSubEntities(
-				$this->getStoredSubOptionParams( $oMainMng, $oMainEnt )
-			);
-			
-			$sAction = sprintf( '%s_getstoredsubopts', $this->_sActionPrefix );
-			$aRet = apply_filters( $sAction, $aRet, $oMainEnt, $this );
-			
+			if ( $oMainMng = $this->_oSubOptionParent ) {
+				
+				$aRet[ $this->_sType ] = $this->getSubEntities(
+					$this->getStoredSubOptionParams( $oMainMng, $oMainEnt )
+				);
+				
+				$sAction = sprintf( '%s_getstoredsubopts', $this->_sActionPrefix );
+				$aRet = apply_filters( $sAction, $aRet, $oMainEnt, $this );
+				
+			}
 		}
 		
 		return $aRet;
@@ -2380,7 +2396,10 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 		
 		// Mega hackish!!!
 		// Force skip update if the var below is set
-		if ( $_REQUEST[ sprintf( '%s-__skip-update__', $this->_sType ) ] ) {
+		if (
+			$_REQUEST[ sprintf( '%s-__skip-update__', $this->_sType ) ] ||
+			$this->_bDisableUpdateRelatedEntities
+		) {
 			return FALSE;
 		}
 		

@@ -123,7 +123,19 @@ abstract class Geko_Wp_Entity_Query extends Geko_Entity_Query
 				$aParams[ 'kwsearch' ], $aParams[ 'kwsearch_fields' ]
 			) );
 		}
-				
+		
+		
+		//// force empty result set
+		if ( $aParams[ 'force_empty' ] ) {
+			
+			$oQuery
+				->unsetClause()
+				->field( 'NULL' )
+				->limit( 0 )
+			;
+		}
+		
+		
 		return $oQuery;
 	}
 	

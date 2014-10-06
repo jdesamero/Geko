@@ -13,6 +13,9 @@ class Geko_Wp_Form_ResponseValue_Manage extends Geko_Wp_Options_Manage
 	protected $_sType = 'fmrv';
 	
 	protected $_bHasDisplayMode = FALSE;
+	protected $_bDisableAttachPage = TRUE;
+	protected $_bDisableGetStoredSubOptions = TRUE;
+	protected $_bDisableUpdateRelatedEntities = TRUE;
 	
 	
 	
@@ -51,22 +54,6 @@ class Geko_Wp_Form_ResponseValue_Manage extends Geko_Wp_Options_Manage
 		return $this;
 	}
 	
-	
-	// HACKish, disable this
-	public function attachPage() { }
-	
-	
-	// disable this
-	public function getStoredSubOptions( $aRet, $oMainEnt, $oPlugin = NULL ) {
-		return $aRet;
-	}
-	
-	
-	
-	//// crud methods
-	
-	// disable this
-	public function updateRelatedEntities( $aQueryParams, $aPostData, $aParams ) { }
 	
 	
 	

@@ -52,9 +52,9 @@ class Geko_Wp_Form_ItemType_Manage extends Geko_Wp_Options_Manage
 		
 		// populate with default values if table is empty
 		
-		$sTable = 'geko_form_item_type';
+		$sTable = '##pfx##geko_form_item_type';
 		
-		Geko_Once::run( sprintf( '%s::populate' ), array( $this, 'populateTable' ), array( $sTable ) );
+		Geko_Once::run( sprintf( '%s::populate', $this->_sInstanceClass ), array( $this, 'populateTable' ), array( $sTable ) );
 		
 		return $this;
 	}

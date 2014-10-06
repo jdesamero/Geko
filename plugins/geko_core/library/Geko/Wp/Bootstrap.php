@@ -33,7 +33,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 				'role.types' => NULL,
 				'role.mng' => array( 'role.types' ),
 				
-				'form.mng' => NULL,
+				'form.mng' => array( 'lang.rslv' ),
 				
 				'emsg.mng' => NULL,
 
@@ -347,7 +347,10 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 		// hard-code for now
 		$aPlugins = array( 'Post', 'Category' );
 		
-		if ( class_exists( 'Geko_Wp_NavigationManagement_Language' ) ) {
+		if (
+			( $this->_aConfig[ 'navmng.lang' ] ) && 
+			( class_exists( 'Geko_Wp_NavigationManagement_Language' ) )
+		) {
 			$aPlugins[] = 'Geko_Wp_NavigationManagement_Language';
 		}
 		

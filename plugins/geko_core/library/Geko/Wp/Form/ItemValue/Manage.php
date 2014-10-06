@@ -13,6 +13,7 @@ class Geko_Wp_Form_ItemValue_Manage extends Geko_Wp_Options_Manage
 	
 	protected $_bExtraForms = TRUE;
 	protected $_bHasDisplayMode = FALSE;
+	protected $_bDisableAttachPage = TRUE;
 	
 	
 	
@@ -73,10 +74,6 @@ class Geko_Wp_Form_ItemValue_Manage extends Geko_Wp_Options_Manage
 	
 	
 	
-	// HACKish, disable this
-	public function attachPage() { }
-	
-	
 	
 	
 	
@@ -126,9 +123,6 @@ class Geko_Wp_Form_ItemValue_Manage extends Geko_Wp_Options_Manage
 		
 		$aSubItemIds = $oDb->getSubItemIds( 'Geko_Wp_Form_Item_Manage' );
 		
-		unset( $aQueryParams[ 'form_id' ] );
-		$aQueryParams[ 'fmitm_id' ] = $aSubItemIds;
-		
 		$aParams[ 'main_entity_pk_field' ] = 'fmitm_id';
 		$aParams[ 'main_entity_format' ] = '%d';
 		$aParams[ 'main_entity_id' ] = $aSubItemIds;
@@ -138,6 +132,8 @@ class Geko_Wp_Form_ItemValue_Manage extends Geko_Wp_Options_Manage
 			foreach ( $aPostData as $sId => $aRow ) {
 				
 				$iFmItmId = $aRow[ 'fmitm_id' ];
+				$aSubItemIds[] = $iFmItmId;
+				
 				if ( $iInsId = $aInsIds[ $iFmItmId ] ) {
 					$aPostData[ $sId ][ 'fmitm_id' ] = $iInsId;
 				}
@@ -164,6 +160,17 @@ class Geko_Wp_Form_ItemValue_Manage extends Geko_Wp_Options_Manage
 				$aPostData[ $sId ][ 'fmitmval_idx' ] = $aIdxCounter[ $iFmItmId ];
 			}
 		}
+		
+		
+		// set up query params
+		unset( $aQueryParams[ 'form_id' ] );
+		
+		if ( is_array( $aSubItemIds ) && count( $aSubItemIds ) > 0 ) {
+			$aQueryParams[ 'fmitm_id' ] = $aSubItemIds;
+		} else {
+			$aQueryParams[ 'force_empty' ] = TRUE;
+		}
+		
 		
 		parent::updateRelatedEntities( $aQueryParams, $aPostData, $aParams );
 		
