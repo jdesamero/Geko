@@ -1,8 +1,11 @@
 <?php
 
-// ini_set( 'display_errors', 1 );
-// error_reporting( E_ALLÊ^ÊE_NOTICE );
-// error_reporting( E_ALL );
+/* /
+ini_set( 'display_errors', 1 );
+ini_set( 'scream.enabled', 1 );		// >= v.5.2.0
+error_reporting( E_ALL ^ E_NOTICE );
+error_reporting( E_ALL );
+/* */
 
 if ( !file_exists( '../../../wp-load.php' ) ) die ( 'wp-load.php not found' );
 

@@ -164,9 +164,11 @@ class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 		$this->getLanguages();		// initialize lang array
 		
 		$aNewNavGroup = array();
+		
 		foreach ( self::$aLanguages as $oLang ) {
 			$aNewNavGroup[ $oLang->getSlug() ] = $aNavGroup;	
 		}
+		
 		return $aNewNavGroup;
 	}
 	
@@ -196,6 +198,8 @@ class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 			
 			$aNewNavGroup = $this->getSiblings( $aNewNavGroup );
 			$aReconcile = array();
+			
+			print_r( $aNewNavGroup );
 			
 			foreach ( $aNewNavGroup as $sLangCode => $aParams ) {
 				
@@ -317,8 +321,6 @@ class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 	
 	//
 	public function getSiblings( $aParams ) {
-		
-		global $wpdb;
 		
 		$sDefLangCode = $this->getLangCode( 0 );
 		
