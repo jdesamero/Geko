@@ -10,10 +10,14 @@ class Gloc_Layout_PageForm extends Gloc_Layout
 	protected $oPage = NULL;
 	protected $oForm = NULL; 
 	
+	protected $_mScripts = 'geko_wp_form_render';
+	
 	
 	
 	//
 	public function start() {
+		
+		parent::start();
 		
 		$oPage = $this->newPage();
 		
@@ -29,12 +33,6 @@ class Gloc_Layout_PageForm extends Gloc_Layout
 		}
 		
 		$this->oPage = $oPage;
-	}
-	
-	
-	//
-	public function echoEnqueue() {
-		$this->enqueueScript( 'geko_wp_form_render' );
 	}
 	
 	//
@@ -73,12 +71,12 @@ class Gloc_Layout_PageForm extends Gloc_Layout
 			$aValidation[] = $aItemValid;
 		}
 		
+		$oService = Gloc_Service_Form::getInstance();
+		
 		// json params
 		$aJsonParams = array(
 			'script' => $this->getScriptUrls(),
-			'status' => array(
-				'success' => Gloc_Service_Form::STAT_SUCCESS
-			),
+			'status' => $oService->getStatusValues(),
 			'validation' => $aValidation,
 			'responses' => $aJsResponse
 		);

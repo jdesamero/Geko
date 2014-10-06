@@ -37,16 +37,11 @@ class Gloc_Layout_PageLoginUpdateProfile extends Gloc_Layout
 	//
 	public function echoHeadLate() {
 		
+		$oService = Gloc_Service_Profile::getInstance();
+		
 		$aJsonParams = array(
 			'script' => $this->getScriptUrls(),
-			'status' => array(
-				'update_profile' => Gloc_Service_Profile::STAT_UPDATE_PROFILE,
-				'change_email' => Gloc_Service_Profile::STAT_CHANGE_EMAIL,
-				'change_password' => Gloc_Service_Profile::STAT_CHANGE_PASSWORD,
-				'bad_password' => Gloc_Service_Profile::STAT_BAD_PASSWORD,
-				'email_exists' => Gloc_Service_Profile::STAT_EMAIL_EXISTS,
-				'send_notification_failed' => Gloc_Service_Profile::STAT_SEND_NOTIFICATION_FAILED
-			),
+			'status' => $oService->getStatusValues(),
 			'labels' => $this->_getLabels()
 		);
 		

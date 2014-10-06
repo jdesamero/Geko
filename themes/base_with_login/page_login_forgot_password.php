@@ -22,12 +22,11 @@ class Gloc_Layout_PageLoginForgotPassword extends Gloc_Layout
 	//
 	public function echoHeadLate() {
 		
+		$oService = Gloc_Service_Profile::getInstance();
+		
 		$aJsonParams = array(
 			'script' => $this->getScriptUrls(),
-			'status' => array(
-				'forgot_password' => Gloc_Service_Profile::STAT_FORGOT_PASSWORD,
-				'send_notification_failed' => Gloc_Service_Profile::STAT_SEND_NOTIFICATION_FAILED
-			),
+			'status' => $oService->getStatusValues(),
 			'labels' => $this->_getLabels()
 		);
 		

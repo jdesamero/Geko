@@ -11,13 +11,10 @@ class Gloc_Layout_Homepage extends Gloc_Layout
 		101 => 'Link'
 	);
 	
-	//
-	public function echoEnqueue() {
-		$this
-			->enqueueScript( 'geko-jquery-geko_slideshow' )
-			->enqueueStyle( 'gloc-gallery' )
-		;
-	}
+	protected $_mStyles = 'gloc-gallery';
+	protected $_mScripts = 'geko-jquery-geko_slideshow';
+	
+	
 	
 	//
 	public function echoHeadLate() {

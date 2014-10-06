@@ -53,12 +53,11 @@ class Gloc_Layout_PageLoginSetPassword extends Gloc_Layout
 		// don't bother showing any javascript code if not a valid user
 		if ( !$this->oUser ) return;
 		
+		$oService = Gloc_Service_Profile::getInstance();
+		
 		$aJsonParams = array(
 			'script' => $this->getScriptUrls(),
-			'status' => array(
-				'set_password' => Gloc_Service_Profile::STAT_SET_PASSWORD,
-				'send_notification_failed' => Gloc_Service_Profile::STAT_SEND_NOTIFICATION_FAILED
-			),
+			'status' => $oService->getStatusValues(),
 			'labels' => $this->_getLabels()
 		);
 		

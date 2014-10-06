@@ -45,12 +45,11 @@ class Gloc_Layout_PageLoginActivateAccount extends Gloc_Layout
 		// don't bother showing any javascript code if not a valid user
 		if ( !$this->oUser ) return;
 		
+		$oService = Gloc_Service_Profile::getInstance();
+		
 		$aJsonParams = array(
 			'script' => $this->getScriptUrls(),
-			'status' => array(
-				'activate_account' => Gloc_Service_Profile::STAT_ACTIVATE_ACCOUNT,
-				'send_notification_failed' => Gloc_Service_Profile::STAT_SEND_NOTIFICATION_FAILED
-			),
+			'status' => $oService->getStatusValues(),
 			'labels' => $this->_getLabels()
 		);
 		

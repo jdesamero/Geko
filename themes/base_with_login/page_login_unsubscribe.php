@@ -21,12 +21,11 @@ class Gloc_Layout_PageLoginUnsubscribe extends Gloc_Layout
 	//
 	public function echoHeadLate() {
 		
+		$oService = Gloc_Service_Profile::getInstance();
+		
 		$aJsonParams = array(
 			'script' => $this->getScriptUrls(),
-			'status' => array(
-				'unsubscribe' => Gloc_Service_Profile::STAT_UNSUBSCRIBE,
-				'send_notification_failed' => Gloc_Service_Profile::STAT_SEND_NOTIFICATION_FAILED
-			),
+			'status' => $oService->getStatusValues(),
 			'labels' => $this->_getLabels()
 		);
 		

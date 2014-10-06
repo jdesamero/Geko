@@ -10,6 +10,8 @@ class Gloc_Layout_PageForm extends Gloc_Layout
 	protected $oPage = NULL;
 	protected $oForm = NULL; 
 	
+	protected $_mScripts = 'geko_wp_form_render';
+	
 	
 	
 	//
@@ -33,11 +35,6 @@ class Gloc_Layout_PageForm extends Gloc_Layout
 		$this->oPage = $oPage;
 	}
 	
-	
-	//
-	public function echoEnqueue() {
-		$this->enqueueScript( 'geko_wp_form_render' );
-	}
 	
 	//
 	public function echoHeadLate() {

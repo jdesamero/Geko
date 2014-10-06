@@ -12,11 +12,8 @@ class Gloc_Layout_Archive extends Gloc_Layout
 		105 => 'Items Found:'
 	);
 	
+	protected $_mStyles = 'gloc-pagination';
 	
-	//
-	public function echoEnqueue() {
-		$this->enqueueStyle( 'gloc-pagination' );
-	}
 	
 	
 	//

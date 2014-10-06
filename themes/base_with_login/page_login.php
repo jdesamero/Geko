@@ -27,12 +27,11 @@ class Gloc_Layout_PageLogin extends Gloc_Layout
 	//
 	public function echoHeadLate() {
 		
+		$oService = Gloc_Service_Profile::getInstance();
+		
 		$aJsonParams = array(
 			'script' => $this->getScriptUrls(),
-			'status' => array(
-				'login' => Gloc_Service_Profile::STAT_LOGIN,
-				'not_activated' => Gloc_Service_Profile::STAT_NOT_ACTIVATED
-			),
+			'status' => $oService->getStatusValues(),
 			'labels' => $this->_getLabels()
 		);
 		

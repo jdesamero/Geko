@@ -15,12 +15,8 @@ class Gloc_Layout_Search extends Gloc_Layout
 		108 => 'Find'
 	);
 	
+	protected $_mStyles = 'gloc-pagination';
 	
-	
-	//
-	public function echoEnqueue() {
-		$this->enqueueStyle( 'gloc-pagination' );
-	}
 	
 	
 	//

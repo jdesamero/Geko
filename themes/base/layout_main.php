@@ -11,24 +11,19 @@ class Gloc_Layout_Main extends Gloc_Layout
 		104 => 'Search'
 	);
 	
+	protected $_mBodyClass = '##body_class##';
+	protected $_mStyles = 'gloc';
+	protected $_mScripts = 'jquery';
+	
+	protected $_aTemplates = array(
+		'page_template:homepage.php custom',
+		'page_template:nosidebar.php no_sidebar'
+	);
 	
 	
-	//
-	public function echoEnqueue() {
-		$this
-			->enqueueStyle( 'gloc' )
-			->enqueueScript( 'jquery' )
-		;
-	}
 	
 	//
 	public function echoMain() {
-		
-		// register templates
-		$this
-			->addTemplate( 'page_template:homepage.php', 'custom' )
-			->addTemplate( 'page_template:nosidebar.php', 'no_sidebar' )
-		;
 		
 		$this->doEnqueue();
 		$this->doGetHeader();

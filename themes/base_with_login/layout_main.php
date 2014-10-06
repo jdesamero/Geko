@@ -31,6 +31,19 @@ class Gloc_Layout_Main extends Gloc_Layout
 		121 => 'This page cannot be accessed while you are logged-in.'
 	);
 	
+	protected $_mBodyClass = '##body_class##';
+	protected $_mStyles = 'gloc';
+	protected $_mScripts = 'geko-jquery-geko_ajax_form';
+	
+	protected $_aTemplates = array(
+		'page_template:homepage.php custom public',
+		'page_template:nosidebar.php no_sidebar public',
+		'page_template:page_login_update_profile.php no_sidebar protected',
+		'page_template:page_login.php no_sidebar unprotected',
+		'page_template:page_login_register.php no_sidebar unprotected'
+	);
+	
+	
 	
 	
 	//
@@ -50,29 +63,8 @@ class Gloc_Layout_Main extends Gloc_Layout
 		
 	}
 	
-	
-	//
-	public function echoEnqueue() {
-		$this
-			->enqueueStyle( 'gloc' )
-			->enqueueScript( 'geko-jquery-geko_ajax_form' )
-		;
-	}
-	
 	//
 	public function echoMain() {
-		
-		// register templates
-		$this
-			->addTemplate( 'page_template:homepage.php', 'custom', 'public' )
-			->addTemplate( 'page_template:nosidebar.php', 'no_sidebar', 'public' )
-			->addTemplate( 'page_template:page_login_update_profile.php', 'no_sidebar', 'protected' )
-			->addTemplate( 'page_template:page_login.php', 'no_sidebar', 'unprotected' )
-			->addTemplate( 'page_template:page_login_register.php', 'no_sidebar', 'unprotected' )
-			
-			// below uses the default template with sidebar and breadcrumbs
-			// ->addTemplate( 'page_template:some_template.php', 'default', ... )
-		;
 		
 		$this->doEnqueue();
 		$this->doGetHeader();
@@ -212,12 +204,11 @@ class Gloc_Layout_Main extends Gloc_Layout
 		// don't bother showing login javascript if already logged-in
 		if ( $this->bIsLoggedIn ) return;
 		
+		$oService = Gloc_Service_Profile::getInstance();
+		
 		$aJsonParams = array(
 			'script' => $this->getScriptUrls(),
-			'status' => array(
-				'login' => Gloc_Service_Profile::STAT_LOGIN,
-				'not_activated' => Gloc_Service_Profile::STAT_NOT_ACTIVATED
-			),
+			'status' => $oService->getStatusValues(),
 			'labels' => $this->_getLabels()
 		);
 		

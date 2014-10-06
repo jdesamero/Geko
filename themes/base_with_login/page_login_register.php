@@ -34,13 +34,11 @@ class Gloc_Layout_PageLoginRegister extends Gloc_Layout
 	//
 	public function echoHeadLate() {
 		
+		$oService = Gloc_Service_Profile::getInstance();
+		
 		$aJsonParams = array(
 			'script' => $this->getScriptUrls(),
-			'status' => array(
-				'register' => Gloc_Service_Profile::STAT_REGISTER,
-				'email_exists' => Gloc_Service_Profile::STAT_EMAIL_EXISTS,
-				'send_notification_failed' => Gloc_Service_Profile::STAT_SEND_NOTIFICATION_FAILED
-			),
+			'status' => $oService->getStatusValues(),
 			'labels' => $this->_getLabels()
 		);
 		
