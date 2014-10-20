@@ -388,7 +388,7 @@ body.toplevel_page_Geko_Wp_Form_Manage .dialog {
 }
 
 .ui-widget-content .ui-icon {
-    background-image: url( '../themes/base/images/ui-icons_222222_256x240.png' );
+    background-image: url( 'images/ui-icons_222222_256x240.png' );
     background-position: -80px -224px;
 }
 .ui-dialog .ui-resizable-se {

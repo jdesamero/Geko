@@ -14,6 +14,90 @@
 	var Backbone = this.Backbone;
 	var Backstab = this.Backstab;
 	
+	
+	var getTarget = function( elem, params, prop ) {
+		
+		var sel = null, fcont = null, target = null, _target = null, defer = null;
+		
+		if ( params && params[ prop ] ) {
+			
+			var propParams = params[ prop ];
+			
+			if ( propParams.selector ) {
+				sel = propParams.selector;
+			}
+			
+			if ( propParams.contents ) {
+				fcont = propParams.contents;
+			}
+
+			if ( propParams.defer ) {
+				defer = propParams.defer;
+			}
+		}
+		
+		// find target
+		
+		if ( sel ) {
+			
+			target = elem.find( sel );
+			if ( target.length > 0 ) _target = target;
+			
+		} else {
+			
+			// try these selectors
+			var sels = [ '.%s'.printf( prop ), '#%s'.printf( prop ) ];
+			
+			$.each( sels, function( i, sel2 ) {
+				target = elem.find( sel2 );
+				if ( target.length > 0 ) {
+					_target = target;
+					return false;
+				}
+			} );
+			
+		}
+		
+		return [ _target, fcont, defer ];
+	};
+	
+	var setTargetValue = function( target, val, cb ) {
+		
+		if ( target ) {
+			
+			if ( cb ) {
+				
+				cb.call( this, target, val );
+				
+			} else {
+				
+				var tag = target.prop( 'tagName' ).toLowerCase();
+				
+				if ( ( 'input' == tag ) || ( 'textarea' == tag ) ) {
+					target.val( val );
+				} else {
+					target.html( val );						
+				}
+			}
+		}
+		
+	};
+	
+	var getTargetValue = function( target ) {
+		
+		var tag = target.prop( 'tagName' ).toLowerCase();
+		
+		// TO DO!!!!!!
+		if ( ( 'input' == tag ) || ( 'textarea' == tag ) ) {
+			return target.val();
+		}
+		
+		return target.html();
+	};
+
+	
+	
+	
 	//
 	Backstab.createConstructor( 'View', {}, {
 		
@@ -22,7 +106,7 @@
 		_props: null,
 		_maxLevels: 3,					// maximum number of descendant levels to traverse
 		_backboneExtend: null,			// reference to the orginal Backbone.View.extend() method
-		
+				
 		
 		//// methods
 		
@@ -47,10 +131,13 @@
 			this._backboneExtend = Backbone.View.extend;
 			
 			Backbone.View.extend = function() {
+				
 				var args = $.makeArray( arguments );
+				
 				if ( args[ 0 ] ) {
 					args[ 0 ] = _this.modifyViewProps( args[ 0 ] );
 				}
+				
 				return _this._backboneExtend.apply( Backbone.View, args );
 			};
 			
@@ -72,9 +159,11 @@
 			
 			//
 			var copyMethod = function( method ) {
+				
 				if ( 'array' === $.type( method ) ) {
 					return method.slice( 0 );	// make a copy
 				}
+				
 				return method;
 			};
 			
@@ -98,11 +187,15 @@
 				
 				// pass 2, find semi-colon separated event/selectors and split
 				$.each( obj.events, function( evtsel, method ) {
+					
 					if ( _.contains( evtsel, ';' ) ) {
+						
 						var split = evtsel.split( ';' );
+						
 						$.each( split, function( i, v ) {
 							obj.events[ $.trim( v ) ] = copyMethod( method );
 						} );
+						
 						delete obj.events[ evtsel ];
 					}
 				} );
@@ -133,6 +226,7 @@
 			}
 			
 			
+			
 			// make sure there is an initialize() method
 			if ( !obj.initialize ) {
 				obj.initialize = function() { };
@@ -140,13 +234,147 @@
 			
 			// execute bindDelegates() after calling initialize()
 			if ( 'function' === $.type( obj.initialize ) ) {
+				
 				var init = obj.initialize;
-				var wrap = function() {
-					init.apply( this );
+				var initWrap = function() {
+					
+					var res = init.apply( this, arguments );
 					_this.bindDelegates( this );
+					
+					return res;
 				};
-				obj.initialize = wrap;
+				
+				obj.initialize = initWrap;
 			}
+			
+			
+			obj._ensureElement = function() {
+				
+				if ( !this.el && this.createElement ) {
+					
+					var eElem = this.createElement();
+					
+					if ( 'object' == $.type( eElem ) ) {
+						this.el = this.createElement();
+					}
+				}
+				
+				return Backbone.View.prototype._ensureElement.apply( this, arguments );
+			};
+			
+			obj.delegateEvents = function() {
+				return Backbone.View.prototype.delegateEvents.apply( this, arguments );
+			};
+			
+			obj.extractModelValues = function( oModel, eElem, oParams ) {
+				
+				var _this = this;
+				
+				if ( !oModel ) oModel = this.model;
+				if ( !eElem ) eElem = this.$el;
+				if ( !oParams ) oParams = {};
+				
+				// ---------------------------------------------------------------------------------
+				
+				if ( oModel && eElem ) {
+					
+					var data;
+					
+					if ( oModel.toJSON ) {
+						data = oModel.toJSON();
+					} else {
+						data = oModel;
+					}
+					
+					$.each( data, function( prop, val ) {
+						
+						var sTargetProp = prop;
+						if ( _this.elementPrefix ) {
+							sTargetProp = '%s%s'.printf( _this.elementPrefix, prop );
+						}
+						
+						var res = getTarget( eElem, oParams, sTargetProp );
+						var _target = res[ 0 ];
+						var fcont = res[ 1 ];
+						var defer = res[ 2 ];
+						
+						if ( defer ) {
+							
+							if ( defer.contents ) {
+								defer.contents.call( _this, _target, val );
+							}
+							
+							var funtil = defer.until;
+							
+							if ( funtil ) {
+								var itvl, deferTil = function() {
+									if ( funtil() ) {
+										setTargetValue.call( _this, _target, val, fcont );
+										clearInterval( itvl );
+									}
+								};
+								
+								itvl = setInterval( deferTil, 100 );
+							}
+							
+						} else {
+							setTargetValue.call( _this, _target, val, fcont );
+						}
+						
+					} );
+				}						
+				
+			};
+			
+			obj.getModelDataFromElem = function( oModel, eElem, oParams ) {
+				
+				var _this = this;
+				
+				if ( !oModel ) oModel = this.model;
+				if ( !eElem ) eElem = this.$el;
+				if ( !oParams ) oParams = {};
+				
+				// ---------------------------------------------------------------------------------
+				
+				var ret = {};
+				
+				var data;
+				if ( oModel.toJSON ) data = oModel.toJSON();
+				else data = oModel;
+				
+				$.each( data, function( prop, oldval ) {
+					
+					var sTargetProp = prop;
+					if ( _this.elementPrefix ) {
+						sTargetProp = '%s%s'.printf( _this.elementPrefix, prop );
+					}
+					
+					var res = getTarget( eElem, oParams, sTargetProp );
+					var _target = res[ 0 ];
+					var fcont = res[ 1 ];
+					
+					// populate
+					if ( _target ) {
+						if ( fcont ) ret[ prop ] = fcont( _target );
+						else ret[ prop ] = getTargetValue( _target );
+					}
+					
+				} );
+				
+				return ret;
+			};
+			
+			obj.setModelValues = function( oModel, eElem, oParams ) {
+
+				if ( !oModel ) oModel = this.model;
+				if ( !eElem ) eElem = this.$el;
+				if ( !oParams ) oParams = {};
+				
+				// ---------------------------------------------------------------------------------
+				
+				oModel.set( this.getModelDataFromElem( oModel, eElem, oParams ) );
+			};
+			
 			
 			return obj;
 		},
@@ -172,26 +400,31 @@
 			
 			//
 			var resolveTarget = function( elem, sel ) {
+				
 				if ( sel ) {
 					var subtgt = elem.find( sel );
 					if ( subtgt.length > 0 ) return subtgt;
 				}
+				
 				return elem;	
 			};
 			
 			//
 			var getDelegateSelector = function( prop, evt ) {
+				
 				if (
 					( delegate[ prop ] ) && 
 					( typeof delegate[ prop ][ evt ] !== 'undefined' )
 				) {
 					return delegate[ prop ][ evt ];
 				};
+				
 				return null;
 			};
 			
 			// go through the "events" hash and bind the view event to the matching descendants
 			if (  view.events ) {
+				
 				$.each( view.events, function( evtsel, method ) {
 					
 					var func = null;
@@ -213,9 +446,10 @@
 						
 						var sel = '', part1 = '', part2 = '', pos = null, evt = null, on = false;
 						
-						part1 = prop + ':';
+						part1 = '%s:'.printf( prop );
 						part2 = $.trim( evtsel.substring( part1.length ) );
 						pos = part2.indexOf( ' ' );
+						
 						if ( -1 != pos ) {
 							sel = $.trim( part2.substring( pos ) );
 							part2 = $.trim( part2.substring( 0, pos ) );
@@ -223,16 +457,29 @@
 						
 						delegate[ prop ][ part2 ] = sel;
 						
-						evt = $.trim( part1 + part2 );
+						evt = $.trim( '%s%s'.printf( part1, part2 ) );
 						
-						var target = resolveTarget( view.$el, sel );
+						bJqueryElem = false;
+						
+						var mainTarget = view.$el;
+						if ( view[ prop ] && view[ prop ].jquery ) {
+							mainTarget = view[ prop ];
+							evt = part2;
+							bJqueryElem = true;
+						}
+						
+						var target = resolveTarget( mainTarget, sel );
 											
 						if ( evt ) {
 							
 							func = _.bind( func, view );
 							
 							var hasEachProp = _.beginsWith( evt, hasEach );
-							if ( hasEachProp && ( ( hasEachProp + ':initialize' ) == evt ) ) {
+							if ( hasEachProp && ( ( '%s:initialize'.printf( hasEachProp ) ) == evt ) ) {
+								target.on( evt, func );
+							}
+							
+							if ( bJqueryElem ) {
 								target.on( evt, func );
 							}
 						}
@@ -255,7 +502,7 @@
 												
 						var args = $.makeArray( arguments );
 						var evt = args.shift();
-						var event = prop + ':' + evt;
+						var event = '%s:%s'.printf( prop, evt );
 						var sel = getDelegateSelector( prop, evt );
 						
 						if ( null !== sel ) {
@@ -267,6 +514,7 @@
 					
 					// trigger now
 					if ( _.contains( hasEach, prop ) ) {
+						
 						propObj.each( function() {
 							
 							var args2 = $.makeArray( arguments );
@@ -275,11 +523,12 @@
 							
 							if ( null !== sel ) {
 								var target = resolveTarget( view.$el, sel );
-								target.trigger( prop + ':' + evt, args2 );
+								target.trigger( '%s:%s'.printf( prop, evt ), args2 );
 							}
 							
 						} );
 					}
+					
 				}
 			} );
 			
@@ -287,10 +536,15 @@
 		
 		// wrapper for Backbone.View.extend() which applies enhancements to events
 		extend: function() {
+			
 			var args = $.makeArray( arguments );
-			if ( args[ 0 ] ) {
-				args[ 0 ] = this.modifyViewProps( args[ 0 ] );
+			
+			if ( !args[ 0 ] ) {
+				args[ 0 ] = {};
 			}
+			
+			args[ 0 ] = this.modifyViewProps( args[ 0 ] );
+			
 			return Backbone.View.extend.apply( Backbone.View, args );
 		}
 		

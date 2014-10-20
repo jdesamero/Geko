@@ -174,7 +174,7 @@
 			var target = state[ targetname ];
 			
 			// fShowMe( [ state, targetname, args ] );
-			// fShowMe( trigger + ':' + target );
+			// fShowMe( '%s:%s'.printf( trigger, target ) );
 			
 			var _trigger = function( evt, args ) {
 				args.unshift( evt );
@@ -182,10 +182,10 @@
 				args.shift();
 			};
 			
-			_trigger( this._prefix + 'fire', args );
-			_trigger( this._prefix + trigger, args );
-			_trigger( this._prefix + trigger + ':' + target, args );
-						
+			_trigger( '%sfire'.printf( this._prefix ), args );
+			_trigger( '%s%s'.printf( this._prefix, trigger ), args );
+			_trigger( '%s%s:%s'.printf( this._prefix, trigger, target ), args );
+				
 		}
 		
 	} );

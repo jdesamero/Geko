@@ -8,7 +8,7 @@
 		<!-- non-jquery libraries -->
 		
 		<file id="geko-array" src="##geko_core_uri##/external/js/array.min.js" />
-		<file id="geko-backbone" src="##geko_core_uri##/external/js/backbone-min.js" dependencies="geko-underscore" />
+		<file id="geko-backbone" src="##geko_core_uri##/external/js/backbone-1.1.2.min.js" dependencies="geko-underscore" />
 		<file id="geko-compatibility" src="##geko_core_uri##/external/js/compatibility.js" />
 		<file id="geko-css_query" src="##geko_core_uri##/external/js/cssQuery-p.js" />
 		<file id="geko-css_sandpaper" src="##geko_core_uri##/external/js/cssSandpaper.js" dependencies="geko-event_helpers geko-css_query geko-sylvester" />
@@ -25,12 +25,12 @@
 		<file id="geko-swf-object" src="##geko_core_uri##/external/js/swfobject.js" />
 		<file id="geko-swipe" src="##geko_core_uri##/external/js/swipe.js" />
 		<file id="geko-sylvester" src="##geko_core_uri##/external/js/sylvester.js" />
-		<file id="geko-underscore" src="##geko_core_uri##/external/js/underscore-min.js" dependencies="jquery" />
+		<file id="geko-underscore" src="##geko_core_uri##/external/js/underscore-1.7.0.min.js" dependencies="jquery" />
 		
 		
 		
 		<!-- backstab enhancements -->
-		<file id="geko-backstab-underscore" src="##geko_core_uri##/js/backstab/underscore.js" dependencies="geko-underscore" />
+		<file id="geko-backstab-underscore" src="##geko_core_uri##/js/backstab/underscore.js" dependencies="geko-string_format geko-underscore" />
 		<file id="geko-backstab-core" src="##geko_core_uri##/js/backstab/core.js" dependencies="geko-backstab-underscore geko-backbone" />
 		<file id="geko-backstab-model" src="##geko_core_uri##/js/backstab/model.js" dependencies="geko-backstab-core" />
 		<file id="geko-backstab-collection" src="##geko_core_uri##/js/backstab/collection.js" dependencies="geko-backstab-core" />
@@ -38,7 +38,7 @@
 		<file id="geko-backstab-dispatcher" src="##geko_core_uri##/js/backstab/dispatcher.js" dependencies="geko-backstab-core" />
 		<file id="geko-backstab-statemachine" src="##geko_core_uri##/js/backstab/statemachine.js" dependencies="geko-backstab-core" />
 		<file id="geko-backstab-foo" src="##geko_core_uri##/js/backstab/foo.js" dependencies="geko-backstab-core" />
-		<file id="geko-backstab-factory" src="##geko_core_uri##/js/backstab/factory.js" dependencies="geko-jquery-tmpl geko-backstab-model geko-backstab-collection geko-backstab-view" />
+		<file id="geko-backstab-factory" src="##geko_core_uri##/js/backstab/factory.js" dependencies="geko-jquery-tmpl geko-backstab-model geko-backstab-collection geko-backstab-view geko-backstab-dispatcher" />
 		
 		
 		<!-- d3, http://d3js.org -->
@@ -288,7 +288,7 @@
 		<file id="geko_wp_emailmessage_recipient_manage" src="##geko_core_uri##/js/Geko/Wp/EmailMessage/Recipient/Manage.js" dependencies="geko_phpquery_formtransform_plugin_rowtemplate" />
 		<file id="geko_wp_emailmessage_storage_manage" src="##geko_core_uri##/js/Geko/Wp/EmailMessage/Storage/Manage.js" dependencies="jquery" />
 		<file id="geko_wp_emailmessage_transport_manage" src="##geko_core_uri##/js/Geko/Wp/EmailMessage/Transport/Manage.js" dependencies="jquery" />
-		<file id="geko_wp_form_manage" src="##geko_core_uri##/js/Geko/Wp/Form/Manage.js" dependencies="geko-string_format geko-jquery-geko_util geko-jquery-fx-blind geko-jquery-ui-sortable geko-jquery-ui-button geko-jquery-ui-tabs geko-jquery-ui-dialog" />
+		<file id="geko_wp_form_manage" src="##geko_core_uri##/js/Geko/Wp/Form/Manage.js" dependencies="geko-jquery-geko_util geko-backstab-factory geko-jquery-fx-blind geko-jquery-ui-sortable geko-jquery-ui-button geko-jquery-ui-tabs geko-jquery-ui-dialog" />
 		<file id="geko_wp_form_render" src="##geko_core_uri##/js/Geko/Wp/Form/Render.js" dependencies="geko-jquery-geko_util geko-jquery-ui-tabs geko-jquery-geko_ajax_form geko-jquery-ui-tooltip" />
 		<file id="geko_wp_location" src="##geko_core_uri##/js/Geko/Wp/Location.js" dependencies="geko-jquery-geko_util" />
 		<file id="geko_wp_navigationmanagement_pagemanager_admin" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/Admin.js" dependencies="geko_navigation_pagemanager_uri" />

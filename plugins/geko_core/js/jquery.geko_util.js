@@ -318,27 +318,51 @@
 	};
 	
 	//
-	$.fn.showSelOpts = function( selector ) {
-	
+	$.fn.showSelOpts = function( sSelector ) {
+		
 		return this.each( function() {
-			var elem = $( this );
-			if ( 'select' == elem.getTagName() ) {
+			
+			var eElem = $( this );
+			
+			if ( 'select' == eElem.getTagName() ) {
 				
-				if ( !elem.data( 'selectHtml' ) ) {
-					var selectHtml = elem.outerHTML();
-					elem.data( 'selectHtml', selectHtml );
+				if ( !eElem.data( 'sSelectHtml' ) ) {
+					var sSelectHtml = eElem.outerHTML();
+					eElem.data( 'sSelectHtml', sSelectHtml );
 				}
 				
-				var tmpSel = $( elem.data( 'selectHtml' ) );
-				var curVal = elem.val();
+				var eTemp = $( eElem.data( 'sSelectHtml' ) );
+				var sCurVal = eElem.val();
 				
-				elem.html( '' );
-				tmpSel.find( selector ).each( function() {
-					elem.append( $( this ) );
+				eElem.html( '' );
+				eTemp.find( sSelector ).each( function() {
+					eElem.append( $( this ) );
 				} );
 				
-				elem.val( curVal );
+				eElem.val( sCurVal );
 			}
+		} );
+		
+	};
+	
+	
+	
+	//// class manipulation
+	
+	$.fn.ternaryClass = function( bCond, sTrueClass, sFalseClass ) {
+		
+		return this.each( function() {
+			
+			var eElem = $( this );
+			
+			eElem.removeClass( '%s %s'.printf( sTrueClass, sFalseClass ) );
+			
+			if ( bCond ) {
+				eElem.addClass( sTrueClass );
+			} else {
+				eElem.addClass( sFalseClass );			
+			}
+			
 		} );
 		
 	};

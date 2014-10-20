@@ -10,52 +10,6 @@
 
 ( function() {
 	
-	var getTarget = function( elem, params, prop ) {
-		
-		var sel = null, fcont = null, target = null, _target = null, defer = null;
-		
-		if ( params && params[ prop ] ) {
-			
-			var propParams = params[ prop ];
-			
-			if ( propParams.selector ) {
-				sel = propParams.selector;
-			}
-			
-			if ( propParams.contents ) {
-				fcont = propParams.contents;
-			}
-
-			if ( propParams.defer ) {
-				defer = propParams.defer;
-			}
-		}
-		
-		// find target
-		
-		if ( sel ) {
-			
-			target = elem.find( sel );
-			if ( target.length > 0 ) _target = target;
-			
-		} else {
-
-			// try these selectors
-			var sels = [ '.' + prop, '#' + prop ];
-			
-			$.each( sels, function( i, sel2 ) {
-				target = elem.find( sel2 );
-				if ( target.length > 0 ) {
-					_target = target;
-					return false;
-				}
-			} );
-			
-		}
-		
-		return [ _target, fcont, defer ];
-	};
-	
 	var $ = this.jQuery;
 	var Backbone = this.Backbone;
 	var Backstab = this.Backstab;
@@ -100,63 +54,6 @@
 	
 	_.extend( Backbone.Model.prototype, {
 		
-		populateElem: function( elem, params ) {
-			
-			var model = this;
-			
-			var setTargetValue = function( target, val, cb ) {
-				if ( target ) {
-					if ( cb ) {
-						cb( target, val );
-					} else {
-						var tag = target.prop( 'tagName' ).toLowerCase();
-						if ( 'input' == tag ) {
-							target.val( val );
-						} else {
-							target.html( val );						
-						}
-					}
-				}
-			};
-			
-			// -------------------------------------------------------------------------------------
-			
-			if ( model && elem ) {
-				var data = model.toJSON();
-				$.each( data, function( prop, val ) {
-					
-					var res = getTarget( elem, params, prop );
-					var _target = res[ 0 ];
-					var fcont = res[ 1 ];
-					var defer = res[ 2 ];
-					
-					if ( defer ) {
-						
-						if ( defer.contents ) {
-							defer.contents( _target, val );
-						}
-						
-						var funtil = defer.until;
-						
-						if ( funtil ) {
-							var itvl, deferTil = function() {
-								if ( funtil() ) {
-									setTargetValue( _target, val, fcont );
-									clearInterval( itvl );
-								}
-							};
-							
-							itvl = setInterval( deferTil, 100 );
-						}
-						
-					} else {
-						setTargetValue( _target, val, fcont );
-					}
-					
-				} );
-			}		
-		},
-		
 		getDataValues: function() {
 			
 			var model = this;
@@ -168,62 +65,19 @@
 			}
 			
 			return ret;
+		},
+		
+		toggleValue: function( sKey ) {
+			
+			if ( 'boolean' === $.type( this.get( sKey ) ) ) {
+				var bToggle = this.get( sKey ) ? false : true ;
+				this.set( sKey, bToggle );
+			}
+			
+			return this;
 		}
 		
 	} );
-	
-	
-	
-	/*
-	 * reciprocal functionality for model.populateElem( $el )
-	 */
-	;( function ( $ ) {
-		
-		$.fn.extractData = function( model, params ) {
-			
-			var getTargetValue = function( target ) {
-				
-				var tag = target.prop( 'tagName' ).toLowerCase();
-				
-				// TO DO!!!!!!
-				if ( 'input' == tag ) {
-					return target.val();
-				}
-				
-				return target.html();
-			};
-			
-			// -----------------------------------------------------------------------------------------
-			
-			var elem = $( this );
-			var ret = {};
-			
-			var data;
-			if ( model.toJSON ) data = model.toJSON();
-			else data = model;
-			
-			$.each( data, function( prop, oldval ) {
-				
-				var res = getTarget( elem, params, prop );
-				var _target = res[ 0 ];
-				var fcont = res[ 1 ];
-				
-				// populate
-				if ( _target ) {
-					if ( fcont ) ret[ prop ] = fcont( _target );
-					else ret[ prop ] = getTargetValue( _target );
-				}
-				
-			} );
-			
-			return ret;	
-		};
-		
-		$.fn.populateModel = function( model ) {
-			model.set( $( this ).extractData( model ) );
-		};
-		
-	} )( this.jQuery );
 	
 	
 	

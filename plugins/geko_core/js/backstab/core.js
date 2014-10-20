@@ -87,7 +87,7 @@
 				if ( this.setup ) {
 					this.setup.apply( this, arguments );
 				}
-	
+				
 				if ( this.initialize ) {
 					this.initialize.apply( this, arguments );
 				}

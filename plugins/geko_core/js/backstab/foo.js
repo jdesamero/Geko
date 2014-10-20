@@ -25,8 +25,8 @@
 		foo: function( msg ) {
 			
 			var alrt = 'Calling Foo!!!';
-			alrt += ' (this.options.foo -> ' + _.stringify( this.options.foo ) + ')';
-			alrt += ' (msg -> ' + _.stringify( msg ) + ')';
+			alrt += ' (this.options.foo -> %s)'.printf( _.stringify( this.options.foo ) );
+			alrt += ' (msg -> %s)'.printf( _.stringify( msg ) );
 			
 			alert( alrt );
 			
@@ -36,9 +36,10 @@
 		
 		baz: function( msg ) {
 			this.trigger( 'baz', this, msg );
-			return 'Calling baz: ' + this.options.baz + ' ' + msg;
+			return 'Calling baz: %s %s'.printf( this.options.baz, msg );
 		}
 		
 	} );
 	
 } ).call( this );
+

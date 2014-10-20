@@ -16,10 +16,12 @@
 		
 		// extend events if it exists
 		if ( setupRes.events && setupOpts.extend.events ) {
+			
 			setupRes.events = $.extend(
 				setupRes.events,
 				setupOpts.extend.events
 			);
+			
 			delete setupOpts.extend.events;
 		}
 		
@@ -27,7 +29,20 @@
 		setupRes = $.extend( setupRes, setupOpts.extend );
 		
 		return setupRes;
-	}
+	};
+	
+	var getTmplElem = function( vals, tmplName, bEsc ) {
+
+		if ( !vals ) vals = {};
+		
+		if ( bEsc ) {
+			var sSrc = $.trim( $( '#%s-tmpl'.printf( tmplName ) ).html().replace( /\\\//g, '\/' ) );
+			return $.tmpl( sSrc, vals );
+		} else {
+			return $( '#%s-tmpl'.printf( tmplName ) ).tmpl( vals );
+		}
+		
+	};
 	
 	//
 	Backstab.factory = function( options ) {
@@ -37,11 +52,23 @@
 			model: {},
 			collection: {},
 			itemView: {},
-			listView: {}
+			listView: {},
+			formView: {}
 		}, options );
 		
-		if ( !opts.name_plural ) {
-			opts.name_plural = opts.name + 's';
+		if ( !opts.namePlural ) {
+			opts.namePlural = '%ss'.printf( opts.name );
+		}
+		
+		var oLocalDispatcher;
+		if ( opts.enableLocalDispatcher ) {
+			oLocalDispatcher = new Backstab.Dispatcher();
+		}
+		
+		var sElementPrefix;
+		if ( opts.useElementPrefix ) {
+			// default element prefix
+			sElementPrefix = '%s_'.printf( opts.name );
 		}
 		
 		var ent = {};
@@ -54,14 +81,18 @@
 			
 			var mdPrms = $.extend( {}, opts.model.params );
 			
-			var modelExt = {};
+			var modelExt = {
+				
+				factory: ent
+				
+			};
 			
 			modelExt = factorySetup( modelExt, opts.model, function( ext, params ) {
 				
 				if ( 'srv' == params.autourl ) {
-					ext.url = opts.script.srv + '/' + opts.name;
+					ext.url = '%s/%s'.printf( opts.script.srv, opts.name );
 				} else if ( 'ajax_content' == params.autourl ) {
-					ext.url = opts.script.ajax_content + '&section=' + opts.name;
+					ext.url = '%s&section=%s'.printf( opts.script.ajax_content, opts.name );
 				}
 				
 				return ext;
@@ -80,17 +111,32 @@
 		
 			var clPrms = $.extend( {}, opts.collection.params );
 			
-			var collectionExt = { model: ent.Model };
+			var collectionExt = {
+				
+				factory: ent,
+				
+				model: ent.Model,
+				
+				loadObjects: function( aObjects ) {
+					
+					var _this = this;
+					
+					$.each( aObjects, function( i, v ) {
+						_this.add( new ent.Model( v ) );
+					} );
+				}
+				
+			};
 			
 			collectionExt = factorySetup( collectionExt, opts.collection, function( ext, params ) {
 				
-				if ( 'srv' == params.autourl ) {
-					ext.url = opts.script.srv + '/' + opts.name;
-				} else if ( 'ajax_content' == params.autourl ) {
-					ext.url = opts.script.ajax_content + '&section=' + opts.name_plural;
+				if ( 'srv' == params.autoUrl ) {
+					ext.url = '%s/%s'.printf( opts.script.srv, opts.name );
+				} else if ( 'ajax_content' == params.autoUrl ) {
+					ext.url = '%s&section=%s'.printf( opts.script.ajax_content, opts.namePlural );
 				}
 				
-				if ( params.parseinfo ) {
+				if ( params.parseInfo ) {
 					
 					ext.parse = function( response, options ) {
 						
@@ -123,36 +169,60 @@
 			
 			var itemViewExt = {
 				
+				factory: ent,
+				
 				events: {
 					'model:change :first': 'updateItem',
 					'model:destroy :first': 'removeItem'
 				},
 				
+				createElement: function() {
+					
+					if ( ent.itemTmpl ) {
+						return ent.itemTmpl.clone();
+					}
+					
+					return this.getTmpl( this.getTmplInitVals() );
+				},
+				
 				initialize: function() {
 					
-					if ( ivPrms.inittmpl ) {
-						this.$el = $( '#' + opts.name + '-tmpl' ).tmpl( {} );
+					if ( ivPrms.postInit ) {
+						ivPrms.postInit.call( this );
 					}
-					
-					if ( ivPrms.postinit ) {
-						ivPrms.postinit.call( this );
-					}
+				},
+				
+				// hook method
+				getTmplInitVals: function() {
+					return {};
+				},
+				
+				getTmpl: function( vals, name ) {
+					if ( !name ) name = opts.name;
+					return getTmplElem( vals, name, opts.unescapeTemplateSrc );
 				},
 				
 				updateItem: function( e, model ) {
 					
-					if ( ivPrms.populatehash ) {
-						this.model.populateElem( this.$el, ivPrms.populatehash );
+					if ( ivPrms.updateElem ) {
+						ivPrms.updateElem.call( this );
+					} else if ( ivPrms.populateHash ) {
+						this.extractModelValues( null, null, ivPrms.populateHash );
 					} else {
-						this.model.populateElem( this.$el );
+						this.extractModelValues();
 					}
 					
-					if ( ivPrms.postupdate ) {
-						ivPrms.postupdate.call( this );
+					if ( ivPrms.postUpdate ) {
+						ivPrms.postUpdate.call( this );
 					}
 				},
 				
 				removeItem: function( e, model ) {
+					
+					if ( ivPrms.removeElem ) {
+						ivPrms.removeElem.call( this );
+					}
+					
 					this.unbind();
 					this.remove();
 				},
@@ -163,6 +233,14 @@
 				}
 							
 			};
+			
+			if ( oLocalDispatcher ) {
+				itemViewExt.localDispatcher = oLocalDispatcher;
+			}
+			
+			if ( sElementPrefix ) {
+				itemViewExt.elementPrefix = sElementPrefix;
+			}
 			
 			itemViewExt = factorySetup( itemViewExt, opts.itemView, function( ext, params ) {
 				
@@ -183,50 +261,98 @@
 			
 			var listViewExt = {
 				
+				factory: ent,
+				
 				events: {
-					'collection:initialize :first; collection:add :first': 'appendItem'
+					'collection:initialize :first; collection:add :first': 'appendItem',
+					'collection:remove': 'removeItem'
 				},
 				
 				_items: [],
-	
+				
+				createElement: function() {
+					return this.getTmpl( this.getTmplInitVals() );
+				},
+				
 				initialize: function() {
 					
-					if ( lvPrms.inittmpl ) {
-						this.$el = $( '#' + opts.name_plural + '-tmpl' ).tmpl( {} );
+					if ( lvPrms.itemTmplSelector ) {
+
+						var eItemTmpl = this.$( lvPrms.itemTmplSelector );
+						
+						if ( !ent.itemTmpl ) {
+							ent.itemTmpl = eItemTmpl.clone();
+						}
+						
+						eItemTmpl.remove();					
 					}
 					
-					if ( lvPrms.postinit ) {
-						lvPrms.postinit.call( this );
+					if ( lvPrms.postInit ) {
+						lvPrms.postInit.call( this );
 					}
+				},
+				
+				// hook method
+				getTmplInitVals: function() {
+					return {};
+				},
+				
+				getTmpl: function( vals, name ) {
+					if ( !name ) name = opts.namePlural;
+					return getTmplElem( vals, name, opts.unescapeTemplateSrc );
 				},
 				
 				appendItem: function( e, model ) {
 					
-					var item = new ent.ItemView( { model: model } );
+					var item = new ent.ItemView( {
+						model: model,
+						attributes: {
+							listView: this
+						}
+					} );
+					
 					this._items.push( item );
 					
 					item.render();
 					
 					var appendTarget = this.$el;
-					if ( lvPrms.appendtarget ) {
-						appendTarget = this.$( lvPrms.appendtarget );
+					if ( lvPrms.appendTarget ) {
+						appendTarget = this.$( lvPrms.appendTarget );
 					}
 					
 					appendTarget.append( item.$el );
 					
-					if ( lvPrms.postappend ) {
-						lvPrms.postappend.call( this, appendTarget, item, model, e );
+					if ( lvPrms.postAppend ) {
+						lvPrms.postAppend.call( this, appendTarget, item, model, e );
 					}
 					
 					return item;
 				},
 				
-				render: function() {
-					return this;
+				removeItem: function( e, model, collection, options ) {
+					
+					var item;
+					
+					$.each( this._items, function( i, v ) {
+						if ( v.model === model ) {
+							item = v;
+							return false;
+						}
+					} );
+					
+					this._items = _.without( this._items, item );
 				}
 				
 			};
-	
+			
+			if ( oLocalDispatcher ) {
+				listViewExt.localDispatcher = oLocalDispatcher;
+			}
+			
+			if ( sElementPrefix ) {
+				listViewExt.elementPrefix = sElementPrefix;
+			}
+			
 			listViewExt = factorySetup( listViewExt, opts.listView, function( ext, params ) {
 				
 				return ext;
@@ -236,6 +362,41 @@
 			ent.ListView = Backstab.View.extend( listViewExt );
 		}
 		
+		
+		
+		// --- form view ---------------------------------------------------------------------------
+		
+		if ( false !== opts.formView ) {
+		
+			var fvPrms = $.extend( {}, opts.formView.params );
+			
+			var formViewExt = {
+				
+				factory: ent,
+				
+				getTmpl: function( vals, name ) {
+					if ( !name ) name = '%s_form'.printf( opts.name );
+					return getTmplElem( vals, name, opts.unescapeTemplateSrc );
+				}
+				
+			};
+			
+			if ( oLocalDispatcher ) {
+				formViewExt.localDispatcher = oLocalDispatcher;
+			}
+			
+			if ( sElementPrefix ) {
+				formViewExt.elementPrefix = sElementPrefix;
+			}
+			
+			formViewExt = factorySetup( formViewExt, opts.formView, function( ext, params ) {
+				
+				return ext;
+				
+			} );
+			
+			ent.FormView = Backstab.View.extend( formViewExt );
+		}
 		
 		
 		// -----------------------------------------------------------------------------------------
