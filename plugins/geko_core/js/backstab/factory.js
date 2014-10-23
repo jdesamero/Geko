@@ -172,8 +172,8 @@
 				factory: ent,
 				
 				events: {
-					'model:change :first': 'updateItem',
-					'model:destroy :first': 'removeItem'
+					'model:change': 'updateItem',
+					'model:destroy': 'removeItem'
 				},
 				
 				createElement: function() {
@@ -185,10 +185,10 @@
 					return this.getTmpl( this.getTmplInitVals() );
 				},
 				
-				initialize: function() {
+				initialize: function( options2 ) {
 					
 					if ( ivPrms.postInit ) {
-						ivPrms.postInit.call( this );
+						ivPrms.postInit.call( this, options2 );
 					}
 				},
 				
@@ -205,7 +205,7 @@
 				updateItem: function( e, model ) {
 					
 					if ( ivPrms.updateElem ) {
-						ivPrms.updateElem.call( this );
+						ivPrms.updateElem.call( this, e, model );
 					} else if ( ivPrms.populateHash ) {
 						this.extractModelValues( null, null, ivPrms.populateHash );
 					} else {
@@ -213,18 +213,20 @@
 					}
 					
 					if ( ivPrms.postUpdate ) {
-						ivPrms.postUpdate.call( this );
+						ivPrms.postUpdate.call( this, e, model );
 					}
 				},
 				
 				removeItem: function( e, model ) {
 					
 					if ( ivPrms.removeElem ) {
-						ivPrms.removeElem.call( this );
+						ivPrms.removeElem.call( this, e, model );
 					}
 					
 					this.unbind();
 					this.remove();
+					
+					e.stopPropagation();
 				},
 				
 				render: function() {
@@ -264,17 +266,20 @@
 				factory: ent,
 				
 				events: {
-					'collection:initialize :first; collection:add :first': 'appendItem',
+					'collection:initialize; collection:add': 'appendItem',
 					'collection:remove': 'removeItem'
 				},
 				
-				_items: [],
+				_items: null,
 				
 				createElement: function() {
 					return this.getTmpl( this.getTmplInitVals() );
 				},
 				
-				initialize: function() {
+				initialize: function( options2 ) {
+					
+					// important!!! this ensures scope belonging to instance
+					this._items = [];
 					
 					if ( lvPrms.itemTmplSelector ) {
 
@@ -288,7 +293,7 @@
 					}
 					
 					if ( lvPrms.postInit ) {
-						lvPrms.postInit.call( this );
+						lvPrms.postInit.call( this, options2 );
 					}
 				},
 				
@@ -306,7 +311,7 @@
 					
 					var item = new ent.ItemView( {
 						model: model,
-						attributes: {
+						data: {
 							listView: this
 						}
 					} );
@@ -326,10 +331,12 @@
 						lvPrms.postAppend.call( this, appendTarget, item, model, e );
 					}
 					
+					e.stopPropagation();
+					
 					return item;
 				},
 				
-				removeItem: function( e, model, collection, options ) {
+				removeItem: function( e, model, collection, options2 ) {
 					
 					var item;
 					
@@ -340,7 +347,11 @@
 						}
 					} );
 					
-					this._items = _.without( this._items, item );
+					if ( item ) {
+						this._items = _.without( this._items, item );
+						item.remove();
+					}
+					
 				}
 				
 			};
@@ -377,6 +388,13 @@
 				getTmpl: function( vals, name ) {
 					if ( !name ) name = '%s_form'.printf( opts.name );
 					return getTmplElem( vals, name, opts.unescapeTemplateSrc );
+				},
+				
+				initialize: function( options2 ) {
+					
+					if ( fvPrms.postInit ) {
+						fvPrms.postInit.call( this, options2 );
+					}
 				}
 				
 			};

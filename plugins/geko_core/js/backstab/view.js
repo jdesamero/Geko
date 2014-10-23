@@ -73,7 +73,7 @@
 				
 				var tag = target.prop( 'tagName' ).toLowerCase();
 				
-				if ( ( 'input' == tag ) || ( 'textarea' == tag ) ) {
+				if ( -1 !== $.inArray( tag, [ 'input', 'textarea', 'select' ] ) ) {
 					target.val( val );
 				} else {
 					target.html( val );						
@@ -88,7 +88,7 @@
 		var tag = target.prop( 'tagName' ).toLowerCase();
 		
 		// TO DO!!!!!!
-		if ( ( 'input' == tag ) || ( 'textarea' == tag ) ) {
+		if ( -1 !== $.inArray( tag, [ 'input', 'textarea', 'select' ] ) ) {
 			return target.val();
 		}
 		
@@ -238,6 +238,11 @@
 				var init = obj.initialize;
 				var initWrap = function() {
 					
+					var oArg1 = arguments[ 0 ];
+					if ( oArg1 && oArg1.data ) {
+						this.data = oArg1.data;
+					}
+					
 					var res = init.apply( this, arguments );
 					_this.bindDelegates( this );
 					
@@ -337,10 +342,24 @@
 				// ---------------------------------------------------------------------------------
 				
 				var ret = {};
+				var data = {};
+				var oFormat;
 				
-				var data;
-				if ( oModel.toJSON ) data = oModel.toJSON();
-				else data = oModel;
+				if ( oModel.extractFields ) {
+					
+					$.each( oModel.extractFields, function( i, v ) {
+						data[ v ] = null;
+					} );
+					
+				} else if ( oModel.toJSON ) {
+					data = oModel.toJSON();
+				} else {
+					data = oModel;
+				}
+				
+				if ( oModel.fieldFormats ) {
+					oFormat = oModel.fieldFormats;
+				}
 				
 				$.each( data, function( prop, oldval ) {
 					
@@ -355,8 +374,25 @@
 					
 					// populate
 					if ( _target ) {
-						if ( fcont ) ret[ prop ] = fcont( _target );
-						else ret[ prop ] = getTargetValue( _target );
+						
+						var mValue = ( fcont ) ? fcont( _target ) : getTargetValue( _target ) ;
+						
+						// apply formatting
+						if ( oFormat && oFormat[ prop ] ) {
+							
+							var sProp = oFormat[ prop ];
+							
+							if ( ( 'int' === sProp ) || ( 'number' === sProp ) ) {
+								mValue = parseInt( mValue );
+							} else if ( 'float' === sProp ) {
+								mValue = parseFloat( mValue );							
+							} else if ( 'boolean' === sProp ) {
+								mValue = ( mValue ) ? true : false ;
+							}
+							
+						}
+						
+						ret[ prop ] = mValue;
 					}
 					
 				} );
@@ -364,15 +400,16 @@
 				return ret;
 			};
 			
-			obj.setModelValues = function( oModel, eElem, oParams ) {
+			obj.setModelValues = function( oModel, eElem, oParams, oFields ) {
 
 				if ( !oModel ) oModel = this.model;
 				if ( !eElem ) eElem = this.$el;
 				if ( !oParams ) oParams = {};
+				if ( !oFields ) oFields = oModel;
 				
 				// ---------------------------------------------------------------------------------
 				
-				oModel.set( this.getModelDataFromElem( oModel, eElem, oParams ) );
+				oModel.set( this.getModelDataFromElem( oFields, eElem, oParams ) );
 			};
 			
 			
@@ -387,8 +424,12 @@
 			var props = this._props;
 			
 			if ( 'array' !== $.type( props ) ) {
+				
 				// find view descendants with an "on()" method so we can trigger them from the "events" hash
 				props = _.descendantsWithMethod( view, 'on', this._maxLevels );
+				
+				// magic handler for view instance
+				props.push( 'this' );
 			}
 			
 			// find view descendants with an "each()" method so we can iterate through members when initializing
@@ -426,7 +467,7 @@
 			if (  view.events ) {
 				
 				$.each( view.events, function( evtsel, method ) {
-					
+										
 					var func = null;
 					
 					if ( 'function' === $.type( method ) ) {
@@ -439,6 +480,7 @@
 					}
 					
 					var prop = _.beginsWith( evtsel, props );
+					
 					
 					if ( func && prop ) {
 						
@@ -459,14 +501,30 @@
 						
 						evt = $.trim( '%s%s'.printf( part1, part2 ) );
 						
-						bJqueryElem = false;
 						
-						var mainTarget = view.$el;
-						if ( view[ prop ] && view[ prop ].jquery ) {
+						bJqueryElem = false;
+						bBind = false;
+						
+						var mainTarget = null;
+						
+						if ( 'this' === prop ) {
+							
+							mainTarget = view;
+							evt = part2;
+							bBind = true;
+							
+						} else if ( view[ prop ] && view[ prop ].jquery ) {
+							
 							mainTarget = view[ prop ];
 							evt = part2;
 							bJqueryElem = true;
+							
+						} else {
+							
+							// default target
+							mainTarget = view.$el;
 						}
+						
 						
 						var target = resolveTarget( mainTarget, sel );
 											
@@ -475,13 +533,17 @@
 							func = _.bind( func, view );
 							
 							var hasEachProp = _.beginsWith( evt, hasEach );
-							if ( hasEachProp && ( ( '%s:initialize'.printf( hasEachProp ) ) == evt ) ) {
+							if (
+								( hasEachProp && ( ( '%s:initialize'.printf( hasEachProp ) ) == evt ) ) || 
+								( bJqueryElem )
+							) {
 								target.on( evt, func );
 							}
 							
-							if ( bJqueryElem ) {
-								target.on( evt, func );
+							if ( bBind ) {
+								target.bind( evt, func );
 							}
+							
 						}
 					}
 				} );

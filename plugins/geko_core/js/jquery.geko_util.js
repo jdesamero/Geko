@@ -367,6 +367,19 @@
 		
 	};
 	
+	$.fn.showHideElem = function( sShowSelector, sHideSelector ) {
+		
+		return this.each( function() {
+			
+			var eElem = $( this );
+			
+			eElem.find( sShowSelector ).show();
+			eElem.find( sHideSelector ).hide();
+			
+		} );
+		
+	};
+	
 	
 	
 	//// math functions
