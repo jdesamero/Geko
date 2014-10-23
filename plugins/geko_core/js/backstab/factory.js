@@ -89,9 +89,9 @@
 			
 			modelExt = factorySetup( modelExt, opts.model, function( ext, params ) {
 				
-				if ( 'srv' == params.autourl ) {
+				if ( 'srv' == params.autoUrl ) {
 					ext.url = '%s/%s'.printf( opts.script.srv, opts.name );
-				} else if ( 'ajax_content' == params.autourl ) {
+				} else if ( 'ajax_content' == params.autoUrl ) {
 					ext.url = '%s&section=%s'.printf( opts.script.ajax_content, opts.name );
 				}
 				
