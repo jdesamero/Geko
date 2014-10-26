@@ -35,7 +35,7 @@
 		},
 		
 		beginsWith: {
-			func: function( haystack, needle ) {
+			func: function( haystack, needle, greedy ) {
 				
 				if ( 'string' !== $.type( haystack ) ) {
 					_.consoleError( 'Backstab Error: _.beginsWith( haystack, needle ): invalid first parameter (haystack) provided!' );			
@@ -51,14 +51,25 @@
 					// if *haystack* begins with any of the values in *needle* array, return the matching value
 					// otherwise, return "false"
 					var len = needle.length;
+					var greedyRes = '';
 					
 					for ( var i = 0; i < len; i++ ) {
 						if ( _.beginsWith( haystack, needle[ i ] ) ) {
-							return needle[ i ];
+							if ( greedy ) {
+								if ( needle[ i ].length > greedyRes.length ) {
+									greedyRes = needle[ i ];
+								}
+							} else {
+								return needle[ i ];
+							}
 						}
 					}
 					
-					return false;			
+					if ( greedyRes ) {
+						return greedyRes;
+					}
+					
+					return false;	
 				}
 				
 				_.consoleError( 'Backstab Error: _.beginsWith( haystack, needle ): invalid second parameter (needle) provided!' );
@@ -83,7 +94,7 @@
 						subs = regs[ 2 ].split( ';' );
 						$.each( subs, function( i, v ) {
 							if ( exp ) exp += '; ';
-							exp += regs[ 1 ] + $.trim( v ) + regs[ 3 ];
+							exp += '%s%s%s'.printf( regs[ 1 ], $.trim( v ), regs[ 3 ] );
 						} );
 						evtsel = evtsel.replace( regs[ 0 ], exp );
 	
@@ -154,18 +165,18 @@
 						// if ( _.contains( [ 'el' ], name ) ) return;
 						
 						if ( val && val[ method ] && ( 'function' === $.type( val[ method ] ) ) ) {
-							match.push( path + name );
-							// console.log( _.stringify( method, level, path + name ) );
+							match.push( '%s%s'.printf( path, name ) );
+							// console.log( _.stringify( method, level, '%s%s'.printf( path, name ) ) );
 						}
 						
 						if (
 							( 'Object' === _.objectType( val ) ) && 
 							( seen.indexOf( val ) == -1 )
 						) {
-							// console.log( name + ' -> ' + Object.prototype.toString.call( val ) );
+							// console.log( '%s -> %s'.printf( name, Object.prototype.toString.call( val ) ) );
 							seen.push( val );
-							getMatches( val, path + name + '.', level + 1 );
-							// console.log( _.stringify( method, level + 1, path + name + '.', val ) );
+							getMatches( val, '%s%s.'.printf( path, name ), level + 1 );
+							// console.log( _.stringify( method, level + 1, '%s%s.'.printf( path, name ), val ) );
 						}
 					} );
 				};
@@ -177,7 +188,7 @@
 		},
 		
 		stringify: {
-			func: function() {				
+			func: function() {
 				
 				var args = $.makeArray( arguments );
 				var obj = ( args.length > 1 ) ? args : args[ 0 ] ;
@@ -186,14 +197,28 @@
 				return JSON.stringify( obj, function( key, val ) {
 					if ( typeof val == 'object' ) {
 						var idx = seen.indexOf( val );
-						if ( idx >= 0 ) return '[Cyclic Object #' + idx + ']';
+						if ( idx >= 0 ) return '[Cyclic Object #%s]'.printf( idx );
 						seen.push( val );
 					}
 					return val;
 				} );
 			}
 		},
+		
+		mergeValues: {
+			func: function( sKey, oTarget, oParams ) {
 				
+				if ( oParams && oParams[ sKey ] ) {
+					
+					if ( oTarget[ sKey ] ) {
+						_.extend( oTarget[ sKey ], oParams[ sKey ] );						
+					} else {
+						oTarget[ sKey ] = oParams[ sKey ];
+					}
+				}
+			}
+		},
+		
 		//// overrides
 		
 		containsOrig: {
@@ -222,7 +247,7 @@
 		} else {
 			
 			if ( !_[ funcName ].backstab ) {
-				_.consoleError( 'Backstab Error: conflict with _.' + funcName + '()!' );
+				_.consoleError( 'Backstab Error: conflict with _.%s()!'.printf( funcName ) );
 			}		
 		}
 		

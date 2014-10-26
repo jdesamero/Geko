@@ -1,10 +1,13 @@
 ( function() {
 	
+	// creates a family of related models, collections, and views in one namespace
+	
+	
 	var $ = this.jQuery;
 	var Backstab = this.Backstab;
 	
 	// helpers
-	var factorySetup = function( setupRes, opts, setupParams ) {
+	var familySetup = function( setupRes, opts, setupParams ) {
 		
 		var setupOpts = $.extend( {
 			params: {},
@@ -44,8 +47,34 @@
 		
 	};
 	
+	var isEventType = function( e, sEvent ) {
+		
+		// direct
+		if ( e.type && ( sEvent === e.type ) ) {
+			return true;
+		}
+		
+		// namespaced, super hackish...
+		if ( e.type && e[ 'namespace' ] ) {
+			
+			var aParts = e[ 'namespace' ].split( '.' );
+			
+			if ( 2 === aParts.length ) {
+				
+				var sCompare = '%s.%s.%s'.printf( e.type, aParts[ 1 ], aParts[ 0 ] );
+				
+				if ( sCompare === sEvent ) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	};
+	
+	
 	//
-	Backstab.factory = function( options ) {
+	Backstab.family = function( options ) {
 		
 		var opts = $.extend( {
 			script: {},
@@ -83,11 +112,11 @@
 			
 			var modelExt = {
 				
-				factory: ent
+				family: ent
 				
 			};
 			
-			modelExt = factorySetup( modelExt, opts.model, function( ext, params ) {
+			modelExt = familySetup( modelExt, opts.model, function( ext, params ) {
 				
 				if ( 'srv' == params.autoUrl ) {
 					ext.url = '%s/%s'.printf( opts.script.srv, opts.name );
@@ -113,22 +142,13 @@
 			
 			var collectionExt = {
 				
-				factory: ent,
+				family: ent,
 				
-				model: ent.Model,
-				
-				loadObjects: function( aObjects ) {
-					
-					var _this = this;
-					
-					$.each( aObjects, function( i, v ) {
-						_this.add( new ent.Model( v ) );
-					} );
-				}
+				model: ent.Model
 				
 			};
 			
-			collectionExt = factorySetup( collectionExt, opts.collection, function( ext, params ) {
+			collectionExt = familySetup( collectionExt, opts.collection, function( ext, params ) {
 				
 				if ( 'srv' == params.autoUrl ) {
 					ext.url = '%s/%s'.printf( opts.script.srv, opts.name );
@@ -169,11 +189,11 @@
 			
 			var itemViewExt = {
 				
-				factory: ent,
+				family: ent,
 				
 				events: {
-					'model:change': 'updateItem',
-					'model:destroy': 'removeItem'
+					'model:change this': 'updateItem',
+					'model:destroy this; data.listView.collection:remove this': 'removeItem'
 				},
 				
 				createElement: function() {
@@ -217,16 +237,27 @@
 					}
 				},
 				
-				removeItem: function( e, model ) {
+				removeItem: function( e, model, collection, options ) {
 					
-					if ( ivPrms.removeElem ) {
-						ivPrms.removeElem.call( this, e, model );
+					var bRemove = false;
+					
+					if ( isEventType( e, 'data.listView.collection:remove' ) ) {
+						if ( model === this.model ) {
+							bRemove = true;
+						}
+					} else {
+						bRemove = true;
 					}
 					
-					this.unbind();
-					this.remove();
+					if ( bRemove ) {
 					
-					e.stopPropagation();
+						if ( ivPrms.removeElem ) {
+							ivPrms.removeElem.call( this, e, model, collection, options );
+						}
+						
+						this.unbind();
+						this.remove();
+					}
 				},
 				
 				render: function() {
@@ -244,7 +275,7 @@
 				itemViewExt.elementPrefix = sElementPrefix;
 			}
 			
-			itemViewExt = factorySetup( itemViewExt, opts.itemView, function( ext, params ) {
+			itemViewExt = familySetup( itemViewExt, opts.itemView, function( ext, params ) {
 				
 				return ext;
 				
@@ -263,23 +294,17 @@
 			
 			var listViewExt = {
 				
-				factory: ent,
+				family: ent,
 				
 				events: {
-					'collection:initialize; collection:add': 'appendItem',
-					'collection:remove': 'removeItem'
+					'collection:initialize this; collection:add this': 'appendItem'
 				},
-				
-				_items: null,
 				
 				createElement: function() {
 					return this.getTmpl( this.getTmplInitVals() );
 				},
 				
 				initialize: function( options2 ) {
-					
-					// important!!! this ensures scope belonging to instance
-					this._items = [];
 					
 					if ( lvPrms.itemTmplSelector ) {
 
@@ -307,7 +332,7 @@
 					return getTmplElem( vals, name, opts.unescapeTemplateSrc );
 				},
 				
-				appendItem: function( e, model ) {
+				appendItem: function( e, model, collection, options ) {
 					
 					var item = new ent.ItemView( {
 						model: model,
@@ -315,8 +340,6 @@
 							listView: this
 						}
 					} );
-					
-					this._items.push( item );
 					
 					item.render();
 					
@@ -331,27 +354,7 @@
 						lvPrms.postAppend.call( this, appendTarget, item, model, e );
 					}
 					
-					e.stopPropagation();
-					
 					return item;
-				},
-				
-				removeItem: function( e, model, collection, options2 ) {
-					
-					var item;
-					
-					$.each( this._items, function( i, v ) {
-						if ( v.model === model ) {
-							item = v;
-							return false;
-						}
-					} );
-					
-					if ( item ) {
-						this._items = _.without( this._items, item );
-						item.remove();
-					}
-					
 				}
 				
 			};
@@ -364,7 +367,7 @@
 				listViewExt.elementPrefix = sElementPrefix;
 			}
 			
-			listViewExt = factorySetup( listViewExt, opts.listView, function( ext, params ) {
+			listViewExt = familySetup( listViewExt, opts.listView, function( ext, params ) {
 				
 				return ext;
 				
@@ -383,7 +386,7 @@
 			
 			var formViewExt = {
 				
-				factory: ent,
+				family: ent,
 				
 				getTmpl: function( vals, name ) {
 					if ( !name ) name = '%s_form'.printf( opts.name );
@@ -407,7 +410,7 @@
 				formViewExt.elementPrefix = sElementPrefix;
 			}
 			
-			formViewExt = factorySetup( formViewExt, opts.formView, function( ext, params ) {
+			formViewExt = familySetup( formViewExt, opts.formView, function( ext, params ) {
 				
 				return ext;
 				

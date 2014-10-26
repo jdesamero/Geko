@@ -16,10 +16,12 @@
 	var Backbone = this.Backbone;
 	var Backstab = this.Backstab;
 	
-	//
-	Backstab.createConstructor( 'StateMachine', {
+	
+	
+	// add new methods and properties
+	var oOpts = {
 		
-		setup: function() {
+		setup: function( options ) {
 			
 			var _this = this;
 			
@@ -27,11 +29,11 @@
 			
 			StateMachine.create( {
 				
-				target: _this,
+				target: this,
 				
-				initial: _this.initial,
-				events: _this.events,
-				callbacks: _this.callbacks,
+				initial: this.initial,
+				events: ( this.events || options.events ),
+				callbacks: this.callbacks,
 				
 				error: function ( event, fromstate, tostate, errorArgs, errorCode, errorMessage ) {
 					
@@ -188,7 +190,14 @@
 				
 		}
 		
-	} );
+	};
+
+	
+	
+	
+	
+	//
+	Backstab.createConstructor( 'StateMachine', oOpts );
 	
 	
 } ).call( this );

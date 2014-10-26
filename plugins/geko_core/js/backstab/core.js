@@ -61,56 +61,77 @@
 	// in case we want to add enhancements Backbone.Events in the future
 	Backstab.Events = Backbone.Events;
 	
-	// convenience latcher for subclasses
-	Backstab.latchToBackbone = function() {
-		
-		var _this = this;
-		var args = $.makeArray( arguments );
-		
-		$.each( args, function( i, sub ) {
-			if ( _this[ sub ] && _this[ sub ].latchToBackbone ) {
-				_this[ sub ].latchToBackbone();
-			}
-		} );
-		
-		return this;
-	};
+	
 	
 	// Backstab constructor template
-	Backstab.createConstructor = function( namespc, opts, staticProps, cons ) {
+	Backstab.createConstructor = function( namespc, opts, staticProps, origCons ) {
 		
-		//
-		if ( !cons ) {
+		
+		// define a new constructor
+		
+		var cons = function() {
 			
-			cons = function() {
+			if ( origCons ) {
 				
-				if ( this.setup ) {
-					this.setup.apply( this, arguments );
-				}
+				origCons.apply( this, arguments );
 				
+			} else {
+			
 				if ( this.initialize ) {
 					this.initialize.apply( this, arguments );
 				}
-	
-				if ( this.afterInit ) {
-					this.afterInit.apply( this, arguments );
-				}
-			};
 			
-			//
-			_.extend( cons.prototype, Backstab.Events, opts );
+			}
 			
-			cons._namespace = namespc;
+			if ( this.setup ) {
+				this.setup.apply( this, arguments );
+			}
 			
-			cons.extend = Backstab.extend;
+			if ( this.afterInit ) {
+				this.afterInit.apply( this, arguments );
+			}
 			
-			cons.latchToBackbone = function() {
-				Backbone[ namespc ] = this;
-				return this;
-			};
+		};
+		
+		cons._namespace = namespc;
+		
+		
+		var useExtend;
+		
+		if ( origCons ) {
+			
+			cons.prototype = Object.create( origCons.prototype );			
+			useExtend = origCons.extend;
+			
+		} else {
+			
+			_.extend( cons.prototype, Backstab.Events );
+			useExtend = Backstab.extend;
 		}
-				
-		// latch to Backstab namespace
+		
+		if ( opts ) {
+			_.extend( cons.prototype, opts );
+		}
+		
+		
+		
+		cons.extend = function( protoProps2, staticProps2 ) {
+			
+			if ( !protoProps2 ) protoProps2 = {};
+			
+			if ( origCons ) {
+				_.extend( protoProps2, opts );
+			}
+			
+			if ( this.modifyProps ) {
+				protoProps2 = this.modifyProps( protoProps2 );
+			}
+			
+			return useExtend.call( cons, protoProps2, staticProps2 );
+		}
+		
+		
+		// add to Backstab namespace
 		Backstab[ namespc ] = cons;
 		// alert( 'created constructor: ' + cons._namespace );
 		

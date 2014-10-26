@@ -12,11 +12,12 @@
 	
 	var $ = this.jQuery;
 	var Backbone = this.Backbone;
-	var Backstab = this.Backstab;
+	var Backstab = this.Backstab;	
 	
-	//
-	Backstab.createConstructor( 'Foo', {
-				
+	
+	// add new methods and properties
+	var oOpts = {
+		
 		setup: function( opts ) {
 			this.options = $.extend( {}, opts );
 			return this;
@@ -38,8 +39,11 @@
 			this.trigger( 'baz', this, msg );
 			return 'Calling baz: %s %s'.printf( this.options.baz, msg );
 		}
-		
-	} );
+
+	};
+	
+	//
+	Backstab.createConstructor( 'Foo', oOpts );
 	
 } ).call( this );
 

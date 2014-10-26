@@ -14,93 +14,14 @@
 	var Backbone = this.Backbone;
 	var Backstab = this.Backstab;
 	
-	//
-	Backstab.createConstructor( 'Collection', {}, {
-				
-		// apply enhancements to Backbone.Collection
-		latchToBackbone: function() {
-			
-			var _this = this;
-			
-			this._backboneExtend = Backbone.Collection.extend;
-			
-			Backbone.Collection.extend = function() {
-				
-				var args = $.makeArray( arguments );
-				
-				if ( args[ 0 ] ) {
-					args[ 0 ] = _this.modifyCollectionProps( args[ 0 ] );
-				}
-				
-				return _this._backboneExtend.apply( Backbone.Collection, args );
-			};
-			
-			return this;
+	
+	
+	// add new methods and properties
+	var oOpts = {
+		
+		setup: function() {
+			_.mergeValues( 'data', this, arguments[ 1 ] );
 		},
-		
-		// revert to the original Backbone.Collection.extend() method
-		unlatchFromBackbone: function() {
-			Backbone.Collection.extend = this._backboneExtend;
-			return this;
-		},
-		
-		
-		//
-		modifyCollectionProps: function( obj ) {
-			
-			var _this = this;
-			
-			// make sure there is an initialize() method
-			if ( !obj.initialize ) {
-				obj.initialize = function() { };
-			}
-			
-			
-			// execute bindDelegates() after calling initialize()
-			if ( 'function' === $.type( obj.initialize ) ) {
-				
-				var init = obj.initialize;
-				var initWrap = function() {
-					
-					var oArg2 = arguments[ 1 ];
-					if ( oArg2 && oArg2.data ) {
-						this.data = oArg2.data;
-					}
-					
-					var res = init.apply( this, arguments );
-					
-					return res;
-				};
-				
-				obj.initialize = initWrap;
-			}
-			
-			return obj;
-		},
-		
-		
-		// wrapper for Backbone.Collection.extend() which applies enhancements to events
-		extend: function() {
-			
-			var args = $.makeArray( arguments );
-			
-			if ( !args[ 0 ] ) {
-				args[ 0 ] = {};
-			}
-			
-			args[ 0 ] = this.modifyCollectionProps( args[ 0 ] );
-			
-			return Backbone.Collection.extend.apply( Backbone.Collection, args );
-		}
-		
-	} );
-	
-	
-	/* ------------------------------------------------------------------------------------------ */
-	
-	// collection bindings
-	
-	_.extend( Backbone.Collection.prototype, {
 		
 		transfer: function( oModel, oDestCollection ) {
 			
@@ -111,8 +32,14 @@
 			
 			return this;
 		}
-		
-	} );
+
+	};
+	
+	
+	
+	//
+	Backstab.createConstructor( 'Collection', oOpts, null, Backbone.Collection );
+	
 	
 	
 } ).call( this );
