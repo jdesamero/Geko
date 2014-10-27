@@ -239,17 +239,10 @@
 				
 				removeItem: function( e, model, collection, options ) {
 					
-					var bRemove = false;
-					
-					if ( isEventType( e, 'data.listView.collection:remove' ) ) {
-						if ( model === this.model ) {
-							bRemove = true;
-						}
-					} else {
-						bRemove = true;
-					}
-					
-					if ( bRemove ) {
+					if (
+						( ( 'remove' === e.type ) && ( model === this.model ) ) || 
+						( 'remove' !== e.type )
+					) {
 					
 						if ( ivPrms.removeElem ) {
 							ivPrms.removeElem.call( this, e, model, collection, options );

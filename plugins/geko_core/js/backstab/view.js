@@ -440,12 +440,8 @@
 			var props = this._props;
 			
 			if ( 'array' !== $.type( props ) ) {
-				
 				// find view descendants with an "on()" method so we can trigger them from the "events" hash
 				props = _.descendantsWithMethod( view, 'on', this._maxLevels );
-				
-				// magic handler for view instance
-				props.push( 'this' );
 			}
 			
 			// find view descendants with an "each()" method so we can iterate through members when initializing
@@ -547,10 +543,30 @@
 								// target: The DOM element (backbone object) that initiated the event.
 								// relatedTarget: The other DOM element (backbone object) involved in the event, if any
 								
+								// parse evt as follows:
+								// 	  'reveal'					= { type: 'reveal' }
+								// 	  'collection:add'			= { type: 'add', namespace: 'collection' }
+								//	  'model:change:status'		= { type: 'change:status', namespace: 'model' }
+								//	  'data.foo:doStuff'		= { type: 'doStuff', namespace: 'data.foo' }
+								
+								var sType = '', sNamespace = null;
+								var iColonPos = evt.indexOf( ':' );
+								
+								if ( -1 !== iColonPos ) {
+									sNamespace = $.trim( evt.substring( 0, iColonPos ) );
+									sType = $.trim( evt.substring( iColonPos + 1 ) );
+								} else {
+									sType = evt;
+								}
+								
 								var oBackboneEvent = {
-									type: evt,
+									type: sType,
 									stopPropagation: function() {}
 								};
+								
+								if ( sNamespace ) {
+									oBackboneEvent[ 'namespace' ] = sNamespace;
+								}
 								
 								// check for a "trigger event" object, which usually is the last argument
 								var oCheck = firstAg[ firstAg.length - 1 ];
