@@ -167,7 +167,7 @@
 			
 			<!-- widgets -->
 			<file id="geko-jquery-ui-accordion" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.accordion.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget" jquery-ui-version="1.9.2" />
-			<file id="geko-jquery-ui-autocomplete" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.autocomplete.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget geko-jquery-ui-position" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-autocomplete" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.autocomplete.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget geko-jquery-ui-position geko-jquery-ui-menu" jquery-ui-version="1.9.2" />
 			<file id="geko-jquery-ui-button" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.button.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget" jquery-ui-version="1.9.2" />
 			<file id="geko-jquery-ui-datepicker" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.datepicker.js" dependencies="geko-jquery-ui-core" jquery-ui-version="1.9.2" />
 			<file id="geko-jquery-ui-dialog" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.dialog.js" dependencies="geko-jquery-ui-widget geko-jquery-ui-position geko-jquery-ui-draggable geko-jquery-ui-resizable" jquery-ui-version="1.9.2" />

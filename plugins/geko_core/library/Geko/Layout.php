@@ -25,8 +25,11 @@ class Geko_Layout extends Geko_Singleton_Abstract
 		
 	);
 	
+	protected $_mBodyClass = NULL;
+	protected $_mStyles = NULL;
+	protected $_mScripts = NULL;
+		
 	protected $_aTemplates = array();
-	
 	
 	
 	
@@ -227,6 +230,89 @@ class Geko_Layout extends Geko_Singleton_Abstract
 		return array();
 	}
 	
+	
+	
+	
+	
+	//// layout parts
+	
+	//
+	public function echoEnqueue() {
+		
+		if ( NULL !== $this->_mStyles ) {
+			
+			if ( is_string( $this->_mStyles ) ) {
+				$aStyles = Geko_Array::explodeTrimEmpty( ' ', $this->_mStyles );
+			} else {
+				$aStyles = $this->_mStyles;
+			}
+			
+			call_user_func_array( array( $this, 'enqueueStyle' ), $aStyles );
+		}
+		
+		if ( NULL !== $this->_mScripts ) {
+			
+			if ( is_string( $this->_mScripts ) ) {
+				$aScripts = Geko_Array::explodeTrimEmpty( ' ', $this->_mScripts );
+			} else {
+				$aScripts = $this->_mScripts;
+			}
+			
+			call_user_func_array( array( $this, 'enqueueScript' ), $aScripts );
+		}
+		
+		if ( is_array( $this->_aTemplates ) ) {
+			
+			foreach ( $this->_aTemplates as $mTmpl ) {
+				
+				if ( is_string( $mTmpl ) ) {
+					$aTmpl = Geko_Array::explodeTrimEmpty( ' ', $mTmpl );
+				} else {
+					$aTmpl = $mTmpl;
+				}
+				
+				call_user_func_array( array( $this, 'addTemplate' ), $aTmpl );				
+			}
+			
+		}
+	}
+	
+	// body class
+	public function filterBodyClass( $sBodyClass ) {
+		
+		if ( NULL !== $this->_mBodyClass ) {
+			
+			if ( is_array( $this->_mBodyClass ) ) {
+				$sMergeBodyClass = implode( ' ', $this->_mBodyClass );
+			} else {
+				$sMergeBodyClass = $this->_mBodyClass;		
+			}
+			
+			
+			if ( FALSE !== strpos( $sMergeBodyClass, '##body_class##' ) ) {
+				$sMergeBodyClass = str_replace( '##body_class##', $this->getBodyClassCb(), $sMergeBodyClass );
+			}
+			
+			if ( FALSE !== strpos( $sMergeBodyClass, '##browser_detect##' ) ) {
+				$sMergeBodyClass = str_replace( '##browser_detect##', Geko_Browser::bodyClass(), $sMergeBodyClass );
+			}
+			
+			if ( FALSE !== strpos( $sMergeBodyClass, '##template_grouping##' ) ) {
+				$sMergeBodyClass = str_replace( '##template_grouping##', implode( ' ', $this->getTemplateGrouping() ), $sMergeBodyClass );
+			}
+			
+			
+			$sBodyClass = trim( sprintf( '%s %s', trim( $sBodyClass ), trim( $sMergeBodyClass ) ) );
+		
+		}
+		
+		return $sBodyClass;
+	}
+	
+	//
+	public function getBodyClassCb() {
+		return 'do-this-later';
+	}
 	
 	
 	

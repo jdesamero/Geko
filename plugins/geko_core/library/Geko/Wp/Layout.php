@@ -14,11 +14,6 @@ class Geko_Wp_Layout extends Geko_Layout
 	
 	protected $_aLinks = array();
 	
-	protected $_mBodyClass = NULL;
-	protected $_mStyles = NULL;
-	protected $_mScripts = NULL;
-	
-	protected $_aTemplates = NULL;
 	
 	
 	
@@ -129,80 +124,14 @@ class Geko_Wp_Layout extends Geko_Layout
 	}
 	
 	
-	//// layout parts
+	
 	
 	//
-	public function echoEnqueue() {
-		
-		if ( NULL !== $this->_mStyles ) {
-			
-			if ( is_string( $this->_mStyles ) ) {
-				$aStyles = Geko_Array::explodeTrimEmpty( ' ', $this->_mStyles );
-			} else {
-				$aStyles = $this->_mStyles;
-			}
-			
-			call_user_func( array( $this, 'enqueueStyle' ), $aStyles );
-		}
-		
-		if ( NULL !== $this->_mScripts ) {
-			
-			if ( is_string( $this->_mScripts ) ) {
-				$aScripts = Geko_Array::explodeTrimEmpty( ' ', $this->_mScripts );
-			} else {
-				$aScripts = $this->_mScripts;
-			}
-			
-			call_user_func( array( $this, 'enqueueScript' ), $aScripts );
-		}
-		
-		if ( is_array( $this->_aTemplates ) ) {
-			
-			foreach ( $this->_aTemplates as $mTmpl ) {
-				
-				if ( is_string( $mTmpl ) ) {
-					$aTmpl = Geko_Array::explodeTrimEmpty( ' ', $mTmpl );
-				} else {
-					$aTmpl = $mTmpl;
-				}
-				
-				call_user_func_array( array( $this, 'addTemplate' ), $aTmpl );				
-			}
-			
-		}
+	public function getBodyClassCb() {
+		return Geko_Wp::getBodyClass();
 	}
 	
-	// body class
-	public function filterBodyClass( $sBodyClass ) {
-		
-		if ( NULL !== $this->_mBodyClass ) {
-			
-			if ( is_array( $this->_mBodyClass ) ) {
-				$sMergeBodyClass = implode( ' ', $this->_mBodyClass );
-			} else {
-				$sMergeBodyClass = $this->_mBodyClass;		
-			}
-			
-			
-			if ( FALSE !== strpos( $sMergeBodyClass, '##body_class##' ) ) {
-				$sMergeBodyClass = str_replace( '##body_class##', Geko_Wp::getBodyClass(), $sMergeBodyClass );
-			}
-			
-			if ( FALSE !== strpos( $sMergeBodyClass, '##browser_detect##' ) ) {
-				$sMergeBodyClass = str_replace( '##browser_detect##', Geko_Browser::bodyClass(), $sMergeBodyClass );
-			}
-			
-			if ( FALSE !== strpos( $sMergeBodyClass, '##template_grouping##' ) ) {
-				$sMergeBodyClass = str_replace( '##template_grouping##', implode( ' ', $this->getTemplateGrouping() ), $sMergeBodyClass );
-			}
-			
-			
-			$sBodyClass = trim( sprintf( '%s %s', trim( $sBodyClass ), trim( $sMergeBodyClass ) ) );
-		
-		}
-		
-		return $sBodyClass;
-	}
+	
 	
 	
 	//// render tags

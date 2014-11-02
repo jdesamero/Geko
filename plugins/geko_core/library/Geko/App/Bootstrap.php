@@ -20,6 +20,7 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 		parent::__construct();
 		
 		$this
+			
 			->mergeDeps( array(
 				
 				'db' => NULL,
@@ -39,6 +40,7 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 				'router.auth' => array( 'router', 'auth' )
 				
 			) )
+			
 			->mergeConfig(	array(
 				
 				'match' => TRUE,
@@ -48,6 +50,15 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 				'router.service' => TRUE
 			
 			) )
+			
+			->mergeAbbrMap( array(
+				
+				'cont' => 'Contact',
+				'lang' => 'Language',
+				'mng' => 'Manage'
+				
+			) )
+			
 		;
 		
 	}
@@ -198,7 +209,14 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 		
 		$oAuth = Zend_Auth::getInstance();
 		
-		$oAuthAdapter = new Geko_App_Auth_Adapter( $oDb );
+		$oAuthAdapter = new Geko_App_Auth_Adapter(
+			$oDb,
+			$aArgs[ 'table_name' ],
+			$aArgs[ 'identity_column' ],
+			$aArgs[ 'credential_column' ],
+			$aArgs[ 'credential_treatment' ]
+		);
+		
 		$oAuthStorage = new Geko_App_Auth_Storage( $oSess );
 		
 		$oAuth->setStorage( $oAuthStorage );
@@ -238,6 +256,10 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 		
 		$oRoute = new $sRouteClass( $oAuth );
 		$oRouter->addRoute( $oRoute, 1000, 'auth' );
+		
+		if ( $aArgs[ 'rules' ] ) {
+			$oRoute->addRules( $aArgs[ 'rules' ] );
+		}
 		
 		$this->set( 'router.auth', $oRoute );
 	}
