@@ -71,6 +71,10 @@
 		
 		var cons = function() {
 			
+			if ( this.beforeInit ) {
+				this.beforeInit.apply( this, arguments );
+			}
+			
 			if ( origCons ) {
 				
 				origCons.apply( this, arguments );
@@ -92,8 +96,6 @@
 			}
 			
 		};
-		
-		cons._namespace = namespc;
 		
 		
 		var useExtend;
@@ -127,16 +129,29 @@
 				protoProps2 = this.modifyProps( protoProps2 );
 			}
 			
-			return useExtend.call( cons, protoProps2, staticProps2 );
+			var extendedCons = useExtend.call( cons, protoProps2, staticProps2 );
+			
+			// extend() needs to be overridden
+			extendedCons.extend = function() {
+				return useExtend.apply( extendedCons, arguments );
+			};
+			
+			return extendedCons;
 		}
 		
 		
-		// add to Backstab namespace
-		Backstab[ namespc ] = cons;
-		// alert( 'created constructor: ' + cons._namespace );
-		
 		if ( staticProps ) {
-			_.extend( Backstab[ namespc ], staticProps );
+			_.extend( cons, staticProps );
+		}
+		
+		
+		if ( namespc ) {
+		
+			cons._namespace = namespc;
+			
+			// add to Backstab namespace
+			Backstab[ namespc ] = cons;
+			// alert( 'created constructor: ' + cons._namespace );
 		}
 		
 		return cons;

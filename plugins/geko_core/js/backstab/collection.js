@@ -19,7 +19,7 @@
 	// add new methods and properties
 	var oOpts = {
 		
-		setup: function() {
+		beforeInit: function() {
 			_.mergeValues( 'data', this, arguments[ 1 ] );
 		},
 		
@@ -31,8 +31,25 @@
 			}
 			
 			return this;
+		},
+		
+		createPart: function( sKey, oPartedCollection, oFindParams ) {
+			
+			var oPart = new this.constructor( this.where( oFindParams ) );
+			
+			var oModelParams = {};
+			oModelParams[ sKey ] = oPart;
+			_.extend( oModelParams, oFindParams );
+			
+			oPartedCollection.add( new Backstab.Model( oModelParams ) );
+			
+			return oPart;
+		},
+		
+		findAndGet: function( sGetKey, oFindParams ) {
+			return this.findWhere( oFindParams ).get( sGetKey );
 		}
-
+		
 	};
 	
 	

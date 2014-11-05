@@ -137,7 +137,7 @@
 	// add new methods and properties
 	var oOpts = {
 		
-		setup: function() {
+		beforeInit: function() {
 			_.mergeValues( 'data', this, arguments[ 0 ] );
 		},
 		
@@ -145,10 +145,10 @@
 			
 			if ( !this.el && this.createElement ) {
 				
-				var eElem = this.createElement();
+				var eElem = this.createElement.apply( this, arguments );
 				
 				if ( 'object' == $.type( eElem ) ) {
-					this.el = this.createElement();
+					this.el = eElem;
 				}
 			}
 			
@@ -650,21 +650,18 @@
 					// trigger now
 					if ( _.contains( hasEach, prop ) ) {
 						
-						propObj.each( function() {
+						propObj.each( function( model ) {
 							
-							var args2 = $.makeArray( arguments );
+							var args2 = [ model, propObj ];
 							var evt = 'initialize';
 							var sel = getDelegateSelector( oDelegate, prop, evt );
 
 							// track objects pertinent to event being triggered
 							var oTriggerEvent = {
 								backstabTriggerEvent: true,				// hacky way to identify this object
-								targetParent: propObj
+								targetParent: propObj,
+								target: model
 							};
-							
-							if ( args2[ 0 ] ) {
-								oTriggerEvent.target = args2[ 0 ];
-							}
 							
 							// append our event tracker object to the end of the argument list
 							args2.push( oTriggerEvent );

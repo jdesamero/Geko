@@ -30,7 +30,7 @@
 	// add new methods and properties
 	var oOpts = {
 		
-		setup: function() {
+		beforeInit: function() {
 			_.mergeValues( 'data', this, arguments[ 1 ] );
 		},
 		
@@ -55,8 +55,13 @@
 			}
 			
 			return this;
+		},
+		
+		getIntCid: function() {
+			// return a negative value so it doesn't collide with existing ids
+			return - parseInt( this.cid.replace( 'c', '' ) );
 		}
-
+		
 	};
 	
 	
