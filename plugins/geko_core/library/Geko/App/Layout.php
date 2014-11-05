@@ -9,6 +9,24 @@ class Geko_App_Layout extends Geko_Layout
 	
 	
 	
+	//// layout parts
+	
+	//
+	public function echoHead() {
+		
+		$oThis = $this;
+		
+		Geko_Once::run( __METHOD__, function() use ( $oThis ) {
+
+			$oThis
+				->renderStyleTags()
+				->renderScriptTags()
+			;
+			
+		} );
+		
+	}
+	
 	
 	
 	

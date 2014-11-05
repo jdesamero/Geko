@@ -81,9 +81,10 @@
 				$.each( oCollectionHash, function( k, v ) {
 					
 					var sTitle = ( v.title ) ? v.title : k ;
+					var oCollection = ( v.model ) ? new Backstab.Collection( [ v.model ] ) : v.collection ;
 					
 					var oControl = new Control( {
-						collection: v.collection,
+						collection: oCollection,
 						data: {
 							slug: k,
 							title: sTitle,
