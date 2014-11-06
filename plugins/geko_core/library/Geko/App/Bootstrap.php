@@ -53,8 +53,10 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 			
 			->mergeAbbrMap( array(
 				
+				'addr' => 'Address',
 				'cont' => 'Contact',
 				'lang' => 'Language',
+				'loc' => 'Location',
 				'mng' => 'Manage'
 				
 			) )
