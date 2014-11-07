@@ -100,7 +100,19 @@
 			sElementPrefix = '%s_'.printf( opts.name );
 		}
 		
-		var ent = {};
+		var oFamily = {
+			
+			setData: function( oData ) {
+				
+				if ( !this.data ) {
+					this.data = {};
+				}
+				
+				_.extend( this.data, oData );
+			}
+			
+		};
+		
 		
 		
 		
@@ -112,7 +124,7 @@
 			
 			var modelExt = {
 				
-				family: ent
+				family: oFamily
 				
 			};
 			
@@ -128,7 +140,7 @@
 				
 			} );
 			
-			ent.Model = Backstab.Model.extend( modelExt );			
+			oFamily.Model = Backstab.Model.extend( modelExt );			
 		}
 		
 		
@@ -142,9 +154,9 @@
 			
 			var collectionExt = {
 				
-				family: ent,
+				family: oFamily,
 				
-				model: ent.Model
+				model: oFamily.Model
 				
 			};
 			
@@ -176,7 +188,7 @@
 				
 			} );
 			
-			ent.Collection = Backstab.Collection.extend( collectionExt );
+			oFamily.Collection = Backstab.Collection.extend( collectionExt );
 		}
 		
 		
@@ -189,7 +201,7 @@
 			
 			var itemViewExt = {
 				
-				family: ent,
+				family: oFamily,
 				
 				events: {
 					'model:change this': 'updateItem',
@@ -198,8 +210,8 @@
 				
 				createElement: function() {
 					
-					if ( ent.itemTmpl ) {
-						return ent.itemTmpl.clone();
+					if ( oFamily.itemTmpl ) {
+						return oFamily.itemTmpl.clone();
 					}
 					
 					return this.getTmpl( this.getTmplInitVals() );
@@ -274,7 +286,7 @@
 				
 			} );
 			
-			ent.ItemView = Backstab.View.extend( itemViewExt );
+			oFamily.ItemView = Backstab.View.extend( itemViewExt );
 		}
 		
 		
@@ -287,7 +299,7 @@
 			
 			var listViewExt = {
 				
-				family: ent,
+				family: oFamily,
 				
 				events: {
 					'collection:initialize this; collection:add this': 'appendItem'
@@ -303,8 +315,8 @@
 
 						var eItemTmpl = this.$( lvPrms.itemTmplSelector );
 						
-						if ( !ent.itemTmpl ) {
-							ent.itemTmpl = eItemTmpl.clone();
+						if ( !oFamily.itemTmpl ) {
+							oFamily.itemTmpl = eItemTmpl.clone();
 						}
 						
 						eItemTmpl.remove();					
@@ -327,7 +339,7 @@
 				
 				appendItem: function( e, model, collection, options ) {
 					
-					var item = new ent.ItemView( {
+					var item = new oFamily.ItemView( {
 						model: model,
 						data: {
 							listView: this
@@ -366,7 +378,7 @@
 				
 			} );
 			
-			ent.ListView = Backstab.View.extend( listViewExt );
+			oFamily.ListView = Backstab.View.extend( listViewExt );
 		}
 		
 		
@@ -379,7 +391,7 @@
 			
 			var formViewExt = {
 				
-				family: ent,
+				family: oFamily,
 				
 				getTmpl: function( vals, name ) {
 					if ( !name ) name = '%s_form'.printf( opts.name );
@@ -409,13 +421,21 @@
 				
 			} );
 			
-			ent.FormView = Backstab.View.extend( formViewExt );
+			oFamily.FormView = Backstab.View.extend( formViewExt );
 		}
 		
 		
-		// -----------------------------------------------------------------------------------------
+		// --- family ------------------------------------------------------------------------------
 		
-		return ent;
+		
+		
+		if ( opts.extend ) {
+			_.extend( oFamily, opts.extend );
+		}
+		
+		
+		
+		return oFamily;
 		
 	};
 	

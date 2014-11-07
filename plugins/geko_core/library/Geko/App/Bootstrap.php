@@ -55,9 +55,12 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 				
 				'addr' => 'Address',
 				'cont' => 'Contact',
+				'itm' => 'Item',
 				'lang' => 'Language',
 				'loc' => 'Location',
-				'mng' => 'Manage'
+				'mng' => 'Manage',
+				'prov' => 'Province',
+				'tx' => 'Taxonomy'
 				
 			) )
 			

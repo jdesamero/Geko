@@ -82,7 +82,7 @@ abstract class Geko_Entity_Query
 				
 			}
 			
-			$this->_bProfileQuery = ( $aParams[ '__profile_query' ] ) ? TRUE : FALSE;
+			$this->_bProfileQuery = ( $aParams[ '__profile_query' ] ) ? TRUE : FALSE ;
 			$this->_aParams = $this->modifyParams( $aParams );
 			$this->init();
 		}
@@ -136,12 +136,12 @@ abstract class Geko_Entity_Query
 		
 		if ( is_array( $this->_aParams[ '__merge_with_entity' ] ) ) {
 			$oEntity = array_merge(
-				(array) $oEntity,
+				( array ) $oEntity,
 				$this->_aParams[ '__merge_with_entity' ]
 			);
 		}
 		
-		$sEntityClass = ( $this->_sEntityClass ) ? $this->_sEntityClass : 'Geko_Entity';
+		$sEntityClass = ( $this->_sEntityClass ) ? $this->_sEntityClass : 'Geko_Entity' ;
 		
 		return new $sEntityClass( $oEntity, $this );
 	}
@@ -163,7 +163,7 @@ abstract class Geko_Entity_Query
 	}
 	
 	/*
-	 * An gather pattern is a string that contains ##<method suffix>##
+	 * A gather pattern is a string that contains ##<method suffix>##
 	 * method suffix is a method name that starts with "get" minus the "get" part
 	 * for instance: getId -> Id, getTheContent -> TheContent, getLink -> Link
 	 */
@@ -188,7 +188,7 @@ abstract class Geko_Entity_Query
 		}
 			
 		if ( FALSE !== strpos( $sPattern, '%s' ) ) {
-			$sPattern = sprintf( $sPattern, '##' . $this->_sDefaultField . '##' );
+			$sPattern = sprintf( $sPattern, sprintf( '##%s##', $this->_sDefaultField ) );
 		}
 		
 		if ( preg_match_all( '/##([a-zA-Z0-9_]+)##/s', $sPattern, $aArgs ) ) {
@@ -212,7 +212,7 @@ abstract class Geko_Entity_Query
 				$sOut = $sPattern;
 				foreach ( $aSuffixes as $i => $sSuffix ) {
 					
-					$sMethod = 'get' . $sSuffix;
+					$sMethod = sprintf( 'get%s', $sSuffix );
 					$sEntityProperty = Geko_Inflector::underscore( $sSuffix );
 					
 					$bReplace = TRUE;
@@ -317,7 +317,47 @@ abstract class Geko_Entity_Query
 	}
 	
 	//
-	public function getRawEntities() {
+	public function getRawEntities( $bFormatEntities = FALSE ) {
+
+		if ( $bFormatEntities && $this->_bUseManageQuery && $this->_sManageClass ) {
+			
+			$oMng = Geko_Singleton_Abstract::getInstance( $this->_sManageClass );
+			
+			Geko_Debug::out( $this->_sManageClass, __METHOD__ );
+			
+			$aFields = $oMng->getPrimaryTable()->getFields( TRUE );
+			
+			$aEntities = $this->_aEntities;
+			
+			foreach ( $aEntities as $i => $mRow ) {
+				
+				$aRow = ( array ) $mRow;
+				
+				foreach ( $aRow as $sKey => $mValue ) {
+					
+					$mValueFmt = $mValue;
+					
+					if ( $oField = $aFields[ $sKey ] ) {
+						
+						if ( $oField->isBool() ) {
+							$mValueFmt = intval( $mValue ) ? TRUE : FALSE ;						
+						} elseif ( $oField->isInt() ) {
+							$mValueFmt = intval( $mValue );
+						} elseif ( $oField->isFloat() ) {
+							$mValueFmt = floatval( $mValue );					
+						}
+						
+					}
+
+					$aRow[ $sKey ] = $mValueFmt;
+				}
+				
+				$aEntities[ $i ] = $aRow;
+			}
+			
+			return $aEntities;
+		}
+		
 		return $this->_aEntities;
 	}
 	
@@ -602,7 +642,7 @@ abstract class Geko_Entity_Query
 		if ( $sField ) {
 			if ( count( $this ) > 0 ) {
 				
-				$sPattern = '##' . $sField . '##';
+				$sPattern = sprintf( '##%s##', $sField );
 				$mPattern = array_shift( $aArgs );
 				
 				if ( is_null( $mPattern ) ) {
@@ -623,7 +663,7 @@ abstract class Geko_Entity_Query
 				
 			} else {
 				
-				return ( 'implode' == $sCallMethod ) ? '' : array();
+				return ( 'implode' == $sCallMethod ) ? '' : array() ;
 				
 			}
 		}
@@ -637,7 +677,7 @@ abstract class Geko_Entity_Query
 			// $aArgs[ 2 ] - field name if "__Custom"
 			
 			$sSuffix = substr_replace( $sMethod, '', 0, 6 );
-			$sField = ( '__Custom' == $sSuffix ) ? $aArgs[ 2 ] : $sSuffix;
+			$sField = ( '__Custom' == $sSuffix ) ? $aArgs[ 2 ] : $sSuffix ;
 			
 			// gather
 			
@@ -647,7 +687,7 @@ abstract class Geko_Entity_Query
 				
 				foreach ( $this as $oEntity ) {
 					
-					$sMethod = 'get' . $sSuffix;
+					$sMethod = sprintf( 'get%s', $sSuffix );
 					$sEntityProperty = Geko_Inflector::underscore( $sSuffix );
 					
 					$bGroup = TRUE;
@@ -688,7 +728,7 @@ abstract class Geko_Entity_Query
 			return array_keys( $this->_aSubsets[ $sField ] );
 		}
 		
-		throw new Exception( 'Invalid method ' . get_class( $this ) . '::' . $sMethod . '() called.' );
+		throw new Exception( sprintf( 'Invalid method %s::%s() called.', get_class( $this ), $sMethod ) );
 	}
 	
 	//

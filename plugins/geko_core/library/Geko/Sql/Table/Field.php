@@ -40,6 +40,13 @@ class Geko_Sql_Table_Field
 		return ( $this->_aParams[ 0 ] == strtolower( trim( $sType ) ) ) ? TRUE : FALSE ;
 	}
 	
+	
+	
+	//
+	public function isBool() {
+		return ( 'bool' == $this->_aParams[ 0 ] ) ? TRUE : FALSE ;
+	}
+	
 	//
 	public function isInt() {
 		if ( in_array( $this->_aParams[ 0 ], array(
