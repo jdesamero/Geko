@@ -11,9 +11,10 @@ class Geko_Action
 		
     	$sAction = sprintf( 'Action_%s_%s', $oReq->getControllerName(), $oReq->getActionName() );
     	
-    	$sAction = preg_replace_callback( '/_[a-z]/', function( $aMatches ) {
-			return strtoupper( $aMatches[ 0 ] );
-    	}, $sAction );
+    	$sAction = preg_replace_callback( '/_[a-z]/', create_function(
+			'$matches',
+			'return strtoupper($matches[0]);'
+    	), $sAction );
     	
     	if ( @class_exists( $sAction ) ) {
     		return $sAction;
@@ -25,5 +26,4 @@ class Geko_Action
 	
 
 }
-
 
