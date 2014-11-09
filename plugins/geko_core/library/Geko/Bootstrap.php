@@ -174,7 +174,7 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 				
 				$aComp = $aCompFmt = explode( '.', $sComp );
 				
-				array_walk( $aCompFmt, array( 'Geko_Inflector', 'camelize' ) );
+				$aCompFmt = array_map( array( 'Geko_Inflector', 'camelize' ), $aCompFmt );
 				$sCompFmt = implode( '_', $aCompFmt );
 				
 				$sMethod = sprintf( 'comp%s', $sCompFmt );
@@ -360,19 +360,57 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 		
 	}
 	
+	
+	
+	// know your geography!
+	// independent
+	public function compGeo( $aArgs ) {
+		
+		$oGeo = Geko_Geography_Xml::getInstance();
+		
+		if ( defined( 'GEKO_GEOGRAPHY_XML' ) ) {
+			$oGeo->setFile( GEKO_GEOGRAPHY_XML );
+		}
+		
+		$this->set( 'geo', $oGeo );
+	}
+	
+	
 	// logger/debugger
 	// independent
 	public function compLogger( $aArgs ) {
-		
-		$oLogger = Zend_Registry::get( 'logger' );
-		
-		if ( !$oLogger ) {
+				
+		if ( $aArgs[ 0 ] ) {
+			
 			$oLogger = new Geko_Log( $aArgs[ 0 ], $aArgs[ 1 ] );
+		
+		} else {
+
+			$aLoggerParams = array();
+			
+			if ( defined( 'GEKO_LOG_DISABLED' ) && GEKO_LOG_DISABLED ) {
+				$iLoggerType = Geko_Log::WRITER_DISABLED;
+			} elseif ( defined( 'GEKO_LOG_FIREBUG' ) && GEKO_LOG_FIREBUG ) {
+				$iLoggerType = Geko_Log::WRITER_FIREBUG;
+			} elseif ( defined( 'GEKO_LOG_STREAM' ) && GEKO_LOG_STREAM ) {
+				$iLoggerType = Geko_Log::WRITER_STREAM;
+			} else {
+				if ( is_file( GEKO_LOG ) ) {
+					$iLoggerType = Geko_Log::WRITER_FILE;
+					$aLoggerParams[ 'file' ] = GEKO_LOG;
+				} else {
+					$iLoggerType = Geko_Log::WRITER_STREAM;
+				}
+			}
+			
+			$oLogger = new Geko_Log( $iLoggerType, $aLoggerParams );
+			
 		}
 		
-		if ( $oLogger ) {
-			$this->set( 'logger', $oLogger );
-		}
+		// for backwards compatibility
+		Zend_Registry::set( 'logger', $oLogger );
+		
+		$this->set( 'logger', $oLogger );
 	}
 	
 	

@@ -23,10 +23,6 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 			
 			->mergeDeps( array(
 				
-				'db' => NULL,
-				'match' => NULL,
-				
-				'router' => NULL,
 				'router.file' => array( 'router' ),
 				'router.service' => array( 'router' ),
 				'router.layout' => array( 'router' ),
@@ -41,7 +37,11 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 				
 			) )
 			
-			->mergeConfig(	array(
+			->mergeConfig( array(
+				
+				'path' => TRUE,
+				'geo' => TRUE,
+				'load_ext' => TRUE,
 				
 				'match' => TRUE,
 				
@@ -71,6 +71,133 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 	
 	
 	//// default components
+	
+	
+	
+	// file path/url configuration
+	// independent
+	public function compPath( $aArgs ) {
+		
+		// register global urls to services
+		
+		if ( defined( 'GEKO_CORE_URI' ) ) {
+			
+			Geko_Uri::setUrl( array(
+				'geko_export' => sprintf( '%s/srv/export.php', GEKO_CORE_URI ),
+				'geko_gmap_overlay' => sprintf( '%s/srv/gmap_overlay.php', GEKO_CORE_URI ),
+				'geko_pdf' => sprintf( '%s/srv/pdf.php', GEKO_CORE_URI ),
+				'geko_process' => sprintf( '%s/srv/process.php', GEKO_CORE_URI ),
+				'geko_scss' => sprintf( '%s/srv/scss.php', GEKO_CORE_URI ),
+				'geko_thumb' => sprintf( '%s/srv/thumb.php', GEKO_CORE_URI ),
+				'geko_upload' => sprintf( '%s/srv/upload.php', GEKO_CORE_URI ),
+				'geko_styles' => sprintf( '%s/styles', GEKO_CORE_URI ),
+				'geko_ext_styles' => sprintf( '%s/external/styles', GEKO_CORE_URI ),
+				'geko_ext_swf' => sprintf( '%s/external/swf', GEKO_CORE_URI ),
+				'geko_app_srv' => sprintf( '%s/srv', GEKO_STANDALONE_URL )
+			) );
+		
+		}
+		
+	}
+	
+	
+	// the external files loader
+	// independent
+	public function compLoadExt( $aArgs ) {
+		
+		
+		//// backstab model fields functionality
+		
+		$aModelFields = array();
+		
+		// if "data-model" was provided, then track it
+		Geko_Hooks::addFilter( 'Geko_Loader_ExternalFiles::registerFromXmlConfigFile::params', function( $aParams, $sId, $sType, $oItem ) use ( &$aModelFields ) {
+				
+			if ( $sDataModel = strval( $oItem[ 'data-model' ] ) ) {
+				
+				// start with NULL values, we'll populate this later
+				$aModelFields[ $sDataModel ] = NULL;
+			}
+			
+			return $aParams;
+		} );
+		
+		
+		Geko_Hooks::addAction( 'Geko_Loader_ExternalFiles::renderScriptTags::pre', function( $oLoadExt ) use ( &$aModelFields ) {
+			
+			foreach ( $aModelFields as $sKey => $null ) {
+				
+				if ( $oMng = Geko_App::get( sprintf( '%s.mng', $sKey ) ) ) {
+					$aModelFields[ $sKey ] = $oMng->getPrimaryTable();
+				}
+			}
+			
+			if ( count( $aModelFields ) > 0 ): ?>
+				<script type="text/javascript">
+					( function() {
+					
+						if ( !this.Backstab ) this.Backstab = {};
+						
+						var Backstab = this.Backstab;
+						
+						Backstab.ModelFields = <?php echo Geko_Json::encode( $aModelFields ); ?>;
+						
+					} ).call( this );
+				</script>
+			<?php endif;
+			
+		} );
+		
+		
+		
+		// register external files (js/css)
+		$oLoadExt = Geko_Loader_ExternalFiles::getInstance();
+		$oLoadExt
+			->setMergeParams( array(
+				'geko_core_root' => GEKO_CORE_ROOT,
+				'geko_core_uri' => GEKO_CORE_URI
+			) )
+		;
+		
+		// extra
+		if ( defined( 'GEKO_REGISTER_EXTRA_XML' ) ) {
+			$oLoadExt->registerFromXmlConfigFile( GEKO_REGISTER_EXTRA_XML );
+		}
+		
+		// main
+		if ( defined( 'GEKO_REGISTER_XML' ) ) {
+			$oLoadExt->registerFromXmlConfigFile( GEKO_REGISTER_XML );
+		}
+		
+		if (
+			@class_exists( 'Geko_Constant_Values' ) &&
+			method_exists( 'Geko_Constant_Values', 'getUrls' )
+		) {
+			$oLoadExt->setMergeParams( Geko_Constant_Values::getUrls() );
+		}
+		
+		
+		if ( defined( 'GEKO_TEMPLATE_URL' ) ) {
+			$oLoadExt->setMergeParams( array(
+				'geko_template_url' => GEKO_TEMPLATE_URL
+			) );
+		}
+		
+		if ( defined( 'GEKO_TEMPLATE_PATH' ) ) {
+			
+			$oLoadExt->setMergeParams( array(
+				'geko_template_path' => GEKO_TEMPLATE_PATH
+			) );
+			
+			$sRegFile = sprintf( '%s/etc/register.xml', GEKO_TEMPLATE_PATH );
+			if ( is_file( $sRegFile ) ) {
+				$oLoadExt->registerFromXmlConfigFile( $sRegFile );
+			}
+		}
+		
+		
+		$this->set( 'load_ext', $oLoadExt );
+	}
 	
 	
 	

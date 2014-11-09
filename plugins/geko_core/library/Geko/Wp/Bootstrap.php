@@ -24,54 +24,19 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 			
 			->mergeDeps( array(
 				
-				'db' => NULL,
-				'sess' => NULL,
-				'consts' => NULL,
-				'setup' => NULL,
-				'hooks' => NULL,
-				
-				'role.types' => NULL,
 				'role.mng' => array( 'role.types' ),
-				
 				'form.mng' => array( 'lang.rslv' ),
-				
-				'emsg.mng' => NULL,
-
-				'cont.mng' => NULL,
-				
-				'loc.mng' => NULL,
-				
-				'lang.mng' => NULL,
 				'lang.rslv' => array( 'lang.mng' ),
-				
 				'navmng.lang' => array( 'lang.rslv' ),
-				
-				'user.mng' => NULL,
-				'user.rewrite' => NULL,
-				'user.photo' => NULL,
-				'user.security' => NULL,
-				'user.op' => NULL,
-				
-				'cat.meta' => NULL,
-				'cat.alias' => NULL,
-				'cat.tmpl' => NULL,
-				'cat.posttmpl' => NULL,
-				
-				'post.meta' => NULL,
-				'post.defcat' => NULL,
-				'post.expdate' => NULL,
-				
-				'page.meta' => NULL,
-				
-				'pin.mng' => NULL,
-				'pin.log.mng' => array( 'pin.mng' ),
-				
-				'custhks' => NULL
+				'pin.log.mng' => array( 'pin.mng' )
 				
 			) )
 			
 			->mergeConfig( array(
 				
+				'path' => TRUE,
+				'geo' => TRUE,
+				'load_ext' => TRUE,
 				'db' => TRUE,
 				'consts' => TRUE,
 				'setup' => TRUE,
@@ -118,6 +83,94 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	
 	
 	//// components
+	
+	
+	// file path/url configuration
+	// independent
+	public function compPath( $aArgs ) {
+	
+		// set-up path (url-to-path/path-to-url) conversion
+		Geko_String_Path::setRoots( Geko_Wp::getUrl(), ABSPATH );
+		
+		
+		// register global urls to services
+		
+		Geko_Uri::setUrl( array(
+			'wp_admin' => sprintf( '%s/wp-admin/admin.php', Geko_Wp::getUrl() ),
+			'wp_login' => sprintf( '%s/wp-login.php', Geko_Wp::getUrl() ),
+			'wp_user_edit' => sprintf( '%s/wp-admin/user-edit.php', Geko_Wp::getUrl() )
+		) );
+		
+		 
+		if ( defined( 'GEKO_CORE_URI' ) ) {
+			
+			Geko_Uri::setUrl( array(
+				'geko_export' => sprintf( '%s/srv/export.php', GEKO_CORE_URI ),
+				'geko_gmap_overlay' => sprintf( '%s/srv/gmap_overlay.php', GEKO_CORE_URI ),
+				'geko_pdf' => sprintf( '%s/srv/pdf.php', GEKO_CORE_URI ),
+				'geko_process' => sprintf( '%s/srv/process.php', GEKO_CORE_URI ),
+				'geko_scss' => sprintf( '%s/srv/scss.php', GEKO_CORE_URI ),
+				'geko_thumb' => sprintf( '%s/srv/thumb.php', GEKO_CORE_URI ),
+				'geko_upload' => sprintf( '%s/srv/upload.php', GEKO_CORE_URI ),
+				'geko_styles' => sprintf( '%s/styles', GEKO_CORE_URI ),
+				'geko_ext' => sprintf( '%s/external', GEKO_CORE_URI ),
+				'geko_ext_images' => sprintf( '%s/external/images', GEKO_CORE_URI ),
+				'geko_ext_styles' => sprintf( '%s/external/styles', GEKO_CORE_URI ),
+				'geko_ext_swf' => sprintf( '%s/external/swf', GEKO_CORE_URI )
+			) );
+			
+		}
+		
+		// image thumbnailer
+		if ( defined( 'GEKO_IMAGE_THUMB_CACHE_DIR' ) ) {
+			Geko_Image_Thumb::setCacheDir( GEKO_IMAGE_THUMB_CACHE_DIR );
+		}
+		
+		// scss pre-processor
+		if ( defined( 'GEKO_SCSS_CACHE_DIR' ) ) {
+			Geko_Scss::setCacheDir( GEKO_SCSS_CACHE_DIR );
+		}
+		
+	}
+	
+	
+	// the external files loader
+	// independent
+	public function compLoadExt( $aArgs ) {
+		
+		// register external files (js/css)
+		$aPlh = array();
+		
+		if ( defined( 'GEKO_CORE_ROOT' ) ) {
+			$aPlh[ 'geko_core_root' ] = GEKO_CORE_ROOT;
+		}
+		
+		if ( defined( 'GEKO_CORE_URI' ) ) {
+			$aPlh[ 'geko_core_uri' ] = GEKO_CORE_URI;
+		}
+		
+		
+		// set placeholders, if any
+		if ( count( $aPlh ) > 0 ) {
+			Geko_Wp::setStandardPlaceholders( $aPlh );
+		}
+		
+		
+		if ( defined( 'GEKO_REGISTER_XML' ) ) {
+			Geko_Wp::registerExternalFiles( GEKO_REGISTER_XML );
+		}
+		
+		
+		// external files
+		$sExternalFiles = sprintf( '%s/etc/register.xml', TEMPLATEPATH );
+		
+		if ( is_file( $sExternalFiles ) ) {
+			Geko_Wp::registerExternalFiles( $sExternalFiles );
+		}
+		
+	}
+	
+	
 	
 	
 	// database connection
@@ -245,8 +298,6 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 		Geko_PhpQuery_FormTransform::registerPlugin( 'Geko_PhpQuery_FormTransform_Plugin_RowTemplate' );
 		
 		
-		// external files
-		Geko_Wp::registerExternalFiles( sprintf( '%s/etc/register.xml', TEMPLATEPATH ) );
 		
 		
 		// misc
