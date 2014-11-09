@@ -123,17 +123,7 @@ class Geko_App_Entity_Manage extends Geko_Singleton_Abstract
 		
 		if ( $oSqlTable = $this->resolveTable( $mSqlTable ) ) {
 			
-			$aRet = array();
-
-			// format db fields as Geko_Wp_Options_Field
-			$aDbFields = $oSqlTable->getFields( TRUE );
-			
-			// ??? ???
-			foreach ( $aDbFields as $sField => $oDbField ) {
-				$aRet[ $sField ] = Geko_Wp_Options_Field::wrapSqlField( $oDbField );
-			}
-			
-			return $aRet;
+			return $oSqlTable->getFields( TRUE );
 		}
 		
 		return array();
@@ -145,17 +135,7 @@ class Geko_App_Entity_Manage extends Geko_Singleton_Abstract
 		
 		if ( $oSqlTable = $this->resolveTable( $mSqlTable ) ) {
 			
-			$aRet = array();
-
-			// format db fields as Geko_Wp_Options_Field
-			$aDbFields = $oSqlTable->getKeyFields( TRUE );
-			
-			// ??? ???
-			foreach ( $aDbFields as $sField => $oDbField ) {
-				$aRet[ $sField ] = Geko_Wp_Options_Field::wrapSqlField( $oDbField );
-			}
-			
-			return $aRet;
+			return $oSqlTable->getKeyFields( TRUE );
 		}
 		
 		return array();
@@ -176,10 +156,7 @@ class Geko_App_Entity_Manage extends Geko_Singleton_Abstract
 		
 		if ( $oSqlTable = $this->resolveTable( $mSqlTable ) ) {
 			
-			// ??? ???
-			if ( $oPkf = $oSqlTable->getPrimaryKeyField() ) {
-				return Geko_Wp_Options_Field::wrapSqlField( $oPkf );
-			}
+			return $oSqlTable->getPrimaryKeyField();
 		}
 		
 		return NULL;
@@ -189,6 +166,8 @@ class Geko_App_Entity_Manage extends Geko_Singleton_Abstract
 	public function getPrimaryTablePrimaryKeyField() {
 		return $this->getTablePrimaryKeyField( $this->getPrimaryTable() );
 	}
+	
+	
 	
 	
 	

@@ -22,6 +22,9 @@ class Geko_Hooks
 	
 	//
 	public static function hasAction( $sActionName ) {
+		
+		$sActionName = strtolower( $sActionName );
+		
 		return array_key_exists( $sActionName, self::$aActions );
 	}
 	
@@ -75,7 +78,9 @@ class Geko_Hooks
 	
 	//
 	public static function didAction( $sActionName ) {
+		
 		$sActionName = strtolower( $sActionName );
+		
 		return in_array( $sActionName, self::$aCalledActions );
 	}
 	
@@ -96,6 +101,9 @@ class Geko_Hooks
 	
 	//
 	public static function hasFilter( $sFilterName ) {
+		
+		$sFilterName = strtolower( $sFilterName );
+		
 		return array_key_exists( $sFilterName, self::$aFilters );
 	}
 	
