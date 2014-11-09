@@ -3,6 +3,7 @@
 abstract class Geko_Entity_Query
 	implements Iterator, ArrayAccess, Countable
 {
+	protected $_oPrimaryTable = NULL;
 	
 	protected $_aParams = array();
 	protected $_bAddToDefaultParams = TRUE;
@@ -319,13 +320,9 @@ abstract class Geko_Entity_Query
 	//
 	public function getRawEntities( $bFormatEntities = FALSE ) {
 
-		if ( $bFormatEntities && $this->_bUseManageQuery && $this->_sManageClass ) {
+		if ( $bFormatEntities && ( $oTable = $this->getPrimaryTable() ) ) {
 			
-			$oMng = Geko_Singleton_Abstract::getInstance( $this->_sManageClass );
-			
-			Geko_Debug::out( $this->_sManageClass, __METHOD__ );
-			
-			$aFields = $oMng->getPrimaryTable()->getFields( TRUE );
+			$aFields = $oTable->getFields( TRUE );
 			
 			$aEntities = $this->_aEntities;
 			
@@ -451,13 +448,8 @@ abstract class Geko_Entity_Query
 		
 		$oQuery = NULL;
 		
-		if ( $this->_bUseManageQuery && $this->_sManageClass ) {
-			
-			$oMng = Geko_Singleton_Abstract::getInstance( $this->_sManageClass );
-			
-			Geko_Debug::out( $this->_sManageClass, __METHOD__ );
-			
-			$oQuery = $oMng->getPrimaryTable()->getSelect();
+		if ( $this->_bUseManageQuery && ( $oTable = $this->getPrimaryTable() ) ) {
+			$oQuery = $oTable->getSelect();
 		}
 		
 		if ( !$oQuery ) $oQuery = $this->createSqlSelect();
@@ -477,6 +469,35 @@ abstract class Geko_Entity_Query
 		
 		return ( $bReturnObject ) ? $oQuery : strval( $oQuery ) ;
 	}
+	
+	
+	
+	// should be a mix-in
+	public function getPrimaryTable() {
+		
+		if ( NULL === $this->_oPrimaryTable ) {
+			
+			if ( $this->_sManageClass ) {
+				
+				$oMng = Geko_Singleton_Abstract::getInstance( $this->_sManageClass );
+				
+				if ( !$oMng->getCalledInit() ) {
+					$oMng->init();
+				}
+				
+				if ( $oTable = $oMng->getPrimaryTable() ) {
+					$this->_oPrimaryTable = $oTable;
+				} else {
+					$this->_oPrimaryTable = FALSE;
+				}
+			}
+			
+		}
+		
+		return $this->_oPrimaryTable;
+	}
+	
+	
 	
 	
 	// can be overridden by superclass

@@ -3,6 +3,7 @@
 //
 abstract class Geko_Entity
 {
+	protected $_oPrimaryTable = NULL;
 	
 	protected $_oEntity;
 	protected $_oQuery;
@@ -410,6 +411,31 @@ abstract class Geko_Entity
 		return new $this->_sEntityClass( $iParentId );
 	}
 	
+	
+	// should be a mix-in
+	public function getPrimaryTable() {
+		
+		if ( NULL === $this->_oPrimaryTable ) {
+			
+			if ( $this->_sManageClass ) {
+				
+				$oMng = Geko_Singleton_Abstract::getInstance( $this->_sManageClass );
+				
+				if ( !$oMng->getCalledInit() ) {
+					$oMng->init();
+				}
+				
+				if ( $oTable = $oMng->getPrimaryTable() ) {
+					$this->_oPrimaryTable = $oTable;
+				} else {
+					$this->_oPrimaryTable = FALSE;
+				}
+			}
+			
+		}
+		
+		return $this->_oPrimaryTable;
+	}
 	
 	
 	

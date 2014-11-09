@@ -27,6 +27,7 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 	
 	//
 	public function init() {
+		
 		if ( !$this->_bInit ) {
 			
 			if ( !$this->_sBaseUrl ) {
@@ -36,18 +37,23 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 			
 			$this->_bInit = TRUE;
 		}
+		
 		return $this;
 	}
 	
 	//
 	public function setBaseUrl( $sBaseUrl ) {
+		
 		$this->_sBaseUrl = $sBaseUrl;
+		
 		return $this;
 	}	
 	
 	//
 	public function setCurUrl( $sCurUrl ) {
+		
 		$this->_sCurUrl = $sCurUrl;
+		
 		return $this;
 	}
 	
@@ -55,11 +61,13 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 	public function setMergeParam( $sKey, $mValue ) {
 
 		$this->_aMergeParams[ $sKey ] = $mValue;
+		
 		return $this;
 	}
 	
 	//
 	public function setMergeParams( $aMergeParams ) {
+		
 		$this->_aMergeParams = array_merge(
 			$this->_aMergeParams,
 			$aMergeParams
@@ -76,8 +84,8 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 	public function register( $iType, $sId, $aParams ) {
 		
 		$this->init();
-		
 		$this->_aRegistered[ $iType ][ $sId ] = $aParams;
+		
 		return $this;
 	}
 	
@@ -111,7 +119,9 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 	
 	//
 	public function renderTags( $iType, $fCallback ) {
+		
 		$aQueue = $this->_aEnqueued[ $iType ];
+		
 		foreach ( $aQueue as $sId ) {
 			$aItem = $this->_aRegistered[ $iType ][ $sId ];
 			call_user_func( $fCallback, $aItem );
@@ -120,10 +130,9 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 	
 	//
 	public function modifyFileUrl( $sFile ) {
-		if (
-			( 0 !== strpos( $sFile, 'http:' ) ) && 
-			( 0 !== strpos( $sFile, 'https:' ) )
-		) {
+		
+		if ( Geko_Array::beginsWith( $sUrl, array( 'http:', 'https:' ) ) ) {
+			
 			if ( 0 === strpos( $sFile, '/' ) ) {
 				// absolute path
 				$sFile = sprintf( '%s%s', $this->_sBaseUrl, $sFile );		
@@ -132,6 +141,7 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 				$sFile = sprintf( '%s/%s', $this->_sCurUrl, $sFile );			
 			}
 		}
+		
 		return $sFile;
 	}
 	
@@ -163,7 +173,11 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 	
 	//
 	public function renderScriptTags() {
+		
+		Geko_Hooks::doAction( sprintf( '%s::pre', __METHOD__ ), $this );
+		
 		$this->renderTags( self::SCRIPT_TYPE, array( $this, 'renderScriptTag' ) );
+		
 		return $this;
 	}
 	
@@ -181,7 +195,11 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 	
 	//
 	public function renderStyleTags() {
+		
+		Geko_Hooks::doAction( sprintf( '%s::pre', __METHOD__ ), $this );
+		
 		$this->renderTags( self::STYLE_TYPE, array( $this, 'renderStyleTag' ) );
+		
 		return $this;
 	}
 	
@@ -232,9 +250,11 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 		
 		// determine the version to use for particular flag
 		foreach ( $aVersionFlags as $sFlag ) {
+			
 			$sDefVerKey = sprintf( 'default-%s-version', $sFlag );
 			$sUseVersion = trim( $oReg[ $sDefVerKey ] );
 			$sConst = $aVersionConst[ $sFlag ];
+			
 			if ( $sConst && defined( $sConst ) ) $sUseVersion = constant( $sConst );
 			if ( $sUseVersion ) $aUseVersion[ $sFlag ] = $sUseVersion;
 		}
@@ -304,6 +324,10 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 					}
 					
 					
+					// apply filters, if any
+					$aParams = Geko_Hooks::applyFilter( sprintf( '%s::params', __METHOD__ ), $aParams, $sId, $sType, $oItem );
+					
+					// call script registry function/method
 					call_user_func( $fCallback, $sId, $aParams );
 
 					// printf( '%s - %s - %s<br />', $sId, $sFile, implode( ', ', $aDependencies ) );
@@ -320,6 +344,7 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 	
 	//
 	public function debug() {
+		
 		print_r( $this->_aRegistered );
 		echo "\n\n";
 		print_r( $this->_aEnqueued );

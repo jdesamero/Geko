@@ -69,9 +69,11 @@ class Geko_Wp_Options_Field
 	
 	//
 	public function getTitle() {
+		
 		if ( !$sTitle = $this->_aField[ 'title' ] ) {
 			$sTitle = Geko_Inflector::humanize( $this->_aField[ '__field' ] );
 		}
+		
 		return $sTitle;
 	}
 	
@@ -84,33 +86,41 @@ class Geko_Wp_Options_Field
 	
 	//
 	public function getFormat() {
+		
 		if ( $this->isInt() ) return '%d';
 		elseif ( $this->isFloat() ) return '%f';
+		
 		return '%s';
 	}
 	
 	//
 	public function getFormattedValue( $mValue ) {
+		
 		if ( $this->isInt() ) $mValue = intval( $mValue );
 		elseif ( $this->isFloat() ) $mValue = floatval( $mValue );
 		else $mValue = strval( stripslashes( $mValue ) );
+		
 		return $mValue;
 	}
 	
 	
 	//
 	public function isPrimaryKey() {
+		
 		if ( $this->hasDbField() ) {
 			return $this->_oDbField->isPrimaryKey();
 		}
+		
 		return FALSE;
 	}
 
 	//
 	public function isText() {
+		
 		if ( $this->hasDbField() ) {
 			return $this->_oDbField->isText();
 		}
+		
 		return FALSE;
 	}	
 	
@@ -121,7 +131,9 @@ class Geko_Wp_Options_Field
 	
 	//
 	public function setManage( $oManage ) {
+		
 		$this->_oManage = $oManage;
+		
 		return $this;
 	}
 	
@@ -153,13 +165,18 @@ class Geko_Wp_Options_Field
 			( is_subclass_of( $sType, 'Geko_Wp_Options_Plugin' ) )
 		) {
 			if ( !$bTextOnly ) {
+				
 				$oPlugin = new $sType();
+				
 				if ( $oManage = $this->_oManage ) {
 					$oPlugin->setManage( $oManage );
 				}
+				
 				$oPlugin->setProperties( $this->_aField );
+				
 				return $oPlugin;
 			} else {
+				
 				return 'plugin';
 			}
 		}
@@ -186,7 +203,9 @@ class Geko_Wp_Options_Field
 	
 	//
 	public function isSkipAddMode() {
+		
 		$sField = $this->getName();
+		
 		return ( 
 			( $this->isAuto() ) || 
 			( $this->isPrimaryKey() ) ||
@@ -203,7 +222,9 @@ class Geko_Wp_Options_Field
 	
 	//
 	public function isSkipEditMode() {
+		
 		$sField = $this->getName();
+		
 		return ( $this->isAuto() );
 	}
 		
@@ -216,7 +237,9 @@ class Geko_Wp_Options_Field
 	
 	//
 	public function isSkipDetailMode() {
+		
 		$sField = $this->getName();
+		
 		return ( $this->isAuto() );
 	}
 	
@@ -235,13 +258,17 @@ class Geko_Wp_Options_Field
 		$aParams = array();
 		
 		$sSmartType = $this->getSmartType();
+		
 		if ( 'Geko_Wp_Enumeration' == $sSmartType ) {
+			
 			$aParams[ 'empty_choice' ] = '- Select -';
 			$aEnum = Geko_Wp_Enumeration_Query::getSet( $sField );
 			$aChoices = array();
+			
 			foreach ( $aEnum as $oEnum ) {
 				$aChoices[ $oEnum->getId() ] = $oEnum->getTitle();
 			}
+			
 			$aParams[ 'choices' ] = $aChoices;
 		}
 		
@@ -269,7 +296,9 @@ class Geko_Wp_Options_Field
 	
 	//
 	public function isAutoInsert() {
+		
 		$sField = $this->getName();
+		
 		return in_array( $sField, array( 'date_created', 'date_modified' ) );
 	}
 	
@@ -287,7 +316,9 @@ class Geko_Wp_Options_Field
 	
 	//
 	public function isAutoUpdate() {
+		
 		$sField = $this->getName();
+		
 		return in_array( $sField, array( 'date_modified' ) );
 	}
 
@@ -295,6 +326,7 @@ class Geko_Wp_Options_Field
 	public function isSkipUpdateField() {
 		
 		$sField = $this->getName();
+		
 		if (
 			( $this->isAutoDb() ) || 
 			( in_array( $sField, array( 'date_created' ) ) )
@@ -331,7 +363,9 @@ class Geko_Wp_Options_Field
 	
 	//
 	public function returnsUpdateValue() {
+		
 		$sField = $this->getName();
+		
 		return in_array( $sField, array( 'date_modified' ) );
 	}
 	
@@ -362,7 +396,7 @@ class Geko_Wp_Options_Field
 			}
 		}
 		
-		throw new Exception( 'Invalid method ' . __CLASS__ . '::' . $sMethod . '() called.' );
+		throw new Exception( sprintf( 'Invalid method %s::%s() called.', __CLASS__, $sMethod ) );
 	}
 	
 	
