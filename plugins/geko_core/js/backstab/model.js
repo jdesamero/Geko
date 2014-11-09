@@ -118,8 +118,13 @@
 					obj.defaults = oDefaults;
 				}
 				
-				obj.extractFields = aExtractFields;
-				obj.fieldFormats = oFormats;
+				if ( !obj.extractFields ) {
+					obj.extractFields = aExtractFields;
+				}
+				
+				if ( !obj.fieldFormats ) {
+					obj.fieldFormats = oFormats;
+				}
 			}
 			
 			

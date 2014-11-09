@@ -270,11 +270,11 @@
 						
 						var sProp = oFormat[ prop ];
 						
-						if ( ( 'int' === sProp ) || ( 'number' === sProp ) ) {
+						if ( -1 !== $.inArray( sProp, [ 'int', 'integer', 'number' ] ) ) {
 							mValue = parseInt( mValue );
 						} else if ( 'float' === sProp ) {
-							mValue = parseFloat( mValue );							
-						} else if ( 'boolean' === sProp ) {
+							mValue = parseFloat( mValue );
+						} else if ( -1 !== $.inArray( sProp, [ 'bool', 'boolean' ] ) ) {
 							mValue = ( mValue ) ? true : false ;
 						}
 						
