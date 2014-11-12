@@ -89,9 +89,9 @@ abstract class Geko_Singleton_Abstract
 	
 	
 	// hooks
-	public function preStart() { }						// ???
-	public function start() { }							// ???
-	public function postStart() { }						// ???
+	public function preStart() { }						// before start
+	public function start() { }							// during start
+	public function postStart() { }						// after start
 	
 	
 	// public function end() { }						// ???
@@ -109,7 +109,7 @@ abstract class Geko_Singleton_Abstract
 	}
 	
 	// hooks
-	public function reStart() { }						// ???
+	public function reStart() { }						// called before init sequence starts all over again
 	
 	
 	

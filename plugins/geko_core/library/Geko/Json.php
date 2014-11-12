@@ -44,30 +44,9 @@ class Geko_Json
 				
 				$mDefValue = $oField->getDefaultValue();
 				
-				if ( $oField->isBool() ) {
-					
-					$mDefValue = intval( $mDefValue ) ? TRUE : FALSE ;
-					$sFormat = 'bool';
-					
-				} elseif ( $oField->isInt() ) {
-					
-					$mDefValue = intval( $mDefValue );
-					$sFormat = 'int';
-					
-				} elseif ( $oField->isFloat() ) {
-					
-					$mDefValue = floatval( $mDefValue );
-					$sFormat = 'float';
-					
-				} else {
-					
-					$mDefValue = strval( $mDefValue );
-					$sFormat = 'string';
-				}
-				
 				$mValue[ $sKey ] = array(
-					'value' => $mDefValue,
-					'format' => $sFormat
+					'value' => $oField->getAssertedValue( $mDefValue ),
+					'format' => $oField->getAssertedType()
 				);
 			}
 			

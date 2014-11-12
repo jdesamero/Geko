@@ -105,6 +105,8 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 	// independent
 	public function compLoadExt( $aArgs ) {
 		
+		$oThis = $this;
+		
 		
 		//// backstab model fields functionality
 		
@@ -123,13 +125,24 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 		} );
 		
 		
-		Geko_Hooks::addAction( 'Geko_Loader_ExternalFiles::renderScriptTags::pre', function( $oLoadExt ) use ( &$aModelFields ) {
+		Geko_Hooks::addAction( 'Geko_Loader_ExternalFiles::renderScriptTags::pre', function( $oLoadExt ) use ( &$aModelFields, $oThis ) {
 			
 			foreach ( $aModelFields as $sKey => $null ) {
 				
-				if ( $oMng = Geko_App::get( sprintf( '%s.mng', $sKey ) ) ) {
+				$sCompKey = sprintf( '%s.mng', $sKey );
+				
+				if ( !$oMng = Geko_App::get( $sCompKey ) ) {
+					
+					// attempt to load component and try again
+					$oThis->loadComponent( $sCompKey, TRUE );
+					
+					$oMng = Geko_App::get( $sCompKey );
+				}
+				
+				if ( $oMng ) {
 					$aModelFields[ $sKey ] = $oMng->getPrimaryTable();
 				}
+				
 			}
 			
 			if ( count( $aModelFields ) > 0 ): ?>

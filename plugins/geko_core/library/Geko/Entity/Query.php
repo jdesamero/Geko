@@ -200,17 +200,24 @@ abstract class Geko_Entity_Query
 		
 		// gather
 		foreach ( $this as $oEntity ) {
+			
 			if ( $bSimple ) {
+				
 				if ( method_exists( $oEntity, $this->_sDefaultField ) ) {
+					
 					$sOut = call_user_func_array(
 						array( $oEntity, $this->_sDefaultField ),
 						$aArgs[ 0 ]
 					);
+					
 				} else {
 					$sOut = '';
 				}
+			
 			} else {
+				
 				$sOut = $sPattern;
+				
 				foreach ( $aSuffixes as $i => $sSuffix ) {
 					
 					$sMethod = sprintf( 'get%s', $sSuffix );
@@ -258,8 +265,10 @@ abstract class Geko_Entity_Query
 		$mPattern = array_shift( $aArgs );
 		
 		if ( is_array( $mPattern ) ) {
+			
 			$sPattern = $mPattern[ 0 ];
 			$sDelim = $mPattern[ 1 ];
+		
 		} elseif (
 			( is_string( $mPattern ) ) && 
 			( FALSE === strpos( $mPattern, '%s' ) ) && 
@@ -335,17 +344,9 @@ abstract class Geko_Entity_Query
 					$mValueFmt = $mValue;
 					
 					if ( $oField = $aFields[ $sKey ] ) {
-						
-						if ( $oField->isBool() ) {
-							$mValueFmt = intval( $mValue ) ? TRUE : FALSE ;						
-						} elseif ( $oField->isInt() ) {
-							$mValueFmt = intval( $mValue );
-						} elseif ( $oField->isFloat() ) {
-							$mValueFmt = floatval( $mValue );					
-						}
-						
+						$mValueFmt = $oField->getAssertedValue( $mValueFmt );
 					}
-
+					
 					$aRow[ $sKey ] = $mValueFmt;
 				}
 				

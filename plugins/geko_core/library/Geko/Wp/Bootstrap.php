@@ -138,6 +138,65 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	// independent
 	public function compLoadExt( $aArgs ) {
 		
+		$oThis = $this;
+		
+		
+		//// backstab model fields functionality
+		
+		$aModelFields = array();
+		
+		// if "data-model" was provided, then track it
+		Geko_Hooks::addFilter( 'Geko_Loader_ExternalFiles::registerFromXmlConfigFile::params', function( $aParams, $sId, $sType, $oItem ) use ( &$aModelFields ) {
+				
+			if ( $sDataModel = strval( $oItem[ 'data-model' ] ) ) {
+				
+				// start with NULL values, we'll populate this later
+				$aModelFields[ $sDataModel ] = NULL;
+			}
+			
+			return $aParams;
+		} );
+		
+		
+		add_action( 'wp_print_scripts', function( $oLoadExt ) use ( &$aModelFields, $oThis ) {
+			
+			foreach ( $aModelFields as $sKey => $null ) {
+				
+				$sCompKey = sprintf( '%s.mng', $sKey );
+				
+				if ( !$oMng = Geko_App::get( $sCompKey ) ) {
+					
+					// attempt to load component and try again
+					$oThis->loadComponent( $sCompKey, TRUE );
+					
+					$oMng = Geko_App::get( $sCompKey );
+				}
+				
+				if ( $oMng ) {
+					$aModelFields[ $sKey ] = $oMng->getPrimaryTable();
+				}
+				
+			}
+			
+			if ( count( $aModelFields ) > 0 ): ?>
+				<script type="text/javascript">
+					( function() {
+					
+						if ( !this.Backstab ) this.Backstab = {};
+						
+						var Backstab = this.Backstab;
+						
+						Backstab.ModelFields = <?php echo Geko_Json::encode( $aModelFields ); ?>;
+						
+					} ).call( this );
+				</script>
+			<?php endif;
+			
+		} );
+		
+		
+		
+		
 		// register external files (js/css)
 		$aPlh = array();
 		

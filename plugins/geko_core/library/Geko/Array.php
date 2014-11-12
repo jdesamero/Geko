@@ -54,7 +54,11 @@ class Geko_Array
 		if ( !is_array( $aSubject ) ) return FALSE;
 		
 		foreach ( $aSubject as $sSubject ) {
-			if ( 0 === strpos( $sValue, $sSubject ) ) {
+			
+			if (
+				( 0 === strpos( $sValue, $sSubject ) ) || 
+				( 0 === strpos( $sSubject, $sValue ) )
+			) {
 				return ( $bRetSubj ) ? $sSubject : TRUE ;
 			}
 		}

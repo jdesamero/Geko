@@ -149,57 +149,12 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 		$this->_aLoadedComponents = $aConfig;
 		
 		// $mArgs, use if needed later
-		$i = 0;
-		
+		$i = 0;				// debug counter
 		
 		foreach ( $aConfig as $sComp => $mArgs ) {
 			
-			$aArgs = Geko_Array::wrap( $mArgs );
-			
-			Geko_Debug::out( sprintf( '%d: %s', $i, $sComp ), sprintf( '%s::order', __METHOD__ ) );
+			$this->loadComponent( $sComp, $mArgs, $i );
 			$i++;
-			
-			$sDebugMsg = '';
-			
-			if ( $fComponent = $this->_aExtComponents[ $sComp ] ) {
-				
-				// call external component first
-				call_user_func( $fComponent, $aArgs );
-				
-				$sDebugMsg = 'Handled by external component';
-				
-			} else {
-				
-				// call internal, method-based component
-				
-				$aComp = $aCompFmt = explode( '.', $sComp );
-				
-				$aCompFmt = array_map( array( 'Geko_Inflector', 'camelize' ), $aCompFmt );
-				$sCompFmt = implode( '_', $aCompFmt );
-				
-				$sMethod = sprintf( 'comp%s', $sCompFmt );
-				
-				// check first if method is defined
-				if ( $bMethodExists = method_exists( $this, $sMethod ) ) {
-					
-					$this->$sMethod( $aArgs );
-					$sDebugMsg = sprintf( 'Method %s() found', $sMethod );
-					
-				} else {
-					
-					// pass through "magic" handler
-					if ( $this->handleComponent( $sComp, $aComp, $aArgs ) ) {
-						$sDebugMsg = sprintf( 'Handled component %s', $sComp );
-					} else {
-						$sDebugMsg = sprintf( 'Unable to handle component %s', $sComp );
-					}
-					
-				}
-				
-			}
-			
-			Geko_Debug::out( sprintf( '%s: %s', $this->_sInstanceClass, $sDebugMsg ), __METHOD__ );
-
 		}
 		
 		$this->doInitPost();
@@ -207,6 +162,55 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 	}
 	
 	
+	//
+	public function loadComponent( $sComp, $mArgs, $i = NULL ) {
+		
+		$aArgs = Geko_Array::wrap( $mArgs );
+		
+		Geko_Debug::out( sprintf( '%d: %s', $i, $sComp ), sprintf( '%s::order', __METHOD__ ) );
+		
+		$sDebugMsg = '';
+		
+		if ( $fComponent = $this->_aExtComponents[ $sComp ] ) {
+			
+			// call external component first
+			call_user_func( $fComponent, $aArgs );
+			
+			$sDebugMsg = 'Handled by external component';
+			
+		} else {
+			
+			// call internal, method-based component
+			
+			$aComp = $aCompFmt = explode( '.', $sComp );
+			
+			$aCompFmt = array_map( array( 'Geko_Inflector', 'camelize' ), $aCompFmt );
+			$sCompFmt = implode( '_', $aCompFmt );
+			
+			$sMethod = sprintf( 'comp%s', $sCompFmt );
+			
+			// check first if method is defined
+			if ( $bMethodExists = method_exists( $this, $sMethod ) ) {
+				
+				$this->$sMethod( $aArgs );
+				$sDebugMsg = sprintf( 'Method %s() found', $sMethod );
+				
+			} else {
+				
+				// pass through "magic" handler
+				if ( $this->handleComponent( $sComp, $aComp, $aArgs ) ) {
+					$sDebugMsg = sprintf( 'Handled component %s', $sComp );
+				} else {
+					$sDebugMsg = sprintf( 'Unable to handle component %s', $sComp );
+				}
+				
+			}
+			
+		}
+		
+		Geko_Debug::out( sprintf( '%s: %s', $this->_sInstanceClass, $sDebugMsg ), __METHOD__ );
+		
+	}
 	
 	
 	
@@ -379,38 +383,41 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 	// logger/debugger
 	// independent
 	public function compLogger( $aArgs ) {
-				
+		
 		if ( $aArgs[ 0 ] ) {
 			
-			$oLogger = new Geko_Log( $aArgs[ 0 ], $aArgs[ 1 ] );
-		
-		} else {
-
-			$aLoggerParams = array();
+			if ( is_int( $aArgs[ 0 ] ) ) {
+				
+				$oLogger = new Geko_Log( $aArgs[ 0 ], $aArgs[ 1 ] );
 			
-			if ( defined( 'GEKO_LOG_DISABLED' ) && GEKO_LOG_DISABLED ) {
-				$iLoggerType = Geko_Log::WRITER_DISABLED;
-			} elseif ( defined( 'GEKO_LOG_FIREBUG' ) && GEKO_LOG_FIREBUG ) {
-				$iLoggerType = Geko_Log::WRITER_FIREBUG;
-			} elseif ( defined( 'GEKO_LOG_STREAM' ) && GEKO_LOG_STREAM ) {
-				$iLoggerType = Geko_Log::WRITER_STREAM;
 			} else {
-				if ( is_file( GEKO_LOG ) ) {
-					$iLoggerType = Geko_Log::WRITER_FILE;
-					$aLoggerParams[ 'file' ] = GEKO_LOG;
-				} else {
+	
+				$aLoggerParams = array();
+				
+				if ( defined( 'GEKO_LOG_DISABLED' ) && GEKO_LOG_DISABLED ) {
+					$iLoggerType = Geko_Log::WRITER_DISABLED;
+				} elseif ( defined( 'GEKO_LOG_FIREBUG' ) && GEKO_LOG_FIREBUG ) {
+					$iLoggerType = Geko_Log::WRITER_FIREBUG;
+				} elseif ( defined( 'GEKO_LOG_STREAM' ) && GEKO_LOG_STREAM ) {
 					$iLoggerType = Geko_Log::WRITER_STREAM;
+				} else {
+					if ( is_file( GEKO_LOG ) ) {
+						$iLoggerType = Geko_Log::WRITER_FILE;
+						$aLoggerParams[ 'file' ] = GEKO_LOG;
+					} else {
+						$iLoggerType = Geko_Log::WRITER_STREAM;
+					}
 				}
+				
+				$oLogger = new Geko_Log( $iLoggerType, $aLoggerParams );
 			}
 			
-			$oLogger = new Geko_Log( $iLoggerType, $aLoggerParams );
+			// for backwards compatibility
+			Zend_Registry::set( 'logger', $oLogger );
+			
+			$this->set( 'logger', $oLogger );
 			
 		}
-		
-		// for backwards compatibility
-		Zend_Registry::set( 'logger', $oLogger );
-		
-		$this->set( 'logger', $oLogger );
 	}
 	
 	
@@ -466,7 +473,10 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 					$oComp = $this->callComponentMethods( $oComp, $aBiArgs );			
 				}
 				
-				$oComp->init();
+				if ( !$oComp->getCalledInit() ) {
+					// call init() on singleton if not already called
+					$oComp->init();
+				}
 				
 				if ( count( $aAiArgs ) > 0 ) {
 					$oComp = $this->callComponentMethods( $oComp, $aAiArgs );			

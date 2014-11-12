@@ -629,9 +629,13 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 				$aFields = $this->getPrimaryTableFields();
 				
 				foreach ( $aFields as $oField ) {
+					
 					$sFieldName = $oField->getFieldName();
 					$sRetKey = sprintf( '%s_%s', $this->_sType, $sFieldName );
-					$aRet[ $sRetKey ] = $oEntity->getEntityPropertyValue( $sFieldName );
+					
+					$mValue = $oEntity->getEntityPropertyValue( $sFieldName );
+					
+					$aRet[ $sRetKey ] = $oField->getAssertedValue( $mValue );
 				}
 				
 				// hook method
@@ -691,8 +695,10 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	
 	//
 	public function getDefaultOptions( $aRet, $oPlugin = NULL ) {
+		
 		$sAction = sprintf( '%s_getdefaultopts', $this->_sActionPrefix );
 		$aRet = apply_filters( $sAction, $aRet, $this );
+		
 		return $aRet;
 	}
 	
@@ -703,6 +709,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	
 	//
 	public function modifyStoredOptions( $aRet, $oEntity ) {
+		
 		if ( $this->_sNestedType ) {
 			
 			// TO DO: add hook
@@ -714,6 +721,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 			
 			$aRet[ $this->_sNestedType ] = $this->getSubEntities( $aParams );
 		}
+		
 		return $aRet;
 	}
 	
@@ -729,12 +737,26 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 			$aSubs = new $sQueryClass( $aParams, FALSE );
 			
 			foreach ( $aSubs as $i => $oSubItem ) {
-				$mSubId = ( $this->_sEntityIdVarName ) ? $oSubItem->getId() : $i;
+				
+				$mSubId = ( $this->_sEntityIdVarName ) ? $oSubItem->getId() : $i ;
 				$aRow = array();
+				
 				foreach ( $aFields as $mField ) {
-					$sFieldName = ( is_object( $mField ) ) ? $mField->getFieldName() : $mField;
-					$aRow[ $sFieldName ] = $oSubItem->getEntityPropertyValue( $sFieldName );
+					
+					// print_r( $mField );
+					// echo '<br /><br />';
+					
+					$sFieldName = ( is_object( $mField ) ) ? $mField->getFieldName() : $mField ;
+					
+					$mValue = $oSubItem->getEntityPropertyValue( $sFieldName );
+					
+					if ( is_object( $mField ) ) {
+						$mValue = $mField->getAssertedValue( $mValue );
+					}
+					
+					$aRow[ $sFieldName ] = $mValue;
 				}
+				
 				$aRow = $this->modifySubEntityValues( $aRow, $oSubItem );
 				$aSubFmt[ $mSubId ] = $aRow;
 			}
@@ -834,7 +856,7 @@ class Geko_Wp_Options_Manage extends Geko_Wp_Options
 	
 	//
 	public function getDetailsMenuHandle() {
-		return $this->_sParentManageClass ? $this->_sParentManageClass : $this->_sInstanceClass;
+		return $this->_sParentManageClass ? $this->_sParentManageClass : $this->_sInstanceClass ;
 	}
 	
 	//

@@ -108,6 +108,7 @@ class Geko_Sql_Table_Field
 		return FALSE;
 	}
 	
+	
 	//
 	public function getDefaultValue() {
 		
@@ -118,6 +119,54 @@ class Geko_Sql_Table_Field
 		return NULL;
 	}
 	
+	
+	// format value according to type
+	public function getAssertedValue( $mValue ) {
+		
+		if ( $this->isBool() ) {
+			
+			$mValue = intval( $mValue ) ? TRUE : FALSE ;
+			
+		} elseif ( $this->isInt() ) {
+			
+			$mValue = intval( $mValue );
+			
+		} elseif ( $this->isFloat() ) {
+			
+			$mValue = floatval( $mValue );
+			
+		} elseif ( $this->isStr() || $this->isText() ) {
+			
+			$mValue = strval( $mValue );
+		}
+		
+		return $mValue;
+	}
+	
+	//
+	public function getAssertedType() {
+		
+		$sType = 'unknown';
+		
+		if ( $this->isBool() ) {
+			
+			$sType = 'bool';
+			
+		} elseif ( $this->isInt() ) {
+			
+			$sType = 'int';
+			
+		} elseif ( $this->isFloat() ) {
+			
+			$sType = 'float';
+			
+		} elseif ( $this->isStr() || $this->isText() ) {
+			
+			$sType = 'string';
+		}
+		
+		return $sType;
+	}
 	
 }
 
