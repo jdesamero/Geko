@@ -104,11 +104,11 @@
 			
 			setData: function( oData ) {
 				
-				if ( !this.data ) {
-					this.data = {};
+				if ( !oFamily.data ) {
+					oFamily.data = {};
 				}
 				
-				_.extend( this.data, oData );
+				_.extend( oFamily.data, oData );
 			}
 			
 		};
@@ -302,7 +302,7 @@
 				family: oFamily,
 				
 				events: {
-					'collection:initialize this; collection:add this': 'appendItem'
+					'collection:{ initialize; add } this': 'appendItem'
 				},
 				
 				createElement: function() {

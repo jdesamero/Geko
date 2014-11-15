@@ -27,6 +27,25 @@
 	};
 	
 	
+	//
+	var getValueFormat = function( mValue ) {
+		
+		var sFormat = $.type( mValue );
+		
+		// try to be more specific is sFormat is "number"
+		if ( 'number' === sFormat ) {
+			if ( isInt( mValue ) ) {
+				sFormat = 'int';
+			} else if ( isFloat( mValue ) ) {
+				sFormat = 'float';
+			}
+		}
+		
+		return sFormat;
+	};
+	
+	
+	
 	// add new methods and properties
 	var oOpts = {
 		
@@ -60,6 +79,26 @@
 		getIntCid: function() {
 			// return a negative value so it doesn't collide with existing ids
 			return - parseInt( this.cid.replace( 'c', '' ) );
+		},
+		
+		isNew: function() {
+			
+			var mId = this.get( 'id' );
+			
+			if ( ( 'number' === $.type( mId ) ) && ( mId < 0 ) ) {
+				return true;
+			}
+			
+			return Backbone.Model.prototype.isNew.apply( this, arguments );
+		},
+		
+		getFieldFormat: function( sKey ) {
+			
+			if ( this.fieldFormats && this.fieldFormats[ sKey ] ) {
+				return this.fieldFormats[ sKey ];
+			}
+			
+			return null;
 		}
 		
 	};
@@ -73,15 +112,16 @@
 			
 			var _this = this;
 			
+			var oFields = obj.fields;
+			
+			var oDefaults = {};
+			var aExtractFields = [];
+			var aUniqueCheckFields = [];
+			var oFormats = {};
+			
 			
 			// reformat
-			if ( obj.fields ) {
-				
-				var oFields = obj.fields;
-				
-				var oDefaults = {};
-				var aExtractFields = [];
-				var oFormats = {};
+			if ( oFields ) {
 				
 				$.each( oFields, function( k, v ) {
 					
@@ -94,19 +134,13 @@
 						aExtractFields.push( k );
 					}
 					
+					if ( v.uniqueCheck ) {
+						aUniqueCheckFields.push( k );
+					}
+					
 					var sFormat = v.format;
 					if ( !sFormat ) {
-						
-						sFormat = $.type( mDefaultValue );
-						
-						// try to be more specific is sFormat is "number"
-						if ( 'number' === sFormat ) {
-							if ( isInt( mDefaultValue ) ) {
-								sFormat = 'int';
-							} else if ( isFloat( mDefaultValue ) ) {
-								sFormat = 'float';
-							}
-						}
+						sFormat = getValueFormat( mDefaultValue );
 					}
 					
 					oFormats[ k ] = sFormat;
@@ -118,13 +152,31 @@
 					obj.defaults = oDefaults;
 				}
 				
-				if ( !obj.extractFields ) {
+				if ( !obj.extractFields && ( aExtractFields.length > 0 ) ) {
 					obj.extractFields = aExtractFields;
 				}
 				
-				if ( !obj.fieldFormats ) {
+				if ( !obj.uniqueCheckFields && ( aUniqueCheckFields.length > 0 ) ) {
+					obj.uniqueCheckFields = aUniqueCheckFields;
+				}
+				
+				if ( !obj.fieldFormats && ( !$.isEmptyObject( oFormats ) ) ) {
 					obj.fieldFormats = oFormats;
 				}
+				
+			} else {
+			
+				// get field formats from default values
+				
+				if ( !obj.fieldFormats && obj.defaults ) {
+					
+					$.each( obj.defaults, function( k, v ) {
+						oFormats[ k ] = getValueFormat( v );
+					} );
+					
+					obj.fieldFormats = oFormats;
+				}
+				
 			}
 			
 			

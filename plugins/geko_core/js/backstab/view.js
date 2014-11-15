@@ -23,16 +23,25 @@
 			
 			var propParams = params[ prop ];
 			
-			if ( propParams.selector ) {
-				sel = propParams.selector;
-			}
+			if ( 'string' === $.type( propParams ) ) {
+				
+				// selector was given
+				sel = propParams;
+				
+			} else {
+				
+				if ( propParams.selector ) {
+					sel = propParams.selector;
+				}
+				
+				if ( propParams.contents ) {
+					fcont = propParams.contents;
+				}
+	
+				if ( propParams.defer ) {
+					defer = propParams.defer;
+				}
 			
-			if ( propParams.contents ) {
-				fcont = propParams.contents;
-			}
-
-			if ( propParams.defer ) {
-				defer = propParams.defer;
 			}
 		}
 		
@@ -49,11 +58,14 @@
 			var sels = [ '.%s'.printf( prop ), '#%s'.printf( prop ) ];
 			
 			$.each( sels, function( i, sel2 ) {
+				
 				target = elem.find( sel2 );
+				
 				if ( target.length > 0 ) {
 					_target = target;
 					return false;
 				}
+				
 			} );
 			
 		}
@@ -200,6 +212,7 @@
 						var funtil = defer.until;
 						
 						if ( funtil ) {
+							
 							var itvl, deferTil = function() {
 								if ( funtil() ) {
 									setTargetValue.call( _this, _target, val, fcont );
@@ -232,6 +245,7 @@
 			var ret = {};
 			var data = {};
 			var oFormat;
+			var bDataIsModel = true;
 			
 			if ( oModel.extractFields ) {
 				
@@ -240,8 +254,13 @@
 				} );
 				
 			} else if ( oModel.toJSON ) {
+				
 				data = oModel.toJSON();
+			
 			} else {
+				
+				// arg given is a regular object, not a real model
+				bDataIsModel = false;
 				data = oModel;
 			}
 			
@@ -251,36 +270,60 @@
 			
 			$.each( data, function( prop, oldval ) {
 				
-				var sTargetProp = prop;
-				if ( _this.elementPrefix ) {
-					sTargetProp = '%s%s'.printf( _this.elementPrefix, prop );
-				}
+				var sIntCidKey = 'intcid:%s'.printf( prop );
+				var sValKey = 'val:%s'.printf( prop );
 				
-				var res = getTarget( eElem, oParams, sTargetProp );
-				var _target = res[ 0 ];
-				var fcont = res[ 1 ];
-				
-				// populate
-				if ( _target ) {
+				if ( oParams[ sIntCidKey ] ) {
 					
-					var mValue = ( fcont ) ? fcont( _target ) : getTargetValue( _target ) ;
+					var oIntCidModel = oParams[ sIntCidKey ];
 					
-					// apply formatting
-					if ( oFormat && oFormat[ prop ] ) {
-						
-						var sProp = oFormat[ prop ];
-						
-						if ( -1 !== $.inArray( sProp, [ 'int', 'integer', 'number' ] ) ) {
-							mValue = parseInt( mValue );
-						} else if ( 'float' === sProp ) {
-							mValue = parseFloat( mValue );
-						} else if ( -1 !== $.inArray( sProp, [ 'bool', 'boolean' ] ) ) {
-							mValue = ( mValue ) ? true : false ;
+					if ( 'object' !== $.type( oIntCidModel ) ) {
+						if ( bDataIsModel ) {
+							oIntCidModel = oModel;
 						}
-						
 					}
 					
-					ret[ prop ] = mValue;
+					if ( oIntCidModel && oIntCidModel.getIntCid ) {
+						ret[ prop ] = oIntCidModel.getIntCid();
+					}
+					
+				} else if ( oParams[ sValKey ] ) {
+					
+					ret[ prop ] = oParams[ sValKey ];
+					
+				} else {
+					
+					var sTargetProp = prop;
+					if ( _this.elementPrefix ) {
+						sTargetProp = '%s%s'.printf( _this.elementPrefix, prop );
+					}
+					
+					var res = getTarget( eElem, oParams, sTargetProp );
+					var _target = res[ 0 ];
+					var fcont = res[ 1 ];
+					
+					// populate
+					if ( _target ) {
+						
+						var mValue = ( fcont ) ? fcont( _target ) : getTargetValue( _target ) ;
+						
+						// apply formatting
+						if ( oFormat && oFormat[ prop ] ) {
+							
+							var sProp = oFormat[ prop ];
+							
+							if ( -1 !== $.inArray( sProp, [ 'int', 'integer', 'number' ] ) ) {
+								mValue = parseInt( mValue );
+							} else if ( 'float' === sProp ) {
+								mValue = parseFloat( mValue );
+							} else if ( -1 !== $.inArray( sProp, [ 'bool', 'boolean' ] ) ) {
+								mValue = ( mValue ) ? true : false ;
+							}
+							
+						}
+						
+						ret[ prop ] = mValue;
+					}
 				}
 				
 			} );
