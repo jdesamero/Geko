@@ -28,7 +28,29 @@ class Geko_App_Layout extends Geko_Layout
 	}
 	
 	
+	//
+	public function getBodyClassCb() {
+		
+		$aBodyClass = array();
+		
+		if ( $oRouter = Geko_App::get( 'router' ) ) {
+			
+			$aPathItems = $oRouter->getPathItems();
+			
+			foreach ( $aPathItems as $i => $sItem ) {
+				$aBodyClass[] = sprintf( 'path_lv%d_%s', $i + 1, $sItem );
+			}
+			
+			$aBodyClass[] = sprintf( 'path_full_%s', implode( '_', $aPathItems ) );
+		}
+		
+		
+		return implode( ' ', $aBodyClass );
+	}
+	
 	
 	
 }
+
+
 

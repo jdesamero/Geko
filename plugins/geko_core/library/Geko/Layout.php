@@ -309,9 +309,9 @@ class Geko_Layout extends Geko_Singleton_Abstract
 		return $sBodyClass;
 	}
 	
-	//
+	// to be implemented by sub-class
 	public function getBodyClassCb() {
-		return 'do-this-later';
+		return '';
 	}
 	
 	
