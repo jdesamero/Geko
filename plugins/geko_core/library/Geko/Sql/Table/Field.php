@@ -41,6 +41,12 @@ class Geko_Sql_Table_Field
 	}
 	
 	
+	//
+	public function hasFlag( $sFlag ) {
+		return in_array( $sFlag, $this->_aParams ) ? TRUE : FALSE ;
+	}
+	
+	
 	
 	//
 	public function isBool() {

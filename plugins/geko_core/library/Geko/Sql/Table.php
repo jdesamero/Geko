@@ -254,15 +254,17 @@ class Geko_Sql_Table
 	//// helpers
 	
 	//
-	public function hasFlag( $mFlag, $aParams ) {
-		return in_array( $mFlag, $aParams );
+	public function hasFlag( $sFlag, $aParams ) {
+		return in_array( $sFlag, $aParams ) ? TRUE : FALSE ;
 	}
 	
 	//
 	public function hasField( $sFieldNameCheck ) {
+		
 		foreach ( $this->_aFields as $sFieldName => $aParams ) {
 			if ( $sFieldNameCheck == $sFieldName ) return TRUE;
 		}
+		
 		return FALSE;
 	}
 	
@@ -275,9 +277,13 @@ class Geko_Sql_Table
 		
 		//
 		if ( 0 === strpos( $sMethod, 'field' ) ) {
+			
 			$sFieldType = strtolower( str_replace( 'field', '', $sMethod ) );
+			
 			if ( in_array( $sFieldType, $this->_aTypes ) ) {
+				
 				array_unshift( $aArgs, $sFieldType );
+				
 				return call_user_func_array( array( $this, 'field' ), $aArgs );
 			}
 		}

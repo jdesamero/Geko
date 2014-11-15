@@ -48,6 +48,10 @@ class Geko_Json
 					'value' => $oField->getAssertedValue( $mDefValue ),
 					'format' => $oField->getAssertedType()
 				);
+				
+				if ( $oField->hasFlag( 'uniquecheck' ) ) {
+					$mValue[ $sKey ][ 'uniqueCheck' ] = TRUE;
+				}
 			}
 			
 		}
