@@ -3,24 +3,31 @@
 	// set up the Geko namespace and descendants
 	
 	var $ = this.jQuery;
-	var Geko = {};
 	
-	Geko.setNamespace = function( sNamespace ) {
+	var Geko = {
 		
-		// spit into parts
+		_setNamespace: function( sNamespace, oInitTarget ) {
+			
+			// spit into parts
+			
+			var aParts = sNamespace.split( '.' );
+			var oTarget = oInitTarget;			// start here
+			
+			$.each( aParts, function( i, v ) {
+				
+				if ( !oTarget[ v ] ) {
+					oTarget[ v ] = {};
+				}
+				
+				oTarget = oTarget[ v ];
+				
+			} );
+			
+		},
 		
-		var aParts = sNamespace.split( '.' );
-		var oTarget = Geko;		// start here
-		
-		$.each( aParts, function( i, v ) {
-			
-			if ( !oTarget[ v ] ) {
-				oTarget[ v ] = {};
-			}
-			
-			oTarget = oTarget[ v ];
-			
-		} );
+		setNamespace: function( sNamespace ) {
+			Geko._setNamespace( sNamespace, Geko );
+		}
 		
 	};
 	
