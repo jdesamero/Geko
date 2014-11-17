@@ -123,9 +123,16 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
     protected function _renderMenu(Zend_Navigation_Container $container,
                                    $ulClass,
                                    $indent,
+                                   $innerIndent,
                                    $minDepth,
                                    $maxDepth,
-                                   $onlyActive)
+                                   $onlyActive,
+                                   $expandSibs,
+                                   $ulId,
+                                   $addPageClassToLi,
+                                   $activeClass,
+                                   $parentClass,
+                                   $renderParentClass)
     {
         $html = '';
 
@@ -143,8 +150,6 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
         if (is_int($maxDepth)) {
             $iterator->setMaxDepth($maxDepth);
         }
-		
-		
 		
 		
 		
@@ -178,6 +183,21 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
             if ($depth < $minDepth || !$this->accept($page)) {
                 // page is below minDepth or not accepted by acl/visibilty
                 continue;
+            } else if ($expandSibs && $depth > $minDepth) {
+                // page is not active itself, but might be in the active branch
+                $accept = false;
+                if ($foundPage) {
+                    if ($foundPage->hasPage($page)) {
+                        // accept if page is a direct child of the active page
+                        $accept = true;
+                    } else if ($page->getParent()->isActive(true)) {
+                        // page is a sibling of the active branch...
+                        $accept = true;
+                    }
+                }
+                if (!$isActive && !$accept) {
+                    continue;
+                }
             } else if ($onlyActive && !$isActive) {
                 // page is not active itself, but might be in the active branch
                 $accept = false;
@@ -200,6 +220,7 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
                     continue;
                 }
             }
+            
             
             
             
@@ -255,39 +276,96 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
             $ulClassRep = str_replace( '##depth##', $depth, $ulClass );
             $liClassRep = str_replace( '##depth##', $depth, $options['liClass'] );
             
+            
+            
             // make sure indentation is correct
-            $depth -= $minDepth;
-            $myIndent = $indent . str_repeat('        ', $depth);
-            
-            
-            $oCurTemplate = $oTemplateStack->get( $depth );
-            
+            $depth   -= $minDepth;
+            $myIndent = $indent . str_repeat($innerIndent, $depth * 2);
+			
+			
+			$oCurTemplate = $oTemplateStack->get( $depth );
+			
+			
             if ($depth > $prevDepth) {
+                $attribs = array();
+
+                // start new ul tag
+                if (0 == $depth) {
+                    $attribs = array(
+                        'class' => $ulClass,
+                        'id'    => $ulId,
+                    );
+                }
+
+                // We don't need a prefix for the menu ID (backup)
+                $skipValue = $this->_skipPrefixForId;
+                $this->skipPrefixForId();
+
+                /* $html .= $myIndent . '<ul'
+                                   . $this->_htmlAttribs($attribs)
+                                   . '>'
+                                   . $this->getEOL(); */
                 
-                // start new container
-                $html .= $oCurTemplate->containerStart( array( 'depth' => $depth, 'page' => $page, 'ulClass' => $ulClassRep, 'isActive' => $isActive ) );
+				// start new container
+				$html .= $oCurTemplate->containerStart( array( 'depth' => $depth, 'page' => $page, 'ulClass' => $ulClassRep, 'isActive' => $isActive ) );
                 
+                
+                // Reset prefix for IDs
+                $this->_skipPrefixForId = $skipValue;
+            
             } else if ($prevDepth > $depth) {
                 
-                // close item/container until we're at current depth
+                // close li/ul tags until we're at current depth
                 for ($i = $prevDepth; $i > $depth; $i--) {
+                    
+                    /* $ind   = $indent . str_repeat($innerIndent, $i * 2);
+                    $html .= $ind . $innerIndent . '</li>' . $this->getEOL();
+                    $html .= $ind . '</ul>' . $this->getEOL(); */
+                    
                     $oTemplate = $oTemplateStack->get( $i );
                     $html .= $oTemplate->itemEnd( array( 'depth' => $i, 'page' => $page ) )
                           .  $oTemplate->containerEnd( array( 'depth' => $i, 'page' => $page ) );
                 }
                 
-                // close previous item
+                // close previous li tag
+                // $html .= $myIndent . $innerIndent . '</li>' . $this->getEOL();
                 $html .= $oCurTemplate->itemEnd( array( 'depth' => $depth, 'page' => $page, 'isActive' => $isActive ) );
                 
             } else {
-                // close previous item
+                
+                // close previous li tag
+                // $html .= $myIndent . $innerIndent . '</li>' . $this->getEOL();
                 $html .= $oCurTemplate->itemEnd( array( 'depth' => $depth, 'page' => $page, 'isActive' => $isActive ) );
+                
             }
 
             // render li tag and page
-            if (  $isActive ) {
-            	$liClassRep .= ' active';
+            $liClasses = array();
+            // Is page active?
+            if ($isActive) {
+                $liClasses[] = $activeClass;
+                $liClassRep .= ' active';
             }
+            // Add CSS class from page to LI?
+            if ($addPageClassToLi) {
+                $liClasses[] = $page->getClass();
+            }
+            // Add CSS class for parents to LI?
+            if ($renderParentClass && $page->hasChildren()) {
+                // Check max depth
+                if ((is_int($maxDepth) && ($depth + 1 < $maxDepth))
+                    || !is_int($maxDepth)
+                ) {
+                    $liClasses[] = $parentClass;
+                }
+            }
+
+            /* $html .= $myIndent . $innerIndent . '<li'
+                   . $this->_htmlAttribs(array('class' => implode(' ', $liClasses)))
+                   . '>' . $this->getEOL()
+                   . $myIndent . str_repeat($innerIndent, 2)
+                   . $this->htmlify($page)
+                   . $this->getEOL(); */
             
             $html .= $oCurTemplate->itemStart( array( 'depth' => $depth, 'page' => $page, 'liClass' => $liClassRep, 'isActive' => $isActive ) ) 
                   .  $oCurTemplate->link( array( 'depth' => $depth, 'page' => $page, 'isActive' => $isActive ) );
@@ -298,14 +376,21 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
 
         if ($html) {
             
-            // done iterating container; close open item/container tags
+            // done iterating container; close open ul/li tags
+            
             for ($i = $prevDepth+1; $i > 0; $i--) {
+                
+                /* $myIndent = $indent . str_repeat($innerIndent . $innerIndent, $i - 1);
+                $html    .= $myIndent . $innerIndent . '</li>' . $this->getEOL()
+                         . $myIndent . '</ul>' . $this->getEOL(); */
+                
                 $oTemplate = $oTemplateStack->get( $i );
                 $html .= $oTemplate->itemEnd( array( 'depth' => $i, 'page' => $page ) )
                       .  $oTemplate->containerEnd( array( 'depth' => $i, 'page' => $page ) );
+                
             }
             
-            $html = rtrim($html, self::EOL);
+            $html = rtrim($html, $this->getEOL());
         }
 
         return $html;
