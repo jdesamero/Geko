@@ -84,30 +84,28 @@ class Geko_Wp_Form_ItemValue_Manage extends Geko_Wp_Options_Manage
 		?>
 		<div class="dialog" id="edit_form_value">
 			<form>
-				<div id="edit_form_item_value_lang" class="geko-wpadmin-tabs">
+				<div id="edit_form_itemval_lang" class="geko-wpadmin-tabs">
 					<ul>
-						<script id="item_value-dialog-tab-tmpl" type="text/x-jquery-tmpl">
-							<li class="ui-tab-template"><a href="" class="ui-tab"><\/a><\/li>
-						</script>
+						<li class="ui-tab-template"><a href="#{href}" class="ui-tab">#{label}</a></li>
 					</ul>
-					<script id="item_value-dialog-content-tmpl" type="text/x-jquery-tmpl">
+					<div class="ui-tabs-panel-template">
 						<div class="ui-tabs-panel-single">
 							<fieldset class="ui-helper-reset">
 								<div>
-									<label for="item_value_label">Label<\/label>
-									<input type="text" name="item_value_label" id="item_value_label" value="" \/>
-								<\/div>
+									<label for="itemval_label">Label</label>
+									<input type="text" name="itemval_label" id="itemval_label" value="" />
+								</div>
 								<div>
-									<label for="item_value_slug">Code<\/label>
-									<input type="text" name="item_value_slug" id="item_value_slug" value="" \/>
-								<\/div>
+									<label for="itemval_slug">Code</label>
+									<input type="text" name="itemval_slug" id="itemval_slug" value="" />
+								</div>
 								<div>
-									<label for="item_value_help">Help Text<\/label>
-									<textarea name="item_value_help" id="item_value_help"><\/textarea>
-								<\/div>
-							<\/fieldset>
-						<\/div>
-					</script>
+									<label for="itemval_help">Help Text</label>
+									<textarea name="itemval_help" id="itemval_help"></textarea>
+								</div>
+							</fieldset>
+						</div>
+					</div>
 				</div>
 			</form>
 		</div>

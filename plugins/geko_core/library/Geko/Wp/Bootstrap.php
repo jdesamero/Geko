@@ -52,6 +52,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 				'defcat' => 'DefaultCategory',
 				'expdate' => 'ExpirationDate',
 				'emsg' => 'EmailMessage',
+				'enum' => 'Enumeration',
 				'lang' => 'Language',
 				'loc' => 'Location',
 				'mng' => 'Manage',

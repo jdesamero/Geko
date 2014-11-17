@@ -94,31 +94,33 @@ class Geko_Wp_Form_Section_Manage extends Geko_Wp_Options_Manage
 			<form>
 				<div id="edit_form_section_lang" class="geko-wpadmin-tabs">
 					<ul>
-						<li class="ui-tab-template"><a href="#{href}" class="ui-tab">#{label}</a></li>
+						<script id="section-dialog-tab-tmpl" type="text/x-jquery-tmpl">
+							<li><a href="" class="ui-tab"><\/a><\/li>
+						</script>
 					</ul>
-					<div class="ui-tabs-panel-template">
+					<script id="section-dialog-content-tmpl" type="text/x-jquery-tmpl">
 						<div class="ui-tabs-panel-single">
 							<fieldset class="ui-helper-reset">
-								<div>
-									<label for="section_title">Title</label>
-									<input type="text" name="section_title" id="section_title" value="" />
-								</div>
-								<div>
-									<label for="section_slug">Code</label>
-									<input type="text" name="section_slug" id="section_slug" value="" />
-								</div>
-								<div>
-									<label for="section_description">Description</label>
-									<textarea name="section_description" id="section_description"></textarea>
-								</div>
-							</fieldset>
-						</div>
-					</div>
+								<div class="default">
+									<label for="section_title">Title<\/label>
+									<input type="text" name="section_title" id="section_title" value="" \/>
+								<\/div>
+								<div class="default">
+									<label for="section_slug">Code<\/label>
+									<input type="text" name="section_slug" id="section_slug" value="" \/>
+								<\/div>
+								<div class="default">
+									<label for="section_description">Description<\/label>
+									<textarea name="section_description" id="section_description"><\/textarea>
+								<\/div>
+							<\/fieldset>
+						<\/div>
+					</script>
 				</div>
 			</form>
-		</div>		
+		</div>
 		<?php
-	}	
+	}
 	
 	//
 	public function formFields( $oEntity, $sSection ) {
@@ -135,48 +137,57 @@ class Geko_Wp_Form_Section_Manage extends Geko_Wp_Options_Manage
 					<div id="form_editor" class="geko-wpadmin-tabs">
 						<ul>
 							<li class="ui-not-sortable add_menu"><a>+</a></li>
-							<li class="ui-tab-template"><a href="#{href}" class="ui-tab">#{label}</a></li>
+							<script id="section-tmpl" type="text/x-jquery-tmpl">
+								<li><a href="" class="ui-tab"><\/a><\/li>
+							</script>
 						</ul>
-						<div class="ui-tabs-panel-template">
-							<div class="ui-tabs-panel-header">
-								<div class="icons">
-									<a href="#" class="geko-form-add-item"><span class="geko-form-icon"></span></a>
-									<span class="spacer"></span>
-									<a href="#" class="geko-form-edit-section" title="Edit Section"><span class="geko-form-icon geko-form-icon-edit"></span></a>
-									<a href="#" class="geko-form-remove-section" title="Remove Section"><span class="geko-form-icon geko-form-icon-remove"></span></a>
-								</div>
-								<br clear="all" />
-								<div class="description"></div>
-							</div>
-							<div class="ui-tabs-panel-body">
-								<ul class="geko-form-items">
-									<li class="geko-form-item">
-										<a href="#" class="geko-form-item-options"><span class="geko-form-icon"></span></a>
-										<a href="#" class="geko-form-remove-item" title="Remove Item"><span class="geko-form-icon geko-form-icon-remove"></span></a>
-										<a href="#" class="geko-form-move-item" title="Move Item to Other Section"><span class="geko-form-icon geko-form-icon-submit"></span></a>
-										<span class="label"></span>
-										<div class="fix"></div>
-										<div class="geko-form-values-main">
-											<ul class="geko-form-values">
-												<li class="geko-form-value">
-													<a href="#" class="geko-form-item-options"><span class="geko-form-icon geko-form-icon-plain_text"></span></a>
-													<span class="label"></span>
-													<div class="icons_container"><div class="icons"><span class="spacer"></span></div></div>
-													<a href="#" class="geko-form-expand-widgets"><span class="geko-form-icon"></span></a>
-													<a href="#" class="geko-form-expand-items"><span class="geko-form-icon"></span></a>
-													<div class="fix"></div>
-													<div class="geko-form-sub-items"></div>
-												</li>
-											</ul>
-											<div class="fix"></div>
-										</div>
-										<a href="#" class="geko-form-expand-choices" title="See Choices for this Question"><span class="geko-form-icon"></span></a>
-									</li>
-								</ul>
-							</div>
-							<div class="ui-tabs-panel-footer">&nbsp;</div>
-							<input type="hidden" class="fmsec_id" name="fmsec_id[]" value="" />
-						</div>
+						<script id="section-content-tmpl" type="text/x-jquery-tmpl">
+							<div id="">
+								<div class="ui-tabs-panel-header">
+									<div class="icons">
+										<a href="#" class="geko-form-add-item"><span class="geko-form-icon"><\/span><\/a>
+										<span class="spacer"><\/span>
+										<a href="#" class="geko-form-edit-section" title="Edit Section"><span class="geko-form-icon geko-form-icon-edit"><\/span><\/a>
+										<a href="#" class="geko-form-remove-section" title="Remove Section"><span class="geko-form-icon geko-form-icon-remove"><\/span><\/a>
+									<\/div>
+									<br clear="all" />
+									<div class="description"><\/div>
+								<\/div>
+								<div class="ui-tabs-panel-body">
+									<ul class="geko-form-items">
+										<li class="geko-form-item">
+											<a href="#" class="geko-form-item-options"><span class="geko-form-icon"><\/span><\/a>
+											<a href="#" class="geko-form-remove-item" title="Remove Item"><span class="geko-form-icon geko-form-icon-remove"><\/span><\/a>
+											<a href="#" class="geko-form-move-item" title="Move Item to Other Section"><span class="geko-form-icon geko-form-icon-submit"><\/span><\/a>
+											<span class="label"><\/span>
+											<div class="fix"><\/div>
+											<div class="geko-form-values-main">
+												<ul class="geko-form-values">
+													<li class="geko-form-value">
+														<a href="#" class="geko-form-item-options"><span class="geko-form-icon geko-form-icon-plain_text"><\/span><\/a>
+														<span class="label"><\/span>
+														<div class="icons_container">
+															<div class="icons">
+																<a href="#" class="geko-form-add-item"><span class="geko-form-icon"><\/span><\/a>
+																<span class="spacer"><\/span>
+															<\/div>
+														<\/div>
+														<a href="#" class="geko-form-expand-widgets"><span class="geko-form-icon"><\/span><\/a>
+														<a href="#" class="geko-form-expand-items"><span class="geko-form-icon"><\/span><\/a>
+														<div class="fix"><\/div>
+														<div class="geko-form-sub-items"><\/div>
+													<\/li>
+												<\/ul>
+												<div class="fix"><\/div>
+											<\/div>
+											<a href="#" class="geko-form-expand-choices" title="See Choices for this Question"><span class="geko-form-icon"><\/span><\/a>
+										<\/li>
+									<\/ul>
+								<\/div>
+								<div class="ui-tabs-panel-footer">&nbsp;<\/div>
+								<input type="hidden" class="fmsec_id" name="fmsec_id[]" value="" />
+							<\/div>
+						</script>
 					</div>
 					<input type="hidden" id="fmsec" name="fmsec" />
 					<input type="hidden" id="fmitm" name="fmitm" />

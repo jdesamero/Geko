@@ -84,6 +84,12 @@ class Geko_Wp_Form_Item_Manage extends Geko_Wp_Options_Manage
 		return $aParams;
 	}
 	
+	//
+	public function modifySubEntityValues( $aRow, $oSubItem ) {
+		$aRow[ 'item_type' ] = $oSubItem->getEntityPropertyValue( 'item_type' );
+		return $aRow;
+	}
+	
 	
 	
 	
@@ -96,32 +102,30 @@ class Geko_Wp_Form_Item_Manage extends Geko_Wp_Options_Manage
 			<form>
 				<div id="edit_form_item_lang" class="geko-wpadmin-tabs">
 					<ul>
-						<script id="item-dialog-tab-tmpl" type="text/x-jquery-tmpl">
-							<li class="ui-tab-template"><a href="" class="ui-tab"></a></li>
-						</script>
+						<li class="ui-tab-template"><a href="#{href}" class="ui-tab">#{label}</a></li>
 					</ul>
-					<script id="item-dialog-content-tmpl" type="text/x-jquery-tmpl">
+					<div class="ui-tabs-panel-template">
 						<div class="ui-tabs-panel-single">
 							<fieldset class="ui-helper-reset">
 								<div>
-									<label for="item_title">Title<\/label>
-									<input type="text" name="item_title" id="item_title" value="" \/>
-								<\/div>
+									<label for="item_title">Title</label>
+									<input type="text" name="item_title" id="item_title" value="" />
+								</div>
 								<div>
-									<label for="item_slug">Code<\/label>
-									<input type="text" name="item_slug" id="item_slug" value="" \/>
-								<\/div>
+									<label for="item_slug">Code</label>
+									<input type="text" name="item_slug" id="item_slug" value="" />
+								</div>
 								<div>
-									<label for="item_help">Help Text<\/label>
-									<textarea name="item_help" id="item_help"><\/textarea>
-								<\/div>
+									<label for="item_help">Help Text</label>
+									<textarea name="item_help" id="item_help"></textarea>
+								</div>
 								<div>
-									<label for="item_css">CSS<\/label>
-									<input type="text" name="item_css" id="item_css" value="" \/>
-								<\/div>
-							<\/fieldset>
-						<\/div>
-					</script>
+									<label for="item_css">CSS</label>
+									<input type="text" name="item_css" id="item_css" value="" />
+								</div>
+							</fieldset>
+						</div>
+					</div>
 				</div>
 			</form>
 		</div>		

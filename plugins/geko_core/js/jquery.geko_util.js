@@ -382,6 +382,54 @@
 	
 	
 	
+	
+	//// value formatting shortcuts
+	
+	$.fn.intVal = function() {
+		
+		var eElem = $( this );
+		var mRes = parseInt( $.trim( eElem.val() ) );
+		
+		if ( ( 'number' === $.type( mRes ) ) && ( !isNaN( mRes ) ) ) {
+			return mRes;
+		}
+		
+		return 0;
+	};
+	
+	$.fn.floatVal = function() {
+		
+		var eElem = $( this );
+		var mRes = parseFloat( $.trim( eElem.val() ) );
+		
+		if ( ( 'number' === $.type( mRes ) ) && ( !isNaN( mRes ) ) ) {
+			return mRes;
+		}
+		
+		return 0;
+	};
+	
+	
+	$.fn.boolVal = function() {
+		
+		var eElem = $( this );
+		var sRes = $.trim( eElem.val() ).toLowerCase();
+		var iRes = parseInt( sRes );
+		
+		// try to be a smarty pants
+		if (
+			( 0 !== iRes ) && 
+			( '' !== sRes ) && 
+			( 'false' !== sRes ) && 
+			( 'no' !== sRes )
+		) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	
 	//// math functions
 	
 	$.gekoRandomInt = function( min, max ) {

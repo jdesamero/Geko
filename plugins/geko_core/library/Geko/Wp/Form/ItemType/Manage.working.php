@@ -144,15 +144,15 @@ class Geko_Wp_Form_ItemType_Manage extends Geko_Wp_Options_Manage
 			<div class="fields">
 				<div class="text">
 					<label for="" class="main"></label>
-					<input type="text" name="" id="" value="" class="text" />
+					<input type="text" name="" id="" value="" class="widget text" />
 				</div>
 				<div class="textarea">
 					<label for="" class="main"></label>
-					<textarea type="text" name="" id=""></textarea>
+					<textarea type="text" name="" id="" class="widget"></textarea>
 				</div>
 				<div class="radio">
 					<label for="" class="main"></label>
-					<div class="multiple">
+					<div class="multiple widget">
 						<div class="row">
 							<input type="radio" name="" id="" value="" class="sub radio" /> 
 							<label for="" class="sub"></label>
@@ -161,11 +161,11 @@ class Geko_Wp_Form_ItemType_Manage extends Geko_Wp_Options_Manage
 				</div>
 				<div class="checkbox">
 					<label for="" class="main"></label>
-					<input type="checkbox" name="" id="" value="" />
+					<input type="checkbox" name="" id="" value="" class="widget" />
 				</div>
 				<div class="checkbox_multi">
 					<label for="" class="main"></label>
-					<div class="multiple">
+					<div class="multiple widget">
 						<div class="row">
 							<input type="checkbox" name="" id="" value="" class="sub checkbox" /> 
 							<label for="" class="sub"></label>
@@ -174,18 +174,18 @@ class Geko_Wp_Form_ItemType_Manage extends Geko_Wp_Options_Manage
 				</div>
 				<div class="select">
 					<label for="" class="main"></label>
-					<select name="" id=""></select>
+					<select name="" id="" class="widget"></select>
 				</div>
 				<div class="select_multi">
 					<label for="" class="main"></label>
-					<select name="" id="" multiple="multiple"></select>
+					<select name="" id="" multiple="multiple" class="widget"></select>
 				</div>
 			</div>
 			<div class="values">
 				<div class="default">
 					<label for="" class="main">Default Value</label>
 					<div id="default_elem">
-						<input type="text" class="label text" />
+						<input type="text" class="label widget text" />
 					</div>
 				</div>
 				<div class="checkbox">

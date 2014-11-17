@@ -90,6 +90,12 @@ class Geko_Wp_Form_MetaData_Manage extends Geko_Wp_Options_Manage
 		return $aParams;
 	}
 	
+	//
+	public function modifySubEntityValues( $aRow, $oSubItem ) {
+		$aRow[ 'item_type' ] = $oSubItem->getEntityPropertyValue( 'item_type' );
+		return $aRow;
+	}
+
 	
 	
 	// HACKish, disable this
@@ -152,32 +158,28 @@ class Geko_Wp_Form_MetaData_Manage extends Geko_Wp_Options_Manage
 					<div class="loading">Loading... <span class="loading"></span></div>
 					<div id="meta_data_editor" class="geko-wpadmin-tabs">
 						<ul>
-							<script id="meta_tabs-tmpl" type="text/x-jquery-tmpl">
-								<li><a href="" class="ui-tab"><\/a><\/li>
-							</script>
+							<li class="ui-tab-template"><a href="#{href}" class="ui-tab">#{label}</a></li>
 						</ul>
-						<script id="meta_tabs-content-tmpl" type="text/x-jquery-tmpl">
-							<div id="">
-								<div class="ui-tabs-panel-header">
-									<div class="icons">
-										<a href="#" class="geko-form-add-item"><span class="geko-form-icon"><\/span><\/a>
-									<\/div>
-									<br clear="all" \/>
-								<\/div>
-								<div class="ui-tabs-panel-body">
-									<ul class="geko-form-items">
-										<li class="geko-form-item">
-											<a href="#" class="geko-form-item-options"><span class="geko-form-icon"><\/span><\/a>
-											<a href="#" class="geko-form-remove-item" title="Remove Meta Data"><span class="geko-form-icon geko-form-icon-remove"><\/span><\/a>
-											<a href="#" class="geko-form-move-item" title="Move Meta Data to Other Language"><span class="geko-form-icon geko-form-icon-submit"><\/span><\/a>
-											<span class="label"><\/span>
-											<div class="fix"><\/div>
-										<\/li>
-									<\/ul>
-								<\/div>
-								<div class="ui-tabs-panel-footer">&nbsp;<\/div>
-							<\/div>
-						</script>
+						<div class="ui-tabs-panel-template">
+							<div class="ui-tabs-panel-header">
+								<div class="icons">
+									<a href="#" class="geko-form-add-item"><span class="geko-form-icon"></span></a>
+								</div>
+								<br clear="all" />
+							</div>
+							<div class="ui-tabs-panel-body">
+								<ul class="geko-form-items">
+									<li class="geko-form-item">
+										<a href="#" class="geko-form-item-options"><span class="geko-form-icon"></span></a>
+										<a href="#" class="geko-form-remove-item" title="Remove Meta Data"><span class="geko-form-icon geko-form-icon-remove"></span></a>
+										<a href="#" class="geko-form-move-item" title="Move Meta Data to Other Language"><span class="geko-form-icon geko-form-icon-submit"></span></a>
+										<span class="label"></span>
+										<div class="fix"></div>
+									</li>
+								</ul>
+							</div>
+							<div class="ui-tabs-panel-footer">&nbsp;</div>
+						</div>
 					</div>
 					<input type="hidden" id="fmmd" name="fmmd" />
 					<input type="hidden" id="fmmv" name="fmmv" />

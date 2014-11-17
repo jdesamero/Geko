@@ -276,6 +276,9 @@
 		
 		
 		<!-- Geek Oracle PHP Extensions class-bound jQuery plugins -->
+		
+		<file id="geko" src="##geko_core_uri##/js/Geko.js" dependencies="jquery" />
+		
 		<file id="geko_navigation_pagemanager" src="##geko_core_uri##/js/Geko/Navigation/PageManager.js" dependencies="geko-jquery-geko_util" />
 		<file id="geko_navigation_pagemanager_custom" src="##geko_core_uri##/js/Geko/Navigation/PageManager/Custom.js" dependencies="geko_navigation_pagemanager" />
 		<file id="geko_navigation_pagemanager_uri" src="##geko_core_uri##/js/Geko/Navigation/PageManager/Uri.js" dependencies="geko_navigation_pagemanager" />
@@ -283,6 +286,8 @@
 		
 		<file id="geko_phpquery_formtransform_plugin_rowtemplate" src="##geko_core_uri##/js/Geko/PhpQuery/FormTransform/Plugin/RowTemplate.js" dependencies="jquery" />
 		<file id="geko_phpunit" src="##geko_core_uri##/js/Geko/PhpUnit.js" dependencies="jquery" />
+		
+		<file id="geko_wp" src="##geko_core_uri##/js/Geko/Wp.js" dependencies="geko" />
 		
 		<file id="geko_wp_booking_schedule_time_manage" src="##geko_core_uri##/js/Geko/Wp/Booking/Schedule/Time/Manage.js" dependencies="jquery" />
 		
@@ -294,20 +299,23 @@
 		<file id="geko_wp_emailmessage_storage_manage" src="##geko_core_uri##/js/Geko/Wp/EmailMessage/Storage/Manage.js" dependencies="jquery" />
 		<file id="geko_wp_emailmessage_transport_manage" src="##geko_core_uri##/js/Geko/Wp/EmailMessage/Transport/Manage.js" dependencies="jquery" />
 		
+		<file id="geko_wp_enumeration_manage" data-model="enum" src="##geko_core_uri##/js/Geko/Wp/Enumeration/Manage.js" dependencies="geko" />
+		
 		<file id="geko_wp_form_manage" src="##geko_core_uri##/js/Geko/Wp/Form/Manage.js"
-			dependencies="
-				geko-jquery-geko_util geko-backstab-family geko-backstab-inspector geko-jquery-fx-blind geko-jquery-ui-sortable geko-jquery-ui-button geko-jquery-ui-tabs geko-jquery-ui-dialog
-				geko_wp_form_itemtype_manage geko_wp_form_itemvalue_manage geko_wp_form_item_manage geko_wp_form_section_manage geko_wp_form_metavalue_manage geko_wp_form_metadata_manage geko_wp_form_itemmetavalue_manage
-			"
+			dependencies="geko geko-jquery-geko_util geko-backstab-family geko-backstab-inspector geko-jquery-fx-blind geko-jquery-ui-sortable geko-jquery-ui-button geko-jquery-ui-tabs geko-jquery-ui-dialog geko_wp_form_section_manage"
 		/>
-		<file id="geko_wp_form_itemtype_manage" data-model="form.item_type" src="##geko_core_uri##/js/Geko/Wp/Form/ItemType/Manage.js" />
-		<file id="geko_wp_form_itemvalue_manage" data-model="form.item_value" src="##geko_core_uri##/js/Geko/Wp/Form/ItemValue/Manage.js" />
-		<file id="geko_wp_form_item_manage" data-model="form.item" src="##geko_core_uri##/js/Geko/Wp/Form/Item/Manage.js" />
-		<file id="geko_wp_form_section_manage" data-model="form.section" src="##geko_core_uri##/js/Geko/Wp/Form/Section/Manage.js" />
-		<file id="geko_wp_form_metavalue_manage" data-model="form.meta_value" src="##geko_core_uri##/js/Geko/Wp/Form/MetaValue/Manage.js" />
-		<file id="geko_wp_form_metadata_manage" data-model="form.meta_data" src="##geko_core_uri##/js/Geko/Wp/Form/MetaData/Manage.js" />
+		<file id="geko_wp_form_item_manage" data-model="form.item" src="##geko_core_uri##/js/Geko/Wp/Form/Item/Manage.js" dependencies="geko_wp_form_metadata_manage geko_wp_form_itemvalue_manage" />
 		<file id="geko_wp_form_itemmetavalue_manage" data-model="form.item_meta_value" src="##geko_core_uri##/js/Geko/Wp/Form/ItemMetaValue/Manage.js" />
+		<file id="geko_wp_form_itemtype_manage" data-model="form.item_type" src="##geko_core_uri##/js/Geko/Wp/Form/ItemType/Manage.js" />
+		<file id="geko_wp_form_itemvalue_manage" data-model="form.item_value" src="##geko_core_uri##/js/Geko/Wp/Form/ItemValue/Manage.js" dependencies="geko_wp_form_metadata_manage" />
+		<file id="geko_wp_form_section_manage" data-model="form.section" src="##geko_core_uri##/js/Geko/Wp/Form/Section/Manage.js" dependencies="geko_wp_form_metadata_manage geko_wp_form_item_manage" />
+		<file id="geko_wp_form_metadata_manage" data-model="form.meta_data" src="##geko_core_uri##/js/Geko/Wp/Form/MetaData/Manage.js" 
+			dependencies="geko_wp_enumeration_manage geko_wp_language_manage geko_wp_form_itemtype_manage geko_wp_form_metavalue_manage geko_wp_form_itemmetavalue_manage"
+		/>
+		<file id="geko_wp_form_metavalue_manage" data-model="form.meta_value" src="##geko_core_uri##/js/Geko/Wp/Form/MetaValue/Manage.js" />
 		<file id="geko_wp_form_render" src="##geko_core_uri##/js/Geko/Wp/Form/Render.js" dependencies="geko-jquery-geko_util geko-jquery-ui-tabs geko-jquery-geko_ajax_form geko-jquery-ui-tooltip" />
+		
+		<file id="geko_wp_language_manage" data-model="lang" src="##geko_core_uri##/js/Geko/Wp/Language/Manage.js" dependencies="geko" />
 		
 		<file id="geko_wp_location" src="##geko_core_uri##/js/Geko/Wp/Location.js" dependencies="geko-jquery-geko_util" />
 		

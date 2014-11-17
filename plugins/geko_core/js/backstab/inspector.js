@@ -52,7 +52,8 @@
 	Backstab.Inspector = Backstab.View.extend( {
 		
 		events: {
-			'localDispatcher:displayResults this': 'displayResults'
+			'localDispatcher:displayResults this': 'displayResults',
+			'click a.toggle': 'togglePanel'
 		},
 		
 		localDispatcher: oLocalDispatcher,
@@ -61,9 +62,15 @@
 			
 			return $(
 				'<form>' + 
-					'<div class="controls"><\/div>' + 
-					'<hr \/>' + 
-					'<div class="result"><\/div>' + 
+					'<p><strong>Backstab Inspector<\/strong> &nbsp; <a href="#" class="toggle">Hide<\/a><\/p>' + 
+					'<div class="wrap">' + 
+						'<div class="controls"><\/div>' + 
+						'<div class="options">' +
+							'<input type="checkbox" class="include_type" /> <label>Include Type<\/label>' +
+						'<\/div>' + 
+						'<hr \/>' + 
+						'<div class="result"><\/div>' + 
+					'<\/div>' + 
 				'<\/form>'
 			);
 		},
@@ -108,6 +115,41 @@
 		
 		displayResults: function( e, oCollection ) {
 			
+			// replace old results
+			this.$( '> div.wrap > div.result' ).html( this.createResultsTable( oCollection ) );
+			
+		},
+		
+		togglePanel: function() {
+			
+			var eWrap = this.$( '> div.wrap' );
+			var eToggle = this.$( 'a.toggle' );
+			
+			if ( eWrap.is( ':hidden' ) ) {
+				
+				eWrap.show();
+				eToggle.html( 'Hide' );
+				
+			} else {
+				
+				eWrap.hide();
+				eToggle.html( 'Show' );
+			}
+			
+			
+			return false;
+		},
+		
+		// helpers
+		
+		createResultsTable: function( oCollection ) {
+			
+			if ( !oCollection.length ) {
+				return null;
+			}
+			
+			var _this = this;
+			
 			// create a blank results table
 			var eTable = $(
 				'<table class="current wp-list-table widefat">' + 
@@ -119,27 +161,34 @@
 			var bTitle = true;
 			var bAlternate = true;
 			var aKeys = [];
-			
+			var bIncludeType = this.$( '.include_type' ).is( ':checked' ) ? true : false ;
+						
 			oCollection.each( function( oModel ) {
+				
+				// these are row titles
 				
 				if ( bTitle ) {
 	
 					var eTitleTr = $( '<tr></tr>' );
-	
+					
 					$.each( oModel.toJSON(), function( k, v ) {
-						
-						var eTh = $( '<th></th>' );
-						eTh.html( k );
-						
-						eTitleTr.append( eTh );
-						
-						aKeys.push( k );
+						_this.createColumnTitle( k, eTitleTr, aKeys );
 					} );
 					
-					eTable.find( 'thead' ).append( eTitleTr );
+					if ( oCollection.assertColumns ) {
+						
+						$.each( oCollection.assertColumns, function( i, v ) {
+							_this.createColumnTitle( v, eTitleTr, aKeys );
+						} );
+					}
+					
+					eTable.find( '> thead' ).append( eTitleTr );
 					
 					bTitle = false;
 				}
+				
+				
+				// these are the rows
 				
 				var eTr = $( '<tr></tr>' );
 				
@@ -153,19 +202,46 @@
 				$.each( aKeys, function( i, v ) {
 					
 					var eTd = $( '<td></td>' );
-					eTd.html( oModel.get( v ) );
+					
+					var mModelVal = oModel.get( v );
+					var sColVal = mModelVal;
+					var sType = $.type( mModelVal );
+					
+					if ( 'object' === sType ) {
+						
+						eTd.append( _this.createResultsTable( mModelVal ) );
+						
+					} else {
+					
+						if ( bIncludeType ) {
+							sColVal += ' &nbsp; [%s]'.printf( sType );
+						}
+						
+						eTd.html( sColVal );
+					}
 					
 					eTr.append( eTd );
 				} );
 				
-				eTable.find( 'tbody' ).append( eTr );
+				eTable.find( '> tbody' ).append( eTr );
 				
 			} );
 			
-			// replace old results
-			this.$( '> div.result' ).html( eTable );
+			return eTable;
+		},
+		
+		
+		createColumnTitle: function( sKey, eTr, aKeys ) {
+			
+			var eTh = $( '<th></th>' );
+			eTh.html( sKey );
+						
+			eTr.append( eTh );
+			
+			aKeys.push( sKey );
 			
 		}
+		
 		
 	} );
 	

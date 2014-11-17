@@ -112,7 +112,9 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 					var oParams = <?php echo Zend_Json::encode( $aJsonParams ); ?>;
 					
 					$.get( oParams.script.ajax, function( data ) {
-						$.gekoWpFormManage( data );					
+						
+						Geko.Wp.Form.Manage.run( data );					
+					
 					}, 'json' );
 					
 				} );
@@ -137,10 +139,15 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 		
 		if ( $_GET[ 'ajax' ] ) {
 			
+			//// auxiliary data
+			
 			$aLangs = new Geko_Wp_Language_Query( array(
 				'showposts' => -1,
 				'posts_per_page' => -1
 			), FALSE );
+
+			$aContext = Geko_Wp_Enumeration_Query::getSet( 'geko-form-context' );
+			
 			
 			$sUnsupportedBrowser = '';
 			
@@ -151,11 +158,19 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 				$sUnsupportedBrowser = 'Google Chrome';			
 			}*/
 			
-			$aValues = $this->fixValues( $this->getStoredOptions() );
+			
+			//// set-up payload
+			
+			$aValues = $this->getStoredOptions();
+			
+			$aValues[ 'langs' ] = $aLangs->getRawEntities( TRUE );
+			$aValues[ 'contexts' ] = $aContext->getRawEntities( TRUE );
+			
+			
+			$aValues = $this->fixValues( $aValues );
 			
 			$aParams = array(
 				'values' => $aValues,
-				'langs' => $aLangs->getRawEntities(),
 				'unsupported_browser' => $sUnsupportedBrowser
 			);
 			
@@ -224,17 +239,34 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 			unset( $aValues[ 'fmitmmv' ][ $iIdx ] );
 		}
 		
+		
 		////// FIX #2
+
+		// reset indexing to maintain sorting sequence
 		
 		$aSubs = array( 'fmitmtyp', 'fmsec', 'fmitm', 'fmitmval', 'fmmd', 'fmmv', 'fmitmmv' );
 		
-		// reset indexing to maintain sorting sequence
 		foreach ( $aValues as $sKey => $mValue ) {
 			if ( in_array( $sKey, $aSubs ) ) {
 				$aValues[ $sKey ] = array_values( $mValue );
 			}
 		}
+		
 				
+		////// FIX #3
+		
+		
+		// enforce data formatting
+		
+		foreach ( $aValues[ 'contexts' ] as $i => $aVal ) {
+			
+			$aVal[ 'value' ] = intval( $aVal[ 'value' ] );
+			
+			$aValues[ 'contexts' ][ $i ] = $aVal;
+		}
+		
+		
+		
 		return $aValues;
 	}
 	
