@@ -1,15 +1,13 @@
-;( function ( $ ) {
+( function() {
 	
 	var Geko = this.Geko;
 	var $ = this.jQuery;
-	
-	Geko.setNamespace( 'Wp.Form.MetaValue.Manage' );
 	
 	
 	
 	// meta data value
 	
-	Geko.Wp.Form.MetaValue.Manage = Backstab.family( {
+	Geko.setNamespace( 'Wp.Form.MetaValue.Manage', Backstab.family( {
 		
 		name: 'meta_value',
 		
@@ -22,8 +20,8 @@
 			}
 		}
 		
-	} );
+	} ) );
 	
 	
 	
-} )( jQuery );
+} ).call( this );

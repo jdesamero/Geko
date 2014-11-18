@@ -1,15 +1,13 @@
-;( function ( $ ) {
+( function() {
 	
 	var Geko = this.Geko;
 	var $ = this.jQuery;
-	
-	Geko.setNamespace( 'Wp.Form.Item.Manage' );
 	
 	
 	
 	//// main family
 	
-	Geko.Wp.Form.Item.Manage = Backstab.family( {
+	Geko.setNamespace( 'Wp.Form.Item.Manage', Backstab.family( {
 		
 		name: 'item',
 		
@@ -409,7 +407,7 @@
 			
 		}
 	
-	} );
+	} ) );
 	
 	var _family = Geko.Wp.Form.Item.Manage;
 	
@@ -417,7 +415,7 @@
 	
 	// move item to another section, dialog box view
 	
-	Geko.Wp.Form.Item.Manage.MoveDialog = Backstab.View.extend( {
+	Geko.setNamespace( 'Wp.Form.Item.Manage.MoveDialog', Backstab.View.extend( {
 		
 		events: {
 			'data.itemDispatcher:openMoveItem this': 'openMoveItem',
@@ -513,7 +511,7 @@
 			eDialog.dialog( 'close' );
 		}
 		
-	} );
+	} ) );
 	
 	
-} )( jQuery );
+} ).call( this );

@@ -3,7 +3,6 @@
 	var Geko = this.Geko;
 	var $ = this.jQuery;
 	
-	Geko.setNamespace( 'Wp.Form.Manage' );
 	
 	
 	//// apply convenience methods collection instances
@@ -125,7 +124,7 @@
 	
 	//// implement Geko.Wp.Form.Manage.run()
 	
-	$.extend( Geko.Wp.Form.Manage, {
+	Geko.setNamespace( 'Wp.Form.Manage', {
 		
 		iAnimDelay: 300,
 		iDialogWidth: 500,

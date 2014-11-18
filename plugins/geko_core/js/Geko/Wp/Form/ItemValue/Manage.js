@@ -1,15 +1,13 @@
-;( function ( $ ) {
+( function() {
 	
 	var Geko = this.Geko;
 	var $ = this.jQuery;
-	
-	Geko.setNamespace( 'Wp.Form.ItemValue.Manage' );
 	
 	
 	
 	//// main family
 	
-	Geko.Wp.Form.ItemValue.Manage = Backstab.family( {
+	Geko.setNamespace( 'Wp.Form.ItemValue.Manage', Backstab.family( {
 		
 		name: 'item_value',
 		
@@ -396,8 +394,8 @@
 			
 		}
 		
-	} );
+	} ) );
 	
 	
 	
-} )( jQuery );
+} ).call( this );

@@ -3,12 +3,10 @@
 	var Geko = this.Geko;
 	var $ = this.jQuery;
 	
-	Geko.setNamespace( 'Wp.Language.Manage' );
 	
 	
 	//
-	
-	Geko.Wp.Language.Manage = Backstab.family( {
+	Geko.setNamespace( 'Wp.Language.Manage', Backstab.family( {
 		
 		name: 'language',
 		
@@ -34,7 +32,7 @@
 			
 		}
 		
-	} );
+	} ) );
 	
 	
 	

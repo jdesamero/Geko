@@ -1,15 +1,13 @@
-;( function ( $ ) {
+( function() {
 	
 	var Geko = this.Geko;
 	var $ = this.jQuery;
-	
-	Geko.setNamespace( 'Wp.Form.ItemType.Manage' );
 	
 	
 	
 	//// item type
 	
-	Geko.Wp.Form.ItemType.Manage = Backstab.family( {
+	Geko.setNamespace( 'Wp.Form.ItemType.Manage', Backstab.family( {
 		
 		name: 'item_type',
 		
@@ -74,7 +72,7 @@
 			
 		}
 		
-	} );
+	} ) );
 	
 	var _family = Geko.Wp.Form.ItemType.Manage;
 	
@@ -141,7 +139,7 @@
 	
 	//// widget factory, a pseudo-view that generates widgets
 	
-	Geko.Wp.Form.ItemType.Manage.WidgetFactory = Backstab.View.extend( {
+	Geko.setNamespace( 'Wp.Form.ItemType.Manage.WidgetFactory', Backstab.View.extend( {
 		
 		make: function( oModel, oContextDispatcher, sMetaKey ) {
 			
@@ -168,13 +166,13 @@
 			} );
 		}
 		
-	} );
+	} ) );
 	
 	
 	
 	//// widget controls view (add new items/meta-data)
 	
-	Geko.Wp.Form.ItemType.Manage.AddWidgetControl = Backstab.View.extend( {
+	Geko.setNamespace( 'Wp.Form.ItemType.Manage.AddWidgetControl', Backstab.View.extend( {
 		
 		events: {
 			'click :first': 'openAddDialog'
@@ -200,8 +198,8 @@
 			return false;
 		}
 		
-	} );
+	} ) );
 	
 	
 	
-} )( jQuery );
+} ).call( this );

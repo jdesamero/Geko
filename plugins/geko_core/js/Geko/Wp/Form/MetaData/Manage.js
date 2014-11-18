@@ -1,15 +1,13 @@
-;( function ( $ ) {
+( function() {
 	
 	var Geko = this.Geko;
 	var $ = this.jQuery;
-	
-	Geko.setNamespace( 'Wp.Form.MetaData.Manage' );
 	
 	
 	
 	//// main family
 	
-	Geko.Wp.Form.MetaData.Manage = Backstab.family( {
+	Geko.setNamespace( 'Wp.Form.MetaData.Manage', Backstab.family( {
 		
 		name: 'meta_data',
 		
@@ -304,7 +302,7 @@
 			
 		}
 		
-	} );
+	} ) );
 	
 	var _family = Geko.Wp.Form.MetaData.Manage;
 	
@@ -312,7 +310,7 @@
 	
 	//// move meta-data between languages dialog
 	
-	Geko.Wp.Form.MetaData.Manage.MoveDialog = Backstab.View.extend( {
+	Geko.setNamespace( 'Wp.Form.MetaData.Manage.MoveDialog', Backstab.View.extend( {
 		
 		events: {
 			'data.metaDataDispatcher:openMoveMetaData this': 'openMoveMetaData',
@@ -418,13 +416,13 @@
 			eDialog.dialog( 'close' );
 		}
 		
-	} );
+	} ) );
 	
 	
 	
 	// family applied to meta-data language tabs
 	
-	Geko.Wp.Form.MetaData.Manage.Tabs = Backstab.family( {
+	Geko.setNamespace( 'Wp.Form.MetaData.Manage.Tabs', Backstab.family( {
 		
 		name: 'meta_tabs',
 		
@@ -573,13 +571,13 @@
 		}
 		
 		
-	} );
+	} ) );
 	
 	
 	// this handles the meta data fields shown on the various tabs
 	// (section, item, and choice)
 	
-	Geko.Wp.Form.MetaData.Manage.LangField = Backstab.family( {
+	Geko.setNamespace( 'Wp.Form.MetaData.Manage.LangField', Backstab.family( {
 		
 		itemView: {
 			
@@ -719,8 +717,8 @@
 			
 		}
 		
-	} );
+	} ) );
 	
 	
 	
-} )( jQuery );
+} ).call( this );

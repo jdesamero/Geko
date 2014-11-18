@@ -1,16 +1,13 @@
-;( function ( $ ) {
+( function() {
 	
 	var Geko = this.Geko;
 	var $ = this.jQuery;
-	
-	Geko.setNamespace( 'Wp.Form.Section.Manage' );
-	
 	
 	
 	
 	// section
 	
-	Geko.Wp.Form.Section.Manage = Backstab.family( {
+	Geko.setNamespace( 'Wp.Form.Section.Manage', Backstab.family( {
 		
 		name: 'section',
 		
@@ -381,7 +378,7 @@
 			
 		}
 		
-	} );
+	} ) );
 	
 	var _family = Geko.Wp.Form.Section.Manage;
 	
@@ -389,7 +386,7 @@
 	
 	// section controls
 	
-	Geko.Wp.Form.Section.Manage.Controls = Backstab.View.extend( {
+	Geko.setNamespace( 'Wp.Form.Section.Manage.Controls', Backstab.View.extend( {
 
 		events: {
 			'click a.geko-form-edit-section': 'openDialog',
@@ -439,9 +436,9 @@
 			return false;
 		}
 		
-	} );
+	} ) );
 			
 	
 	
 	
-} )( jQuery );
+} ).call( this );
