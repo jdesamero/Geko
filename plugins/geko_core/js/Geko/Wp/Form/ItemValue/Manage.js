@@ -267,18 +267,11 @@
 							eContent.find( '.ui-helper-reset' ).html( '' );
 						}
 						
+						
 						var sTabId = 'choice_%s'.printf( oLang.get( 'code' ) );
 						
+						Geko.Wp.Form.Manage.addTab( eTabs, eTab, eContent, sTabId, oLang.get( 'title' ) );
 						
-						// update nav
-						var eA = eTab.find( 'a' );
-						eA.attr( 'href', '#%s'.printf( sTabId ) );
-						eA.html( oLang.get( 'title' ) );
-						
-						eContent.attr( 'id', sTabId );
-						
-						eTabs.find( '.ui-tabs-nav' ).append( eTab );
-						eTabs.append( eContent );
 						
 						
 						// handle the meta-data fields via a view
@@ -373,6 +366,11 @@
 					
 					this.current.collection.add( oModel );
 					
+					
+					// add meta-data values
+					this.localDispatcher.trigger( 'addMetaData', oModel );
+					
+					
 					eDialog.dialog( 'close' );
 				},
 				
@@ -381,6 +379,11 @@
 					var eDialog = this.$el;
 					
 					this.setModelValues( this.current.model );
+					
+					
+					// edit meta-data values
+					this.localDispatcher.trigger( 'editMetaData' );
+					
 					
 					eDialog.dialog( 'close' );
 				},
@@ -396,6 +399,230 @@
 		
 	} ) );
 	
+	var _family = Geko.Wp.Form.ItemValue.Manage;
+	
+	
+	
+	
+	////
+	
+	Geko.setNamespace( 'Wp.Form.ItemValue.Manage.OptionValue', Backstab.family( {
+		
+		name: 'option_value',
+		
+		unescapeTemplateSrc: true,
+		enableLocalDispatcher: true,
+		useElementPrefix: true,
+		
+		model: {
+			
+			extend: {
+				
+				defaults: {
+					'label': '',
+					'slug': '',
+					'is_default': false,
+					'orig_id': 0,
+					'orig_idx': 0
+				}
+				
+			}
+			
+		},
+		
+		itemView: {
+			
+			extend: {
+				
+				events: {
+					'click a.geko-form-remove-item': 'deleteValue'
+				},
+				
+				createElement: function() {
+					
+					var oListView = this.data.listView;
+					
+					return oListView.getTmpl( {}, null, '.row-tmpl' );
+				},
+				
+				deleteValue: function() {
+					
+					if ( confirm( 'Are you sure you want to delete this value?' ) ) {
+						this.model.destroy();
+					}
+					
+					return false;
+				}
+				
+			}
+			
+		},
+		
+		listView: {
+			
+			params: {
+				
+				appendTarget: 'tbody'
+				
+			}
+			
+		},
+		
+		
+		formView: {
+			
+			params: {
+				
+				postInit: function() {
+					
+					var _this = this;
+					
+					var oCollection = new this.family.Collection();
+					
+					// load existing values, if any
+					var oItem = this.data.item;
+					if ( oItem ) {
+						
+						var oItemValuesParted = _family.data.itemValuesParted;
+						
+						// get item values for item
+						var oItemValues = oItemValuesParted.getPart( oItem.get( 'fmitm_id' ) );
+						
+						oItemValues.each( function( oItemValue ) {
+							
+							var oData = oItemValue.toJSON();
+							
+							var oModel = new _this.family.Model( {
+								'label': oData[ 'label' ],
+								'slug': oData[ 'slug' ],
+								'is_default': oData[ 'is_default' ],
+								'orig_id': oData[ 'fmitm_id' ],
+								'orig_idx': oData[ 'fmitmval_idx' ]
+							} );
+							
+							oCollection.add( oModel );
+							
+						} );
+						
+					}
+					
+					var eTable = this.$( 'table' );
+					
+					var oListView = new this.family.ListView( {
+						collection: oCollection,
+						el: eTable
+					} );
+					
+					this.current = { collection: oCollection };
+					
+				}
+				
+			},
+			
+			extend: {
+			
+				events: {
+					'click button.add': 'addValue',
+					'click button.remove_default': 'removeDefault',
+					'current.collection:lengthChanged this': 'toggleTable',
+					'cleanUp this': 'cleanUp'
+				},
+				
+				addValue: function() {
+					
+					var oModel = new this.family.Model();
+					
+					this.current.collection.add( oModel );
+					
+					return false;
+				},
+				
+				removeDefault: function() {
+					
+					this.$( 'input.option_value_is_default' ).removeAttr( 'checked' );
+					
+					return false;
+				},
+				
+				toggleTable: function( e, oCollection, iCurLen, iPrevLen ) {
+					
+					var eTable = this.$( 'table' );
+					
+					if ( iCurLen > 0 ) {
+						eTable.show();
+					} else {
+						eTable.hide();
+					}
+					
+				},
+				
+				cleanUp: function() {
+					
+					var oCollection = this.current.collection;
+					if ( oCollection ) oCollection.destroyEach();
+					
+				}
+				
+			}
+			
+		}
+		
+		
+	} ) );
+	
+	
+	
+	////
+	
+	Geko.setNamespace( 'Wp.Form.ItemValue.Manage.OptionsPanel', Backstab.View.extend( {
+		
+		localDispatcher: new Backstab.Dispatcher(),
+		
+		events: {
+			'localDispatcher:loadPanel this': 'loadPanel'
+		},
+		
+		loadPanel: function( e, oItemType, oItem ) {
+			
+			if ( this.model === oItemType ) {
+				
+				if ( !this.current ) this.current = {};
+				
+				if ( this.current.valueManager ) {
+					this.current.valueManager.trigger( 'cleanUp' );
+				}
+							
+				if ( oItemType.get( 'has_multiple_values' ) ) {
+					
+					this.$el.html( '' );
+					
+					// TEMPORARY!!!! CHANGE THIS LATER!!!!!
+					var eValueTemplates = $( '#dialog_value_templates' );			
+					
+					if ( oItemType.get( 'has_multiple_response' ) ) {
+						this.$el.html( eValueTemplates.find( '> div.has_multiple_responses' ).html() );
+					} else {
+						this.$el.html( eValueTemplates.find( '> div.has_multiple_values' ).html() );
+					}
+					
+					var oValueManager = new Geko.Wp.Form.ItemValue.Manage.OptionValue.FormView( {
+						el: this.$( 'div.wrap' ),
+						data: {
+							item: oItem
+						}
+					} );
+					
+					oValueManager.current.collection.lengthChanged();
+					
+					this.current.valueManager = oValueManager;
+					
+				}
+				
+			}
+			
+		}
+		
+	} ) );
 	
 	
 } ).call( this );

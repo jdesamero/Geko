@@ -111,6 +111,62 @@ class Geko_Wp_Form_ItemValue_Manage extends Geko_Wp_Options_Manage
 				</div>
 			</form>
 		</div>
+		<div id="dialog_value_templates">
+			<div class="has_multiple_values">
+				<label for="" class="main">Values</label>
+				<div class="wrap">
+					<table>
+						<thead>
+							<tr>
+								<th>&nbsp;</th>
+								<th>Title</th>
+								<th>Code</th>
+								<th>Default</th>
+							</tr>
+						</thead>
+						<tbody>
+							<script class="row-tmpl" type="text/x-jquery-tmpl">
+								<tr>
+									<td><a href="#" class="geko-form-remove-item" title="Remove Option"><span class="geko-form-icon geko-form-icon-remove"><\/span><\/a><\/td>
+									<td><input type="text" class="option_value_label" \/><\/td>
+									<td><input type="text" class="option_value_slug" \/><\/td>
+									<td><input type="radio" class="option_value_is_default" name="is_default" value="1" \/><\/td>
+								<\/tr>
+							</script>
+						</tbody>
+					</table>
+					<button class="add">Add</button>
+					&nbsp;&nbsp;&nbsp;
+					<button class="remove_default">Remove Default</button>
+				</div>
+			</div>
+			<div class="has_multiple_responses">
+				<label for="" class="main">Values</label>
+				<div class="wrap">
+					<table>
+						<thead>
+							<tr>
+								<th>&nbsp;</th>
+								<th>Title</th>
+								<th>Code</th>
+								<th>Default</th>
+							</tr>
+						</thead>
+						<tbody>
+							<script class="row-tmpl" type="text/x-jquery-tmpl">
+								<tr class="multi">
+									<td><a href="#" class="geko-form-remove-item" title="Remove Option"><span class="geko-form-icon geko-form-icon-remove"><\/span><\/a><\/td>
+									<td><input type="text" class="option_value_label" \/><\/td>
+									<td><input type="text" class="option_value_slug" \/><\/td>
+									<td><input type="checkbox" class="option_value_is_default" value="1" \/><\/td>
+								<\/tr>
+							</script>
+						</tbody>
+					</table>
+					<button class="add">Add</button>
+				</div>
+			</div>
+		</div>
 		<?php
 	}
 	

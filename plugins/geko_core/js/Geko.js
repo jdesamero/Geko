@@ -8,17 +8,6 @@
 	if ( !Geko ) Geko = {};
 	
 	
-	// helpers
-	
-	var fAssignProps = function( mTarget, oProps ) {
-		
-		$.each( oProps, function( k, v ) {
-			mTarget[ k ] = v;
-		} );
-		
-	};
-	
-	
 	
 	// main
 	
@@ -49,45 +38,14 @@
 			
 			if ( mValue ) {
 				
-				var sTargetType = $.type( mTarget );
-				var sValueType = $.type( mValue );
+				// assign target's props to value function, if any
+				$.each( mTarget, function( k, v ) {
+					mValue[ k ] = v;
+				} );
 				
-				if ( 'object' === sTargetType ) {
-					
-					if ( 'object' === sValueType ) {
-						
-						// do a merge
-						$.extend( mTarget, mValue );
-						
-					} else if ( 'function' === sValueType ) {
-						
-						// assign target's props to value function, if any
-						fAssignProps( mValue, mTarget );
-						
-						// do a switcheroo
-						mPrevTarget[ sLastKey ] = mValue;
-						
-					}
-					
-				} else if ( 'function' === sTargetType ) {
+				// do a switcheroo
+				mPrevTarget[ sLastKey ] = mValue;
 				
-					if ( 'object' === sValueType ) {
-						
-						// assign value props to target function
-						fAssignProps( mTarget, mValue );
-						
-					} else if ( 'function' === sValueType ) {
-						
-						// assign target's props to value function, if any
-						fAssignProps( mValue, mTarget );
-						
-						// overwrite the existing function
-						mPrevTarget[ sLastKey ] = mValue;
-						
-					}
-				
-				}
-			
 			}
 			
 		},

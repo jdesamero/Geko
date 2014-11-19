@@ -318,7 +318,8 @@ body.toplevel_page_Geko_Wp_Form_Manage .dialog {
 }
 
 
-#dialog_field_templates {
+#dialog_field_templates,
+#dialog_value_templates {
 	display: none;
 }
 

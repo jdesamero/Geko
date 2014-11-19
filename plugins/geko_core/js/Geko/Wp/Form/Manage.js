@@ -7,7 +7,7 @@
 	
 	//// apply convenience methods collection instances
 	
-	var fSetConveniencMethods = function( oSharedData, oContexts, oItemsParted, oMetaDataParted, oMetaDataLangParted ) {
+	var fSetConveniencMethods = function( oSharedData, oContexts, oItemsParted, oItemValuesParted, oMetaDataParted, oMetaDataLangParted ) {
 		
 		
 		//// context enumeration
@@ -68,6 +68,31 @@
 			}
 			
 		} );
+		
+		
+		
+		//// item values, parted by item id
+		
+		$.extend( oItemValuesParted, {
+			
+			setPart: function( iItemId ) {
+				
+				oMainCollection = oSharedData.itemValues;
+				
+				return oMainCollection.createPart( 'item_value', this, {
+					'fmitm_id': iItemId						
+				} );
+			},
+			
+			getPart: function( iItemId ) {
+				
+				return this.findAndGet( 'item_value', {
+					'fmitm_id': iItemId
+				} );
+			}
+			
+		} );
+
 		
 		
 		//// meta-data, parted by language
@@ -144,6 +169,23 @@
 		},
 		
 		
+		addTab: function( eTabs, eTab, eContent, sTabId, sTitle ) {
+			
+			// update nav
+			var eA = eTab.find( 'a' );
+			eA.attr( 'href', '#%s'.printf( sTabId ) );
+			
+			if ( sTitle ) {
+				eA.html( sTitle );
+			}
+			
+			eContent.attr( 'id', sTabId );
+			
+			eTabs.find( '.ui-tabs-nav' ).append( eTab );
+			eTabs.append( eContent );
+		},
+		
+		
 		run: function( oParams ) {
 			
 			
@@ -205,10 +247,10 @@
 			
 			// track "parted" collections
 			var oItemsParted = new Backstab.Collection();
+			var oItemValuesParted = new Backstab.Collection();
 			var oMetaDataParted = new Backstab.Collection();
 			var oMetaDataLangParted = new Backstab.Collection();
 			
-						
 			
 			
 			// item types
@@ -220,10 +262,10 @@
 			
 			
 			
-			
 			//// set-up shared data as a hash
 			
 			var oSharedData = {
+				
 				contexts: oContexts,
 				itemTypes: oItemTypes,
 				languages: oLanguages,
@@ -232,15 +274,19 @@
 				sections: oSections,
 				metaData: oMetaData,
 				itemMetaVals: oItemMetaVals,
+				
 				itemsParted: oItemsParted,
+				itemValuesParted: oItemValuesParted,
 				metaDataParted: oMetaDataParted,
 				metaDataLangParted: oMetaDataLangParted,
+				
 				widgetFactory: oWidgetFactory
+				
 			};
 			
 			// set convenience methods
 			
-			fSetConveniencMethods( oSharedData, oContexts, oItemsParted, oMetaDataParted, oMetaDataLangParted );
+			fSetConveniencMethods( oSharedData, oContexts, oItemsParted, oItemValuesParted, oMetaDataParted, oMetaDataLangParted );
 
 			
 			// primitives
@@ -257,6 +303,11 @@
 			
 			
 			//// views
+			
+			
+			// run postInit on widget factory
+			
+			oWidgetFactory.trigger( 'postInit' );
 			
 			
 			// meta data

@@ -34,15 +34,19 @@
 		return setupRes;
 	};
 	
-	var getTmplElem = function( vals, tmplName, bEsc ) {
-
+	var getTmplElem = function( vals, tmplName, bEsc, eTmpl ) {
+		
 		if ( !vals ) vals = {};
 		
+		if ( !eTmpl ) {
+			eTmpl = $( '#%s-tmpl'.printf( tmplName ) );
+		}
+		
 		if ( bEsc ) {
-			var sSrc = $.trim( $( '#%s-tmpl'.printf( tmplName ) ).html().replace( /\\\//g, '\/' ) );
+			var sSrc = $.trim( eTmpl.html().replace( /\\\//g, '\/' ) );
 			return $.tmpl( sSrc, vals );
 		} else {
-			return $( '#%s-tmpl'.printf( tmplName ) ).tmpl( vals );
+			return eTmpl.tmpl( vals );
 		}
 		
 	};
@@ -229,9 +233,17 @@
 					return {};
 				},
 				
-				getTmpl: function( vals, name ) {
+				getTmpl: function( vals, name, sSelector ) {
+					
 					if ( !name ) name = opts.name;
-					return getTmplElem( vals, name, opts.unescapeTemplateSrc );
+					
+					var eElem;
+					
+					if ( sSelector ) {
+						eElem = this.$( sSelector );
+					}
+					
+					return getTmplElem( vals, name, opts.unescapeTemplateSrc, eElem );
 				},
 				
 				updateItem: function( e, model ) {
@@ -332,9 +344,17 @@
 					return {};
 				},
 				
-				getTmpl: function( vals, name ) {
+				getTmpl: function( vals, name, sSelector ) {
+					
 					if ( !name ) name = opts.namePlural;
-					return getTmplElem( vals, name, opts.unescapeTemplateSrc );
+					
+					var eElem;
+					
+					if ( sSelector ) {
+						eElem = this.$( sSelector );
+					}
+					
+					return getTmplElem( vals, name, opts.unescapeTemplateSrc, eElem );
 				},
 				
 				appendItem: function( e, model, collection, options ) {
@@ -393,9 +413,17 @@
 				
 				family: oFamily,
 				
-				getTmpl: function( vals, name ) {
+				getTmpl: function( vals, name, sSelector ) {
+					
 					if ( !name ) name = '%s_form'.printf( opts.name );
-					return getTmplElem( vals, name, opts.unescapeTemplateSrc );
+					
+					var eElem;
+					
+					if ( sSelector ) {
+						eElem = this.$( sSelector );
+					}
+					
+					return getTmplElem( vals, name, opts.unescapeTemplateSrc, eElem );
 				},
 				
 				initialize: function( options2 ) {

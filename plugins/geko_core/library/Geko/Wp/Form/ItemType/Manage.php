@@ -182,64 +182,22 @@ class Geko_Wp_Form_ItemType_Manage extends Geko_Wp_Options_Manage
 				</div>
 			</div>
 			<div class="values">
-				<div class="default">
+				<div class="text">
 					<label for="" class="main">Default Value</label>
-					<div id="default_elem">
-						<input type="text" class="label text" />
-					</div>
+					<input type="text" class="label text" />
 				</div>
+				<div class="textarea">
+					<label for="" class="main">Default Value</label>
+					<textarea type="text" name="" id=""></textarea>
+				</div>
+				<div class="radio"></div>
 				<div class="checkbox">
 					<label for="" class="main">Checked</label>
-					<div id="default_elem">
-						<input type="checkbox" value="1" class="is_default" name="is_default" />
-					</div>
+					<input type="checkbox" value="1" class="is_default" name="is_default" />
 				</div>
-				<div class="has_multiple_values">
-					<label for="" class="main">Values</label>
-					<table>
-						<thead>
-							<tr>
-								<th>&nbsp;</th>
-								<th>Title</th>
-								<th>Code</th>
-								<th>Default</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr class="multi">
-								<td><a href="#" class="geko-form-remove-item" title="Remove Option"><span class="geko-form-icon geko-form-icon-remove"></span></a></td>
-								<td><input type="text" class="label" /></td>
-								<td><input type="text" class="slug" /></td>
-								<td><input type="radio" class="is_default" name="is_default" value="1" /></td>
-							</tr>
-						</tbody>
-					</table>
-					<button class="add">Add</button>
-					&nbsp;&nbsp;&nbsp;
-					<button class="remove_default">Remove Default</button>
-				</div>
-				<div class="has_multiple_responses">
-					<label for="" class="main">Values</label>
-					<table>
-						<thead>
-							<tr>
-								<th>&nbsp;</th>
-								<th>Title</th>
-								<th>Code</th>
-								<th>Default</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr class="multi">
-								<td><a href="#" class="geko-form-remove-item" title="Remove Option"><span class="geko-form-icon geko-form-icon-remove"></span></a></td>
-								<td><input type="text" class="label" /></td>
-								<td><input type="text" class="slug" /></td>
-								<td><input type="checkbox" class="is_default" value="1" /></td>
-							</tr>
-						</tbody>
-					</table>
-					<button class="add">Add</button>
-				</div>
+				<div class="checkbox_multi"></div>
+				<div class="select"></div>
+				<div class="select_multi"></div>
 			</div>
 			<div class="validation">
 				<div class="all">

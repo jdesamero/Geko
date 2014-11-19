@@ -237,17 +237,10 @@
 							eContent.find( '.ui-helper-reset' ).html( '' );
 						}
 						
+						
 						var sTabId = 'section_%s'.printf( oLang.get( 'code' ) );
 						
-						// update nav
-						var eA = eTab.find( 'a' );
-						eA.attr( 'href', '#%s'.printf( sTabId ) );
-						eA.html( oLang.get( 'title' ) );
-						
-						eContent.attr( 'id', sTabId );
-						
-						eTabs.find( '.ui-tabs-nav' ).append( eTab );
-						eTabs.append( eContent );
+						Geko.Wp.Form.Manage.addTab( eTabs, eTab, eContent, sTabId, oLang.get( 'title' ) );
 						
 						
 						// handle the meta-data fields via a view

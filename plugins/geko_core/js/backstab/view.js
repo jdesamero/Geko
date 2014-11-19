@@ -574,14 +574,7 @@
 							var funcWrap = func;
 							
 							func = function() {
-								
-								var ag = $.makeArray( arguments );
-								var firstAg = ag[ 0 ];
-								
-								if ( 'array' !== $.type( firstAg ) ) {
-									firstAg = [];
-								}
-								
+																
 								// http://api.jquery.com/category/events/event-object/
 								// target: The DOM element (backbone object) that initiated the event.
 								// relatedTarget: The other DOM element (backbone object) involved in the event, if any
@@ -595,12 +588,25 @@
 								var sType = '', sNamespace = null;
 								var iColonPos = evt.indexOf( ':' );
 								
+								var ag = $.makeArray( arguments );
+								var firstAg = null;
+								
 								if ( -1 !== iColonPos ) {
+									
 									sNamespace = $.trim( evt.substring( 0, iColonPos ) );
 									sType = $.trim( evt.substring( iColonPos + 1 ) );
+									
+									firstAg = ag[ 0 ];
+									if ( 'array' !== $.type( firstAg ) ) {
+										firstAg = [];
+									}
+
 								} else {
-									sType = evt;
+									
+									sType = evt;	
+									firstAg = ag;
 								}
+								
 								
 								var oBackboneEvent = {
 									type: sType,

@@ -141,13 +141,43 @@
 	
 	Geko.setNamespace( 'Wp.Form.ItemType.Manage.WidgetFactory', Backstab.View.extend( {
 		
+		events: {
+			'postInit this': 'postInit'
+		},
+		
+		postInit: function() {
+			
+			var _this = this;
+			
+			// add views to more "complex" item types
+			
+			var oItemTypes = _family.data.itemTypes;
+			
+			oItemTypes.each( function( oItemType ) {
+				
+				var sItemType = oItemType.get( 'slug' );
+				
+				var sTypeSelector = '> div.values > div.%s'.printf( sItemType );
+				
+				var oOptionsPanelView = new Geko.Wp.Form.ItemValue.Manage.OptionsPanel( {
+					el: _this.$( sTypeSelector ),
+					model: oItemType
+				} );
+				
+				// assign so we can access later
+				oWidgets[ sItemType ].valueHandler = oOptionsPanelView;
+				
+			} );
+			
+		},
+		
 		make: function( oModel, oContextDispatcher, sMetaKey ) {
 			
 			// oModel is a meta-data item
 			
 			var sItemType = oModel.getItemTypeSlug();
 			
-			var sTypeSelector = '> .fields > div.%s'.printf( sItemType );
+			var sTypeSelector = '> div.fields > div.%s'.printf( sItemType );
 			var eWidget = this.$( sTypeSelector ).clone();
 			eWidget.removeClass( sItemType );
 			
@@ -197,6 +227,56 @@
 			
 			return false;
 		}
+		
+	} ) );
+	
+	
+	
+	//// view to manage item options
+	
+	Geko.setNamespace( 'Wp.Form.ItemType.Manage.ItemOptionsPanel', Backstab.View.extend( {
+		
+		localDispatcher: new Backstab.Dispatcher(),
+		
+		events: {
+			'localDispatcher:loadPanel this': 'loadPanel',
+			'localDispatcher:commitValues this': 'commitValues'
+		},
+		
+		loadPanel: function( e, oItemType, oItem ) {
+			
+			var sItemType = oItemType.get( 'slug' );
+			
+			var eValues = _family.data.widgetFactory.$( '> div.values' );
+			var ePanel = this.$( 'div.value_options' );
+			
+			// take what's in the panel, if any, and put into values
+			var eCurVal = ePanel.find( '> *' );
+			if ( eCurVal.length ) {
+				eValues.append( eCurVal );
+			}
+			
+			var sTypeSelector = '> div.%s'.printf( sItemType );
+			
+			eCurVal = eValues.find( sTypeSelector );
+			ePanel.append( eCurVal );
+			
+			// trigger loadPanel on value handler, if it exists
+			var oValueHandler = oWidgets[ sItemType ].valueHandler;
+			oValueHandler.localDispatcher.trigger( 'loadPanel', oItemType, oItem );
+			
+		},
+		
+		commitValues: function( e, oItem ) {
+			
+			var sItemType = oItem.getItemTypeSlug();
+			
+			// trigger loadPanel on value handler, if it exists
+			var oValueHandler = oWidgets[ sItemType ].valueHandler;
+			oValueHandler.localDispatcher.trigger( 'commitValues', oItem );
+			
+		}
+		
 		
 	} ) );
 	

@@ -41,6 +41,10 @@
 					return this.getItemType().get( 'name' );
 				},
 				
+				getItemTypeHasMultipleValues: function() {
+					return this.getItemType().get( 'has_multiple_values' );
+				},
+				
 				
 				// item meta values
 				
@@ -81,7 +85,7 @@
 					var eLi = this.$el;
 					
 					
-					var oItemValues = this.family.data.itemValues;
+					var oItemValuesParted = this.family.data.itemValuesParted;
 					
 					
 					//// item values
@@ -94,9 +98,7 @@
 					
 					if ( oItemType.get( 'has_multiple_values' ) ) {
 						
-						var oItemValues = new Geko.Wp.Form.ItemValue.Manage.Collection( oItemValues.where( {
-							'fmitm_id': oModel.get( 'fmitm_id' )
-						} ) );
+						var oItemValues = oItemValuesParted.setPart( oModel.get( 'fmitm_id' ) );
 						
 						var oItemValueListView = new Geko.Wp.Form.ItemValue.Manage.ListView( {
 							collection: oItemValues,
@@ -246,18 +248,11 @@
 							eContent.find( '.ui-helper-reset' ).html( '' );
 						}
 						
+						
 						var sTabId = 'question_%s'.printf( oLang.get( 'code' ) );
 						
+						Geko.Wp.Form.Manage.addTab( eTabs, eTab, eContent, sTabId, oLang.get( 'title' ) );
 						
-						// update nav
-						var eA = eTab.find( 'a' );
-						eA.attr( 'href', '#%s'.printf( sTabId ) );
-						eA.html( oLang.get( 'title' ) );
-						
-						eContent.attr( 'id', sTabId );
-						
-						eTabs.find( '.ui-tabs-nav' ).append( eTab );
-						eTabs.append( eContent );
 						
 						
 						// handle the meta-data fields via a view
@@ -269,8 +264,30 @@
 							}
 						} );
 						
-						
 					} );
+					
+					
+					// create an "choice" options type, only available for certain types
+					
+					var eChoiceTab = _this.getTmpl( null, 'item-dialog-tab' );
+					var eChoiceContent = _this.getTmpl( null, 'item-dialog-content' );
+					
+					eChoiceContent.find( '.ui-helper-reset' ).html( '<div class="value_options"><\/div>' );
+					
+					Geko.Wp.Form.Manage.addTab( eTabs, eChoiceTab, eChoiceContent, 'item_choices' );
+					
+					// handle the (value) choice tab via a view
+					
+					var oChoiceTabView = new Geko.Wp.Form.Item.Manage.OptionsTab( {
+						el: eChoiceTab,
+						data: {
+							itemDispatcher: this.localDispatcher,			// item dispatcher
+							choiceContent: eChoiceContent
+						}
+					} );
+					
+					
+					
 					
 					setTimeout( function() {
 						eTabs.tabs( 'refresh' );
@@ -321,9 +338,16 @@
 					// reset
 					this.extractModelValues( new Geko.Wp.Form.Item.Manage.Model() );
 					
+					
+					// item values tab
+					this.localDispatcher.trigger( 'openAddItemOptions', oItemType );
+					
+					
 					// update dialog meta-data values
 					this.localDispatcher.trigger( 'openAddMetaData' );
 					
+					
+					this.$tabs.tabs( { active: 0 } );
 					
 					eDialog.dialog( 'open' );
 				},
@@ -344,9 +368,15 @@
 					
 					this.extractModelValues( oModel );
 					
+
+					// item values tab
+					this.localDispatcher.trigger( 'openEditItemOptions', oModel );
+					
 					// update dialog meta-data values
 					this.localDispatcher.trigger( 'openEditMetaData', oModel );
 					
+					
+					this.$tabs.tabs( { active: 0 } );
 					
 					eDialog.dialog( 'open' );
 				},
@@ -366,6 +396,7 @@
 					var oModel = new Geko.Wp.Form.Item.Manage.Model();
 					
 					var oModelParams = {
+						'intcid:fmitm_id': true,
 						'val:fmitmtyp_id': oItemType.get( 'fmitmtyp_id' ),
 						'val:fmsec_id': oSection.get( 'fmsec_id' )
 					};
@@ -386,14 +417,30 @@
 					oItems.add( oModel );
 					
 					
+					// commit item values
+					this.localDispatcher.trigger( 'commitItemOptions', oModel );
+					
+					// add meta-data values
+					this.localDispatcher.trigger( 'addMetaData', oModel );
+					
+					
 					eDialog.dialog( 'close' );
 				},
 				
 				saveItem: function() {
 					
 					var eDialog = this.$el;
+					var oModel = this.current.model;
 					
-					this.setModelValues( this.current.model, null, null, new Geko.Wp.Form.Item.Manage.Model() );
+					this.setModelValues( oModel, null, null, new Geko.Wp.Form.Item.Manage.Model() );
+					
+					
+					// commit item values
+					this.localDispatcher.trigger( 'commitItemOptions', oModel );
+					
+					// edit meta-data values
+					this.localDispatcher.trigger( 'editMetaData' );
+					
 					
 					eDialog.dialog( 'close' );
 				},
@@ -512,6 +559,59 @@
 		}
 		
 	} ) );
+	
+	
+	
+	//// item options tab view
+	
+	Geko.setNamespace( 'Wp.Form.Item.Manage.OptionsTab', Backstab.View.extend( {
+		
+		events: {
+			'data.itemDispatcher:openAddItemOptions this': 'openAddItemOptions',
+			'data.itemDispatcher:openEditItemOptions this': 'openEditItemOptions',
+			'data.itemDispatcher:commitItemOptions this': 'commitItemOptions'
+		},
+		
+		initialize: function() {
+			
+			var oOptionsPanelView = new Geko.Wp.Form.ItemType.Manage.ItemOptionsPanel( {
+				el: this.data.choiceContent
+			} );
+			
+			this.data.optionsPanelDispatcher = oOptionsPanelView.localDispatcher;
+			
+		},
+		
+		openAddItemOptions: function( e, oItemType ) {
+			
+			this.updateTab( oItemType );
+			
+		},
+		
+		openEditItemOptions: function( e, oItem ) {
+			
+			this.updateTab( oItem.getItemType(), oItem );
+			
+		},
+		
+		updateTab: function( oItemType, oItem ) {
+			
+			var sTitle = '%s Options'.printf( oItemType.get( 'name' ) );
+			this.$( 'a' ).html( sTitle );
+			
+			this.data.optionsPanelDispatcher.trigger( 'loadPanel', oItemType, oItem );
+		},
+		
+		commitItemOptions: function( e, oItem ) {
+			
+			this.data.optionsPanelDispatcher.trigger( 'commitValues', oItem );
+			
+		}
+		
+		
+	} ) );
+	
+	
 	
 	
 } ).call( this );

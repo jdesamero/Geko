@@ -128,6 +128,22 @@
 			
 			
 			return oReturnModel;
+		},
+		
+		
+		// explicitly destroy each model
+		destroyEach: function() {
+			
+			var aEach = [];
+			
+			// destroying model here has weird effects
+			this.each( function( oModel ) {
+				aEach.push( oModel );
+			} );
+			
+			$.each( aEach, function( i, v ) {
+				v.destroy();
+			} );
 		}
 		
 	};
