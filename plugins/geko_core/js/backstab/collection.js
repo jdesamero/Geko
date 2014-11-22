@@ -38,11 +38,64 @@
 			}
 		},
 		
-		transfer: function( oModel, oDestCollection ) {
+		transfer: function() {
 			
-			if ( this.contains( oModel ) ) {
-				this.remove( oModel );
-				oDestCollection.add( oModel );
+			var _this = this;
+			
+			var iArgLen = arguments.length;
+			
+			if ( 1 === iArgLen ) {
+				
+				// transfer "all" the models to another collection
+				
+				var oDestCollection = arguments[ 0 ];
+				
+				var aModels = [];
+				
+				this.each( function( oModel ) {
+					aModels.push( oModel );
+				} );
+				
+				$.each( aModels, function( i, v ) {
+					_this.transfer( v, oDestCollection );
+				} );
+				
+			} else {
+				
+				var oDestCollection = arguments[ 1 ];
+				
+				
+				// transfer something (?) to another collection
+				var mArg1 = arguments[ 0 ];
+				var oModel, oParams;
+				
+				if ( 'number' === $.type( mArg1 ) ) {
+					
+					oModel = this.at( mArg1 );
+				
+				} else {
+					
+					// assume mArg1 is an object
+					if ( mArg1._events && mArg1.cid && mArg1.collection && mArg1.attributes ) {
+						oModel = mArg1;				// a model
+					} else {
+						oParams = mArg1;			// where params
+					}
+				}
+				
+				if ( oModel && this.contains( oModel ) ) {
+					this.remove( oModel );
+					oDestCollection.add( oModel );
+				} else if ( oParams ) {
+					
+					var aModels = this.where( oParams );
+					
+					$.each( aModels, function( i, v ) {
+						_this.transfer( v, oDestCollection );
+					} );
+					
+				}
+			
 			}
 			
 			return this;
