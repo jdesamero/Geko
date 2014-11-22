@@ -7,7 +7,7 @@ class Geko_Wp_Layout extends Geko_Layout
 	protected $_aUnprefixedActions = array(
 		'get_header', 'wp_head', 'get_sidebar', 'wp_footer', 'get_footer'
 	);
-	protected $_aUnprefixedFilters = array( 'body_class', 'post_class' );
+	protected $_aUnprefixedFilters = array();
 	
 	protected $_sRenderer = 'Geko_Wp_Layout_Renderer';
 	protected $_aPrefixes = array( 'Gloc_', 'Geko_Wp_', 'Geko_' );

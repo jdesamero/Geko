@@ -482,8 +482,9 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	//
 	public function templateInclude( $sTemplate ) {
 		
-		
-		$sCurTmpSuffix = Geko_Inflector::camelize( pathinfo( $sTemplate, PATHINFO_FILENAME ) );
+		// HACK HACK HACK, change dashes to underscore
+		$sCurTmpSuffix = pathinfo( $sTemplate, PATHINFO_FILENAME );
+		$sCurTmpSuffix = Geko_Inflector::camelize( str_replace( '-', '_', $sCurTmpSuffix ) );
 		
 		
 		//
