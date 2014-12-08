@@ -15,6 +15,8 @@
 	var Backstab = this.Backstab;
 	
 	
+	//// helpers
+
 	var isInt = function( n ) {
 		return n % 1 === 0;
 	};
@@ -46,11 +48,25 @@
 	
 	
 	
-	// add new methods and properties
-	var oOpts = {
+	//// main
+	
+	Backstab.setNamespace( 'Model', Backbone.Model.extend( {
 		
-		beforeInit: function() {
-			_.mergeValues( 'data', this, arguments[ 1 ] );
+		constructor: function() {
+			
+			this.sharedSetup();					// from Backstab.Shared
+			
+			
+			// modify instance properties
+			Backstab.Model.modifyProps( this );
+			
+			
+			// merge "data" values provided in the constructor
+			Backstab.Util.mergeValues( 'data', this, arguments[ 1 ] );
+			
+			
+			// call original constructor
+			Backbone.Model.apply( this, arguments );
 		},
 		
 		getDataValues: function() {
@@ -101,13 +117,19 @@
 			return null;
 		}
 		
-	};
+		
+	} ) );
 	
 	
-	// static properties
+	// mix-in Backstab.Shared
+	$.extend( Backstab.Model.prototype, Backstab.Shared );
+	
+	
+	
+	//// class methods
+	
 	var oStaticProps = {
 		
-		//
 		modifyProps: function( obj ) {
 			
 			var _this = this;
@@ -179,16 +201,11 @@
 				
 			}
 			
-			
-			return obj;
 		}
 		
 	};
 	
-	
-	//
-	Backstab.createConstructor( 'Model', oOpts, oStaticProps, Backbone.Model );
-	
+	$.extend( Backstab.Model, oStaticProps );
 	
 	
 } ).call( this );

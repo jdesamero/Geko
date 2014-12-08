@@ -78,97 +78,94 @@
 	
 	
 	
-	//// actual widget views
+	//// widget, a ui control such as text field, select, textarea, etc.
 	
-	var oWidgets = {};
-	var GwfItv = Geko.Wp.Form.ItemType.Manage.ItemView;
-	
-	// <input type="text" />
-	oWidgets[ 'text' ] = GwfItv.extend( {
+	Geko.setNamespace( 'Wp.Form.ItemType.Manage.Widget', Backstab.Hash.extend( {
 		
-		widgetSelector: '> input'
+		initialize: function( oOptions ) {
+			
+			// oOptions = this.params;
+			
+			var oItemType = oOptions.itemType;
+			var oParams = oOptions.params;
+			var ePanelWidget = oOptions.panelWidget;
+			
+			//// view constructor
+			
+			var oVcParams = {};
+			
+			if ( oParams && oParams.widgetSelector ) oVcParams.widgetSelector = oParams.widgetSelector;
+			
+			var fViewConstructor = Geko.Wp.Form.ItemType.Manage.ItemView.extend( oVcParams );
+			
+			
+			//// panel view
+			
+			var oOptionsPanelView = new Geko.Wp.Form.ItemValue.Manage.OptionsPanel( {
+				el: ePanelWidget,
+				model: oItemType
+			} );
+			
+			
+			// assign to the factory hash
+			this.viewConstructor = fViewConstructor;
+			this.valueHandler = oOptionsPanelView;
+			
+		}
 		
-	} );
+	} ) );
 	
-	// <textarea></textarea>
-	oWidgets[ 'textarea' ] = GwfItv.extend( {
+	
+	//// widget factory, a singleton responsible for handling widgets (i.e.: form controls)
+	
+	
+	// TEMPORARY!!! Fix this later...
+	var oWidgetParams = {
+		'text': { widgetSelector: '> input' },
+		'textarea': { widgetSelector: '> textarea' },
+		'checkbox': { widgetSelector: '> input' },
+		'select': { widgetSelector: '> select' },
+		'select_multi': { widgetSelector: '> select' }
+	};
+	
+	
+	//
+	Geko.setNamespace( 'Wp.Form.ItemType.Manage.WidgetFactory', Backstab.Hash.extend( {
 		
-		widgetSelector: '> textarea'
+		member: Geko.Wp.Form.ItemType.Manage.Widget,
 		
-	} );
-	
-	// <input type="radio" /> ...
-	oWidgets[ 'radio' ] = GwfItv.extend( {
-	
-	} );
-	
-	// <input type="checkbox" />
-	oWidgets[ 'checkbox' ] = GwfItv.extend( {
-	
-	} );
-	
-	// <input type="checkbox" /> ...
-	oWidgets[ 'checkbox_multi' ] = GwfItv.extend( {
-	
-	} );
-	
-	// <select></select>
-	oWidgets[ 'select' ] = GwfItv.extend( {
-		
-		widgetSelector: '> select'
-		
-	} );
-	
-	// <select multiple="multiple"></select>
-	oWidgets[ 'select_multi' ] = GwfItv.extend( {
-		
-		widgetSelector: '> select'
-		
-	} );
-	
-	// default widget
-	oWidgets[ 'default' ] = oWidgets[ 'text' ];
-	
-	
-	// namespace for widget views
-	Geko.Wp.Form.ItemType.Manage.Widgets = oWidgets;
-	
-	
-	
-	
-	
-	//// widget factory, a pseudo-view that generates widgets
-	
-	Geko.setNamespace( 'Wp.Form.ItemType.Manage.WidgetFactory', Backstab.View.extend( {
-		
-		events: {
-			'postInit this': 'postInit'
-		},
-		
-		postInit: function() {
+		initialize: function( oMembers, oOptions ) {
 			
 			var _this = this;
 			
-			// add views to more "complex" item types
+			// DOM container of widget templates
+			var eTemplates = oOptions.templates;
+			var oItemTypes = oOptions.itemTypes;
 			
-			var oItemTypes = _family.data.itemTypes;
+			
+			this.eFields = eTemplates.find( '> div.fields' );
+			this.eValues = eTemplates.find( '> div.values' );
+			
+			
+			// initialize stuff
 			
 			oItemTypes.each( function( oItemType ) {
-				
-				var sItemType = oItemType.get( 'slug' );
-				
-				var sTypeSelector = '> div.values > div.%s'.printf( sItemType );
-				
-				var oOptionsPanelView = new Geko.Wp.Form.ItemValue.Manage.OptionsPanel( {
-					el: _this.$( sTypeSelector ),
-					model: oItemType
-				} );
-				
-				// assign so we can access later
-				oWidgets[ sItemType ].valueHandler = oOptionsPanelView;
-				
+				_this.registerWidget( oItemType );
 			} );
 			
+		},
+		
+		registerWidget: function( oItemType ) {
+			
+			var sItemType = oItemType.get( 'slug' );
+			
+			var sTypeSelector = '> div.%s'.printf( sItemType );
+			
+			this.set( sItemType, {
+				itemType: oItemType,
+				panelWidget: this.eValues.find( sTypeSelector ),
+				params: oWidgetParams[ sItemType ]
+			} );
 		},
 		
 		make: function( oModel, oContextDispatcher, sMetaKey ) {
@@ -177,16 +174,14 @@
 			
 			var sItemType = oModel.getItemTypeSlug();
 			
-			var sTypeSelector = '> div.fields > div.%s'.printf( sItemType );
-			var eWidget = this.$( sTypeSelector ).clone();
+			var sTypeSelector = '> div.%s'.printf( sItemType );
+			var eWidget = this.eFields.find( sTypeSelector ).clone();
 			eWidget.removeClass( sItemType );
 			
-			var WidgetView = oWidgets[ sItemType ];
-			if ( !WidgetView ) {
-				var WidgetView = oWidgets[ 'default' ];		
-			}
+			var oWidget = this.get( sItemType );
 			
-			return new WidgetView( {
+			//
+			return new oWidget.viewConstructor( {
 				el: eWidget,
 				model: oModel,
 				data: {
@@ -194,9 +189,45 @@
 					metaKey: sMetaKey
 				}
 			} );
+		},
+		
+		
+		loadOptionsPanel: function( ePanel, oItemType, oItem ) {
+		
+			var sItemType = oItemType.get( 'slug' );
+			
+			var eValues = this.eValues;
+			
+			// take what's in the panel, if any, and put into values
+			var eCurVal = ePanel.find( '> *' );
+			if ( eCurVal.length ) {
+				eValues.append( eCurVal );
+			}
+			
+			var sTypeSelector = '> div.%s'.printf( sItemType );
+			
+			eCurVal = eValues.find( sTypeSelector );
+			ePanel.append( eCurVal );
+			
+			// trigger loadPanel on value handler, if it exists
+			var oValueHandler = this.get( sItemType ).valueHandler;
+			oValueHandler.trigger( 'loadPanel', oItemType, oItem );
+			
+		},
+		
+		commitValues: function( oItem ) {
+			
+			var sItemType = oItem.getItemTypeSlug();
+			
+			// trigger loadPanel on value handler, if it exists
+			var oValueHandler = this.get( sItemType ).valueHandler;
+			oValueHandler.trigger( 'commitValues', oItem );
+			
 		}
 		
+		
 	} ) );
+	
 	
 	
 	
@@ -245,35 +276,15 @@
 		
 		loadPanel: function( e, oItemType, oItem ) {
 			
-			var sItemType = oItemType.get( 'slug' );
-			
-			var eValues = _family.data.widgetFactory.$( '> div.values' );
-			var ePanel = this.$( 'div.value_options' );
-			
-			// take what's in the panel, if any, and put into values
-			var eCurVal = ePanel.find( '> *' );
-			if ( eCurVal.length ) {
-				eValues.append( eCurVal );
-			}
-			
-			var sTypeSelector = '> div.%s'.printf( sItemType );
-			
-			eCurVal = eValues.find( sTypeSelector );
-			ePanel.append( eCurVal );
-			
-			// trigger loadPanel on value handler, if it exists
-			var oValueHandler = oWidgets[ sItemType ].valueHandler;
-			oValueHandler.localDispatcher.trigger( 'loadPanel', oItemType, oItem );
+			var oWidgetFactory = _family.data.widgetFactory;
+			oWidgetFactory.loadOptionsPanel( this.$( 'div.value_options' ), oItemType, oItem );
 			
 		},
 		
 		commitValues: function( e, oItem ) {
 			
-			var sItemType = oItem.getItemTypeSlug();
-			
-			// trigger loadPanel on value handler, if it exists
-			var oValueHandler = oWidgets[ sItemType ].valueHandler;
-			oValueHandler.localDispatcher.trigger( 'commitValues', oItem );
+			var oWidgetFactory = _family.data.widgetFactory;
+			oWidgetFactory.commitValues( oItem );
 			
 		}
 		

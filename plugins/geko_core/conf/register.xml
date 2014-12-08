@@ -30,16 +30,18 @@
 		
 		
 		<!-- backstab enhancements -->
-		<file id="geko-backstab-underscore" src="##geko_core_uri##/js/backstab/underscore.js" dependencies="geko-string_format geko-underscore" />
-		<file id="geko-backstab-core" src="##geko_core_uri##/js/backstab/core.js" dependencies="geko-backstab-underscore geko-backbone" />
-		<file id="geko-backstab-model" src="##geko_core_uri##/js/backstab/model.js" dependencies="geko-backstab-core" />
-		<file id="geko-backstab-collection" src="##geko_core_uri##/js/backstab/collection.js" dependencies="geko-backstab-core" />
-		<file id="geko-backstab-view" src="##geko_core_uri##/js/backstab/view.js" dependencies="geko-backstab-core" />
-		<file id="geko-backstab-dispatcher" src="##geko_core_uri##/js/backstab/dispatcher.js" dependencies="geko-backstab-core" />
-		<file id="geko-backstab-statemachine" src="##geko_core_uri##/js/backstab/statemachine.js" dependencies="geko-backstab-core" />
-		<file id="geko-backstab-foo" src="##geko_core_uri##/js/backstab/foo.js" dependencies="geko-backstab-core" />
+		<file id="geko-backstab-base" src="##geko_core_uri##/js/backstab/base.js" dependencies="geko-backbone geko" />
+		<file id="geko-backstab-util" src="##geko_core_uri##/js/backstab/util.js" dependencies="geko-string_format geko-underscore geko-backstab-base" />
+		<file id="geko-backstab-model" src="##geko_core_uri##/js/backstab/model.js" dependencies="geko-backstab-util" />
+		<file id="geko-backstab-collection" src="##geko_core_uri##/js/backstab/collection.js" dependencies="geko-backstab-util" />
+		<file id="geko-backstab-view" src="##geko_core_uri##/js/backstab/view.js" dependencies="geko-backstab-util" />
+		<file id="geko-backstab-dispatcher" src="##geko_core_uri##/js/backstab/dispatcher.js" dependencies="geko-backstab-util" />
+		<file id="geko-backstab-generic" src="##geko_core_uri##/js/backstab/generic.js" dependencies="geko-backstab-util" />
+		<file id="geko-backstab-hash" src="##geko_core_uri##/js/backstab/hash.js" dependencies="geko-backstab-util" />
+		<file id="geko-backstab-statemachine" src="##geko_core_uri##/js/backstab/statemachine.js" dependencies="geko-backstab-util" />
 		<file id="geko-backstab-family" src="##geko_core_uri##/js/backstab/family.js" dependencies="geko-jquery-tmpl geko-backstab-model geko-backstab-collection geko-backstab-view geko-backstab-dispatcher" />
 		<file id="geko-backstab-inspector" src="##geko_core_uri##/js/backstab/inspector.js" dependencies="geko-backstab-model geko-backstab-collection geko-backstab-view" />
+		<file id="geko-backstab-foo" src="##geko_core_uri##/js/backstab/foo.js" dependencies="geko-backstab-util" />
 		
 		
 		<!-- d3, http://d3js.org -->
@@ -302,7 +304,7 @@
 		<file id="geko_wp_enumeration_manage" data-model="enum" src="##geko_core_uri##/js/Geko/Wp/Enumeration/Manage.js" dependencies="geko" />
 		
 		<file id="geko_wp_form_manage" src="##geko_core_uri##/js/Geko/Wp/Form/Manage.js"
-			dependencies="geko geko-jquery-geko_util geko-backstab-family geko-backstab-inspector geko-jquery-fx-blind geko-jquery-ui-sortable geko-jquery-ui-button geko-jquery-ui-tabs geko-jquery-ui-dialog geko_wp_form_section_manage"
+			dependencies="geko geko-jquery-geko_util geko-backstab-family geko-backstab-generic geko-backstab-hash geko-backstab-inspector geko-jquery-fx-blind geko-jquery-ui-sortable geko-jquery-ui-button geko-jquery-ui-tabs geko-jquery-ui-dialog geko_wp_form_section_manage"
 		/>
 		<file id="geko_wp_form_item_manage" data-model="form.item" src="##geko_core_uri##/js/Geko/Wp/Form/Item/Manage.js" dependencies="geko_wp_form_metadata_manage geko_wp_form_itemvalue_manage" />
 		<file id="geko_wp_form_itemmetavalue_manage" data-model="form.item_meta_value" src="##geko_core_uri##/js/Geko/Wp/Form/ItemMetaValue/Manage.js" />

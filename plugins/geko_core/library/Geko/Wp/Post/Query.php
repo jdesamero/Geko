@@ -428,6 +428,10 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 			}
 		}
 		
+		if ( $oDb = Geko_Wp::get( 'db' ) ) {
+			$sValue = $oDb->replacePrefixPlaceholder( $sValue );
+		}
+		
 		return trim( $sValue );
 	}
 	

@@ -16,19 +16,24 @@
 	
 	
 	
-	// add new methods and properties
-	var oOpts = {
+	//// main
+	
+	Backstab.setNamespace( 'Collection', Backbone.Collection.extend( {
 		
 		_prevLen: null,
 		
-		beforeInit: function() {
+		constructor: function() {
 			
-			_.mergeValues( 'data', this, arguments[ 1 ] );
+			this.sharedSetup();					// from Backstab.Shared
+			
+			
+			Backstab.Util.mergeValues( 'data', this, arguments[ 1 ] );
 			
 			this.on( 'add', this.lengthChanged );
 			this.on( 'remove', this.lengthChanged );
 			this.on( 'reset', this.lengthChanged );
 			
+			Backbone.Collection.apply( this, arguments );
 		},
 		
 		lengthChanged: function() {
@@ -197,14 +202,82 @@
 			$.each( aEach, function( i, v ) {
 				v.destroy();
 			} );
+		},
+		
+		
+		// re-organize the existing collection using the provided oEdited collection
+		// add, edit, or delete the collection's models, all in one go
+		
+		batchEdit: function( oEdited, fWhereCb, fExistingCb, fNewCb ) {
+			
+			var _this = this;
+			
+			var aNewModels = [];											// track all new models that are created
+			
+			// create a temporary collection
+			var oTempCollection = new this.constructor();
+			
+			// transfer all my models to oTempCollection
+			this.transfer( oTempCollection );
+			
+			// go through each of the edit items
+			oEdited.each( function( oEditItem ) {
+				
+				var oWhereVals = fWhereCb.call( oEditItem );				// values used for finding existing model
+				var oExistingVals = fExistingCb.call( oEditItem );			// values used to modify existing model
+				
+				// determine if model already exists
+				var oExistingItem = oTempCollection.findWhere( oWhereVals );
+				
+				if ( oExistingItem ) {
+					
+					// modify values of existing model
+					oExistingItem.set( oExistingVals );
+					
+					oTempCollection.transfer( oExistingItem, _this );
+					
+				} else {
+					
+					// create a new model
+					
+					var oNewVals;
+					
+					if ( fNewCb ) {
+						
+						oNewVals = fNewCb.call( oEditItem );				// values used for creating a new model
+					
+					} else {
+						
+						// if fNewCb was not provided, then merge values from fWhereCb and fExistingCb
+						
+						oNewVals = {};
+						$.extend( oNewVals, oWhereVals );
+						$.extend( oNewVals, oExistingVals );
+						
+					}
+					
+					var oModel = new _this.model( oNewVals );
+					
+					aNewModels.push( oNewVals );
+					
+					_this.add( oModel );
+				}
+				
+			} );
+			
+			// destroy all leftovers
+			oTempCollection.destroyEach();
+			
+			// return all the new models
+			return aNewModels;
 		}
 		
-	};
+		
+	} ) );
 	
 	
-	
-	//
-	Backstab.createConstructor( 'Collection', oOpts, null, Backbone.Collection );
+	// mix-in Backstab.Shared
+	$.extend( Backstab.Collection.prototype, Backstab.Shared );
 	
 	
 	

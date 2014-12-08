@@ -255,9 +255,10 @@
 			
 			// item types
 			
-			// this is a pseudo-view that generates widgets
-			var oWidgetFactory = new Geko.Wp.Form.ItemType.Manage.WidgetFactory( {
-				el: $( '#dialog_field_templates' )
+			// this is a singleton responsible for handling widgets
+			var oWidgetFactory = new Geko.Wp.Form.ItemType.Manage.WidgetFactory( {}, {
+				templates: $( '#dialog_field_templates' ),
+				itemTypes: oItemTypes
 			} );
 			
 			
@@ -304,10 +305,6 @@
 			
 			//// views
 			
-			
-			// run postInit on widget factory
-			
-			oWidgetFactory.trigger( 'postInit' );
 			
 			
 			// meta data

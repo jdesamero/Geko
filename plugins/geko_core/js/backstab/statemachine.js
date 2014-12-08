@@ -18,10 +18,11 @@
 	
 	
 	
-	// add new methods and properties
-	var oOpts = {
+	//// main
+	
+	Backstab.setNamespace( 'StateMachine', Backstab.Base.extend( {
 		
-		setup: function( options ) {
+		constructor: function( options ) {
 			
 			var _this = this;
 			
@@ -74,6 +75,8 @@
 				}
 			} );
 			
+			
+			Backstab.Base.apply( this, arguments );
 		},
 		
 		
@@ -175,8 +178,8 @@
 			var trigger = state.trigger;
 			var target = state[ targetname ];
 			
-			// fShowMe( [ state, targetname, args ] );
-			// fShowMe( '%s:%s'.printf( trigger, target ) );
+			// console.log( [ state, targetname, args ] );
+			// console.log( '%s:%s'.printf( trigger, target ) );
 			
 			var _trigger = function( evt, args ) {
 				args.unshift( evt );
@@ -190,14 +193,8 @@
 				
 		}
 		
-	};
+	} ) );
 
-	
-	
-	
-	
-	//
-	Backstab.createConstructor( 'StateMachine', oOpts );
 	
 	
 } ).call( this );

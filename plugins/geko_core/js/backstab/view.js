@@ -15,6 +15,8 @@
 	var Backstab = this.Backstab;
 	
 	
+	//// helpers
+	
 	var getTarget = function( elem, params, prop ) {
 		
 		var sel = null, fcont = null, target = null, _target = null, defer = null;
@@ -144,13 +146,24 @@
 	
 	
 	
+	//// main
 	
-	
-	// add new methods and properties
-	var oOpts = {
+	Backstab.setNamespace( 'View', Backbone.View.extend( {
 		
-		beforeInit: function() {
-			_.mergeValues( 'data', this, arguments[ 0 ] );
+		constructor: function() {
+			
+			this.sharedSetup();					// from Backstab.Shared
+			
+			
+			// modify instance properties
+			Backstab.View.modifyProps( this );
+			
+			
+			// merge "data" values provided in the constructor
+			Backstab.Util.mergeValues( 'data', this, arguments[ 0 ] );
+			
+			
+			Backbone.View.apply( this, arguments );
 		},
 		
 		_ensureElement: function() {
@@ -343,10 +356,16 @@
 			oModel.set( this.getModelDataFromElem( oFields, eElem, oParams ) );
 		}
 		
-	};
+	} ) );
 	
 	
-	// static properties	
+	// mix-in Backstab.Shared
+	$.extend( Backstab.View.prototype, Backstab.Shared );
+	
+	
+	
+	//// class methods
+	
 	var oStaticProps = {
 		
 		//// properties
@@ -398,7 +417,7 @@
 				$.each( obj.events, function( evtsel, method ) {
 					
 					var orig = evtsel;
-					evtsel = _.expandCurlyShortform( evtsel );
+					evtsel = Backstab.Util.expandCurlyShortform( evtsel );
 					
 					if ( evtsel != orig ) {
 						obj.events[ evtsel ] = copyMethod( method );
@@ -410,7 +429,7 @@
 				// pass 2, find semi-colon separated event/selectors and split
 				$.each( obj.events, function( evtsel, method ) {
 					
-					if ( _.contains( evtsel, ';' ) ) {
+					if ( Backstab.Util.contains( evtsel, ';' ) ) {
 						
 						var split = evtsel.split( ';' );
 						
@@ -460,7 +479,7 @@
 				var init = obj.initialize;
 				var initWrap = function() {
 					
-					_.mergeValues( 'data', this, arguments[ 0 ] );
+					Backstab.Util.mergeValues( 'data', this, arguments[ 0 ] );
 					
 					var res = init.apply( this, arguments );
 					_this.bindDelegates( this );
@@ -472,7 +491,6 @@
 			}
 			
 			
-			return obj;
 		},
 		
 				
@@ -484,11 +502,11 @@
 			
 			if ( 'array' !== $.type( props ) ) {
 				// find view descendants with an "on()" method so we can trigger them from the "events" hash
-				props = _.descendantsWithMethod( view, 'on', this._maxLevels );
+				props = Backstab.Util.descendantsWithMethod( view, 'on', this._maxLevels );
 			}
 			
 			// find view descendants with an "each()" method so we can iterate through members when initializing
-			var hasEach = _.descendantsWithMethod( view, 'each', this._maxLevels );
+			var hasEach = Backstab.Util.descendantsWithMethod( view, 'each', this._maxLevels );
 			
 			var oDelegate = {};
 			
@@ -527,7 +545,7 @@
 					
 					
 					// look at the event and see if there is a matching view property
-					var prop = _.beginsWith( evt, props, true );
+					var prop = Backstab.Util.beginsWith( evt, props, true );
 					
 					// selector "this" is a special case, referring to the view itself
 					if ( !prop && ( 'this' === sel ) ) {
@@ -669,7 +687,7 @@
 			// set listener
 			$.each( props, function( i, prop ) {
 				
-				var propObj = _.descendant( view, prop );
+				var propObj = Backstab.Util.descendant( view, prop );
 				
 				if ( propObj && propObj.on && !propObj.jquery ) {
 					
@@ -697,7 +715,7 @@
 					} );
 					
 					// trigger now
-					if ( _.contains( hasEach, prop ) ) {
+					if ( Backstab.Util.contains( hasEach, prop ) ) {
 						
 						propObj.each( function( model ) {
 							
@@ -728,10 +746,8 @@
 		
 	};
 	
+	$.extend( Backstab.View, oStaticProps );
 	
-	
-	//
-	Backstab.createConstructor( 'View', oOpts, oStaticProps, Backbone.View );
 	
 	
 } ).call( this );

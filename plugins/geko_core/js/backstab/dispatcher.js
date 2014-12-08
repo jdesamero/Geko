@@ -14,12 +14,16 @@
 	var Backbone = this.Backbone;
 	var Backstab = this.Backstab;
 	
-	//
-	Backstab.createConstructor( 'Dispatcher' );
-
-	// create a global instance
-	var Dispatcher = Backstab.Dispatcher.extend();
-	Backstab.Dispatcher.global = new Dispatcher();
+	
+	
+	//// main
+	
+	Backstab.setNamespace( 'Dispatcher', Backstab.Base.extend( {
+		
+	} ) );
+	
+	Backstab.Dispatcher.global = new Backstab.Dispatcher();
+	
 	
 	
 } ).call( this );

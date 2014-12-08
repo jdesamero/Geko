@@ -15,19 +15,22 @@
 	var Backstab = this.Backstab;	
 	
 	
-	// add new methods and properties
-	var oOpts = {
+	//// main
+	
+	Backstab.setNamespace( 'Foo', Backstab.Base.extend( {
 		
-		setup: function( opts ) {
-			this.options = $.extend( {}, opts );
-			return this;
+		constructor: function() {
+			
+			this.options = $.extend( {}, arguments[ 0 ] );
+			
+			Backstab.Base.apply( this, arguments );
 		},
 		
 		foo: function( msg ) {
 			
 			var alrt = 'Calling Foo!!!';
-			alrt += ' (this.options.foo -> %s)'.printf( _.stringify( this.options.foo ) );
-			alrt += ' (msg -> %s)'.printf( _.stringify( msg ) );
+			alrt += ' (this.options.foo -> %s)'.printf( Backstab.Util.stringify( this.options.foo ) );
+			alrt += ' (msg -> %s)'.printf( Backstab.Util.stringify( msg ) );
 			
 			alert( alrt );
 			
@@ -39,11 +42,9 @@
 			this.trigger( 'baz', this, msg );
 			return 'Calling baz: %s %s'.printf( this.options.baz, msg );
 		}
-
-	};
+		
+	} ) );
 	
-	//
-	Backstab.createConstructor( 'Foo', oOpts );
 	
 } ).call( this );
 

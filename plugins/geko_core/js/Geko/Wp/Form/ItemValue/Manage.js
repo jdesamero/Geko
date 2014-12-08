@@ -435,6 +435,8 @@
 			extend: {
 				
 				events: {
+					'focus input.option_value_label; blur input.option_value_label': 'updateLabel',
+					'focus input.option_value_slug; blur input.option_value_slug': 'updateSlug',
 					'click a.geko-form-remove-item': 'deleteValue'
 				},
 				
@@ -443,6 +445,14 @@
 					var oListView = this.data.listView;
 					
 					return oListView.getTmpl( {}, null, '.row-tmpl' );
+				},
+				
+				updateLabel: function() {
+					this.model.set( 'label', $.trim( this.$( 'input.option_value_label' ).val() ) );
+				},
+				
+				updateSlug: function() {
+					this.model.set( 'slug', $.trim( this.$( 'input.option_value_slug' ).val() ) );				
 				},
 				
 				deleteValue: function() {
@@ -531,6 +541,7 @@
 				addValue: function() {
 					
 					var oModel = new this.family.Model();
+					oModel.set( { 'orig_idx': oModel.getIntCid() } );
 					
 					this.current.collection.add( oModel );
 					
@@ -579,48 +590,89 @@
 		localDispatcher: new Backstab.Dispatcher(),
 		
 		events: {
-			'localDispatcher:loadPanel this': 'loadPanel'
+			'loadPanel this': 'loadPanel',
+			'commitValues this': 'commitValues'
 		},
 		
 		loadPanel: function( e, oItemType, oItem ) {
 			
-			if ( this.model === oItemType ) {
+			if ( !this.current ) this.current = {};
+			
+			if ( this.current.valueManager ) {
+				this.current.valueManager.trigger( 'cleanUp' );
+			}
+			
+			if ( oItemType.get( 'has_multiple_values' ) ) {
 				
-				if ( !this.current ) this.current = {};
+				this.$el.html( '' );
 				
-				if ( this.current.valueManager ) {
-					this.current.valueManager.trigger( 'cleanUp' );
+				// TEMPORARY!!!! CHANGE THIS LATER!!!!!
+				var eValueTemplates = $( '#dialog_value_templates' );			
+				
+				if ( oItemType.get( 'has_multiple_response' ) ) {
+					this.$el.html( eValueTemplates.find( '> div.has_multiple_responses' ).html() );
+				} else {
+					this.$el.html( eValueTemplates.find( '> div.has_multiple_values' ).html() );
 				}
-							
-				if ( oItemType.get( 'has_multiple_values' ) ) {
-					
-					this.$el.html( '' );
-					
-					// TEMPORARY!!!! CHANGE THIS LATER!!!!!
-					var eValueTemplates = $( '#dialog_value_templates' );			
-					
-					if ( oItemType.get( 'has_multiple_response' ) ) {
-						this.$el.html( eValueTemplates.find( '> div.has_multiple_responses' ).html() );
-					} else {
-						this.$el.html( eValueTemplates.find( '> div.has_multiple_values' ).html() );
+				
+				// oItem is null if a new item is being added
+				var oValueManager = new Geko.Wp.Form.ItemValue.Manage.OptionValue.FormView( {
+					el: this.$( 'div.wrap' ),
+					data: {
+						item: oItem
 					}
-					
-					var oValueManager = new Geko.Wp.Form.ItemValue.Manage.OptionValue.FormView( {
-						el: this.$( 'div.wrap' ),
-						data: {
-							item: oItem
-						}
-					} );
-					
-					oValueManager.current.collection.lengthChanged();
-					
-					this.current.valueManager = oValueManager;
-					
-				}
+				} );
 				
+				oValueManager.current.collection.lengthChanged();
+				
+				this.current.valueManager = oValueManager;
+				
+			} else {
+				
+				// handle basic stuff!!!
+				
+			}
+		
+		},
+		
+		commitValues: function( e, oItem ) {
+			
+			var oItemType = oItem.getItemType();
+			
+			if ( oItemType.get( 'has_multiple_values' ) ) {
+			
+				var oValueManager = this.current.valueManager;
+				var oEditCollection = oValueManager.current.collection;
+				
+				var oMainItemValues = _family.data.itemValues;
+				var oItemValuesParted = _family.data.itemValuesParted;
+						
+				// get item values for item
+				var oItemValues = oItemValuesParted.getPart( oItem.get( 'fmitm_id' ) );
+				
+				var aNewItemValues = oItemValues.batchEdit(
+					oEditCollection,
+					function() { return {
+						'fmitm_id': oItem.get( 'fmitm_id' ),
+						'fmitmval_idx': this.get( 'orig_idx' ) 
+					}; },
+					function() { return {
+						'label': this.get( 'label' ),
+						'slug': this.get( 'slug' ),
+						'is_default': this.get( 'is_default' )
+					}; }
+				);
+				
+				oMainItemValues.add( aNewItemValues );
+			
+			} else {
+				
+				// handle basic stuff!!!
+			
 			}
 			
 		}
+		
 		
 	} ) );
 	
