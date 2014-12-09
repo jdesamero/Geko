@@ -233,6 +233,7 @@
 		<file id="geko-jquery-supersized_shutter" src="##geko_core_uri##/external/js/jquery.supersized.shutter.js" dependencies="geko-jquery-supersized" />
 		<file id="geko-jquery-syger" src="##geko_core_uri##/external/js/jquery-syger.js" dependencies="jquery" />
 		<file id="geko-jquery-tabslideout" src="##geko_core_uri##/external/js/jquery.tabSlideOut.v1.3.1.js" dependencies="jquery" />
+		<file id="geko-jquery-tablesorter" src="##geko_core_uri##/external/js/jquery.tablesorter.js" dependencies="jquery" />
 		<file id="geko-jquery-tinysort" src="##geko_core_uri##/external/js/jquery.tinysort.min.js" dependencies="jquery" />
 		<file id="geko-jquery-tinysort_charorder" src="##geko_core_uri##/external/js/jquery.tinysort.charorder.min.js" dependencies="geko-jquery-tinysort" />
 		<file id="geko-jquery-tmpl" src="##geko_core_uri##/external/js/jquery.tmpl.js" dependencies="jquery" />
