@@ -419,30 +419,27 @@
 					var orig = evtsel;
 					evtsel = Backstab.Util.expandCurlyShortform( evtsel );
 					
-					if ( evtsel != orig ) {
-						obj.events[ evtsel ] = copyMethod( method );
-						delete obj.events[ orig ];
-					}
+					evt[ evtsel ] = copyMethod( method );
 					
 				} );
 				
 				// pass 2, find semi-colon separated event/selectors and split
-				$.each( obj.events, function( evtsel, method ) {
+				$.each( evt, function( evtsel, method ) {
 					
 					if ( Backstab.Util.contains( evtsel, ';' ) ) {
 						
 						var split = evtsel.split( ';' );
 						
 						$.each( split, function( i, v ) {
-							obj.events[ $.trim( v ) ] = copyMethod( method );
+							evt[ $.trim( v ) ] = copyMethod( method );
 						} );
 						
-						delete obj.events[ evtsel ];
+						delete evt[ evtsel ];
 					}
 				} );
 				
 				// pass 3, apply parameters where needed
-				$.each( obj.events, function( evtsel, method ) {
+				$.each( evt, function( evtsel, method ) {
 					
 					if ( 'array' === $.type( method ) ) {
 						
