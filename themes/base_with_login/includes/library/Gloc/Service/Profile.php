@@ -29,7 +29,6 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 	
 	
 	
-	
 	//
 	public function processLogin() {
 		
@@ -39,7 +38,8 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 		// do initial validation
 		if ( $sEmail && $sPassword && email_exists( $sEmail ) ) {
 			
-			$oUser = new Gloc_User( $sEmail );
+			$sUserClass = $this->resolveClass( 'User' );
+			$oUser = new $sUserClass( $sEmail );
 			
 			if ( $oUser->getIsActivated() ) {
 				
@@ -127,7 +127,9 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 		
 		if ( $sKey = trim( $_REQUEST[ 'key' ] ) ) {
 			
-			$oUser = Gloc_User::getOne( array( 'geko_activation_key' => $sKey ), FALSE );
+			$sUserClass = $this->resolveClass( 'User' );
+			
+			$oUser = call_user_func( array( $sUserClass, 'getOne' ), array( 'geko_activation_key' => $sKey ), FALSE );
 			
 			if ( $oUser->isValid() ) {
 				
@@ -279,7 +281,9 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 		
 		if ( email_exists( $sEmail ) ) {
 			
-			$oUser = new Gloc_User( $sEmail );
+			$sUserClass = $this->resolveClass( 'User' );
+			$oUser = new $sUserClass( $sEmail );
+			
 			$iUserId = $oUser->getId();
 			
 			$sKey = md5( sprintf( '%s%s%s', $oUser->getFullName(), time(), rand() ) );
@@ -318,7 +322,8 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 		$sPassword = trim( $_REQUEST[ 'password' ] );
 		$sConfirmPass = trim( $_REQUEST[ 'confirm_pass' ] );
 		
-		$oUser = Gloc_User::getOne( array( 'geko_password_reset_key' => $sKey ), FALSE );
+		$sUserClass = $this->resolveClass( 'User' );
+		$oUser = call_user_func( array( $sUserClass, 'getOne' ), array( 'geko_password_reset_key' => $sKey ), FALSE );
 		
 		if ( $oUser->isValid() && ( $sPassword == $sConfirmPass ) ) {
 			
@@ -358,7 +363,9 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 		
 		if ( email_exists( $sEmail ) ) {
 			
-			$oUser = new Gloc_User( $sEmail );
+			$sUserClass = $this->resolveClass( 'User' );
+			$oUser = new $sUserClass( $sEmail );
+			
 			$iUserId = $oUser->getId();
 			
 			wp_delete_user( $iUserId, 1 );
