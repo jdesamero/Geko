@@ -4,8 +4,7 @@
 class Gloc_Layout_Main extends Gloc_Layout
 {
 	
-	private $oUser = NULL;
-	private $bIsLoggedIn = FALSE;
+	protected $_oUser = NULL;
 	
 	protected $_aLabels = array(
 		101 => 'Copyright %s',
@@ -51,17 +50,9 @@ class Gloc_Layout_Main extends Gloc_Layout
 		
 		parent::start();
 		
-		global $user_ID;
-		
-		if ( $user_ID ) {
-			
-			$oUser = $this->newUser( $user_ID );
-			$this->bIsLoggedIn = ( $oUser->getIsActivated() ) ? TRUE : FALSE;
-			
-			if ( $this->bIsLoggedIn ) $this->oUser = $oUser;
-		}
-		
+		$this->oUser = $this->regGet( 'user' );
 	}
+	
 	
 	//
 	public function echoMain() {
@@ -92,11 +83,14 @@ class Gloc_Layout_Main extends Gloc_Layout
 			$this->doWpHead();
 			
 			if ( $this->isTemplateList( 'protected' ) ):
-				if ( $this->isLoggedIn() ):
+				if ( $this->_oUser ):
 					$this->doHeadLate();
+				else:
+					$this->doHeadLateUnprotected();
 				endif;
 			else:
 				$this->doHeadLate();
+				$this->doHeadLateUnprotected();
 			endif;
 			
 			?>
@@ -163,7 +157,7 @@ class Gloc_Layout_Main extends Gloc_Layout
 	public function _echoContent( $sPageLayout ) {
 		// route content display
 		if ( $this->isTemplateList( $sPageLayout, 'protected' ) ):
-			if ( $this->isLoggedIn() ):
+			if ( $this->_oUser ):
 				// show protected page, since user is logged-in
 				$this->doContent();
 			else:
@@ -178,7 +172,7 @@ class Gloc_Layout_Main extends Gloc_Layout
 				<?php
 			endif;
 		elseif ( $this->isTemplateList( $sPageLayout, 'unprotected' ) ):
-			if ( $this->isLoggedIn() ):
+			if ( $this->_oUser ):
 				// do not show unprotected page, user is ALREADY logged-in
 				?>
 				<div>
@@ -199,10 +193,10 @@ class Gloc_Layout_Main extends Gloc_Layout
 	}
 	
 	//
-	public function echoHeadLate() {
+	public function echoHeadLateUnprotected() {
 				
 		// don't bother showing login javascript if already logged-in
-		if ( $this->bIsLoggedIn ) return;
+		if ( $this->_oUser ) return;
 		
 		$oService = Gloc_Service_Profile::getInstance();
 		
@@ -276,13 +270,13 @@ class Gloc_Layout_Main extends Gloc_Layout
 	//
 	public function echoBodyHeader() {
 		
-		$oUser = $this->oUser;
+		$oUser = $this->_oUser;
 		
 		?><div id="topnav"><?php $this->doNavMenu( 'top', array( 'renderDepth' => 0 ) ); ?></div>
 		<div id="header">
 			<a href="<?php Geko_Wp::echoUrl(); ?>" class="logo"><img src="<?php bloginfo( 'template_directory' ); ?>/images/toplogo.gif" alt="<?php bloginfo( 'name' ); ?>" width="221" height="69" border="0" /></a>
 			<div id="login">
-				<?php if ( !$this->bIsLoggedIn ): ?>
+				<?php if ( !$oUser ): ?>
 					<form id="loginform" class="loginform">
 						<div class="loading"><img src="<?php bloginfo( 'template_directory' ); ?>/images/loader.gif" /></div>
 						<div class="error"></div>
@@ -345,20 +339,6 @@ class Gloc_Layout_Main extends Gloc_Layout
 		</div><?php	
 	}
 	
-	
-	
-	//// public accessors!!!
-	
-	//
-	public function getUser() {
-		return $this->oUser;
-	}
-	
-	//
-	public function isLoggedIn() {
-		return $this->bIsLoggedIn;
-	}
-		
 	
 	
 }

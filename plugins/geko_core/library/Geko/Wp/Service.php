@@ -4,19 +4,7 @@
 class Geko_Wp_Service extends Geko_Service
 {
 	
-	protected $_aPrefixes = array( 'Geko_', 'Geko_Wp_' );
-	
-	protected $_sManageClassPrefix = 'Geko_Wp_';
-	
-	protected $_aManageClassOverrides = array();
-	
-	
-	/* /
-	protected $_aManageClassOverrides = array(
-		'User_Meta' => 'Geko_Wp_User_Meta',
-		'User_Location_Manage' => 'Geko_Wp_User_Location_Manage'
-	);
-	/* */
+	protected $_aPrefixes = array( 'Gloc_', 'Geko_Wp_', 'Geko_' );
 	
 	
 	
@@ -304,15 +292,7 @@ class Geko_Wp_Service extends Geko_Service
 		// inline override
 		if ( $sManageClass ) return $sManageClass;
 		
-		// class override
-		$sClass = $this->_aManageClassOverrides[ $sClassSuffix ];
-		if ( $sClass ) return $sClass;
-		
-		// default
-		$sClass = sprintf( '%s%s', $this->_sManageClassPrefix, $sClassSuffix );
-		if ( class_exists( $sClass ) ) return $sClass;
-		
-		return NULL;
+		return Geko_Class::getBestMatch( $this->_aPrefixes, $sClassSuffix );
 	}
 	
 	//

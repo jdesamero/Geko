@@ -73,9 +73,7 @@ class Gloc_Layout_Shared_Entity extends Gloc_Layout
 		
 		//// setup other objects
 		
-		$oMainLayout = Gloc_Layout_Main::getInstance();
-		
-		$this->_oUser = $oUser = $oMainLayout->getUser();
+		$this->_oUser = $oUser = $this->regGet( 'user' );
 		
 		
 		

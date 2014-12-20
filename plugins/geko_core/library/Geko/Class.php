@@ -95,6 +95,8 @@ class Geko_Class
 	//
 	public static function getBestMatch( $aPrefixes, $aSuffixes ) {
 		
+		$aSuffixes = Geko_Array::wrap( $aSuffixes );
+		
 		$aClasses = array();
 		
 		foreach ( $aSuffixes as $sSuffix ) {

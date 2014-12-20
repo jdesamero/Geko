@@ -28,10 +28,6 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 	
 	
 	
-	protected $_sManageClassPrefix = 'Gloc_';
-	
-	
-	
 	
 	
 	//
@@ -163,7 +159,6 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 	//
 	public function processUpdateProfile() {
 		
-		global $user_ID;
 		global $wpdb;
 		
 		$sEmail = trim( $_POST[ 'email' ] );
@@ -176,13 +171,12 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 		$bNewEmail = FALSE;
 		$bNewPass = FALSE;
 		
-		if ( $user_ID ) {
-			$oUser = new Gloc_User( $user_ID );
+		if ( $oUser = $this->regGet( 'user' ) ) {
 			$iUserId = $oUser->getId();
-			$bNewEmail = ( $sEmail != $oUser->getEmail() ) ? TRUE : FALSE;
+			$bNewEmail = ( $sEmail != $oUser->getEmail() ) ? TRUE : FALSE ;
 		}
 		
-		$bNewPass = ( $sNewPass && $sConfirmNewPass && ( $sNewPass == $sConfirmNewPass ) ) ? TRUE : FALSE;
+		$bNewPass = ( $sNewPass && $sConfirmNewPass && ( $sNewPass == $sConfirmNewPass ) ) ? TRUE : FALSE ;
 		
 		// do initial checks
 		if (

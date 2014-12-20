@@ -35,6 +35,7 @@ $oBoot->config( array(
 	
 	'emsg.mng' => TRUE,
 	
+	'user' => TRUE,
 	// 'user.mng' => TRUE,
 	'user.rewrite' => TRUE,
 	'user.photo' => TRUE,

@@ -475,6 +475,32 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	}
 	
 	
+	// logged-in user
+	public function compUser() {
+		
+		global $user_ID;
+		
+		if (
+			( $user_ID ) && 
+			( $sUserClass = $this->getBestMatch( 'User' ) )
+		) {
+			
+			$oUser = new $sUserClass( $user_ID );
+			
+			if ( $oUser->getIsActivated() ) {
+				
+				$this->set( 'user', $oUser );
+				
+			} else {
+				
+				wp_logout();
+				unset( $user_ID );
+			}
+			
+		}
+		
+	}
+	
 	
 	
 	//// helpers

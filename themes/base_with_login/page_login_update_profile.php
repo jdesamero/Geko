@@ -159,9 +159,7 @@ class Gloc_Layout_PageLoginUpdateProfile extends Gloc_Layout
 		
 		$oPage = $this->newPage();
 		
-		$oMainLayout = Gloc_Layout_Main::getInstance();
-
-		$oUser = $oMainLayout->getUser();
+		$oUser = $this->regGet( 'user' );
 		
 		$aValues = array(
 			'first_name' => $oUser->getFirstName(),
