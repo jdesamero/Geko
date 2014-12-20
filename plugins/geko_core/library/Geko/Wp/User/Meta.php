@@ -341,7 +341,7 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 			$oQuery
 				->field( 'um.*' )
 				->from( '##pfx##usermeta', 'um' )
-				->where( 'um.user_id = ?' )
+				->where( 'um.user_id = ?', $iUserId )
 			;
 			
 			$aMeta = $oDb->fetchHashObj( strval( $oQuery ), 'meta_key' );
