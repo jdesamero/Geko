@@ -33,7 +33,7 @@ class Geko_Wp_Post_Query_Plugin_IncludeExcludePosts extends Geko_Entity_Query_Pl
 				
 				$sField = ' CASE p.ID ';
 				foreach ( $aIncludeIds as $i => $iId ) {
-					$sField .= sprintf( ' WHEN %d THEN %d ', $iId, %i );
+					$sField .= sprintf( ' WHEN %d THEN %d ', $iId, $i );
 				}
 				$sField .= ' ELSE NULL END ';
 				

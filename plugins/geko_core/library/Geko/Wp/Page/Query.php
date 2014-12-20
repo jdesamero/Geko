@@ -3,21 +3,16 @@
 //
 class Geko_Wp_Page_Query extends Geko_Wp_Post_Query
 {
-	private static $bInitCalled = FALSE;
 	
 	// implement by sub-class to process $aParams
 	public function modifyParams( $aParams ) {
 		
 		$aParams = parent::modifyParams( $aParams );
-		$aParams['post_type'] = 'page';
-		
-		if ( !self::$bInitCalled ) {
-			Geko_Wp_Page_QueryHooks::register();
-			self::$bInitCalled = TRUE;
-		}
+		$aParams[ 'post_type' ] = 'page';
 		
 		return $aParams;
 	}
+	
 	
 	//
 	public function getSingleEntity( $mParam ) {
@@ -30,7 +25,7 @@ class Geko_Wp_Page_Query extends Geko_Wp_Post_Query
 			$aParams = $mParam;
 		}
 
-		$aParams['post_type'] = 'page';
+		$aParams[ 'post_type' ] = 'page';
 		
 		return parent::getSingleEntity( $aParams );
 	}

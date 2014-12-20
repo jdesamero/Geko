@@ -4,17 +4,45 @@
 class Geko_Service extends Geko_Singleton_Abstract
 {
 	
+	protected $_aPrefixes = array( 'Geko_' );
+	
 	protected $aLeftovers = array();
 	protected $aAjaxResponse = array(
 		'context' => 'service'
 	);
 	protected $sEncryptKey = '';
 	
+	protected $_aMapMethods = array();
 	
 	
 	
-	//// other stuff
 	
+	
+	//// call hooks
+	
+	//
+	public function preStart() {
+		
+		
+		//// init best match static root class
+		
+		foreach ( $this->_aPrefixes as $sPrefix ) {
+			
+			$sClass = rtrim( $sPrefix, '_' );
+			
+			if ( class_exists( $sClass ) ) {
+				
+				$this->_aMapMethods = array_merge( $this->_aMapMethods, array(
+					'regGet' => array( $sClass, 'get' ),
+					'regVal' => array( $sClass, 'getVal' )
+				) );
+				
+				break;
+			}
+		}
+		
+		
+	}
 	
 	
 	// implement hook method
@@ -264,18 +292,45 @@ class Geko_Service extends Geko_Singleton_Abstract
 	//
 	public function captchaIsValid() {
 		
-		$oCaptcha = recaptcha_check_answer(
-			RECAPTCHA_PRIVATE_KEY,
-			$_SERVER[ 'REMOTE_ADDR' ],
-			$_REQUEST[ 'recaptcha_challenge_field' ],
-			$_REQUEST[ 'recaptcha_response_field' ]
-		);
+		$sPrivateKey = $this->getVal( 'recaptcha_private_key' );
 		
-		return $oCaptcha->is_valid;
+		if ( !$sPrivateKey && defined( 'RECAPTCHA_PRIVATE_KEY' ) ) {
+			$sPrivateKey = RECAPTCHA_PRIVATE_KEY;
+		}
+		
+		if ( $sPrivateKey ) {
+		
+			$oCaptcha = recaptcha_check_answer(
+				$sPrivateKey,
+				$_SERVER[ 'REMOTE_ADDR' ],
+				$_REQUEST[ 'recaptcha_challenge_field' ],
+				$_REQUEST[ 'recaptcha_response_field' ]
+			);
+			
+			return $oCaptcha->is_valid;
+		}
+		
+		return FALSE;
 	}
 	
 		
 	
+	
+	
+	//
+	public function __call( $sMethod, $aArgs ) {
+		
+		if ( array_key_exists( $sMethod, $this->_aMapMethods ) ) {
+			
+			return call_user_func_array(
+				$this->_aMapMethods[ $sMethod ],
+				$aArgs
+			);
+			
+		}
+		
+		throw new Exception( sprintf( 'Invalid method %s::%s() called.', __CLASS__, $sMethod ) );
+	}
 	
 	
 }

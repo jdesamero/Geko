@@ -133,7 +133,7 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 			if ( isset( self::$aMetaCache[ $iTermId ][ $sMetaKey ] ) ) {
 				return self::$aMetaCache[ $iTermId ][ $sMetaKey ][ $sValueKey ];
 			} else {
-				return ( 'inherit' == $sValueKey ) ? 1 : NULL;
+				return ( 'inherit' == $sValueKey ) ? 1 : NULL ;
 			}
 			
 		} else {
@@ -267,7 +267,9 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 			->field( '0', 'tmeta_id' )
 			
 			->from( '##pfx##term_taxonomy', 't' )
+			
 			->where( 't.term_id * ($)', $aTermIds )
+			->where( 't.taxonomy = ?', 'category' )
 		;
 		
 		
@@ -286,7 +288,6 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 				->on( 'n.mkey_id = m.mkey_id' )
 			
 			->where( 'm.term_id * ($)', $aTermIds )
-			->where( 't.taxonomy = ?', 'category' )
 			
 			->union( $oParentQuery )
 		;

@@ -39,8 +39,24 @@ class Geko_Layout extends Geko_Singleton_Abstract
 		
 		$this->_bUnshift = $bUnshift;
 		
+		return parent::init();
+	}
+	
+	//
+	public function reInit( $bUnshift = FALSE ) {
 		
-		// init best match static root class
+		return parent::reInit();
+	}
+	
+	
+	
+	//// call hooks
+	
+	//
+	public function preStart( $bUnshift = FALSE ) {
+		
+		
+		//// init best match static root class
 		
 		foreach ( $this->_aPrefixes as $sPrefix ) {
 			
@@ -58,21 +74,7 @@ class Geko_Layout extends Geko_Singleton_Abstract
 		}
 		
 		
-		return parent::init();
-	}
-	
-	//
-	public function reInit( $bUnshift = FALSE ) {
-		
-		return parent::reInit();
-	}
-	
-	
-	
-	//// call hooks
-	
-	//
-	public function preStart( $bUnshift = FALSE ) {
+		//// set up the renderer class
 		
 		$oRenderer = Geko_Singleton_Abstract::getInstance( $this->_sRenderer );
 		
@@ -80,7 +82,8 @@ class Geko_Layout extends Geko_Singleton_Abstract
 			$oRenderer->addLayoutUnshift( $this );
 		} else {
 			$oRenderer->addLayout( $this );
-		}	
+		}
+		
 	}
 	
 	

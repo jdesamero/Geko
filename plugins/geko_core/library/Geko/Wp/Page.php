@@ -65,8 +65,8 @@ class Geko_Wp_Page extends Geko_Wp_Post
 		
 		$aParams = parent::modifyGetAttachmentParams( $aParams );
 		
-		unset( $aParams['p'] );
-		$aParams['page_id'] = $this->getId();
+		unset( $aParams[ 'p' ] );
+		$aParams[ 'page_id' ] = $this->getId();
 		
 		return $aParams;
 	}
@@ -79,9 +79,11 @@ class Geko_Wp_Page extends Geko_Wp_Post
 	
 	//
 	public function getPageTemplate() {
+		
 		if ( $sTemplate = $this->getEntityPropertyValue( '_wp_page_template' ) ) {
 			return $sTemplate;
 		}
+		
 		return $this->getMeta( '_wp_page_template' );
 	}
 	

@@ -4,6 +4,8 @@
 class Geko_Wp_Service extends Geko_Service
 {
 	
+	protected $_aPrefixes = array( 'Geko_', 'Geko_Wp_' );
+	
 	protected $_sManageClassPrefix = 'Geko_Wp_';
 	
 	protected $_aManageClassOverrides = array();
