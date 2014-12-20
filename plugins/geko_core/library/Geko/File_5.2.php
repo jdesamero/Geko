@@ -109,9 +109,8 @@ class Geko_File
 		
 		$aFiles = scandir( $sPath );
 		if ( is_array( $aFiles ) ) {
-			$aFiles = array_filter( $aFiles, function( $a ) {
-				return ( ( '.' == $a ) || ( '..' == $a ) ) ? FALSE : TRUE ;
-			} );
+			$sFunc = create_function( '$a', 'return ( ( \'.\' == $a ) || ( \'..\' == $a ) ) ? FALSE : TRUE ;' );
+			$aFiles = array_filter( $aFiles, $sFunc );
 		}
 		
 		return $aFiles;
