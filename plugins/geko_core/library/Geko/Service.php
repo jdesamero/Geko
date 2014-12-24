@@ -327,6 +327,10 @@ class Geko_Service extends Geko_Singleton_Abstract
 				$aArgs
 			);
 			
+		} elseif ( $sCreateType = Geko_Class::callCreateType( $sMethod ) ) {
+			
+			return Geko_Class::callCreateInstance( $sCreateType, $sMethod, $aArgs, $this->_aPrefixes );
+			
 		}
 		
 		throw new Exception( sprintf( 'Invalid method %s::%s() called.', __CLASS__, $sMethod ) );

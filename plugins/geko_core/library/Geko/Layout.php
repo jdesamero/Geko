@@ -571,31 +571,10 @@ class Geko_Layout extends Geko_Singleton_Abstract
 			
 			$this->_aParams[ $sParamKey ] = $aArgs[ 0 ];
 			return $this;
+		
+		} elseif ( $sCreateType = Geko_Class::callCreateType( $sMethod ) ) {
 			
-		} elseif ( 0 === strpos( strtolower( $sMethod ), 'new' ) ) {
-			
-			$sClass = substr_replace( $sMethod, '', 0, 3 );
-			
-			if ( $sClass = $this->resolveClass( $sClass ) ) {
-				$oReflect = new ReflectionClass( $sClass );
-				return $oReflect->newInstanceArgs( $aArgs );
-			}
-			
-			return NULL;
-			
-		} elseif ( 0 === strpos( strtolower( $sMethod ), 'one' ) ) {
-			
-			$sClass = substr_replace( $sMethod, '', 0, 3 );
-			
-			if ( $sClass = $this->resolveClass( $sClass ) ) {
-				$oReflect = new ReflectionClass( $sClass );
-				$oQuery = $oReflect->newInstanceArgs( $aArgs );
-				if ( $oQuery instanceof Geko_Entity_Query ) {
-					return $oQuery->getOne();
-				}
-			}
-			
-			return NULL;
+			return Geko_Class::callCreateInstance( $sCreateType, $sMethod, $aArgs, $this->_aPrefixes );
 			
 		} elseif ( 0 === strpos( $sMethod, 'l_' ) ) {
 			

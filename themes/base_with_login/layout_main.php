@@ -50,7 +50,7 @@ class Gloc_Layout_Main extends Gloc_Layout
 		
 		parent::start();
 		
-		$this->oUser = $this->regGet( 'user' );
+		$this->_oUser = $this->regGet( 'user' );
 	}
 	
 	

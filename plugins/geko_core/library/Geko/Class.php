@@ -143,6 +143,46 @@ class Geko_Class
 	}
 	
 	
+	
+	//// for use with __call()
+	
+	//
+	public static function callCreateType( $sMethod ) {
+		
+		if ( 0 === strpos( strtolower( $sMethod ), 'new' ) ) {
+			return 'new';
+		} elseif ( 0 === strpos( strtolower( $sMethod ), 'one' ) ) {
+			return 'one';
+		}
+		
+		return FALSE;
+	}
+	
+	//
+	public static function callCreateInstance( $sType, $sMethod, $aArgs, $aPrefixes ) {
+		
+		// "new" and "one" have the same length
+		$sClass = substr_replace( $sMethod, '', 0, 3 );
+		
+		if ( $sClass = self::getBestMatch( $aPrefixes, $sClass ) ) {
+			
+			$oInstance = self::createInstance( $sClass, $aArgs );
+			
+			if (
+				( 'one' == $sType ) && 
+				( $oInstance instanceof Geko_Entity_Query )
+			) {
+				return $oInstance->getOne();
+			}
+			
+			return $oInstance;
+		}
+		
+		
+		return NULL;
+	}
+	
+	
 }
 
 

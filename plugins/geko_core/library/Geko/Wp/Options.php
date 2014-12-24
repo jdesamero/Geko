@@ -3,6 +3,7 @@
 // base class for options
 class Geko_Wp_Options extends Geko_Wp_Initialize
 {	
+	protected $_aPrefixes = array( 'Gloc_', 'Geko_Wp_', 'Geko_' );
 	protected $_aOptionKeys = array();
 	protected $_bPrefixFormElems = TRUE;
 	protected $_aParts = NULL;
@@ -881,11 +882,6 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	}
 	
 	
-	//
-	public function resolveClass( $sClass ) {
-		return Geko_Class::existsCoalesce( $sClass, sprintf( 'Gloc_%s', $sClass ), sprintf( 'Geko_Wp_%s', $sClass ) );
-	}
-	
 	
 	
 	//// magic methods
@@ -893,17 +889,9 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	//
 	public function __call( $sMethod, $aArgs ) {
 		
-		if ( 0 === strpos( strtolower( $sMethod ), 'new' ) ) {
+		if ( $sCreateType = Geko_Class::callCreateType( $sMethod ) ) {
 			
-			$sClass = substr_replace( $sMethod, '', 0, 3 );
-			
-			if ( $sClass = $this->resolveClass( $sClass ) ) {
-				$oReflect = new ReflectionClass( $sClass );
-				return $oReflect->newInstanceArgs( $aArgs );
-			}
-			
-			return NULL;
-			
+			return Geko_Class::callCreateInstance( $sCreateType, $sMethod, $aArgs, $this->_aPrefixes );
 		}
 		
 		return parent::__call( $sMethod, $aArgs );

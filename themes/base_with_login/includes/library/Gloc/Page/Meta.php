@@ -126,7 +126,7 @@ class Gloc_Page_Meta extends Geko_Wp_Page_Meta
 				
 			} elseif ( $oPage && ( 'page_form.php' == $oPage->getPageTemplate() ) ) {
 				
-				$aForms = new Geko_Wp_Form_Query( array(
+				$aForms = $this->newForm_Query( array(
 					'showposts' => -1,
 					'posts_per_page' => -1
 				), FALSE );

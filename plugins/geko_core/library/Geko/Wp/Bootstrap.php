@@ -487,12 +487,9 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 		
 		global $user_ID;
 		
-		if (
-			( $user_ID ) && 
-			( $sUserClass = $this->getBestMatch( 'User' ) )
-		) {
+		if ( $user_ID ) {
 			
-			$oUser = new $sUserClass( $user_ID );
+			$oUser = $this->newUser( $user_ID );
 			
 			if ( $oUser->getIsActivated() ) {
 				
