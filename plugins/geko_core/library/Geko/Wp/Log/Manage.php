@@ -710,6 +710,16 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 			
 			get_currentuserinfo();
 			
+			// NOTE: There is an issue using $oDb->lastInsertId() on an archive table
+			// so, do max log_id instead
+			$iInsertId = intval( $oDb->fetchOne( sprintf(
+				'SELECT MAX( log_id ) FROM ##pfx##%s', $this->_sTableName
+			) ) );
+			
+			$iInsertId++;			// increment by one
+			
+			
+			$aParams[ 'log_id' ] = $iInsertId;
 			$aParams[ 'remote_ip' ] = ip2long( $_SERVER[ 'REMOTE_ADDR' ] );
 			$aParams[ 'user_agent' ] = $_SERVER[ 'HTTP_USER_AGENT' ];
 			$aParams[ 'date_created' ] = $oDb->getTimestamp();
@@ -723,6 +733,7 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 			$aParams = $this->modifyParams( $aParams );
 			$aInsertData = $this->getInsertData( $aParams );
 			
+			
 			// start transaction
 			
 			$oDb->beginTransaction();
@@ -730,7 +741,8 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 			$bRes = $oDb->insert( $oDb->_p( $sTb ), $aInsertData[ 0 ] );
 			// $aInsertData[ 1 ] is unused
 			
-			$iInsertId = $oDb->lastInsertId();
+			// NOTE: There is an issue using $oDb->lastInsertId() on an archive table
+			// $iInsertId = $oDb->lastInsertId();
 			
 			if ( $bRes && $this->_bUseMetaTable ) {
 				
