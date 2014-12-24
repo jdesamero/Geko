@@ -17,26 +17,50 @@ class Geko
 	}
 	
 	//
+	public static function getBoot() {
+		
+		if ( !self::$_oBoot ) {
+			self::$_oBoot = Geko_Hooks::applyFilter( sprintf( '%s::default', __METHOD__ ), NULL );
+		}
+		
+		return self::$_oBoot;
+	}
+	
+	//
 	public static function set( $sKey, $mValue ) {
-		self::$_oBoot->set( $sKey, $mValue );
+		self::getBoot()->set( $sKey, $mValue );
 	}
 	
 	//
 	public static function get( $sKey ) {
-		return self::$_oBoot->get( $sKey );
+		return self::getBoot()->get( $sKey );
 	}
 	
 	//
 	public static function setVal( $sKey, $mValue ) {
-		self::$_oBoot->setVal( $sKey, $mValue );
+		self::getBoot()->setVal( $sKey, $mValue );
 	}
 	
 	//
 	public static function getVal( $sKey ) {
-		return self::$_oBoot->getVal( $sKey );
+		return self::getBoot()->getVal( $sKey );
 	}
 	
 	
+	
+	//// utility methods
+	
+	// return the first non-empty value from argument list
+	public static function coalesce() {
+		
+		$aArgs = func_get_args();		
+		
+		foreach ( $aArgs as $mValue ) {			
+			if ( $mValue ) return $mValue;
+		}
+		
+		return NULL;
+	}
 	
 	
 }

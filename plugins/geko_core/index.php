@@ -73,6 +73,10 @@ Geko_Loader::registerNamespaces(
 );
 
 
+//// invoke Bootstrap class, only when needed (so things don't crash when theme is not loaded)
 
+Geko_Hooks::addFilter( 'Geko::getBoot::default', function() {
+	return Geko_Wp_Bootstrap::getInstance()->init();
+} );
 
 

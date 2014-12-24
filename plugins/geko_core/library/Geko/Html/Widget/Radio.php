@@ -12,11 +12,16 @@ class Geko_Html_Widget_Radio extends Geko_Html_Widget
 		
 		$oDiv = _ge( 'div' );
 		
-		$aChoices = ( is_array( $aParams[ 'choices' ] ) ) ? $aParams[ 'choices' ] : array();
+		$aChoices = ( is_array( $aParams[ 'choices' ] ) ) ? $aParams[ 'choices' ] : array() ;
 		
 		foreach ( $aChoices as $mOptValue => $mOptParams ) {
 
 			$aOptAtts = array( 'value' => $mOptValue );
+			
+			if ( $sName = $aAtts[ 'name' ] ) {
+				$aOptAtts[ 'id' ] = sprintf( '%s_%s', $sName, $mOptValue );
+				$aOptAtts[ 'name' ] = $sName;
+			}
 			
 			$sLabel = is_string( $mOptParams ) ? $mOptParams : '' ;
 			

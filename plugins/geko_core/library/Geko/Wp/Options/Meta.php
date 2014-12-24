@@ -200,9 +200,13 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 	//
 	public function fieldText( $sName, $aParams = array() ) {
 		
-		$sClass = $this->fieldClass( $aParams[ 'class' ], 'regular-text' );
+		$sClass = trim( sprintf( '%s regular-text', $aParams[ 'class' ] ) );
 		
-		printf( '<input id="%s" name="%s" type="text" %s value="" />', $sName, $sName, $sClass );
+		echo strval( _gw( 'text', array(
+			'id' => $sName,
+			'name' => $sName,
+			'class' => $sClass		
+		) )->get() );
 		
 		return $this;
 	}
@@ -214,28 +218,35 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 		if ( NULL === $sValue ) {
 			$sValue = 1;
 		}
-
-		$sClass = $this->fieldClass( $aParams[ 'class' ] );
 		
-		printf( '<input id="%s" name="%s" type="checkbox" value="%s" %s />', $sName, $sName, $sValue, $sClass );
+		echo strval( _gw( 'checkbox', array(
+			'id' => $sName,
+			'name' => $sName,
+			'class' => $aParams[ 'class' ],
+			'value' => $sValue
+		) )->get() );
 		
 		return $this;
 	}
 	
 	//
 	public function fieldRadio( $sName, $aParams = array() ) {
-
-		$sClass = $this->fieldClass( $aParams[ 'class' ] );
 		
-		if ( $aValues = $aParams[ 'values' ] ) {
-			
-			foreach ( $aValues as $sKey => $sLabel ) {
-				
-				$sId = sprintf( '%s_%s', $sName, $sKey );
-				
-				printf( '<input id="%s" name="%s" type="radio" value="%s" /> <label for="%s">%s</label><br />', $sId, $sName, $sKey, $sId, $sLabel );
-			}
-		}
+		echo strval( _gw(
+			'radio',
+			array(
+				'name' => $sName,
+				'class' => $aParams[ 'class' ]
+			),
+			NULL,
+			array(
+				'choices' => Geko::coalesce(
+					$aParams[ 'choices' ],
+					$aParams[ 'values' ],
+					$this->fieldFormatQuery( $aParams )
+				)
+			)
+		)->get() );
 		
 		return $this;
 	}
@@ -243,34 +254,24 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 	//
 	public function fieldSelect( $sName, $aParams = array() ) {
 		
-		$sClass = $this->fieldClass( $aParams[ 'class' ] );
+		echo strval( _gw(
+			$aParams[ 'multiple' ] ? 'select_multi' : 'select' ,
+			array(
+				'id' => $sName,
+				'name' => $sName,
+				'class' => $aParams[ 'class' ]
+			),
+			NULL,
+			array(
+				'choices' => Geko::coalesce(
+					$aParams[ 'choices' ],
+					$aParams[ 'values' ],
+					$this->fieldFormatQuery( $aParams )
+				),
+				'empty_choice' => Geko::coalesce( $aParams[ 'empty_choice' ], $aParams[ 'default_empty_label' ] )
+			)
+		)->get() );
 		
-		$sMultiple = '';
-		if ( $aParams[ 'multiple' ] ) {
-			$sMultiple = ' multiple="multiple" ';
-		}
-		
-		
-		printf( '<select id="%s" name="%s" %s %s>', $sName, $sName, $sMultiple, $sClass );
-		
-		if ( $sEmptyLabel = $aParams[ 'default_empty_label' ] ) {
-			printf( '<option value="">%s</option>', $sEmptyLabel );
-		}
-		
-		if ( $aQuery = $aParams[ 'query' ] ) {
-			
-			if ( !$sQryVal = $aParams[ 'query_value' ] ) {
-				$sQryVal = '##Id##';
-			}
-			
-			if ( !$sQryLbl = $aParams[ 'query_label' ] ) {
-				$sQryLbl = '##Title##';
-			}
-			
-			echo $aQuery->implode( array( sprintf( '<option value="%s">%s</option>', $sQryVal, $sQryLbl ), '' ) );
-		}
-		
-		echo '</select>';
 		
 		return $this;
 	}
@@ -278,9 +279,14 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 	//
 	public function fieldTextarea( $sName, $aParams = array() ) {
 		
-		$sClass = $this->fieldClass( $aParams[ 'class' ] );
-		
-		printf( '<textarea id="%s" name="%s" %s ></textarea>', $sName, $sName, $sClass );
+		echo strval( _gw(
+			'textarea',
+			array(
+				'id' => $sName,
+				'name' => $sName,
+				'class' => $aParams[ 'class' ]
+			)
+		)->get() );
 		
 		return $this;
 	}
@@ -288,7 +294,6 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 	//
 	public function fieldImageUpload( $sName, $aParams = array() ) {
 		
-		$sClass = $this->fieldClass( $aParams[ 'class' ] );
 		
 		$sNameWithPfx = sprintf( '%s%s', $this->getPrefixWithSep(), $sName );
 		
@@ -300,11 +305,31 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 			$iHeight = 200;		
 		}
 		
-		?>
-		<input type="file" id="<?php echo $sName; ?>" name="<?php echo $sName; ?>" _file_upload_dir="<?php echo $this->_sUploadDir; ?>" />
-		<label class="side">(jpg, jpeg, gif, or png)</label><br />
-		<span _bind_to="<?php echo $sNameWithPfx; ?>" _thumb_width="<?php echo $iWidth; ?>" _thumb_height="<?php echo $iHeight; ?>"></span>
-		<?php
+		
+		echo strval(
+			_ge( 'bunch' )
+				->append( _ge( 'input', array(
+					'type' => 'file',
+					'id' => $sName,
+					'name' => $sName,
+					'_file_upload_dir' => $this->_sUploadDir,
+					'class' => $aParams[ 'class' ]
+				) ) )
+				->append(
+					_ge(
+						'label',
+						array(
+							'class' => 'side'
+						)
+					)->append( '(jpg, jpeg, gif, or png)' )
+				)
+				->append( _ge( 'br' ) )
+				->append( _ge( 'span', array(
+					'_bind_to' => $sNameWithPfx,
+					'_thumb_width' => $iWidth,
+					'_thumb_height' => $iHeight
+				) ) )
+		);
 		
 		return $this;
 	}
@@ -313,53 +338,93 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 	//
 	public function fieldImagePicker( $sName, $aParams = array() ) {
 		
-		$sDefaultClass = 'image_picker';
-		if ( $aParams[ 'multi' ] ) {
-			$sDefaultClass = trim( sprintf( '%s multi', $sDefaultClass ) );
-		}
+		$oDiv = _ge( 'div' )->addClass( 'image_picker' );
 		
-		$sClass = $this->fieldClass( $aParams[ 'class' ], $sDefaultClass );
+		if ( $aParams[ 'multi' ] ) $oDiv->addClass( 'multi' );
 		
-		printf( '<div %s >', $sClass );
-			
+		if ( $aParams[ 'class' ] ) $oDiv->addClass( $aParams[ 'class' ] );
+		
 		if ( $aImages = $aParams[ 'query' ] ) {
-			$this->fieldImagePickerItems( $aImages );
+			$oDiv->append( $this->fieldImagePickerItems( $aImages ) );
 		}
 		
-		printf( '<input type="hidden" id="%s" name="%s" class="imgpck_field" _member_ids="yes" />', $sName, $sName );
-			
-		echo '</div>';
+		$oDiv
+			->append( _ge( 'input', array(
+				'type' => 'hidden',
+				'name' => $sName,
+				'id' => $sName,
+				'class' => 'imgpck_field',
+				'_member_ids' => 'yes'
+			) ) )
+		;
+		
+		echo strval( $oDiv );
 		
 		return $this;
 	}
 	
 	
-	//
-	public function fieldClass( $sClass, $sDefaultClass = '' ) {
-		
-		$sConcatClass = trim( sprintf( '%s %s', $sDefaultClass, $sClass ) );
-		
-		if ( $sConcatClass ) {
-			return sprintf( ' class="%s" ', $sConcatClass );
-		}
-		
-		return '';
-	}
-	
 	
 	//
 	public function fieldImagePickerItems( $aImages ) {
 		
-		$aThumbParams = array( 'w' => 75, 'h' => 75 );
+		$iSize = 75;
 		
-		foreach ( $aImages as $oAtt ): ?>
-			<a href="<?php $oAtt->echoUrl(); ?>" title="<?php $oAtt->escechoTitle(); ?>" id="<?php $oAtt->echoId(); ?>">
-				<img src="<?php $oAtt->echoTheImageUrl( $aThumbParams ); ?>" width="75" height="75" />
-			</a><?php
-		endforeach;
+		$aThumbParams = array( 'w' => $iSize, 'h' => $iSize );
+		
+		$oBunch = _ge( 'bunch' );
+		
+		foreach ( $aImages as $oAtt ) {
+			
+			$oA = _ge( 'a', array(
+				'href' => $oAtt->getUrl(),
+				'title' => $oAtt->getTitle(),
+				'id' => $oAtt->getId()
+			) );
+			
+			$oA->append( _ge( 'img', array(
+				'src' => $oAtt->getTheImageUrl( $aThumbParams ),
+				'width' => $iSize,
+				'height' => $iSize
+			) ) );
+			
+			$oBunch->append( $oA );
+		}
+		
+		return $oBunch;
 	}
-
 	
+	
+	//
+	public function fieldFormatQuery( $aParams ) {
+		
+		if ( $aQuery = $aParams[ 'query' ] ) {
+			
+			$aRes = array();
+			
+			if ( !$sQryVal = $aParams[ 'query_value' ] ) {
+				$sQryVal = '##Id##';
+			}
+			
+			if ( !$sQryLbl = $aParams[ 'query_label' ] ) {
+				$sQryLbl = '##Title##';
+			}
+			
+			
+			$aVals = $aQuery->gather( $sQryVal );
+			$aLabels = $aQuery->gather( $sQryLbl );
+			
+			
+			foreach ( $aVals as $i => $sVal ) {
+				$aRes[ $sVal ] = $aLabels[ $i ];
+			}
+			
+			
+			return $aRes;
+		}
+		
+		return NULL;
+	}
 	
 	
 	

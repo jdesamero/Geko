@@ -270,12 +270,19 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	}
 
 
-	// form transform
+	// initial setup stuff
 	public function compSetup( $aArgs ) {
 		
+		//// init meta key system
+		
+		Geko_Wp_Options_MetaKey::init();
+		Geko_Wp_Options_MetaKey::install();
+		
+		
+		
+		//// force https
+		
 		if ( $aArgs[ 'force_https' ] ) {
-			
-			// force https
 			Geko_Uri::forceHttps();	
 		}
 		

@@ -3,10 +3,12 @@
 class Geko_Html_Element
 {
 	
+	protected static $_iHtmlVersion = NULL;			// set to 4 or 5 to enforce restrictions
+	
+	
 	protected $_sElem;
 	protected $_aAtts = array();
 	protected $_aChildren = array();
-	protected $_iHtmlVersion = 4;
 	protected $_bHasContent = TRUE;
 	
 	
@@ -55,7 +57,7 @@ class Geko_Html_Element
 	// factory method
 	public static function create( $sElem, $aAtts = array(), $mContent = NULL ) {
 		
-		$sClass = 'Geko_Html_Element_' . ucfirst( trim( $sElem ) );
+		$sClass = sprintf( 'Geko_Html_Element_%s', ucfirst( trim( $sElem ) ) );
 		
 		if ( class_exists( $sClass ) ) {
 			$oElem = new $sClass();
@@ -88,54 +90,67 @@ class Geko_Html_Element
 	
 	//
 	public function _setAtt( $sKey, $sValue ) {
+		
 		if ( 'class' == $sKey ) {
 			$this->setClass( $sValue );
 		} else {
 			$this->_aAtts[ $sKey ] = $sValue;
 		}
+		
 		return $this;
 	}
 	
 	//
 	public function _setAtts( $aAtts ) {
+		
 		foreach ( $aAtts as $sKey => $sValue ) {
 			$this->_setAtt( $sKey, $sValue );
 		}
+		
 		return $this;
 	}
 	
 	//
 	public function _unsetAtt( $sKey ) {
+		
 		if ( 'class' == $sKey ) {
 			$this->unsetClass();
 		} else {
 			unset( $this->_aAtts[ $sKey ] );		
 		}
+		
 		return $this;
 	}
 	
 	//
 	public function _unsetAtts() {
+		
 		$this->_aAtts = array();
+		
 		return $this;
 	}
 	
 	//
-	public function _setHtmlVersion( $iHtmlVersion ) {
-		$this->_iHtmlVersion = $iHtmlVersion;
-		return $this;
+	public static function _setHtmlVersion( $iHtmlVersion ) {
+		
+		self::$_iHtmlVersion = $iHtmlVersion;
 	}
 	
 	//
 	public function append( $mElem ) {
 		
 		if ( is_string( $mElem ) ) {
+			
 			$oText = new Geko_Html_Element_Text();
 			$oText->_setContent( $mElem );
 			$this->_aChildren[] = $oText;
+		
 		} elseif ( is_object( $mElem ) && is_a( $mElem, __CLASS__ ) ) {
+			
 			$this->_aChildren[] = $mElem;
+		
 		} elseif ( is_array( $mElem ) ) {
+			
 			foreach ( $mElem as $oElem ) {
 				$this->append( $oElem );
 			}
@@ -148,12 +163,17 @@ class Geko_Html_Element
 	public function prepend( $oElem ) {
 
 		if ( is_string( $mElem ) ) {
+			
 			$oText = new Geko_Html_Element_Text();
 			$oText->_setContent( $mElem );
 			array_unshift( $this->_aChildren, $oText );
+		
 		} elseif ( is_object( $mElem ) && is_a( $mElem, __CLASS__ ) ) {
+			
 			array_unshift( $this->_aChildren, $mElem );
+		
 		} elseif ( is_array( $mElem ) ) {
+			
 			$aElems = array_reverse( $mElem );
 			foreach ( $aElems as $oElem ) {
 				$this->prepend( $oElem  );
@@ -165,7 +185,9 @@ class Geko_Html_Element
 	
 	// removes all children
 	public function remove() {
+		
 		$this->_aChildren = array();
+		
 		return $this;
 	}
 	
@@ -184,10 +206,12 @@ class Geko_Html_Element
 	
 	//
 	public function addClass( $sClass ) {
+		
 		$aClass = Geko_Array::explodeTrimEmpty( ' ', $sClass );
 		foreach ( $aClass as $sItem ) {
 			$this->_aClass[] = $sItem;
 		}
+		
 		return $this;
 	}
 	
@@ -205,26 +229,71 @@ class Geko_Html_Element
 	
 	//
 	public function removeClass( $sClass ) {
+		
 		$aRemove = Geko_Array::explodeTrimEmpty( ' ', $sClass );
 		$aRet = array();
+		
 		foreach ( $this->_aClass as $sItem ) {
 			if ( !in_array( $sItem, $aRemove ) ) {
 				$aRet[] = $sItem;
 			}
 		}
+		
 		$this->_aClass = $aRet;
+		
 		return $this;
 	}
 	
 	//
 	public function hasClass( $sClass ) {
+		
 		$aHas = Geko_Array::explodeTrimEmpty( ' ', $sClass );
+		
 		foreach ( $aHas as $sItem ) {
 			if ( !in_array( $sItem, $this->_aClass ) ) {
 				return FALSE;
 			}
 		}
+		
 		return TRUE;
+	}
+	
+	
+	
+	//// helpers
+	
+	//
+	public function isValidAtt( $sAtt ) {
+		
+		// don't enforce any restrictions
+		if ( !self::$_iHtmlVersion ) {
+			return TRUE;
+		}
+		
+		// get list of valid attributes
+		
+		$aValidAtts = array();
+		$aValidAtts = array_merge( $aValidAtts, $this->_aGlobalAtts, $this->_aValidAtts );
+		
+		if ( 5 == self::$_iHtmlVersion ) {
+			$aValidAtts = array_merge( $aValidAtts, $this->_aGlobalAtts5, $this->_aValidAtts5 );		
+		} else {
+			// html 4 is default
+			$aValidAtts = array_merge( $aValidAtts, $this->_aGlobalAtts4, $this->_aValidAtts4 );		
+		}
+		
+		
+		if (
+			( isset( $this->_aAtts[ $sAtt ] ) ) && 
+			(
+				( in_array( $sAtt, $aValidAtts ) ) || 
+				Geko_Array::beginsWith( $sAtt, $this->_aAllowedAttPrefixes )
+			)
+		) {
+			return TRUE;
+		}
+		
+		return FALSE;
 	}
 	
 	
@@ -234,22 +303,14 @@ class Geko_Html_Element
 	// output the completed query
 	public function __toString() {
 		
-		$sOutput = '<' . $this->_sElem;
+		$sOutput = '';
 		
-		//// add attributes
-		
-		// get list of valid attributes
-		
-		$aValidAtts = array();
-		$aValidAtts = array_merge( $aValidAtts, $this->_aGlobalAtts, $this->_aValidAtts );
-		
-		if ( 5 == $this->_iHtmlVersion ) {
-			$aValidAtts = array_merge( $aValidAtts, $this->_aGlobalAtts5, $this->_aValidAtts5 );		
-		} else {
-			// html 4 is default
-			$aValidAtts = array_merge( $aValidAtts, $this->_aGlobalAtts4, $this->_aValidAtts4 );		
+		if ( $this->_sElem ) {
+			$sOutput = sprintf( '<%s', $this->_sElem );
 		}
 		
+		//// add attributes
+				
 		// integrate special attributes
 		if ( count( $this->_aClass ) > 0 ) {
 			$this->_aAtts[ 'class' ] = implode( ' ', $this->_aClass );
@@ -259,29 +320,25 @@ class Geko_Html_Element
 		$aAttFmt = array();
 		$sAtts = '';
 		foreach ( $this->_aAtts as $sAtt => $sValue ) {
-			if (
-				( isset( $this->_aAtts[ $sAtt ] ) ) && 
-				(
-					( in_array( $sAtt, $aValidAtts ) ) || 
-					Geko_Array::beginsWith( $sAtt, $this->_aAllowedAttPrefixes )
-				)
-			) {
+			if ( $this->isValidAtt( $sAtt ) ) {
 				$aAttFmt[] = sprintf( '%s="%s"', $sAtt, htmlspecialchars( $sValue ) );
 			}
 		}
 		
 		if ( count( $aAttFmt ) > 0 ) {
-			$sAtts = ' ' . implode( ' ', $aAttFmt );
+			$sAtts = sprintf( ' %s', implode( ' ', $aAttFmt ) );
 		}
 		
 		if ( !$this->_bHasContent ) {
 			
 			// close the element
-			$sOutput .= $sAtts . ' />';
+			$sOutput .= sprintf( '%s />', $sAtts );
 			
 		} else {
 			
-			$sOutput .= $sAtts . '>';
+			if ( $this->_sElem ) {
+				$sOutput .= sprintf( '%s>', $sAtts );
+			}
 			
 			//// add content
 			$sContent = '';
@@ -292,8 +349,10 @@ class Geko_Html_Element
 			$sOutput .= $sContent;
 			
 			//// close tag
-			$sOutput .= '</' . $this->_sElem . '>';
-		
+			if ( $this->_sElem ) {
+				$sOutput .= sprintf( '</%s>', $this->_sElem );
+			}
+			
 		}
 		
 		return $sOutput;
@@ -304,18 +363,25 @@ class Geko_Html_Element
 	public function __call( $sMethod, $aArgs ) {
 		
 		if ( 0 === strpos( strtolower( $sMethod ), 'set' ) ) {
+			
 			$sAtt = substr_replace( $sMethod, '', 0, 3 );
 			$this->_setAtt( strtolower( $sAtt ), $aArgs[ 0 ] );
+			
 			return $this;
+		
 		} elseif ( 0 === strpos( strtolower( $sMethod ), 'unset' ) ) {
+			
 			$sAtt = substr_replace( $sMethod, '', 0, 5 );
 			$this->_unsetAtt( strtolower( $sAtt ) );
+			
 			return $this;
 		}
 		
-		throw new Exception( 'Invalid method ' . __CLASS__ . '::' . $sMethod . '() called.' );
+		throw new Exception( sprintf( 'Invalid method %s::%s() called.', __CLASS__, $sMethod ) );
 		
 	}
 	
 	
 }
+
+

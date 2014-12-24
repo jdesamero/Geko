@@ -9,7 +9,7 @@ class Geko_String
 		// do nothing
 	}
 	
-	
+	// DEPRECATED: Use Geko::coalesce() instead
 	// return the first non-empty value from argument list
 	public static function coalesce() {
 		
@@ -23,7 +23,7 @@ class Geko_String
 			}
 		}
 		return '';
-	}	
+	}
 	
 	
 	//

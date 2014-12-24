@@ -117,9 +117,15 @@ class Gloc_Page_Meta extends Geko_Wp_Page_Meta
 			
 			if ( $oPage && ( 'homepage.php' == $oPage->getPageTemplate() ) ) {
 			
-				$this->fieldRow( 'Main Image', 'main_image', array(
-					'query' => $aImages
-				), 'image_picker' );
+				$this
+					->fieldRow( 'Main Image', 'main_image', array(
+						'query' => $aImages
+					), 'image_picker' )
+					->fieldRow( 'Slideshow Images', 'slideshow_images', array(
+						'query' => $aImages,
+						'multi' => TRUE
+					), 'image_picker' )
+				;
 				
 			} elseif ( $oPage && ( 'page_form.php' == $oPage->getPageTemplate() ) ) {
 				
