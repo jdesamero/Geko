@@ -40,7 +40,7 @@ class Gloc_Layout_PageLoginSetPassword extends Gloc_Layout
 			$oUser = $this->newUser_Query( array( 'geko_password_reset_key' => $this->sPasswordResetKey ) )->getOne();
 			$this->oUser = ( $oUser->isValid() && $oUser->getPasswordResetKey() ) ? $oUser : NULL ;
 			if ( $oUser->isValid() && !$oUser->getPasswordResetKey() ) {
-				header( 'Location: ' . Geko_Wp::getUrl() );
+				header( sprintf( 'Location: %s', Geko_Wp::getUrl() ) );
 				die();
 			}
 		}

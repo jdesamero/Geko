@@ -145,14 +145,19 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 		//// backstab model fields functionality
 		
 		$aModelFields = array();
+		$aDeferFields = array();
 		
 		// if "data-model" was provided, then track it
-		Geko_Hooks::addFilter( 'Geko_Loader_ExternalFiles::registerFromXmlConfigFile::params', function( $aParams, $sId, $sType, $oItem ) use ( &$aModelFields ) {
+		Geko_Hooks::addFilter( 'Geko_Loader_ExternalFiles::registerFromXmlConfigFile::params', function( $aParams, $sId, $sType, $oItem ) use ( &$aModelFields, &$aDeferFields ) {
 				
 			if ( $sDataModel = strval( $oItem[ 'data-model' ] ) ) {
 				
 				// start with NULL values, we'll populate this later
 				$aModelFields[ $sDataModel ] = NULL;
+			}
+			
+			if ( $oItem[ 'defer' ] ) {
+				$aDeferFields[] = $sId;
 			}
 			
 			return $aParams;
@@ -195,6 +200,16 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 			
 		} );
 		
+		
+		add_filter( 'script_loader_tag', function( $sTag, $sHandle, $sSrc ) use ( &$aDeferFields ) {
+			
+			if ( in_array( $sHandle, $aDeferFields ) ) {
+				$sTag = str_replace( '<script', '<script defer="defer"', $sTag );
+			}
+			
+			return $sTag;
+			
+		}, 10, 3 );
 		
 		
 		
