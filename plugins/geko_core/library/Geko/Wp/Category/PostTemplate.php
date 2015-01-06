@@ -30,20 +30,25 @@ class Geko_Wp_Category_PostTemplate extends Geko_Wp_Category_Meta
 			$iActualCatId = FALSE;
 			
 			$oPost = new Geko_Wp_Post( $post );
-			$iActualCatId = $oPost->getCategory()->getId();
 			
-			$iActualCatId = apply_filters( sprintf( '%s::actualCatId', __METHOD__ ), $iActualCatId, $oPost, $this );
+			if ( $oCat = $oPost->getCategory() ) {
 			
-			// see if there is a matching template
-			if (
-				$iActualCatId && 
-				( $sTemplate = $this->getTemplate( $iActualCatId ) ) &&
-				( $sTemplatePath = realpath( sprintf( '%s/%s', TEMPLATEPATH, $sTemplate ) ) ) 
-			) {
-				$this->_sTemplate = $sTemplate;
-				include( apply_filters( 'template_include', $sTemplatePath ) );
-				die();
+				$iActualCatId = $oCat->getId();
+				
+				$iActualCatId = apply_filters( sprintf( '%s::actualCatId', __METHOD__ ), $iActualCatId, $oPost, $this );
+				
+				// see if there is a matching template
+				if (
+					$iActualCatId && 
+					( $sTemplate = $this->getTemplate( $iActualCatId ) ) &&
+					( $sTemplatePath = realpath( sprintf( '%s/%s', TEMPLATEPATH, $sTemplate ) ) ) 
+				) {
+					$this->_sTemplate = $sTemplate;
+					include( apply_filters( 'template_include', $sTemplatePath ) );
+					die();
+				}
 			}
+			
 		}
 	}
 	
