@@ -525,12 +525,48 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	//// helpers
 	
 	//
+	public function resolveTemplateSuffix( $sTemplate ) {
+
+		// handle templates in sub-directories
+		
+		$sClassPath = str_replace( TEMPLATEPATH, '', $sTemplate );
+		$aParts = pathinfo( $sClassPath );
+		
+		$aSecs = array();
+		
+		if ( $sDir = trim( $aParts[ 'dirname' ], '/' ) ) {
+			$aSecs = explode( '/', $sDir );
+		}
+		
+		$aSecs[] = $aParts[ 'filename' ];
+		
+		$sCurTmplSuffix = '';
+		
+		foreach ( $aSecs as $sSec ) {
+			
+			if ( $sCurTmplSuffix ) {
+				$sCurTmplSuffix .= '_';
+			}
+			
+			$sCurTmplSuffix .= Geko_Inflector::camelize( str_replace( '-', '_', $sSec ) );
+		}
+		
+		
+		/* /
+		// HACK HACK HACK, change dashes to underscore
+		$sCurTmplSuffix = pathinfo( $sTemplate, PATHINFO_FILENAME );
+		$sCurTmplSuffix = Geko_Inflector::camelize( str_replace( '-', '_', $sCurTmplSuffix ) );
+		// echo $sCurTmplSuffix;
+		/* */
+		
+		return $sCurTmplSuffix;
+	}
+	
+	
+	//
 	public function templateInclude( $sTemplate ) {
 		
-		// HACK HACK HACK, change dashes to underscore
-		$sCurTmpSuffix = pathinfo( $sTemplate, PATHINFO_FILENAME );
-		$sCurTmpSuffix = Geko_Inflector::camelize( str_replace( '-', '_', $sCurTmpSuffix ) );
-		
+		$sCurTmplSuffix = $this->resolveTemplateSuffix( $sTemplate );
 		
 		//
 		Geko_Debug::out( $sTemplate, __METHOD__ );
@@ -538,7 +574,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 		$aClassFileMapping = array(
 			'Main' => sprintf( '%s/layout_main.php', TEMPLATEPATH ),
 			'Widgets' => sprintf( '%s/layout_widgets.php', TEMPLATEPATH ),
-			$sCurTmpSuffix => $sTemplate
+			$sCurTmplSuffix => $sTemplate
 		);
 		
 		$oResolve = new Geko_Wp_Resolver();
