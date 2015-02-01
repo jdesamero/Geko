@@ -443,6 +443,15 @@ class Geko_Inflector
 		return $variable;
 	}
 	
+	// ala Wordpress slug
+	public static function sanitize( $sString ) {
+		
+		$sRet = strtolower( $sString );
+		$sRet = str_replace( ' ', '-', $sRet );
+		
+		return $sRet;
+	}
+	
 	//
 	protected static function _enclose( $string ) {
 		return '(?:' . $string . ')';
