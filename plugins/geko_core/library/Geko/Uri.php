@@ -268,6 +268,12 @@ class Geko_Uri
 		return $sOut;	
 	}
 	
+	//
+	public function getQueryString() {
+		
+		return http_build_query( $this->getVars() );
+	}
+	
 	
 	//
 	public function __toString() {
