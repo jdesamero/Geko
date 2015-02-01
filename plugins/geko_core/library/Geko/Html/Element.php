@@ -205,20 +205,27 @@ class Geko_Html_Element
 	//// special accessors
 	
 	//
-	public function addClass( $sClass ) {
+	public function addClass( $mClass ) {
 		
-		$aClass = Geko_Array::explodeTrimEmpty( ' ', $sClass );
+		if ( is_string( $mClass ) ) {
+			$aClass = Geko_Array::explodeTrimEmpty( ' ', $mClass );		
+		} else {
+			$aClass = $mClass;
+		}
+		
 		foreach ( $aClass as $sItem ) {
-			$this->_aClass[] = $sItem;
+			if ( !in_array( $sItem, $this->_aClass ) ) {
+				$this->_aClass[] = $sItem;
+			}
 		}
 		
 		return $this;
 	}
 	
 	//
-	public function setClass( $sClass ) {
+	public function setClass( $mClass ) {
 		$this->_aClass = array();
-		return $this->addClass( $sClass );
+		return $this->addClass( $mClass );
 	}
 	
 	//
@@ -228,9 +235,14 @@ class Geko_Html_Element
 	}
 	
 	//
-	public function removeClass( $sClass ) {
+	public function removeClass( $mClass ) {
 		
-		$aRemove = Geko_Array::explodeTrimEmpty( ' ', $sClass );
+		if ( is_string( $mClass ) ) {
+			$aRemove = Geko_Array::explodeTrimEmpty( ' ', $mClass );		
+		} else {
+			$aRemove = $mClass;
+		}
+		
 		$aRet = array();
 		
 		foreach ( $this->_aClass as $sItem ) {

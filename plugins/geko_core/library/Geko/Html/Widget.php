@@ -4,21 +4,32 @@
 class Geko_Html_Widget
 {
 	
+	protected static $aClassPrefixes = array( 'Geko_Html_Widget_' );
+	
+	
 	protected $_aAtts = array();
 	protected $_mValue;
 	protected $_aParams = array();
 	
 	protected $_sWidget = '';
 	
+	
+	
+	
 	// factory method
 	public static function create( $sWidget, $aAtts, $mValue, $aParams ) {
-		
-		$sClass = 'Geko_Html_Widget_' . Geko_Inflector::camelize( $sWidget );
+
 		$bSetWidget = FALSE;
 		
-		if ( !class_exists( $sClass ) ) {
+		$aClasses = array();
+		
+		foreach ( self::$aClassPrefixes as $sClassPrefix ) {
+			$aClasses[] = sprintf( '%s%s', $sClassPrefix, Geko_Inflector::camelize( $sWidget ) );
+		}
+		
+		if ( !$sClass = Geko_Class::existsCoalesce( $aClasses ) ) {
 			$sClass = __CLASS__;
-			$bSetWidget = TRUE;
+			$bSetWidget = TRUE;		
 		}
 		
 		$oWidget = new $sClass( $aAtts, $mValue, $aParams );
@@ -27,6 +38,24 @@ class Geko_Html_Widget
 		
 		return $oWidget;
 	}
+	
+	//// static accessors
+	
+	//
+	public static function prependClassPrefixes( $sPrefix ) {
+		self::$aClassPrefixes[] = $sPrefix;
+	}
+
+	//
+	public static function appendClassPrefixes( $sPrefix ) {
+		array_unshift( self::$aClassPrefixes, $sPrefix );
+	}
+		
+	//
+	public static function setClassPrefixes( $aPrefixes ) {
+		self::$aClassPrefixes = $aPrefixes;
+	}
+	
 	
 	
 	//
@@ -69,7 +98,12 @@ class Geko_Html_Widget
 		
 		return $oDiv;
 	}
-
+	
+	//
+	public function output() {
+		echo strval( $this->get() );
+	}
+	
 }
 
 
