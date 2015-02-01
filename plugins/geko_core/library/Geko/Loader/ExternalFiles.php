@@ -184,9 +184,14 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 	public function renderScriptTag( $aItem ) {
 		
 		$aAtts = array(
+			'id' => $aItem[ 'id' ],
 			'type' => 'text/javascript',
 			'src' => $this->modifyFileUrl( $aItem[ 'file' ] )
 		);
+		
+		if ( $sDefer = $aItem[ 'defer' ] ) {
+			$aAtts[ 'defer' ] = $sDefer;
+		}
 		
 		echo strval( _ge( 'script', $aAtts ) );
 		echo "\n";
@@ -207,6 +212,7 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 	public function renderStyleTag( $aItem ) {
 		
 		$aAtts = array(
+			'id' => $aItem[ 'id' ],
 			'rel' => 'stylesheet',
 			'type' => 'text/css',
 			'href' => $this->modifyFileUrl( $aItem[ 'file' ] )
@@ -310,11 +316,23 @@ class Geko_Loader_ExternalFiles extends Geko_Singleton_Abstract
 					
 					$sId = trim( $oItem[ 'id' ] );
 					
-					$aParams = array( 'file' => $sFile );
+					$aParams = array(
+						'id' => $sId,
+						'file' => $sFile
+					);
 					
 					if ( $sDeps = trim( $oItem[ 'dependencies' ] ) ) {
 						$aParams[ 'dependencies' ] = array_filter( explode( ' ', $sDeps ) );
 					}
+					
+					
+					if (
+						( 'script' == $sType ) && 
+						( $sDefer = trim( $oItem[ 'defer' ] ) )
+					) {
+						$aParams[ 'defer' ] = $sDefer;
+					}
+					
 					
 					if (
 						( 'style' == $sType ) && 
