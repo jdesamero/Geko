@@ -14,6 +14,8 @@ class Geko_Wp_Ext_WatuPro_TakenExams_Query extends Geko_Wp_Entity_Query
 	
 		$oQuery
 			
+			// taken_exams
+			
 			->field( 't.ID' )
 			->field( 't.percent_correct' )
 			->field( 't.user_id' )
@@ -25,38 +27,59 @@ class Geko_Wp_Ext_WatuPro_TakenExams_Query extends Geko_Wp_Entity_Query
 			
 			->field( 't.in_progress' )
 			
+			
+			// master
+			
 			->field( 'm.name' )
 			->field( 'm.times_to_take' )
-						
+			
+			
 			->from( '##pfx##watupro_taken_exams', 't' )
 			
 			->joinLeft( '##pfx##watupro_master', 'm' )
 				->on( 'm.ID = t.exam_id' )
+				
 		;
 		
 		
-		if ( $iTakingId = intval( $aParams[ 'taking_id' ] ) ) {
-			
-			$oQuery->where( 't.ID = ?', $iTakingId );
-		}
-
-		
-		if ( $iUserId = intval( $aParams[ 'user_id' ] ) ) {
+		// exam urls
+		if ( $aParams[ 'add_exam_post_id_field' ] ) {
 			
 			$oQuery
 				
 				->field( 'po.ID', 'exam_post_id' )
-			
+	
 				->joinLeft( '##pfx##posts', 'po' )
 					->on( "po.post_content LIKE CONCAT( '%[watupro ', m.ID, ']%' )" )
 					->on( 'po.post_status = ?', 'publish' )
 			
-				->where( 't.user_id = ?', $iUserId )
-				->order( 't.date', 'DESC' )
 			;
-		
+			
 		}
-	
+		
+		
+		// taking_id provided
+		if ( $iTakingId = intval( $aParams[ 'taking_id' ] ) ) {
+			
+			$oQuery->where( 't.ID = ?', $iTakingId );
+		}
+		
+		
+		// user_id provided
+		if ( $iUserId = intval( $aParams[ 'user_id' ] ) ) {
+			
+			$oQuery->where( 't.user_id = ?', $iUserId );
+		}
+		
+		
+		// exam_id provided
+		if ( $iExamId = intval( $aParams[ 'exam_id' ] ) ) {
+			
+			$oQuery->where( 't.exam_id = ?', $iExamId );
+		}
+		
+		
+		
 		return $oQuery;
 	}
 	
