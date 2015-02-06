@@ -7,6 +7,8 @@ class Geko_Wp_Ext_WatuPro_Timing_Service extends Geko_Wp_Service
 	const STAT_PAUSED = 1;
 	const STAT_RESUME = 2;
 	
+	const STAT_TAKING_ID = 3;
+	
 	const STAT_ERROR = 999;
 	
 	
@@ -50,6 +52,8 @@ class Geko_Wp_Ext_WatuPro_Timing_Service extends Geko_Wp_Service
 
 			$sStatus = $oTiming->getStatus();
 			
+			$this->setResponseValue( 'elapsed_seconds', $oTiming->getElapsedTime() );
+			
 			if ( 'running' == $sStatus ) {
 				
 				// create new record
@@ -72,6 +76,31 @@ class Geko_Wp_Ext_WatuPro_Timing_Service extends Geko_Wp_Service
 		
 	}
 	
+	//
+	public function processGetTakingId() {
+		
+		$iExamId = intval( $_REQUEST[ 'exam_id' ] );
+		
+		$oUser = $this->regGet( 'user' );
+		
+		if ( $iExamId && $oUser ) {
+		
+			$oTaking = $this->oneExt_WatuPro_TakenExams_Query( array(
+				'exam_id' => intval( $iExamId ),
+				'user_id' => $iUserId,
+				'orderby' => 't.ID',
+				'order' => 'DESC',
+				'limit' => 1
+			), FALSE );
+			
+			$this
+				->setResponseValue( 'taking_id', $oTaking->getId() )
+				->setStatus( self::STAT_TAKING_ID )
+			;
+		}
+		
+	}
+	
 	
 	// get the current timing status
 	public function processGetStatus() {
@@ -79,6 +108,8 @@ class Geko_Wp_Ext_WatuPro_Timing_Service extends Geko_Wp_Service
 		if ( $oTiming = $this->getTiming() ) {
 			
 			$sStatus = $oTiming->getStatus();
+			
+			$this->setResponseValue( 'elapsed_seconds', $oTiming->getElapsedTime() );
 			
 			if ( 'running' == $sStatus ) {
 				
@@ -104,7 +135,7 @@ class Geko_Wp_Ext_WatuPro_Timing_Service extends Geko_Wp_Service
 		
 		$oDb->insert( '##pfx##watupro_timing', array(
 			'taking_id' => $iTakingId,
-			'pause_time' => current_time( 'mysql' )
+			'pause_time' => $oDb->getTimestamp()
 		) );
 		
 		return $this;
@@ -117,7 +148,7 @@ class Geko_Wp_Ext_WatuPro_Timing_Service extends Geko_Wp_Service
 
 		$oDb->update(
 			'##pfx##watupro_timing',
-			array( 'resume_time' => current_time( 'mysql' ) ),
+			array( 'resume_time' => $oDb->getTimestamp() ),
 			sprintf( 'ID = %d', $iTimingId )
 		);
 		

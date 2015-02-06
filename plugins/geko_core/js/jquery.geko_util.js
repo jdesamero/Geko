@@ -674,6 +674,37 @@
 	};
 	
 	
+	//// some basic date/time utilities
+	
+	// client-side version of PHP time()
+	
+	$.gekoTimestamp = function() {
+		return Math.floor( new Date().getTime() / 1000 );
+	};
+	
+	
+	$.gekoFormatDdHsMmSs = function( iSecNum, bIncludeZeroed ) {
+		
+		var iDays   = Math.floor( iSecNum / 86400 );
+		var iHours   = Math.floor( ( iSecNum - ( iDays * 86400 ) ) / 3600 );
+		var iMins = Math.floor( ( iSecNum - ( iDays * 86400 ) - ( iHours * 3600 ) ) / 60 );
+		var iSecs = iSecNum - ( iDays * 86400 ) - ( iHours * 3600 ) - ( iMins * 60 );
+		
+		var sOut = '%02d:%02d'.printf( iMins, iSecs );
+		
+		if ( iHours || bIncludeZeroed ) {
+			sOut = '%02d:%s'.printf( iHours, sOut );
+		}
+
+		if ( iDays || bIncludeZeroed ) {
+			sOut = '%02d:%s'.printf( iDays, sOut );
+		}
+		
+		return sOut;
+	};
+	
+	
+	
 	// prevent IE 9 from crapping out
 	if ( !( window.console && console.log ) ) {
 		window.console = {

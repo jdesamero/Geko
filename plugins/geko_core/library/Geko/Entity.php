@@ -872,24 +872,31 @@ abstract class Geko_Entity
 			}
 			
 			
-			//// file formatting
+			//// file/timestamp formatting
 			
 			$aRegs = array();
 			
-			if ( preg_match( '/get([a-zA-Z0-9]+)Url/', $sMethod, $aRegs ) ) {
+			if ( preg_match( '/^get([a-zA-Z0-9]+)(Url|Path|Size|Ts)$/', $sMethod, $aRegs ) ) {
 				
-				$sCall = sprintf( 'fileurl%s', $aRegs[ 1 ] );
-				return $this->__call( $sCall, $aArgs );
+				$sFormatSubject = $aRegs[ 1 ];
+				$sFormatSuffix = $aRegs[ 2 ];
 				
-			} elseif ( preg_match( '/get([a-zA-Z0-9]+)Path/', $sMethod, $aRegs ) ) {
+				if ( in_array( $sFormatSuffix, array( 'Url', 'Path', 'Size' ) ) ) {
+
+					$sCall = sprintf( 'file%s%s', strtolower( $sFormatSuffix ), $sFormatSubject );
+					return $this->__call( $sCall, $aArgs );
+					
+				} elseif ( 'Ts' == $sFormatSuffix ) {
+					
+					// format db timestamp to unix timestamp
+					$sDbTimeStamp = $this->getEntityPropertyValue(
+						Geko_Inflector::underscore( $sFormatSubject )
+					);
+					
+					// if there are any digits between 1 to 9, then timestamp is no 0
+					return ( preg_match( '/[1-9]+/', $sDbTimeStamp ) ) ? strtotime( $sDbTimeStamp ) : 0 ;
+				}
 				
-				$sCall = sprintf( 'filepath%s', $aRegs[ 1 ] );
-				return $this->__call( $sCall, $aArgs );
-				
-			} elseif ( preg_match( '/get([a-zA-Z0-9]+)Size/', $sMethod, $aRegs ) ) {
-				
-				$sCall = sprintf( 'filesize%s', $aRegs[ 1 ] );
-				return $this->__call( $sCall, $aArgs );
 			}
 			
 			// prevent exeception from being thrown

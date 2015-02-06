@@ -51,6 +51,35 @@ class Geko_Date
 	
 	
 	
+	//
+	public static function formatDdHhMmSs( $iNumSeconds, $bIncludeZeroed = FALSE ) {
+		
+		$iDays   = floor( $iNumSeconds / 86400 );
+		$iHours   = floor( ( $iNumSeconds - ( $iDays * 86400 ) ) / 3600 );
+		$iMinutes = floor( ( $iNumSeconds - ( $iDays * 86400 ) - ( $iHours * 3600 ) ) / 60 );
+		$iSeconds = $iNumSeconds - ( $iDays * 86400 ) - ( $iHours * 3600 ) - ( $iMinutes * 60 );
+		
+		// sprintf( '%02d:%02d:%02d:%02d', $iDays, $iHours, $iMinutes, $iSeconds );
+		
+		// minutes and seconds are always included by default
+		$sOut = sprintf( '%02d:%02d', $iMinutes, $iSeconds );
+		
+		// if include zeroed was set or there is an hours value
+		if ( $bIncludeZeroed || $iHours ) {
+			$sOut = sprintf( '%02d:%s', $iHours, $sOut );		
+		}
+		
+		// if include zeroed was set or there is a days value
+		if ( $bIncludeZeroed || $iDays ) {
+			$sOut = sprintf( '%02d:%s', $iDays, $sOut );		
+		}
+		
+		return $sOut;
+		
+	}
+	
+	
+	
 }
 
 

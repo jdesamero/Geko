@@ -107,7 +107,7 @@
 	} );
 	
 	
-	$.gekoWpCart66 = function( oParams ) {
+	$.gekoWpExtCart66 = function( oParams ) {
 		
 		if ( oParams.addToCart ) {
 			

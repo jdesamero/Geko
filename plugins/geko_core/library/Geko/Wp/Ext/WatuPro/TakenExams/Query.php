@@ -22,8 +22,10 @@ class Geko_Wp_Ext_WatuPro_TakenExams_Query extends Geko_Wp_Entity_Query
 			->field( 't.points' )
 			->field( 't.exam_id' )
 			
+			->field( 't.start_time' )
+			->field( 't.end_time' )
+			
 			->field( 't.date', 'date_taken' )
-			->field( 'UNIX_TIMESTAMP( t.date )', 'date_taken_ts' )
 			
 			->field( 't.in_progress' )
 			
@@ -54,6 +56,36 @@ class Geko_Wp_Ext_WatuPro_TakenExams_Query extends Geko_Wp_Entity_Query
 					->on( 'po.post_status = ?', 'publish' )
 			
 			;
+			
+		}
+		
+		
+		// add timing calculation fields
+		if ( $aParams[ 'add_timing_calculation_fields' ] ) {
+			
+			//// swiped from Geko_Wp_Ext_WatuPro_Timing_Query
+			
+			// group by taking_id
+			
+			$oAggregateQuery = Geko_Wp_Ext_WatuPro_Timing_Query::getTimingAggregateQuery();
+			
+			$oQuery
+				
+				->field( 'tm.max_id' )
+				->field( 'tm.pause_interval' )
+				->field( 'tm.num_timings' )				
+				->field( 'tm.num_complete' )
+				
+				->field( 'tmx.pause_time', 'max_pause_time' )
+				->field( 'tmx.resume_time', 'max_resume_time' )
+				
+				->joinLeft( $oAggregateQuery, 'tm' )
+					->on( 'tm.taking_id = t.ID' )
+				
+				->joinLeft( '##pfx##watupro_timing', 'tmx' )
+					->on( 'tmx.ID = tm.max_id' )			
+			;
+			
 			
 		}
 		

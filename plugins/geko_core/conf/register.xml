@@ -294,13 +294,15 @@
 		
 		<file id="geko_wp_booking_schedule_time_manage" src="##geko_core_uri##/js/Geko/Wp/Booking/Schedule/Time/Manage.js" dependencies="jquery" />
 		
-		<file id="geko_wp_cart66" src="##geko_core_uri##/js/Geko/Wp/Cart66.js" dependencies="geko-backstab-model geko-backstab-collection geko-backstab-view geko-backstab-dispatcher" />
-		<file id="geko_wp_cart66_view_checkout" src="##geko_core_uri##/js/Geko/Wp/Cart66/View/Checkout.js" dependencies="geko-jquery-geko_ajax_form" />
-		
 		<file id="geko_wp_emailmessage_manage" src="##geko_core_uri##/js/Geko/Wp/EmailMessage/Manage.js" dependencies="jquery" />
 		<file id="geko_wp_emailmessage_recipient_manage" src="##geko_core_uri##/js/Geko/Wp/EmailMessage/Recipient/Manage.js" dependencies="geko_phpquery_formtransform_plugin_rowtemplate" />
 		<file id="geko_wp_emailmessage_storage_manage" src="##geko_core_uri##/js/Geko/Wp/EmailMessage/Storage/Manage.js" dependencies="jquery" />
 		<file id="geko_wp_emailmessage_transport_manage" src="##geko_core_uri##/js/Geko/Wp/EmailMessage/Transport/Manage.js" dependencies="jquery" />
+
+		<file id="geko_wp_ext_cart66" src="##geko_core_uri##/js/Geko/Wp/Ext/Cart66.js" dependencies="geko-backstab-model geko-backstab-collection geko-backstab-view geko-backstab-dispatcher" />
+		<file id="geko_wp_ext_cart66_view_checkout" src="##geko_core_uri##/js/Geko/Wp/Ext/Cart66/View/Checkout.js" dependencies="geko-jquery-geko_ajax_form" />
+		
+		<file id="geko_wp_ext_watupro_timing" src="##geko_core_uri##/js/Geko/Wp/Ext/WatuPro/Timing.js" dependencies="geko-jquery-geko_util" />
 		
 		<file id="geko_wp_enumeration_manage" data-model="enum" src="##geko_core_uri##/js/Geko/Wp/Enumeration/Manage.js" dependencies="geko" />
 		

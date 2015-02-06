@@ -5,6 +5,45 @@ class Geko_Wp_Ext_WatuPro_Timing_Query extends Geko_Wp_Entity_Query
 {
 	
 	
+	//// static methods for re-use
+	
+	// pseudo-views
+	
+	//
+	public static function getTimingAggregateQuery() {
+		
+		$oQuery = new Geko_Sql_Select();
+		$oQuery
+			
+			->field( '_agg_tm.taking_id' )
+			
+			->field( 'MAX( _agg_tm.ID )', 'max_id' )
+			
+			->field( 'SUM(
+				IF(
+					_agg_tm.resume_time != 0,
+					UNIX_TIMESTAMP( _agg_tm.resume_time ) - UNIX_TIMESTAMP( _agg_tm.pause_time ),
+					0
+				)
+			)', 'pause_interval' )
+			
+			->field( 'COUNT(*)', 'num_timings' )
+			->field( 'SUM( IF( _agg_tm.resume_time != 0, 1, 0 ) )', 'num_complete' )
+			
+			
+			
+			->from( '##pfx##watupro_timing', '_agg_tm' )
+			
+			->group( '_agg_tm.taking_id' )
+		;
+		
+		return $oQuery;
+	}
+	
+	
+	
+	//// main methods
+	
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
@@ -26,9 +65,6 @@ class Geko_Wp_Ext_WatuPro_Timing_Query extends Geko_Wp_Entity_Query
 				->field( 'tk.start_time' )
 				->field( 'tk.end_time' )
 				
-				->field( 'UNIX_TIMESTAMP( tk.start_time )', 'start_time_ts' )
-				->field( 'UNIX_TIMESTAMP( tk.end_time )', 'end_time_ts' )
-				
 				->from( '##pfx##watupro_taken_exams', 'tk' )
 			;
 			
@@ -40,36 +76,33 @@ class Geko_Wp_Ext_WatuPro_Timing_Query extends Geko_Wp_Entity_Query
 			
 			// group by taking_id
 			
-			$oAggregateQuery = new Geko_Sql_Select();
-			$oAggregateQuery
-				
-				->field( 'tm1.taking_id' )
-				->field( 'MAX( tm1.ID )', 'max_id' )
-				->field( 'COUNT(*)', 'num_timings' )
-				
-				->from( '##pfx##watupro_timing', 'tm1' )
-				
-				->group( 'tm1.taking_id' )
-			;
+			$oAggregateQuery = self::getTimingAggregateQuery();
 			
 			// main query
 			$oQuery
-				->field( 'tm.taking_id' )
 				->field( 'tm.max_id' )
+				->field( 'tm.pause_interval' )
 				->field( 'tm.num_timings' )				
+				->field( 'tm.num_complete' )
 			;
+			
+			//// This needs to be done, in case timings table is empty
 			
 			// from or join?
 			if ( $bAddTakenExamsFields ) {
 
 				$oQuery
+					->field( 'tk.ID', 'taking_id' )					
 					->joinLeft( $oAggregateQuery, 'tm' )
 						->on( 'tk.ID = tm.taking_id' )
 				;
 			
 			} else {
 
-				$oQuery->from( $oAggregateQuery, 'tm' );
+				$oQuery
+					->field( 'tm.taking_id' )
+					->from( $oAggregateQuery, 'tm' )
+				;
 			}
 			
 			
@@ -77,9 +110,6 @@ class Geko_Wp_Ext_WatuPro_Timing_Query extends Geko_Wp_Entity_Query
 				
 				->field( 'tmx.pause_time', 'max_pause_time' )
 				->field( 'tmx.resume_time', 'max_resume_time' )
-				
-				->field( 'UNIX_TIMESTAMP( tmx.pause_time )', 'max_pause_time_ts' )
-				->field( 'UNIX_TIMESTAMP( tmx.resume_time )', 'max_resume_time_ts' )
 				
 				->joinLeft( '##pfx##watupro_timing', 'tmx' )
 					->on( 'tmx.ID = tm.max_id' )			
@@ -91,7 +121,6 @@ class Geko_Wp_Ext_WatuPro_Timing_Query extends Geko_Wp_Entity_Query
 			$oQuery
 				
 				->field( 'tm.ID' )
-				->field( 'tm.taking_id' )
 				->field( 'tm.pause_time' )
 				->field( 'tm.resume_time' )
 				
@@ -99,17 +128,23 @@ class Geko_Wp_Ext_WatuPro_Timing_Query extends Geko_Wp_Entity_Query
 				
 			;
 			
+			//// This needs to be done, in case timings table is empty
+			
 			// from or join?
 			if ( $bAddTakenExamsFields ) {
 
 				$oQuery
+					->field( 'tk.ID', 'taking_id' )					
 					->joinLeft( '##pfx##watupro_timing', 'tm' )
 						->on( 'tk.ID = tm.taking_id' )
 				;
 			
 			} else {
 
-				$oQuery->from( '##pfx##watupro_timing', 'tm' );
+				$oQuery
+					->field( 'tm.taking_id' )
+					->from( '##pfx##watupro_timing', 'tm' )
+				;
 			}
 			
 		}
@@ -125,7 +160,8 @@ class Geko_Wp_Ext_WatuPro_Timing_Query extends Geko_Wp_Entity_Query
 			}
 		}
 		
-				
+		
+		
 		return $oQuery;
 	}
 	

@@ -78,8 +78,8 @@ class Geko_Wp_Ext_WatuPro_Master extends Geko_Wp_Entity
 			return 'active';
 		}
 		
-		$iScheduleFromTs = intval( $this->getEntityPropertyValue( 'schedule_from_ts' ) );
-		$iScheduleToTs = intval( $this->getEntityPropertyValue( 'schedule_to_ts' ) );
+		$iScheduleFromTs = $this->getScheduleFromTs();
+		$iScheduleToTs = $this->getScheduleToTs();
 		
 		$iCurrentTs = time();
 		
@@ -100,6 +100,19 @@ class Geko_Wp_Ext_WatuPro_Master extends Geko_Wp_Entity
 	public function getIsScheduled() {
 		return intval( $this->getEntityPropertyValue( 'is_scheduled' ) ) ? TRUE : FALSE ;
 	}
+	
+	
+	// return either: "complete", "paused" or "running"
+	public function getStatus() {
+		return Geko_Wp_Ext_WatuPro_Timing::calculateStatus( $this );
+	}
+	
+	
+	// calculate the elapsed test time, in seconds
+	public function getElapsedTime() {
+		return Geko_Wp_Ext_WatuPro_Timing::calculateElapsedTime( $this );
+	}
+	
 	
 }
 

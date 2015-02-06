@@ -21,9 +21,6 @@ class Geko_Wp_Ext_WatuPro_Master_Query extends Geko_Wp_Entity_Query
 			->field( 'm.schedule_from' )
 			->field( 'm.schedule_to' )
 			
-			->field( 'UNIX_TIMESTAMP( m.schedule_from )', 'schedule_from_ts' )
-			->field( 'UNIX_TIMESTAMP( m.schedule_to )', 'schedule_to_ts' )
-			
 			->field( 'm.times_to_take' )
 			
 			->from( '##pfx##watupro_master', 'm' )		
@@ -141,10 +138,43 @@ class Geko_Wp_Ext_WatuPro_Master_Query extends Geko_Wp_Entity_Query
 			
 			// get the status of the last taken exam
 			$oQuery
+				
 				->field( 'lt.in_progress' )
+
+				->field( 'lt.start_time' )
+				->field( 'lt.end_time' )
+				
 				->joinLeft( '##pfx##watupro_taken_exams', 'lt' )
 					->on( 'lt.ID = tt.last_taken_id' )
 			;
+			
+			//
+			if ( $aParams[ 'add_timing_calculation_fields' ] ) {
+				
+				//// swiped from Geko_Wp_Ext_WatuPro_Timing_Query
+				
+				// group by taking_id
+				
+				$oAggregateQuery = Geko_Wp_Ext_WatuPro_Timing_Query::getTimingAggregateQuery();
+				
+				$oQuery
+					
+					->field( 'tm.max_id' )
+					->field( 'tm.pause_interval' )
+					->field( 'tm.num_timings' )				
+					->field( 'tm.num_complete' )
+					
+					->field( 'tmx.pause_time', 'max_pause_time' )
+					->field( 'tmx.resume_time', 'max_resume_time' )
+					
+					->joinLeft( $oAggregateQuery, 'tm' )
+						->on( 'tm.taking_id = tt.last_taken_id' )
+					
+					->joinLeft( '##pfx##watupro_timing', 'tmx' )
+						->on( 'tmx.ID = tm.max_id' )			
+				;
+				
+			}
 			
 		}
 		
