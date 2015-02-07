@@ -1,6 +1,12 @@
 ;( function ( $ ) {
-
-	$.gekoWpExtWatuProTiming = function( oParams, eHeaderDisplayDiv ) {
+	
+	// eMainQuizDiv -> the main quiz div
+	// eTimerDisplayCont -> element where timer display gets inserted
+	// eTimerButtonCont -> element where timer button gets inserted
+	
+	$.gekoWpExtWatuProTiming = function( oParams, eMainQuizDiv, eTimerDisplayCont, eTimerButtonCont ) {
+		
+		var iTheTakingId = null;		// a reference to the taking id, if set by fActivateTimer
 		
 		
 		var eHeaderElapsedDiv = $( '<div class="elapsed">Elapsed Time: <\/div>' );
@@ -12,16 +18,14 @@
 		eElapsedPausedSpan.hide();
 		eActivateNoticeDiv.hide();
 		
-		eHeaderDisplayDiv;
 		
 		eHeaderElapsedDiv
 			.append( eElapsedTimeSpan )
 			.append( eElapsedPausedSpan )
 		;
 		
-		// Temporary!!!
-		eHeaderDisplayDiv
-			.append( eHeaderQuestionDiv )
+		//
+		eTimerDisplayCont
 			.append( eHeaderElapsedDiv )
 			.append( eActivateNoticeDiv )
 		;
@@ -30,10 +34,20 @@
 		
 		var fActivateTimer = function( iTakingId ) {
 			
+			iTheTakingId = iTakingId;
+			
+			eActivateNoticeDiv.hide();
 			eHeaderElapsedDiv.show();
 			
-			//
-			eBtnRow.prepend( '<td nowrap="nowrap"><input type="button" value="Loading..." name="quiz-timer" id="quiz-timer" \/> <span class="timer-loading"></span><\/td>' );
+			
+			var eBtn = $( '<input type="button" value="Loading..." name="quiz-timer" id="quiz-timer" \/>' );
+			var eLoading = $( '<span class="timer-loading"><\/span>' );
+			
+			eTimerButtonCont
+				.append( eBtn )
+				.append( ' ' )
+				.append( eLoading )
+			;
 			
 			
 			var iCurTs = 0;
@@ -94,8 +108,6 @@
 			};
 			
 			
-			var eBtn = eBtnRow.find( '#quiz-timer' );
-			var eLoading = eBtnRow.find( 'span.timer-loading' );
 			
 			eBtn.click( function() {
 				
@@ -162,12 +174,8 @@
 			fActivateTimer( oParams.taking_id );
 			
 		} else {
-			
-			var iNumQuestions = eQuizForm.find( '.watupro-qnum-info' ).length;
-			
-			eHeaderQuestionDiv.html( 'Question 1 of %d'.printf( iNumQuestions ) );
-			
-			if ( oParams.taking_id ) {
+						
+			if ( oParams.user_id ) {
 				eActivateNoticeDiv.show();
 			}
 			
@@ -179,7 +187,7 @@
 				if ( !bAjaxTaking ) {
 
 					if ( -1 != settings.data.indexOf( 'exam_id' ) ) {
-
+						
 						$.post (
 							oParams.script.process,
 							{
@@ -203,6 +211,32 @@
 			} );
 
 		}
+		
+		
+		//// handle redirect of completed test
+
+		//
+		$( document ).ajaxSend( function( evt, jqxhr, settings ) {
+			
+			// submit button was clicked
+			if ( -1 != settings.data.indexOf( 'action=watupro_submit' ) ) {
+				
+				eMainQuizDiv.hide();
+				eMainQuizDiv.after( '<div>Submitting Your Test... <span class="timer-loading"><\/span><\/div>' );
+				
+			}
+			
+		} );
+		
+		//
+		$( document ).ajaxSuccess( function( evt, xhr, settings ) {
+			
+			// submit button was clicked
+			if ( -1 != xhr.responseText.indexOf( 'startOutput' ) ) {
+				window.location = '%s/exam-results/exam-review/?id=%d'.printf( oParams.script.url, iTheTakingId );
+			}
+			
+		} );
 		
 		
 	};

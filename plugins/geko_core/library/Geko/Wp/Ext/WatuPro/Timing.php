@@ -40,10 +40,10 @@ class Geko_Wp_Ext_WatuPro_Timing extends Geko_Wp_Entity
 		
 		$iEndTs = 0;
 		
-		if ( 'complete' == $sStatus ) {
-			$iEndTs = $oTiming->getEndTimeTs();
-		} elseif ( 'paused' == $sStatus ) {
+		if ( 'paused' == $sStatus ) {
 			$iEndTs = $oTiming->getMaxPauseTimeTs();		
+		} elseif ( 'complete' == $sStatus ) {
+			$iEndTs = $oTiming->getEndTimeTs();
 		} else {
 			// we're running
 			$iEndTs = time();
