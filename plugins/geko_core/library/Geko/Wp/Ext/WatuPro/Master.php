@@ -43,7 +43,7 @@ class Geko_Wp_Ext_WatuPro_Master extends Geko_Wp_Entity
 			if ( $iRemaining > 0 ) {
 			
 				$sMsg = sprintf(
-					'%d attempt%s remaining out of %d',
+					'%d Attempt%s Remaining Out Of %d',
 					$iRemaining,
 					( ( $iRemaining > 1 ) ? 's' : '' ),
 					$this->getTimesToTake()
@@ -113,6 +113,21 @@ class Geko_Wp_Ext_WatuPro_Master extends Geko_Wp_Entity
 		return Geko_Wp_Ext_WatuPro_Timing::calculateElapsedTime( $this );
 	}
 	
+	// return TRUE if number of answered questions matched the total
+	public function getAnsweredAllQuestions() {
+		return (
+			intval( $this->getEntityPropertyValue( 'answered_questions' ) ) == 
+			intval( $this->getEntityPropertyValue( 'num_questions' ) )
+		) ? TRUE : FALSE ;
+	}
+	
+	//
+	public function getMissedQuestions() {
+		return (
+			intval( $this->getEntityPropertyValue( 'num_questions' ) ) - 
+			intval( $this->getEntityPropertyValue( 'answered_questions' ) )
+		);
+	}
 	
 }
 

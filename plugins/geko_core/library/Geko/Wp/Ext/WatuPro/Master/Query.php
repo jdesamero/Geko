@@ -42,19 +42,27 @@ class Geko_Wp_Ext_WatuPro_Master_Query extends Geko_Wp_Entity_Query
 				->where( 't.ID = ?', $iTakingId )
 			;
 						
-			// get the number of correctly answered questions in this exam
-			if ( $aParams[ 'add_correct_questions_field' ] ) {
+			// get information about the student's answers in this exam
+			if ( $aParams[ 'add_student_answers_fields' ] ) {
 				
 				$oCorrectQuestionsQuery = new Geko_Sql_Select();
 				$oCorrectQuestionsQuery
-					->field( 'COUNT(*)', 'correct_questions' )
-					->from( '##pfx##watupro_student_answers', 'sa' )
-					->where( 'sa.taking_id = t.ID' )
-					->where( 'sa.is_correct = 1' )
+					->field( 'sa1.taking_id' )
+					->field( 'COUNT(*)', 'covered_questions' )
+					->field( 'SUM( IF( sa1.is_correct = 1, 1, 0 ) )', 'correct_questions' )
+					->field( "SUM( IF( ( sa1.answer != '' ) AND ( sa1.answer != 'N;' ), 1, 0 ) )", 'answered_questions' )
+					->from( '##pfx##watupro_student_answers', 'sa1' )
+					->group( 'sa1.taking_id' )
 				;
 				
-				$oQuery->field( $oCorrectQuestionsQuery, 'correct_questions' );
-				
+				$oQuery
+					->field( 'sa.covered_questions' )
+					->field( 'sa.correct_questions' )
+					->field( 'sa.answered_questions' )
+					->joinLeft( $oCorrectQuestionsQuery, 'sa' )
+						->on( 'sa.taking_id = t.ID' )
+				;
+
 			}
 
 		}

@@ -8,6 +8,7 @@ class Geko_Wp_Ext_WatuPro_Timing_Service extends Geko_Wp_Service
 	const STAT_RESUME = 2;
 	
 	const STAT_TAKING_ID = 3;
+	const STAT_GET_MISSED = 4;
 	
 	const STAT_ERROR = 999;
 	
@@ -15,7 +16,7 @@ class Geko_Wp_Ext_WatuPro_Timing_Service extends Geko_Wp_Service
 	
 	// obtain timing data
 	public function getTiming() {
-				
+		
 		$iTakingId = intval( $_REQUEST[ 'taking_id' ] );
 		
 		$oUser = $this->regGet( 'user' );
@@ -97,6 +98,41 @@ class Geko_Wp_Ext_WatuPro_Timing_Service extends Geko_Wp_Service
 				->setResponseValue( 'taking_id', $oTaking->getId() )
 				->setStatus( self::STAT_TAKING_ID )
 			;
+		}
+		
+	}
+	
+	
+	//
+	public function processGetMissed() {
+		
+		$iTakingId = intval( $_REQUEST[ 'taking_id' ] );
+		
+		$oUser = $this->regGet( 'user' );
+		
+		if ( $iTakingId && $oUser ) {
+			
+			$iUserId = intval( $oUser->getId() );
+			
+			$oExam = $this->oneExt_WatuPro_Master_Query( array(
+				'add_num_questions_field' => TRUE,
+				'add_student_answers_fields' => TRUE,
+				'taking_id' => $iTakingId
+			), FALSE );
+			
+			
+			if (
+				( $oExam->isValid() ) && 
+				( $iUserId == intval( $oExam->getUserId() ) )
+			) {
+				
+				$this
+					->setResponseValue( 'missed_questions', $oExam->getMissedQuestions() )
+					->setStatus( self::STAT_GET_MISSED )
+				;
+				
+			}
+			
 		}
 		
 	}

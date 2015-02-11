@@ -40,13 +40,13 @@
 			eHeaderElapsedDiv.show();
 			
 			
-			var eBtn = $( '<input type="button" value="Loading..." name="quiz-timer" id="quiz-timer" \/>' );
-			var eLoading = $( '<span class="timer-loading"><\/span>' );
+			var eTimerBtn = $( '<input type="button" value="Loading..." name="quiz-timer" id="quiz-timer" \/>' );
+			var eTimerLoading = $( '<span class="timer-loading"><\/span>' );
 			
 			eTimerButtonCont
-				.append( eBtn )
+				.append( eTimerBtn )
 				.append( ' ' )
-				.append( eLoading )
+				.append( eTimerLoading )
 			;
 			
 			
@@ -109,11 +109,11 @@
 			
 			
 			
-			eBtn.click( function() {
+			eTimerBtn.click( function() {
 				
 				var eInput = $( this );
 				
-				eLoading.show();
+				eTimerLoading.show();
 				
 				$.post (
 					oParams.script.process,
@@ -132,7 +132,7 @@
 						iCurTs = $.gekoTimestamp();
 						iCurElapsed = res.elapsed_seconds;
 						
-						eLoading.hide();
+						eTimerLoading.hide();
 						
 					}, 'json'
 				)
@@ -150,15 +150,15 @@
 				}, function( res ) {
 					
 					if ( oParams.status.paused == res.status ) {
-						fSetModePause( eBtn );
+						fSetModePause( eTimerBtn );
 					} else if ( oParams.status.resume == res.status ) {
-						fSetModeResume( eBtn );
+						fSetModeResume( eTimerBtn );
 					}
 					
 					iCurTs = $.gekoTimestamp();
 					iCurElapsed = res.elapsed_seconds;
 					
-					eLoading.hide();
+					eTimerLoading.hide();
 					
 				}, 'json'
 			)
@@ -238,6 +238,103 @@
 			
 		} );
 		
+		
+		//// alert user of unanswered questions
+		
+		// override submit button
+		
+		var eSubmitBtn = $( '#action-button' );
+		
+		// get the original click event
+		eSubmitBtn.removeAttr( 'onclick' );
+		
+		eSubmitBtn.on( 'click', function( evt ) {
+			
+			var iCount = 0;
+			var aMissed = [];
+			
+			eMainQuizDiv.find( '.watu-question' ).each( function() {
+				
+				iCount++;
+				
+				var eDiv = $( this );
+				
+				// question was missed!
+				if ( !eDiv.find( 'input[type="radio"]:checked' ).length ) {
+					aMissed.push( iCount );
+				}
+				
+			} );
+			
+			if ( aMissed.length ) {
+				
+				if ( confirm(
+					'You missed the following question%s: %s! Do you want to continue?'.printf(
+						( ( aMissed.length > 1 ) ? 's' : '' ),
+						aMissed.join( ', ' )
+					)
+				) ) {
+					WatuPRO.submitResult( evt );
+				}
+			
+			} else {
+				WatuPRO.submitResult( evt );
+			}
+			
+			return false;
+			
+		} );
+
+		
+		//// DEPRECATED CODE: easier to check missed questions client-side
+		
+		/* /
+		var eSubmitLoading = $( '<span class="timer-loading"><\/span>' );
+		eSubmitLoading.hide();
+		
+		eSubmitBtn.after( eSubmitLoading );
+
+			eSubmitLoading.show();
+			
+			$.post (
+				oParams.script.process,
+				{
+					action: 'Geko_Wp_Ext_WatuPro_Timing_Service',
+					subaction: 'get_missed',
+					taking_id: iTheTakingId
+				}, function( res ) {
+					
+					var iMissedQuestions = res.missed_questions;
+					
+					if ( oParams.status.get_missed == res.status ) {
+						
+						if ( iMissedQuestions ) {
+							
+							if ( confirm(
+								'You missed %s question%s! Do you want to continue?'.printf(
+									iMissedQuestions,
+									( ( iMissedQuestions > 1 ) ? 's' : '' )
+								)
+							) ) {
+								WatuPRO.submitResult( evt );
+							}
+							
+						} else {
+							WatuPRO.submitResult( evt );
+						}
+						
+					} else {
+						alert( 'Sorry, there was an error submitting your exam. Please try again.' );
+					}
+					
+					eSubmitLoading.hide();
+					
+				}, 'json'
+			)
+						
+			return false;
+		
+		/* */
 		
 	};
 
