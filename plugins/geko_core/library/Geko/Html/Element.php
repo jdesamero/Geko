@@ -139,13 +139,7 @@ class Geko_Html_Element
 	//
 	public function append( $mElem ) {
 		
-		if ( is_string( $mElem ) ) {
-			
-			$oText = new Geko_Html_Element_Text();
-			$oText->_setContent( $mElem );
-			$this->_aChildren[] = $oText;
-		
-		} elseif ( is_object( $mElem ) && is_a( $mElem, __CLASS__ ) ) {
+		if ( is_object( $mElem ) && is_a( $mElem, __CLASS__ ) ) {
 			
 			$this->_aChildren[] = $mElem;
 		
@@ -154,6 +148,15 @@ class Geko_Html_Element
 			foreach ( $mElem as $oElem ) {
 				$this->append( $oElem );
 			}
+			
+		} else {
+			
+			// default
+			
+			$oText = new Geko_Html_Element_Text();
+			$oText->_setContent( $mElem );
+			$this->_aChildren[] = $oText;
+		
 		}
 		
 		return $this;

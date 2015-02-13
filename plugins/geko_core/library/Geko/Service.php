@@ -51,8 +51,14 @@ class Geko_Service extends Geko_Singleton_Abstract
 		parent::start();
 		
 		if ( $sData = $GLOBALS[ 'HTTP_RAW_POST_DATA' ] ) {
+			
 			try {
-				$_POST = $_REQUEST = Zend_Json::decode( $sData );
+				
+				$_POST = Zend_Json::decode( $sData );
+				$_GET = Geko_Uri::getGlobal()->getVars();
+				
+				$_REQUEST = array_merge( $_POST, $_GET );
+				
 			} catch ( Exception $e ) { }
 		}
 		
@@ -131,10 +137,7 @@ class Geko_Service extends Geko_Singleton_Abstract
 	//
 	public function getAction() {
 		
-		if (
-			isset( $_REQUEST[ '_service' ] ) && 
-			isset( $_REQUEST[ '_action' ] )
-		) {
+		if ( isset( $_REQUEST[ '_action' ] ) ) {
 			// new way of doing things
 			$sAction = $_REQUEST[ '_action' ];
 		} else {

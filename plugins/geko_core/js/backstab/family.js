@@ -134,10 +134,21 @@
 			
 			modelExt = familySetup( modelExt, opts.model, function( ext, params ) {
 				
+				var sDelim = '?';
+				
 				if ( 'srv' == params.autoUrl ) {
-					ext.url = '%s/%s'.printf( opts.script.srv, opts.name );
+					
+					ext.url = '%s/%s/'.printf( opts.script.srv, opts.name );
+				
 				} else if ( 'ajax_content' == params.autoUrl ) {
+					
 					ext.url = '%s&section=%s'.printf( opts.script.ajax_content, opts.name );
+					sDelim = '&';
+					
+				}
+				
+				if ( params.params ) {
+					ext.url = '%s%s%s'.printf( ext.url, sDelim, params.params );
 				}
 				
 				return ext;
@@ -223,6 +234,10 @@
 				
 				initialize: function( options2 ) {
 					
+					if ( this.status ) {
+						this.status.setElem( this.$el );
+					}
+					
 					if ( ivPrms.postInit ) {
 						ivPrms.postInit.call( this, options2 );
 					}
@@ -293,6 +308,10 @@
 			}
 			
 			itemViewExt = familySetup( itemViewExt, opts.itemView, function( ext, params ) {
+				
+				if ( params.status ) {
+					ext.status = new params.status();
+				}
 				
 				return ext;
 				

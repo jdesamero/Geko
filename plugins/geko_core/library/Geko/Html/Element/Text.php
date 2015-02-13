@@ -28,17 +28,23 @@ class Geko_Html_Element_Text extends Geko_Html_Element
 	
 	//
 	public function _setContent( $sContent ) {
-		if ( is_string( $sContent ) ) {
-			$this->_sContent = $sContent;
+		
+		if ( !is_string( $sContent ) ) {
+			$sContent = strval( $sContent );
 		}
+		
+		$this->_sContent = $sContent;
+		
 		return $this;
 	}
 	
 	// override default method
 	public function __toString() {
+		
 		if ( !$this->_sContent ) {
 			return '';
 		}
+		
 		return $this->_sContent;
 	}
 	

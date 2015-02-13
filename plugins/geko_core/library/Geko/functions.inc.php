@@ -100,7 +100,7 @@ function _ge( $sElem, $aAtts = array(), $mContent = NULL ) {
 }
 
 // shorthand for Geko_Html_Widget::create()
-function _gw( $sWidget, $aAtts, $mValue, $aParams ) {
+function _gw( $sWidget, $aAtts = array(), $mValue = NULL, $aParams = array() ) {
 	return Geko_Html_Widget::create( $sWidget, $aAtts, $mValue, $aParams );
 }
 

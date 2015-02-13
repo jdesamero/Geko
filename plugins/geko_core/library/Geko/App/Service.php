@@ -4,6 +4,9 @@
 class Geko_App_Service extends Geko_Service
 {
 	
+	protected $_aPrefixes = array( 'Gloc_', 'Geko_App_', 'Geko_' );
+	
+	
 	
 	//
 	public function getAction() {

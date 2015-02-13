@@ -17,7 +17,7 @@ class Geko_Html_Widget
 	
 	
 	// factory method
-	public static function create( $sWidget, $aAtts, $mValue, $aParams ) {
+	public static function create( $sWidget, $aAtts = array(), $mValue = NULL, $aParams = array() ) {
 
 		$bSetWidget = FALSE;
 		
@@ -43,12 +43,12 @@ class Geko_Html_Widget
 	
 	//
 	public static function prependClassPrefixes( $sPrefix ) {
-		self::$aClassPrefixes[] = $sPrefix;
+		array_unshift( self::$aClassPrefixes, $sPrefix );
 	}
 
 	//
 	public static function appendClassPrefixes( $sPrefix ) {
-		array_unshift( self::$aClassPrefixes, $sPrefix );
+		self::$aClassPrefixes[] = $sPrefix;
 	}
 		
 	//
@@ -59,7 +59,7 @@ class Geko_Html_Widget
 	
 	
 	//
-	public function __construct( $aAtts, $mValue, $aParams ) {
+	public function __construct( $aAtts = array(), $mValue = NULL, $aParams = array() ) {
 		
 		$this->_aAtts = $aAtts;
 		$this->_mValue = $mValue;
@@ -74,6 +74,100 @@ class Geko_Html_Widget
 		
 		return $this;
 	}
+	
+	
+	//// attribute formatting helper
+	
+	//
+	public function formatAtt( $sKeyFlags, $mDefault = NULL, $aValueMap = array() ) {
+		
+		// parse $sKeyFlags
+		list( $sKey, $sFlags ) = Geko_Array::explodeTrimEmpty( ':', $sKeyFlags );
+		
+		$sKey = trim( $sKey );
+		
+		$aFlags = Geko_Array::explodeTrimEmpty( '|', $sFlags );
+		
+		$mAttVal = $this->_aAtts[ $sKey ];
+		
+		
+		//// apply formatting
+		
+		if ( in_array( 'str', $aFlags ) ) {
+			
+			$mAttVal = trim( $mAttVal );
+			
+			if ( !$mAttVal ) {
+				
+				$mAttVal = '';
+				
+			} else {
+				
+				if ( in_array( 'lc', $aFlags ) ) {
+					$mAttVal = strtolower( $mAttVal );
+				}
+			
+			}
+			
+		} elseif ( in_array( 'int', $aFlags ) ) {
+			
+			$mAttVal = intval( $mAttVal );
+			
+		} elseif ( in_array( 'bool', $aFlags ) ) {
+			
+			$mAttVal = intval( $mAttVal ) ? TRUE : FALSE ;
+			
+		}
+		
+		//// apply value mapping
+		
+		// $aValueMap
+		
+		if ( count( $aValueMap ) > 0 ) {
+			
+			// parse the value map
+			
+			$aValueMapFmt = array();
+			
+			foreach ( $aValueMap as $sValueMap ) {
+				
+				list( $sValueDest, $sValueAliases ) = Geko_Array::explodeTrimEmpty( ':', $sValueMap );
+				
+				$aValueAliases = Geko_Array::explodeTrimEmpty( '|', $sValueAliases );
+				
+				$aValueMapFmt[ $sValueDest ] = $sValueDest;
+				
+				foreach ( $aValueAliases as $sValueAlias ) {
+					$aValueMapFmt[ $sValueAlias ] = $sValueDest;				
+				}
+			}
+
+			if ( $mMapValue = $aValueMapFmt[ $mAttVal ] ) {
+				$mAttVal = $mMapValue;
+			}			
+		}
+		
+		
+		if ( !$mAttVal ) {
+			$mAttVal = $mDefault;
+		}
+		
+		return $mAttVal;
+	}
+	
+	
+	//
+	public function formatAppendValue( $mValue ) {
+		
+		if ( $mValue instanceof Geko_Html_Widget ) {
+			return $mValue->get();
+		}
+		
+		return $mValue;
+	}
+	
+	
+	//// main methods
 	
 	//
 	public function get() {
