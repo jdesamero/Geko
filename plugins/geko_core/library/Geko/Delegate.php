@@ -4,17 +4,28 @@
 class Geko_Delegate
 {
 	
+	protected $_sDelegateClass;
+	
 	protected $_oSubject;
+	protected $_sSubjectClass;
 	
 	
 	
 	//
 	public function __construct( $oSubject ) {
 		
+		$this->_sDelegateClass = get_class( $this );
+		
 		$this->_oSubject = $oSubject;
+		$this->_sSubjectClass = get_class( $oSubject );
 		
 	}
 	
+	// to be implemented by sub-class
+	public function canHandleMethod( $sMethod ) {
+		
+		return FALSE;
+	}
 	
 	
 	
@@ -30,7 +41,11 @@ class Geko_Delegate
 		
 		foreach ( $aDelegates as $oDelegate ) {
 			
-			if ( method_exists( $oDelegate, $sMethod ) ) {
+			if (
+				( method_exists( $oDelegate, $sMethod ) ) || 
+				( $oDelegate->canHandleMethod( $sMethod ) )
+			) {
+				
 				// return callback
 				return array( $oDelegate, $sMethod );
 			}

@@ -156,7 +156,7 @@ class Geko_Sql_Table
 	// Can be called a number of times!!!
 	public function getTableName() {
 		
-		$sTable = $this->_aTable[ 0 ];
+		$sTable = $this->getRawTableName();
 		
 		// auto-prefix replacement
 		if ( $oDb = $this->_oDb ) {

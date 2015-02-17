@@ -411,6 +411,16 @@ abstract class Geko_Entity
 		return new $this->_sEntityClass( $iParentId );
 	}
 	
+	//
+	public function initRawEntity() {
+		
+		if ( !$this->_oEntity ) {
+			$this->_oEntity = new StdClass;
+		}
+		
+		return $this->getRawEntity();
+	}
+	
 	
 	// should be a mix-in
 	public function getPrimaryTable() {
@@ -478,7 +488,7 @@ abstract class Geko_Entity
 		if ( !$sValue ) {
 			$sValue = $this->getMeta( $sKey );
 			if ( !$sValue && !in_array( $sKey, array( 'value', 'meta' ) ) ) {
-				$sMethod = 'get' . Geko_Inflector::camelize( $sKey );
+				$sMethod = sprintf( 'get%s', Geko_Inflector::camelize( $sKey ) );
 				if ( method_exists( $this, $sMethod ) ) {
 					$sValue = call_user_func_array( array( $this, $sMethod ), $aArgs );
 				}
@@ -542,7 +552,7 @@ abstract class Geko_Entity
 		} else {
 			if (
 				( $this->_sEntityPropertyPrefix ) && 
-				( $sValue = $this->getRawMeta( $this->_sEntityPropertyPrefix . $sMetaKey ) )
+				( $sValue = $this->getRawMeta( sprintf( '%s%s', $this->_sEntityPropertyPrefix, $sMetaKey ) ) )
 			) {
 				return $sValue;
 			}
@@ -925,28 +935,28 @@ abstract class Geko_Entity
 		} elseif ( 0 === strpos( strtolower( $sMethod ), 'fileurl' ) ) {
 			
 			// return the full URL, assuming entity property corresponds to a file
-			$sProp = substr_replace( $sMethod, '', 0, 7 );
+			$sProp = substr( $sMethod, 7 );
 			$sCall = sprintf( 'thisget%s', $sProp );
 			return $this->_getFileUrl( $this->__call( $sCall, $aArgs ), $sProp, $aArgs );
 			
 		} elseif ( 0 === strpos( strtolower( $sMethod ), 'filepath' ) ) {
 			
 			// return the full URL, assuming entity property corresponds to a file
-			$sProp = substr_replace( $sMethod, '', 0, 8 );
+			$sProp = substr( $sMethod, 8 );
 			$sCall = sprintf( 'thisget%s', $sProp );
 			return $this->_getFilePath( $this->__call( $sCall, $aArgs ), $sProp, $aArgs );
 			
 		} elseif ( 0 === strpos( strtolower( $sMethod ), 'filesize' ) ) {
 			
 			// return the full URL, assuming entity property corresponds to a file
-			$sProp = substr_replace( $sMethod, '', 0, 8 );
+			$sProp = substr( $sMethod, 8 );
 			$sCall = sprintf( 'thisget%s', $sProp );
 			return $this->_getFileSize( $this->__call( $sCall, $aArgs ), $sProp, $aArgs );
 			
 		} elseif ( 0 === strpos( strtolower( $sMethod ), 'fileis' ) ) {
 			
 			// return the full URL, assuming entity property corresponds to a file
-			$sProp = substr_replace( $sMethod, '', 0, 6 );
+			$sProp = substr( $sMethod, 6 );
 			$sCall = sprintf( 'thisget%s', $sProp );
 			return $this->_getFileIs( $this->__call( $sCall, $aArgs ), $sProp, $aArgs );
 			

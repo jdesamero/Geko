@@ -343,12 +343,12 @@ class Geko_Inflector
 			self::$pluralRules[ 'regexIrregular' ] = $regexIrregular;
 		}
 		
-		if ( preg_match( '/(.*)\\b(' . $regexIrregular . ')$/i', $word, $regs ) ) {
-			self::$pluralized[ $word ] = $regs[ 1 ] . $irregular[ strtolower( $regs[ 2 ] ) ];
+		if ( preg_match( sprintf( '/(.*)\\b(%s)$/i', $regexIrregular ), $word, $regs ) ) {
+			self::$pluralized[ $word ] = sprintf( '%s%s', $regs[ 1 ], $irregular[ strtolower( $regs[ 2 ] ) ] );
 			return self::$pluralized[ $word ];
 		}
 		
-		if ( preg_match( '/^(' . $regexUninflected . ')$/i', $word, $regs ) ) {
+		if ( preg_match( sprintf( '/^(%s)$/i', $regexUninflected ), $word, $regs ) ) {
 			self::$pluralized[ $word ] = $word;
 			return $word;
 		}
@@ -381,12 +381,12 @@ class Geko_Inflector
 			self::$singularRules[ 'regexIrregular' ] = $regexIrregular;
 		}
 		
-		if ( preg_match( '/(.*)\\b(' . $regexIrregular . ')$/i', $word, $regs ) ) {
-			self::$singularized[ $word ] = $regs[ 1 ] . $irregular[ strtolower( $regs[ 2 ] ) ];
+		if ( preg_match( sprintf( '/(.*)\\b(%s)$/i', $regexIrregular ), $word, $regs ) ) {
+			self::$singularized[ $word ] = sprintf( '%s%s', $regs[ 1 ], $irregular[ strtolower( $regs[ 2 ] ) ] );
 			return self::$singularized[ $word ];
 		}
 		
-		if ( preg_match( '/^(' . $regexUninflected . ')$/i', $word, $regs ) ) {
+		if ( preg_match( sprintf( '/^(%s)$/i', $regexUninflected ), $word, $regs ) ) {
 			self::$singularized[ $word ] = $word;
 			return $word;
 		}
@@ -447,14 +447,14 @@ class Geko_Inflector
 	public static function sanitize( $sString ) {
 		
 		$sRet = strtolower( $sString );
-		$sRet = str_replace( ' ', '-', $sRet );
+		$sRet = preg_replace( '/[^a-z0-9-]/', '-', $sRet );
 		
 		return $sRet;
 	}
 	
 	//
 	protected static function _enclose( $string ) {
-		return '(?:' . $string . ')';
+		return sprintf( '(?:%s)', $string );
 	}
 	
 	
