@@ -705,6 +705,64 @@
 	
 	
 	
+	//// some basic input validation functions
+	
+	// email
+	
+	var rEmail = /^[a-z0-9\._-]+@([a-z0-9_-]+\.)+[a-z]{2,6}$/i;
+	
+	$.gekoValidateEmail = function( sEmail ) {
+		return rEmail.test( sEmail );
+	};
+	
+	
+	// credit card
+	
+	// https://gist.github.com/DiegoSalazar/4075533
+	// Luhn algorithm in Javascript. Check valid credit card numbers 
+	
+	var rCreditCard = /[^0-9-\s]+/;
+	var rCcDigit = /\D/g;
+	
+	$.gekoValidateCreditCard = function( value ) {
+		
+		// accept only digits, dashes or spaces
+		if ( rCreditCard.test( value ) ) return false;
+		
+		// The Luhn Algorithm. It's so pretty.
+		var nCheck = 0, nDigit = 0, bEven = false;
+		value = value.replace( rCcDigit, '' );
+		
+		for ( var n = value.length - 1; n >= 0; n-- ) {
+			
+			var cDigit = value.charAt( n ),
+			nDigit = parseInt( cDigit, 10 );
+			
+			if ( bEven ) {
+				if ( (nDigit *= 2 ) > 9 ) nDigit -= 9;
+			}
+		
+			nCheck += nDigit;
+			bEven = !bEven;
+		}
+		
+		return ( nCheck % 10 ) == 0;	
+	};
+	
+	var rCvc = /^[0-9]{3,4}$/;
+	
+	$.gekoValidateCvc = function( cvcValue ) {
+		return rCvc.test( cvcValue );
+	};
+	
+	var rCcExpiry = /^[0-9]{2}\/[0-9]{2}$/;
+	
+	$.gekoValidateCcExpiry = function( ccExpiryValue ) {
+		return rCcExpiry.test( ccExpiryValue );
+	};
+	
+	
+	
 	// prevent IE 9 from crapping out
 	if ( !( window.console && console.log ) ) {
 		window.console = {
