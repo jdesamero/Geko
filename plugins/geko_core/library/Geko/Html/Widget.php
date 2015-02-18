@@ -81,6 +81,19 @@ class Geko_Html_Widget
 	//
 	public function formatAtt( $sKeyFlags, $mDefault = NULL, $aValueMap = array() ) {
 		
+		$aArgs = func_get_args();
+		
+		if ( is_array( $aArgs[ 0 ] ) ) {
+			list( $aSubject, $sKeyFlags, $mDefault, $aValueMap ) = $aArgs;
+		} else {
+			list( $sKeyFlags, $mDefault, $aValueMap ) = $aArgs;
+			$aSubject = $this->_aAtts;
+		}
+		
+		if ( !$aValueMap ) $aValueMap = array(); 
+		
+		
+		
 		// parse $sKeyFlags
 		list( $sKey, $sFlags ) = Geko_Array::explodeTrimEmpty( ':', $sKeyFlags );
 		
@@ -88,7 +101,7 @@ class Geko_Html_Widget
 		
 		$aFlags = Geko_Array::explodeTrimEmpty( '|', $sFlags );
 		
-		$mAttVal = $this->_aAtts[ $sKey ];
+		$mAttVal = $aSubject[ $sKey ];
 		
 		
 		//// apply formatting
@@ -117,7 +130,18 @@ class Geko_Html_Widget
 			
 			$mAttVal = intval( $mAttVal ) ? TRUE : FALSE ;
 			
+		} elseif ( in_array( 'array', $aFlags ) ) {
+			
+			if ( is_object( $mAttVal ) ) {
+				$mAttVal = ( array ) $mAttVal;
+			} else {
+				if ( !is_array( $mAttVal ) ) {
+					$mAttVal = array();
+				}
+			}
+			
 		}
+		
 		
 		//// apply value mapping
 		
@@ -165,6 +189,27 @@ class Geko_Html_Widget
 		
 		return $mValue;
 	}
+	
+	
+	//
+	public function replacePlaceholder( $sKey, $sValue ) {
+		
+		$sPh = sprintf( '##%s##', $sKey );
+		
+		if ( FALSE !== strpos( $sValue, $sPh ) ) {
+			
+			// perform replacement
+			$sMethod = sprintf( 'get%s', Geko_Inflector::camelize( $sKey ) );
+			
+			if ( method_exists( $this, $sMethod ) ) {
+				$sValue = str_replace( $sPh, $this->$sMethod(), $sValue );
+			}
+			
+		}
+		
+		return $sValue;
+	}
+	
 	
 	
 	//// main methods

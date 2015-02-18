@@ -47,7 +47,7 @@ class Geko_Validate
 		$oQuery->where( implode( ' OR ', $aWhere ), $mValue );
 		
 		if ( $aRes = $oDb->fetchRowAssoc( strval( $oQuery ) ) ) {
-			return $aRes[ 'num_matches' ];
+			return intval( $aRes[ 'num_matches' ] );
 		}
 		
 		return FALSE;

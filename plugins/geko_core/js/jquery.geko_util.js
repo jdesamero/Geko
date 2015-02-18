@@ -756,9 +756,13 @@
 	};
 	
 	var rCcExpiry = /^[0-9]{2}\/[0-9]{2}$/;
+	var rCcExpiryClean = /[^0-9\/]/g;
 	
 	$.gekoValidateCcExpiry = function( ccExpiryValue ) {
-		return rCcExpiry.test( ccExpiryValue );
+		
+		var ccNormExpVal = ccExpiryValue.replace( rCcExpiryClean, '' );
+		
+		return rCcExpiry.test( ccNormExpVal );
 	};
 	
 	
