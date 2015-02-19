@@ -193,6 +193,7 @@
 		<!-- third-party jquery plugins -->
 		<file id="geko-jquery-anythingslider" src="##geko_core_uri##/external/js/jquery.anythingslider.js" dependencies="geko-jquery-easing" />
 		<file id="geko-jquery-bgiframe" src="##geko_core_uri##/external/js/jquery.bgiframe.js" dependencies="jquery" />
+		<file id="geko-jquery-card" src="##geko_core_uri##/external/js/jquery.card.js" dependencies="jquery" />
 		<file id="geko-jquery-color" src="##geko_core_uri##/external/js/jquery.color.js" dependencies="jquery" />
 		<file id="geko-jquery-color_svg_names" src="##geko_core_uri##/external/js/jquery.color.svg-names.js" dependencies="geko-jquery-color" />
 		<file id="geko-jquery-cookie" src="##geko_core_uri##/external/js/jquery.cookie.js" dependencies="jquery" />
