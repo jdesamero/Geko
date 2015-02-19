@@ -371,6 +371,7 @@
 		
 		<file id="geko-swipe" src="##geko_core_uri##/external/styles/swipe/style.css" />
 		
+		<file id="geko-jquery-card" src="##geko_core_uri##/external/styles/card/style.css" />
 		<file id="geko-jquery-jcarousel" src="##geko_core_uri##/external/styles/jcarousel/style.css" />
 		<file id="geko-jquery-jcarousel-2006" src="##geko_core_uri##/external/styles/jcarousel/style-2006.css" />
 		<file id="geko-jquery-jscrollbar" src="##geko_core_uri##/external/styles/jScrollbar/style.css" />
