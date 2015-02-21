@@ -485,7 +485,7 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 		
 		foreach ( $aArgs as $sPlugin ) {
 			if ( $sPluginClass = Geko_Class::resolveRelatedClass(
-				$this->_sEntityClass, '', '_Plugin_' . $sPlugin
+				$this->_sEntityClass, '', sprintf( '_Plugin_%s', $sPlugin )
 			) ) {
 				Geko_Singleton_Abstract::getInstance( $sPluginClass )->init();
 			}
@@ -557,12 +557,12 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 			<?php if ( $oCurLog && $oCurLog->getMinDateCreated() && $oCurLog->getMaxDateCreated() ):
 				
 				$sOpAction = 'export';
-				$sNonceField = $sCurLogClass . $sOpAction;
+				$sNonceField = sprintf( '%s%s', $sCurLogClass, $sOpAction );
 				
 				$aJsonParams = array(
 					'date' => array(
-						'min' => $this->formatDateForRange( $oCurLog->getMinDateCreated() ),
-						'max' => $this->formatDateForRange( $oCurLog->getMaxDateCreated() )
+						'min' => Geko_Wp_Date::formatDateForRange( $oCurLog->getMinDateCreated() ),
+						'max' => Geko_Wp_Date::formatDateForRange( $oCurLog->getMaxDateCreated() )
 					)
 				);
 				

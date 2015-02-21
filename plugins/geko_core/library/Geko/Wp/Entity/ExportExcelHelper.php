@@ -163,7 +163,7 @@ abstract class Geko_Wp_Entity_ExportExcelHelper
 		
 		$sMethod = sprintf( 'get%sFrom%s', ucfirst( $sDest ), ucfirst( $sSource ) );
 		
-		return $aEnum->getTitleFromValue( $mPassVal );
+		return $aEnum->$sMethod( $mPassVal );
 
 	}
 	

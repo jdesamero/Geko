@@ -32,101 +32,133 @@
 		
 		
 		
+		//// start activate timer code
+		
 		var fActivateTimer = function( iTakingId ) {
 			
-			iTheTakingId = iTakingId;
+			// only do this if the timer button is not already there
 			
-			eActivateNoticeDiv.hide();
-			eHeaderElapsedDiv.show();
-			
-			
-			var eTimerBtn = $( '<input type="button" value="Loading..." name="quiz-timer" id="quiz-timer" \/>' );
-			var eTimerLoading = $( '<span class="timer-loading"><\/span>' );
-			
-			eTimerButtonCont
-				.append( eTimerBtn )
-				.append( ' ' )
-				.append( eTimerLoading )
-			;
-			
-			
-			var iCurTs = 0;
-			var iCurElapsed = 0;
-			var bTimerRunning = false;
-			
-			// set timer in motion
-			var fRunTimer = function() {
-				
-				if ( iCurElapsed && iCurTs ) {
-					
-					var iShowTime = iCurElapsed;
-					
-					if ( bTimerRunning ) {
-						iShowTime = iShowTime + ( $.gekoTimestamp() - iCurTs );
-					}
-					
-					eElapsedTimeSpan.html( $.gekoFormatDdHsMmSs( iShowTime ) );
-				}
-				
-				setTimeout( function() {
-					fRunTimer();
-				}, 500 );
-			};
-			
-			fRunTimer();
-			
-			
-			
-			//// set mode functions
-			
-			// pause
-			var fSetModePause = function( eInput ) {
+			if ( !eTimerButtonCont.find( '#quiz-timer' ).length ) {
 
-				bTimerRunning = false;
+				iTheTakingId = iTakingId;
 				
-				eInput
-					.removeClass( 'mode-pause' )
-					.addClass( 'mode-resume' )
-					.val( 'Resume Timer' )
-				;		
-
-				eElapsedPausedSpan.show();
-			};
-			
-			// resume
-			var fSetModeResume = function( eInput ) {
+				eActivateNoticeDiv.hide();
+				eHeaderElapsedDiv.show();
 				
-				bTimerRunning = true;
 				
-				eInput
-					.removeClass( 'mode-resume' )
-					.addClass( 'mode-pause' )
-					.val( 'Pause Timer' )
+				var eTimerBtn = $( '<input type="button" value="Loading..." name="quiz-timer" id="quiz-timer" \/>' );
+				var eTimerLoading = $( '<span class="timer-loading"><\/span>' );
+				
+				eTimerButtonCont
+					.append( eTimerBtn )
+					.append( ' ' )
+					.append( eTimerLoading )
 				;
 				
-				eElapsedPausedSpan.hide();
-			};
-			
-			
-			
-			eTimerBtn.click( function() {
 				
-				var eInput = $( this );
+				var iCurTs = 0;
+				var iCurElapsed = 0;
+				var bTimerRunning = false;
 				
-				eTimerLoading.show();
+				// set timer in motion
+				var fRunTimer = function() {
+					
+					if ( iCurElapsed && iCurTs ) {
+						
+						var iShowTime = iCurElapsed;
+						
+						if ( bTimerRunning ) {
+							iShowTime = iShowTime + ( $.gekoTimestamp() - iCurTs );
+						}
+						
+						eElapsedTimeSpan.html( $.gekoFormatDdHsMmSs( iShowTime ) );
+					}
+					
+					setTimeout( function() {
+						fRunTimer();
+					}, 500 );
+				};
 				
+				fRunTimer();
+				
+				
+				
+				//// set mode functions
+				
+				// pause
+				var fSetModePause = function( eInput ) {
+	
+					bTimerRunning = false;
+					
+					eInput
+						.removeClass( 'mode-pause' )
+						.addClass( 'mode-resume' )
+						.val( 'Resume Timer' )
+					;		
+	
+					eElapsedPausedSpan.show();
+				};
+				
+				// resume
+				var fSetModeResume = function( eInput ) {
+					
+					bTimerRunning = true;
+					
+					eInput
+						.removeClass( 'mode-resume' )
+						.addClass( 'mode-pause' )
+						.val( 'Pause Timer' )
+					;
+					
+					eElapsedPausedSpan.hide();
+				};
+				
+				
+				
+				eTimerBtn.click( function() {
+					
+					var eInput = $( this );
+					
+					eTimerLoading.show();
+					
+					$.post (
+						oParams.script.process,
+						{
+							action: 'Geko_Wp_Ext_WatuPro_Timing_Service',
+							subaction: 'toggle_timing',
+							taking_id: iTakingId
+						}, function( res ) {
+							
+							if ( oParams.status.paused == res.status ) {
+								fSetModePause( eInput );
+							} else if ( oParams.status.resume == res.status ) {
+								fSetModeResume( eInput );
+							}
+							
+							iCurTs = $.gekoTimestamp();
+							iCurElapsed = res.elapsed_seconds;
+							
+							eTimerLoading.hide();
+							
+						}, 'json'
+					)
+					
+					
+				} );
+				
+				// init button
 				$.post (
 					oParams.script.process,
 					{
 						action: 'Geko_Wp_Ext_WatuPro_Timing_Service',
-						subaction: 'toggle_timing',
+						subaction: 'get_status',
 						taking_id: iTakingId
 					}, function( res ) {
 						
 						if ( oParams.status.paused == res.status ) {
-							fSetModePause( eInput );
+							fSetModePause( eTimerBtn );
 						} else if ( oParams.status.resume == res.status ) {
-							fSetModeResume( eInput );
+							fSetModeResume( eTimerBtn );
 						}
 						
 						iCurTs = $.gekoTimestamp();
@@ -135,36 +167,24 @@
 						eTimerLoading.hide();
 						
 					}, 'json'
-				)
+				);
 				
 				
-			} );
-			
-			// init button
-			$.post (
-				oParams.script.process,
-				{
-					action: 'Geko_Wp_Ext_WatuPro_Timing_Service',
-					subaction: 'get_status',
-					taking_id: iTakingId
-				}, function( res ) {
+				// prompt for leaving exam
+				$( window ).on( 'beforeunload', function() {
 					
-					if ( oParams.status.paused == res.status ) {
-						fSetModePause( eTimerBtn );
-					} else if ( oParams.status.resume == res.status ) {
-						fSetModeResume( eTimerBtn );
+					// pause timer if it's running
+					if ( bTimerRunning ) {
+						eTimerBtn.trigger( 'click' );
 					}
 					
-					iCurTs = $.gekoTimestamp();
-					iCurElapsed = res.elapsed_seconds;
-					
-					eTimerLoading.hide();
-					
-				}, 'json'
-			)
-			
+				} );
+				
+			}
+						
 		};
 		
+		//// end activate timer code
 		
 		
 		// add pause/resume, only if there is a valid taking_id

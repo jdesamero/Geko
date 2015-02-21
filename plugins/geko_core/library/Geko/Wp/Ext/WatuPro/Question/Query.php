@@ -45,6 +45,7 @@ class Geko_Wp_Ext_WatuPro_Question_Query extends Geko_Wp_Entity_Query
 				->joinLeft( '##pfx##watupro_taken_exams', 't' )
 					->on( 'q.exam_id = t.exam_id' )
 				->where( 't.ID = ?', $iTakingId )
+				->order( 'q.sort_order' )
 			;
 		}		
 		
