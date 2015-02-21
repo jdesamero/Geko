@@ -153,10 +153,12 @@ class Geko_Html_Element
 			
 			// default
 			
-			$oText = new Geko_Html_Element_Text();
-			$oText->_setContent( $mElem );
-			$this->_aChildren[] = $oText;
-		
+			if ( ( NULL !== $mElem ) && ( '' !== $mElem ) ) {
+				$oText = new Geko_Html_Element_Text();
+				$oText->_setContent( $mElem );
+				$this->_aChildren[] = $oText;
+			}
+			
 		}
 		
 		return $this;
@@ -164,14 +166,8 @@ class Geko_Html_Element
 	
 	//
 	public function prepend( $oElem ) {
-
-		if ( is_string( $mElem ) ) {
-			
-			$oText = new Geko_Html_Element_Text();
-			$oText->_setContent( $mElem );
-			array_unshift( $this->_aChildren, $oText );
 		
-		} elseif ( is_object( $mElem ) && is_a( $mElem, __CLASS__ ) ) {
+		if ( is_object( $mElem ) && is_a( $mElem, __CLASS__ ) ) {
 			
 			array_unshift( $this->_aChildren, $mElem );
 		
@@ -181,6 +177,17 @@ class Geko_Html_Element
 			foreach ( $aElems as $oElem ) {
 				$this->prepend( $oElem  );
 			}
+			 
+		} else {
+			
+			// default
+			
+			if ( ( NULL !== $mElem ) && ( '' !== $mElem ) ) {
+				$oText = new Geko_Html_Element_Text();
+				$oText->_setContent( $mElem );
+				array_unshift( $this->_aChildren, $oText );
+			}
+			
 		}
 		
 		return $this;	

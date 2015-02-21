@@ -13,6 +13,9 @@ class Geko_Html_Widget
 	
 	protected $_sWidget = '';
 	
+	protected $_sAttValueKey = NULL;			// if this is specified, then use as value parameter
+												// eg: $mValue --> $_aAtts[ $_sAttValueKey ]
+	
 	
 	
 	
@@ -24,7 +27,7 @@ class Geko_Html_Widget
 		$aClasses = array();
 		
 		foreach ( self::$aClassPrefixes as $sClassPrefix ) {
-			$aClasses[] = sprintf( '%s%s', $sClassPrefix, Geko_Inflector::camelize( $sWidget ) );
+			$aClasses[] = sprintf( '%s%s', $sClassPrefix, Geko_Inflector::camelizeSlash( $sWidget ) );
 		}
 		
 		if ( !$sClass = Geko_Class::existsCoalesce( $aClasses ) ) {
@@ -60,6 +63,21 @@ class Geko_Html_Widget
 	
 	//
 	public function __construct( $aAtts = array(), $mValue = NULL, $aParams = array() ) {
+		
+		if ( $sAttValueKey = $this->_sAttValueKey ) {
+			
+			if ( !is_array( $aAtts ) ) {
+				$aAttsFmt[ $sAttValueKey ] = $aAtts;			// format as assoc array
+				$aAtts = $aAttsFmt;								// re-assign
+			}
+			
+			if ( NULL === $mValue ) {
+				$mValue = $aAtts[ $sAttValueKey ];
+				unset( $aAtts[ $sAttValueKey ] );
+			}
+		
+		}
+		
 		
 		$this->_aAtts = $aAtts;
 		$this->_mValue = $mValue;

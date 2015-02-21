@@ -409,7 +409,18 @@ class Geko_Inflector
 		);		
 		return $replace;
 	}
-
+	
+	// basically, convert something like: some_class/sub_item
+	// to: SomeClass_SubItem
+	public static function camelizeSlash( $sValue ) {
+		
+		$sValue = self::camelize( $sValue );
+		
+		return preg_replace_callback( '/\/([a-z])/', function( $aMatches ) {
+			return sprintf( '_%s', strtoupper( $aMatches[ 1 ] ) );
+		}, $sValue );
+	}
+	
 	//
 	public static function underscore( $camelCasedWord ) {
 		$replace = strtolower( preg_replace( '/(?<=\\w)([A-Z])/', '_\\1', $camelCasedWord ) );
