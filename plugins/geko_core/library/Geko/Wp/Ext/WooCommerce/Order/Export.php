@@ -14,25 +14,33 @@ class Geko_Wp_Ext_WooCommerce_Order_Export extends Geko_Wp_Entity_ExportExcelHel
 		$this->_aColumnMappings = array_merge(
 			$this->_aColumnMappings,
 			array(
-				'order_number' => 'Order Number',
-				'order_status' => array( 'Order Status', array( 'trans' => 'status' ) ),
-				'order_items' => 'Order Items',
-				'user_id' => 'User ID',
-				'transaction_date' => 'Transaction Date',
-				'purchase_date' => 'Purchase Date',
-				'first_name' => 'First Name',
-				'last_name' => 'Last Name',
-				'address1' => 'Addresss Line 1',
-				'address2' => 'Addresss Line 2',
-				'city' => 'City',
-				'province' => 'Province',
-				'postal_code' => 'Postal Code',
-				'email' => 'Email',
-				'telephone' => 'Telephone',
-				'amount' => 'Amount',
-				'discount' => 'Discount',
-				'tax' => 'Tax',
-				'total' => array( 'Total' )
+				'order_number' => TRUE,
+				'order_status_fmt' => array(
+					'title' => 'Order Status'
+				),
+				'order_items' => TRUE,
+				'user_id' => array(
+					'title' => 'User ID'
+				),
+				'transaction_date' => TRUE,
+				'purchase_date' => TRUE,
+				'first_name' => TRUE,
+				'last_name' => TRUE,
+				'address1' => array(
+					'title' => 'Address Line 1'
+				),
+				'address2' => array(
+					'title' => 'Address Line 2'
+				),
+				'city' => TRUE,
+				'province' => TRUE,
+				'postal_code' => TRUE,
+				'email' => TRUE,
+				'telephone' => TRUE,
+				'amount' => TRUE,
+				'discount' => TRUE,
+				'tax' => TRUE,
+				'total' => TRUE
 			)
 		);
 		
@@ -41,29 +49,6 @@ class Geko_Wp_Ext_WooCommerce_Order_Export extends Geko_Wp_Entity_ExportExcelHel
 		
 	}
 	
-	
-	//
-	public function transStatus( $mPassVal, $oItem, $sKey, $aParams ) {
-		
-		$aStatuses = wc_get_order_statuses();
-		
-		return $aStatuses[ $mPassVal ];
-	}
-	
-	//
-	public function transNumformat( $mPassVal, $oItem, $sKey, $aParams ) {
-		
-		return number_format( floatval( $mPassVal ), 2 );
-	}
-	
-	//
-	public function getTotal( $mPassVal, $oItem, $sKey ) {
-		return 
-			floatval( $oItem->getEntityPropertyValue( 'amount' ) ) - 
-			floatval( $oItem->getEntityPropertyValue( 'discount' ) ) + 
-			floatval( $oItem->getEntityPropertyValue( 'tax' ) )
-		;
-	}
 	
 	
 }

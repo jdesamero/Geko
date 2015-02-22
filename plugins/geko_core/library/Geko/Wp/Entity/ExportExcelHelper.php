@@ -59,20 +59,39 @@ abstract class Geko_Wp_Entity_ExportExcelHelper
 		
 		$aRet = array();
 		
-		foreach ( $this->_aColumnMappings as $mMapping ) {
-			if ( is_array( $mMapping ) ) {
-				$aRet[] = $mMapping[ 0 ];
-			} else {
-				$aRet[] = $mMapping;
-			}
+		foreach ( $this->_aColumnMappings as $sKey => $mMapping ) {
+			$aRet[] = $this->getTitle( $sKey, $mMapping );
 		}
 		
 		return $aRet;
 	}
 	
 	//
-	public function getTitle( $mMapping ) {
-		return ( is_array( $mMapping ) ) ? $mMapping[ 0 ] : $mMapping ;
+	public function getTitle( $sKey, $mMapping ) {
+		
+		$sTitle = '';
+		
+		if ( is_string( $mMapping ) ) {
+			
+			$sTitle = $mMapping;
+			
+		} elseif ( is_array( $mMapping ) ) {
+			
+			if ( $sTitleParam = $mMapping[ 'title' ] ) {
+				$sTitle = $sTitleParam;
+			}
+			
+		}
+		
+		
+		// default title, "humanize" the field key
+		// some_field --> "Some Field"
+		
+		if ( !$sTitle ) {
+			$sTitle = Geko_Inflector::humanize( $sKey );		
+		}
+		
+		return $sTitle;
 	}
 	
 	//
@@ -91,60 +110,47 @@ abstract class Geko_Wp_Entity_ExportExcelHelper
 	//
 	public function getValue( $oItem, $sKey, $mMapping ) {
 		
-		$mValue = '';
-		$mPassVal = $oItem->getEntityPropertyValue( $sKey );
+		// defaults
 		
+		$mValue = '';						// final value
+		$aArgs = array();					// allows arbitrary arguments to be passed from the mapping params
+		$sTransMethod = NULL;				// local transformation method
+		
+		
+		// get further options from the mapping param
 		
 		if ( is_array( $mMapping ) ) {
 			
-			$sMethod = NULL;
-			
-			if ( $mMap = $mMapping[ 1 ] ) {
-				
-				if ( is_array( $mMap ) ) {
-					
-					$aMap = $mMap;
-					
-					if ( $sTransKey = $aMap[ 'trans' ] ) {
-						
-						$sMethodFmt = sprintf( 'trans%s', ucfirst( strtolower( $sTransKey ) ) );
-
-						if ( method_exists( $this, $sMethodFmt ) ) {
-							
-							$mValue = $this->$sMethodFmt( $mPassVal, $oItem, $sKey, $aMap );							
-						}
-						
-					}
-					
-				} else {
-					$sMethod = $mMap;
-				}
-				
-			} else {
-				
-				// this happens to be the method title
-				$sMethod = $mMapping[ 0 ];			
+			if ( $aMapArgs = $mMapping[ 'args' ] ) {
+				$aArgs = $aMapArgs;
 			}
 			
-			//
-			if ( $sMethod ) {
-					
-				$sMethodFmt = sprintf( 'get%s', ucfirst( strtolower( $sMethod ) ) );
+			// local transformation function
+			if ( $mTrans = $mMapping[ 'trans' ] ) {
 				
-				if ( method_exists( $this, $sMethodFmt ) ) {
-					
-					$mValue = $this->$sMethodFmt( $mPassVal, $oItem, $sKey );
-					
+				if ( is_string( $mTrans ) ) {
+					$sTransKey = $mTrans;
 				} else {
-					
-					$mValue = $oItem->$sMethodFmt();
+					// default, trans key is same as field key
+					$sTransKey = $sKey;
 				}
-			
+				
+				$sTransMethod = sprintf( 'trans%s', Geko_Inflector::camelize( $sTransKey ) );
 			}
 			
-		} else {
-			
-			$mValue = $mPassVal;
+		}
+		
+		
+		
+		// obtain values from the entity
+		
+		$sValueMethod = sprintf( 'get%s', Geko_Inflector::camelize( $sKey ) );
+		$mValue = call_user_func_array( array( $oItem, $sValueMethod ), $aArgs );
+		
+		
+		// apply transformation method, if needed
+		if ( $sTransMethod && method_exists( $this, $sTransMethod ) ) {
+			$mValue = $this->$sTransMethod( $mValue, $oItem, $sKey, $aArgs, $mMapping );
 		}
 		
 		
@@ -162,17 +168,17 @@ abstract class Geko_Wp_Entity_ExportExcelHelper
 	//// transformation modules/plugins
 	
 	//
-	public function transEnum( $mPassVal, $oItem, $sKey, $aParams ) {
+	public function transEnum( $mValue, $oItem, $sKey, $aArgs, $aMap ) {
 		
-		$sEnumKey = $aParams[ 'key' ];
-		$sDest = ( $aParams[ 'dest' ] ) ? strtolower( $aParams[ 'dest' ] ) : 'title' ;
-		$sSource = ( $aParams[ 'source' ] ) ? strtolower( $aParams[ 'source' ] ) : 'value' ;
+		$sEnumKey = $aArgs[ 'key' ];
+		$sDest = ( $aArgs[ 'dest' ] ) ? strtolower( $aArgs[ 'dest' ] ) : 'title' ;
+		$sSource = ( $aArgs[ 'source' ] ) ? strtolower( $aArgs[ 'source' ] ) : 'value' ;
 		
 		$aEnum = Geko_Wp_Enumeration_Query::getSet( $sEnumKey );
 		
 		$sMethod = sprintf( 'get%sFrom%s', ucfirst( $sDest ), ucfirst( $sSource ) );
 		
-		return $aEnum->$sMethod( $mPassVal );
+		return $aEnum->$sMethod( $mValue );
 
 	}
 	
@@ -200,8 +206,8 @@ abstract class Geko_Wp_Entity_ExportExcelHelper
 		$i = 0;		// cols
 		$j = 0;		// rows
 		
-		foreach ( $this->_aColumnMappings as $mMapping ) {
-			$oWorksheet->write( $j, $i, $this->getTitle( $mMapping ), $oBold );
+		foreach ( $this->_aColumnMappings as $sKey => $mMapping ) {
+			$oWorksheet->write( $j, $i, $this->getTitle( $sKey, $mMapping ), $oBold );
 			$i++;
 		}
 		
