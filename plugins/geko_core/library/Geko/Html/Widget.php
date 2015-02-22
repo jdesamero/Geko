@@ -117,14 +117,14 @@ class Geko_Html_Widget
 		
 		$sKey = trim( $sKey );
 		
-		$aFlags = Geko_Array::explodeTrimEmpty( '|', $sFlags );
+		$oFlags = new Geko_Flag( $sFlags );
 		
 		$mAttVal = $aSubject[ $sKey ];
 		
 		
 		//// apply formatting
 		
-		if ( in_array( 'str', $aFlags ) ) {
+		if ( $oFlags->has( 'str' ) ) {
 			
 			$mAttVal = trim( $mAttVal );
 			
@@ -134,21 +134,21 @@ class Geko_Html_Widget
 				
 			} else {
 				
-				if ( in_array( 'lc', $aFlags ) ) {
+				if ( $oFlags->has( 'lc' ) ) {
 					$mAttVal = strtolower( $mAttVal );
 				}
 			
 			}
 			
-		} elseif ( in_array( 'int', $aFlags ) ) {
+		} elseif ( $oFlags->has( 'int' ) ) {
 			
 			$mAttVal = intval( $mAttVal );
 			
-		} elseif ( in_array( 'bool', $aFlags ) ) {
+		} elseif ( $oFlags->has( 'bool' ) ) {
 			
 			$mAttVal = intval( $mAttVal ) ? TRUE : FALSE ;
 			
-		} elseif ( in_array( 'array', $aFlags ) ) {
+		} elseif ( $oFlags->has( 'array' ) ) {
 			
 			if ( is_object( $mAttVal ) ) {
 				$mAttVal = ( array ) $mAttVal;
@@ -158,6 +158,9 @@ class Geko_Html_Widget
 				}
 			}
 			
+		} elseif ( $oFlags->has( 'flag' ) ) {
+		
+			$mAttVal = new Geko_Flag( $mAttVal );
 		}
 		
 		
