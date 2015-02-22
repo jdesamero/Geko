@@ -110,8 +110,16 @@ class Geko_Wp_Ext_WooCommerce_Order_Query extends Geko_Wp_Entity_Query
 				$oItemsQuery
 					
 					->field( 'oi1.order_id' )
-					->field( "GROUP_CONCAT( CONCAT( oi1.order_item_name, ' (SKU: ', om1.meta_value, ')' ) SEPARATOR ', ' )", 'order_items' )
+					->field( "GROUP_CONCAT(
+						IF( oi1.order_item_type = 'line_item', CONCAT( oi1.order_item_name, ' (SKU: ', om1.meta_value, ')' ), NULL ) 
+					SEPARATOR ', ' )", 'order_items' )
+					
+					->field( "SUM( IF( oi1.order_item_type = 'line_item', CAST( oim2.meta_value AS DECIMAL( 12, 2 ) ), 0 ) )", 'amount' )
+					->field( "SUM( IF( oi1.order_item_type = 'coupon', CAST( oim3.meta_value AS DECIMAL( 12, 2 ) ), 0 ) )", 'discount' )
+					->field( "SUM( IF( oi1.order_item_type = 'tax', CAST( oim4.meta_value AS DECIMAL( 12, 2 ) ), 0 ) )", 'tax' )
+					
 					->from( '##pfx##woocommerce_order_items', 'oi1' )
+					
 					
 					->joinLeft( '##pfx##woocommerce_order_itemmeta', 'oim1' )
 						->on( 'oim1.order_item_id = oi1.order_item_id' )
@@ -120,14 +128,32 @@ class Geko_Wp_Ext_WooCommerce_Order_Query extends Geko_Wp_Entity_Query
 					->joinLeft( '##pfx##postmeta', 'om1' )
 						->on( 'om1.post_id = oim1.meta_value' )
 						->on( 'om1.meta_key = ?', '_sku' )
-
-					->where( 'oi1.order_item_type = ?', 'line_item' )
+					
+					
+					
+					->joinLeft( '##pfx##woocommerce_order_itemmeta', 'oim2' )
+						->on( 'oim2.order_item_id = oi1.order_item_id' )
+						->on( 'oim2.meta_key = ?', '_line_subtotal' )
+					
+					->joinLeft( '##pfx##woocommerce_order_itemmeta', 'oim3' )
+						->on( 'oim3.order_item_id = oi1.order_item_id' )
+						->on( 'oim3.meta_key = ?', 'discount_amount' )
+					
+					->joinLeft( '##pfx##woocommerce_order_itemmeta', 'oim4' )
+						->on( 'oim4.order_item_id = oi1.order_item_id' )
+						->on( 'oim4.meta_key = ?', 'tax_amount' )
+					
 					->group( 'oi1.order_id' )
 				;				
 				
 				
 				$oQuery
+					
 					->field( 'oi.order_items' )
+					->field( 'oi.amount' )
+					->field( 'oi.discount' )
+					->field( 'oi.tax' )
+					
 					->joinLeft( $oItemsQuery, 'oi' )
 						->on( 'o.ID = oi.order_id' )
 				;
@@ -160,6 +186,10 @@ class Geko_Wp_Ext_WooCommerce_Order_Query extends Geko_Wp_Entity_Query
 		if ( $sDateHigh = trim( $aParams[ 'transaction_max_date' ] ) ) {
 			$oQuery->where( 'o.post_date <= ?', $sDateHigh );
 		}
+		
+		
+		// apply filters for custom fields
+		$oQuery = apply_filters( __METHOD__, $oQuery, $aParams, $this );
 		
 		
 		return $oQuery;

@@ -28,9 +28,16 @@ class Geko_Wp_Ext_WooCommerce_Order_Export extends Geko_Wp_Entity_ExportExcelHel
 				'province' => 'Province',
 				'postal_code' => 'Postal Code',
 				'email' => 'Email',
-				'telephone' => 'Telephone'
+				'telephone' => 'Telephone',
+				'amount' => 'Amount',
+				'discount' => 'Discount',
+				'tax' => 'Tax',
+				'total' => array( 'Total' )
 			)
 		);
+		
+		// apply filters for custom fields
+		$this->_aColumnMappings = apply_filters( sprintf( '%s::columnMappings', __METHOD__ ), $this->_aColumnMappings, $this );
 		
 	}
 	
@@ -43,6 +50,20 @@ class Geko_Wp_Ext_WooCommerce_Order_Export extends Geko_Wp_Entity_ExportExcelHel
 		return $aStatuses[ $mPassVal ];
 	}
 	
+	//
+	public function transNumformat( $mPassVal, $oItem, $sKey, $aParams ) {
+		
+		return number_format( floatval( $mPassVal ), 2 );
+	}
+	
+	//
+	public function getTotal( $mPassVal, $oItem, $sKey ) {
+		return 
+			floatval( $oItem->getEntityPropertyValue( 'amount' ) ) - 
+			floatval( $oItem->getEntityPropertyValue( 'discount' ) ) + 
+			floatval( $oItem->getEntityPropertyValue( 'tax' ) )
+		;
+	}
 	
 	
 }

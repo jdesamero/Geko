@@ -61,7 +61,8 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 				'pnt' => 'Point',
 				'posttmpl' => 'PostTemplate',
 				'rslv' => 'Resolver',
-				'tmpl' => 'Template'
+				'tmpl' => 'Template',
+				'wc' => 'WooCommerce'
 				
 			) )
 			

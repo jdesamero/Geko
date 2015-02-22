@@ -97,6 +97,8 @@ abstract class Geko_Wp_Entity_ExportExcelHelper
 		
 		if ( is_array( $mMapping ) ) {
 			
+			$sMethod = NULL;
+			
 			if ( $mMap = $mMapping[ 1 ] ) {
 				
 				if ( is_array( $mMap ) ) {
@@ -108,29 +110,36 @@ abstract class Geko_Wp_Entity_ExportExcelHelper
 						$sMethodFmt = sprintf( 'trans%s', ucfirst( strtolower( $sTransKey ) ) );
 
 						if ( method_exists( $this, $sMethodFmt ) ) {
-						
-							$mValue = $this->$sMethodFmt( $mPassVal, $oItem, $sKey, $aMap );
+							
+							$mValue = $this->$sMethodFmt( $mPassVal, $oItem, $sKey, $aMap );							
 						}
 						
 					}
 					
 				} else {
-					
 					$sMethod = $mMap;
-					
-					$sMethodFmt = sprintf( 'get%s', ucfirst( strtolower( $sMethod ) ) );
-					
-					if ( method_exists( $this, $sMethodFmt ) ) {
-						
-						$mValue = $this->$sMethodFmt( $mPassVal, $oItem, $sKey );
-						
-					} else {
-						
-						$mValue = $oItem->$sMethodFmt();
-					}
-				
 				}
 				
+			} else {
+				
+				// this happens to be the method title
+				$sMethod = $mMapping[ 0 ];			
+			}
+			
+			//
+			if ( $sMethod ) {
+					
+				$sMethodFmt = sprintf( 'get%s', ucfirst( strtolower( $sMethod ) ) );
+				
+				if ( method_exists( $this, $sMethodFmt ) ) {
+					
+					$mValue = $this->$sMethodFmt( $mPassVal, $oItem, $sKey );
+					
+				} else {
+					
+					$mValue = $oItem->$sMethodFmt();
+				}
+			
 			}
 			
 		} else {
