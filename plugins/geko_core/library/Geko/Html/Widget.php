@@ -117,7 +117,7 @@ class Geko_Html_Widget
 		
 		$sKey = trim( $sKey );
 		
-		$oFlags = new Geko_Flag( $sFlags );
+		$oFlags = new Geko_Util_Flag( $sFlags );
 		
 		$mAttVal = $aSubject[ $sKey ];
 		
@@ -160,7 +160,7 @@ class Geko_Html_Widget
 			
 		} elseif ( $oFlags->has( 'flag' ) ) {
 		
-			$mAttVal = new Geko_Flag( $mAttVal );
+			$mAttVal = new Geko_Util_Flag( $mAttVal );
 		}
 		
 		
