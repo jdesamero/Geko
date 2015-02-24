@@ -421,6 +421,12 @@ abstract class Geko_Entity
 		return $this->getRawEntity();
 	}
 	
+	//
+	public function getRawEntityKeys() {
+		return array_keys( get_object_vars( $this->_oEntity ) );
+	}
+	
+	
 	
 	// should be a mix-in
 	public function getPrimaryTable() {
