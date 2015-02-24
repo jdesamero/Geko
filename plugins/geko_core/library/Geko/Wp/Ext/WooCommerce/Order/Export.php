@@ -15,23 +15,15 @@ class Geko_Wp_Ext_WooCommerce_Order_Export extends Geko_Wp_Entity_ExportExcelHel
 			$this->_aColumnMappings,
 			array(
 				'order_number' => TRUE,
-				'order_status_fmt' => array(
-					'title' => 'Order Status'
-				),
+				'order_status_fmt' => 'Order Status',
 				'order_items' => TRUE,
-				'user_id' => array(
-					'title' => 'User ID'
-				),
+				'user_id' => 'User ID',
 				'transaction_date' => TRUE,
 				'purchase_date' => TRUE,
 				'first_name' => TRUE,
 				'last_name' => TRUE,
-				'address1' => array(
-					'title' => 'Address Line 1'
-				),
-				'address2' => array(
-					'title' => 'Address Line 2'
-				),
+				'address1' => 'Address Line 1',
+				'address2' => 'Address Line 2',
 				'city' => TRUE,
 				'province' => TRUE,
 				'postal_code' => TRUE,
