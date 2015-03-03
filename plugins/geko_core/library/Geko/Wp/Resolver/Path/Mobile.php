@@ -13,7 +13,6 @@ class Geko_Wp_Resolver_Path_Mobile extends Geko_Wp_Resolver_Path
 		$oBrowser = new Geko_Browser();
 		
 		return (
-			$oBrowser->isDevice( Geko_Browser::DEVICE_TABLET ) || 
 			$oBrowser->isDevice( Geko_Browser::DEVICE_MOBILE ) || 
 			$_GET[ 'geko_wp_resolver_mobile_test' ]
 		) ? TRUE : FALSE ;
