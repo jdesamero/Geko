@@ -27,10 +27,15 @@ class Geko_Wp_Form_Item extends Geko_Wp_Entity
 		parent::init();
 		
 		$this
+			
+			->addPlugin( 'Geko_Wp_Form_Plugin_LangMeta' )
+			->addPlugin( 'Geko_Wp_Form_Plugin_Placeholder' )
+			
 			->setEntityMapping( 'title', 'title' )
 			->setEntityMapping( 'content', 'description' )
 			->setEntityMapping( 'section_id', 'fmsec_id' )
 			->setEntityMapping( 'item_type_id', 'fmitmtyp_id' )
+			
 			->setData( 'lang_meta_fields', array( 'title', 'help' ) )
 		;
 		

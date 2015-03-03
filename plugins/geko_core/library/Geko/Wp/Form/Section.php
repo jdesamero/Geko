@@ -12,12 +12,17 @@ class Geko_Wp_Form_Section extends Geko_Wp_Entity
 		parent::init();
 		
 		$this
+			
+			->addPlugin( 'Geko_Wp_Form_Plugin_LangMeta' )
+			->addPlugin( 'Geko_Wp_Form_Plugin_Placeholder' )
+			
 			->setEntityMapping( 'id', 'fmsec_id' )
 			->setEntityMapping( 'title', 'title' )
 			->setEntityMapping( 'content', 'description' )
+			
 			->setData( 'lang_meta_fields', array( 'title', 'description' ) )
 		;
-				
+		
 		return $this;
 	}
 	
