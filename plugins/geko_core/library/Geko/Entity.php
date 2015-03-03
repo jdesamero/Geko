@@ -15,6 +15,7 @@ abstract class Geko_Entity
 	protected $_sRewriteClass = '';
 	protected $_sManageClass = '';
 	protected $_sMetaClass = '';
+	protected $_sServiceClass = '';
 	
 	protected $_sEntityIdVarName = '';
 	protected $_aEntityIdVarNames = array();			// multi-key support
@@ -42,6 +43,7 @@ abstract class Geko_Entity
 	protected $_aFileSubdirMap = array();
 	
 	protected $_aDelegates = array();
+	protected $_aPlugins = array();
 	
 	
 	
@@ -74,6 +76,10 @@ abstract class Geko_Entity
 			$this->_sEntityClass, '', '_Meta', $this->_sMetaClass
 		);
 		
+		$this->_sServiceClass = Geko_Class::resolveRelatedClass(
+			$this->_sEntityClass, '', '_Service', $this->_sServiceClass
+		);
+		
 		
 		
 		// default entity mappings
@@ -99,7 +105,7 @@ abstract class Geko_Entity
 		}
 		
 		$this->_oEntity = $this->formatEntity( $mEntity );
-		$this->_oQuery = $oQuery;	
+		if ( $oQuery ) $this->_oQuery = $oQuery;	
 		
 		$this->constructEnd();
 	}
@@ -151,21 +157,16 @@ abstract class Geko_Entity
 	// do stuff after calling formatEntity()
 	public function constructEnd() {
 		
-		////// Refactor later!!!
+		$this->doPluginAction(
+			'constructEnd',
+			$this,
+			$this->_oEntity,
+			$this->_oQuery,
+			$this->_aData,
+			$this->_aQueryParams,
+			$this->_oPrimaryTable
+		);
 		
-		// multi-language capability
-		if ( $oQuery = $this->_oQuery ) {
-			
-			if ( $aLangMeta = $oQuery->getData( 'lang_meta' ) ) {
-				$this->setData( 'lang_meta', $aLangMeta[ $this->getEntityPropertyValue( 'id' ) ] );
-			}
-			
-			if ( $aPlaceholders = $oQuery->getData( 'placeholders' ) ) {
-				$this->setData( 'placeholders', $aPlaceholders );
-			}
-		}
-		
-		////// Refactor later!!!
 		
 		return $this;
 	}
@@ -189,14 +190,7 @@ abstract class Geko_Entity
 			$aParams = array( $this->_sEntityIdVarName => $mEntityId );
 		}
 		
-		if ( is_array( $this->_aQueryParams ) ) {
-			$aParams = array_merge( $aParams, $this->_aQueryParams );
-		}
-		
-		$aParams = $this->modifySingleEntityQueryParams( $aParams );
-		$oQuery = new $this->_sQueryClass( NULL, FALSE );
-		
-		return $oQuery->getSingleEntity( $aParams );
+		return $this->querySingleEntity( $aParams );
 	}
 	
 	//
@@ -204,6 +198,17 @@ abstract class Geko_Entity
 		
 		$aParams = array( $this->_sEntitySlugVarName => $sEntitySlug );
 		
+		return $oQuery->getSingleEntity( $aParams );
+	}
+	
+	// hook method
+	public function modifySingleEntityQueryParams( $aParams ) {
+		return $aParams;
+	}
+	
+	//
+	public function querySingleEntity( $aParams ) {
+		
 		if ( is_array( $this->_aQueryParams ) ) {
 			$aParams = array_merge( $aParams, $this->_aQueryParams );
 		}
@@ -211,12 +216,11 @@ abstract class Geko_Entity
 		$aParams = $this->modifySingleEntityQueryParams( $aParams );
 		$oQuery = new $this->_sQueryClass( NULL, FALSE );
 		
-		return $oQuery->getSingleEntity( $aParams );
-	}
-	
-	//
-	public function modifySingleEntityQueryParams( $aParams ) {
-		return $aParams;
+		$oEntity = $oQuery->getSingleEntity( $aParams );
+		
+		$this->_oQuery = $oQuery;
+		
+		return $oEntity;
 	}
 	
 	
@@ -285,44 +289,37 @@ abstract class Geko_Entity
 		$mProperty = $this->getEntityMapping( $sIndex );
 		if ( !$mProperty ) $mProperty = $sIndex;
 		
-		////// get results
 		
-		$sContent = '';			// always string ???
+		//// get results
+		
+		$mContent = NULL;
 		
 		// muti-key support
 		if ( is_array( $mProperty ) ) {
+			
 			$aRet = array();
+			
 			foreach ( $mProperty as $sMultiIndex ) {
-				$aRet[] = $this->getEntityPropertyValue( $sMultiIndex );
+				
+				// force strval since we're imploding
+				$aRet[] = strval( $this->getEntityPropertyValue( $sMultiIndex ) );
 			}
-			$sContent = implode( ':', $aRet );
+			
+			$mContent = implode( ':', $aRet );
 			$sProperty = implode( ':', $mProperty );
+			
 		} else {
-			$sContent = $this->_oEntity->$mProperty;
+			
 			$sProperty = $mProperty;
-		}
-
-		////// Refactor later!!!
-		
-		//// apply transformations, if any
-		
-		// multi-language capability
-		if (
-			( $aLangMeta = $this->getData( 'lang_meta' ) ) && 
-			( $aLangMetaFields = $this->getData( 'lang_meta_fields' ) ) && 
-			( in_array( $sProperty, $aLangMetaFields ) )
-		) {
-			$sContent = Geko_String::coalesce( $aLangMeta[ $sProperty ], $sContent );
+			$mContent = $this->_oEntity->$sProperty;
 		}
 		
-		// placeholder replacements, if any
-		if ( $aPlaceholders = $this->getData( 'placeholders' ) ) {
-			$sContent = Geko_String::replacePlaceholders( $aPlaceholders, $sContent );
-		}
 		
-		////// Refactor later!!!
+		// apply plugin method
+		$mContent = $this->applyPluginFilter( 'getEntityPropertyValue', $mContent, $sProperty, $sIndex, $this );
 		
-		return $sContent;
+		
+		return $mContent;
 	}
 	
 	//
@@ -474,7 +471,22 @@ abstract class Geko_Entity
 	
 	//
 	public function getRawMeta( $sMetaKey ) {
-		return '';
+		
+		$mValue = NULL;
+		
+		$mValue = $this->applyPluginFilter(
+			'getRawMeta',
+			$mValue,
+			$sMetaKey,
+			$this->_oEntity,
+			$this->_oQuery,
+			$this->_aData,
+			$this->_aQueryParams,
+			$this->_oPrimaryTable,
+			$this
+		);
+		
+		return $mValue;
 	}
 	
 	
@@ -490,18 +502,23 @@ abstract class Geko_Entity
 		
 		if ( !$sKey ) $sKey = 'value';			// take care of possible __call()
 		
-		$sValue = $this->getEntityPropertyValue( $sKey );
-		if ( !$sValue ) {
-			$sValue = $this->getMeta( $sKey );
-			if ( !$sValue && !in_array( $sKey, array( 'value', 'meta' ) ) ) {
+		$mValue = $this->getEntityPropertyValue( $sKey );
+		
+		if ( !$mValue ) {
+			
+			$mValue = $this->getMeta( $sKey );
+			
+			if ( !$mValue && !in_array( $sKey, array( 'value', 'meta' ) ) ) {
+				
 				$sMethod = sprintf( 'get%s', Geko_Inflector::camelize( $sKey ) );
+				
 				if ( method_exists( $this, $sMethod ) ) {
-					$sValue = call_user_func_array( array( $this, $sMethod ), $aArgs );
+					$mValue = call_user_func_array( array( $this, $sMethod ), $aArgs );
 				}
 			}
 		}
 		
-		return $sValue;
+		return $mValue;
 	}
 	
 	// alias of getPermalink()
@@ -558,9 +575,9 @@ abstract class Geko_Entity
 		} else {
 			if (
 				( $this->_sEntityPropertyPrefix ) && 
-				( $sValue = $this->getRawMeta( sprintf( '%s%s', $this->_sEntityPropertyPrefix, $sMetaKey ) ) )
+				( $mValue = $this->getRawMeta( sprintf( '%s%s', $this->_sEntityPropertyPrefix, $sMetaKey ) ) )
 			) {
-				return $sValue;
+				return $mValue;
 			}
 			return $this->getRawMeta( $sMetaKey );
 		}
@@ -569,10 +586,10 @@ abstract class Geko_Entity
 	// access a meta value that is expected to be JSON formatted
 	public function getMetaFromJson( $sMetaKey ) {
 		
-		$sValue = $this->getMeta( $sMetaKey );
+		$mValue = $this->getMeta( $sMetaKey );
 		
 		try {
-			if ( $sValue ) return Zend_Json::decode( $sValue );
+			if ( $mValue ) return Zend_Json::decode( $mValue );
 		} catch ( Exception $e ) {
 			return NULL;		
 		}
@@ -731,33 +748,108 @@ abstract class Geko_Entity
 	
 	//
 	public function mysql2DateFormat() {
+		
 		$aArgs = func_get_args();
 		$sDate = call_user_func_array( array( $this, 'getValue' ), $aArgs );
+		
 		if ( $sFormat = $aArgs[ 1 ] ) return $this->mysql2Date( $sDate, $sFormat );
+		
 		return $sDate;
 	}
 	
 	//
 	public function nl2brFormat() {
+		
 		$aArgs = func_get_args();
 		$sValue = call_user_func_array( array( $this, 'getValue' ), $aArgs );
+		
 		return nl2br( trim( $sValue ) );
 	}
 	
 	//
 	public function getValueFromJson() {		
+		
 		$aArgs = func_get_args();
 		$sValue = call_user_func_array( array( $this, 'getValue' ), $aArgs );
+		
 		if ( $sValue ) return Zend_Json::decode( $sValue );
+		
 		return NULL;
 	}
 	
 	// explode a line delimited meta value into an array
 	public function getValueAsArray() {
+		
 		$aArgs = func_get_args();
 		$sValue = call_user_func_array( array( $this, 'getValue' ), $aArgs );
+		
 		return Geko_Array::explodeTrimEmpty( "\n", $sValue );
 	}
+	
+	
+	
+	
+	
+	//// plugin methods (should be a mix-in)
+	
+	// common with Geko_Entity, Geko_Entity_Query
+	
+	//
+	public function addPlugin( $sClassName ) {
+		
+		if ( is_string( $sClassName ) && !in_array( $sClassName, $this->_aPlugins ) ) {
+			$this->_aPlugins[] = $sClassName;
+		}
+		
+		return $this;
+	}
+	
+	//
+	public function applyPluginFilter() {
+		
+		$aArgs = func_get_args();
+		
+		$sMethod = array_shift( $aArgs );
+		
+		// perform filtering if there are plugins
+		if ( count( $this->_aPlugins ) > 0 ) {
+			
+			foreach ( $this->_aPlugins as $sPluginClass ) {
+				
+				$oPlugin = Geko_Singleton_Abstract::getInstance( $sPluginClass );
+				
+				if ( method_exists( $oPlugin, $sMethod ) ) {
+					$mRetVal = call_user_func_array( array( $oPlugin, $sMethod ), $aArgs );
+					$aArgs[ 0 ] = $mRetVal;
+				}
+			}
+		}
+		
+		return $aArgs[ 0 ];
+	}
+	
+	//
+	public function doPluginAction() {
+
+		$aArgs = func_get_args();
+		
+		$sMethod = array_shift( $aArgs );
+		
+		// perform filtering if there are plugins
+		if ( count( $this->_aPlugins ) > 0 ) {
+			
+			foreach ( $this->_aPlugins as $sPluginClass ) {
+				
+				$oPlugin = Geko_Singleton_Abstract::getInstance( $sPluginClass );
+				
+				if ( method_exists( $oPlugin, $sMethod ) ) {
+					call_user_func_array( array( $oPlugin, $sMethod ), $aArgs );
+				}
+			}
+		}
+		
+	}
+	
 	
 	
 	
@@ -880,11 +972,7 @@ abstract class Geko_Entity
 			// attempt to call echo*() method if it exists
 			$sCall = substr_replace( $sMethod, 'echo', 0, 3 );
 			if ( method_exists( $this, $sCall ) ) {
-				ob_start();
-				call_user_func_array( array( $this, $sCall ), $aArgs );
-				$sOut = ob_get_contents();
-				ob_end_clean();
-				return $sOut;
+				return Geko_String::fromOb( array( $this, $sCall ), $aArgs );
 			}
 			
 			
@@ -923,12 +1011,14 @@ abstract class Geko_Entity
 			// echo results from get*() method
 			$sCall = substr_replace( $sMethod, 'thisget', 0, 4 );			
 			echo strval( $this->__call( $sCall, $aArgs ) );
+			
 			return TRUE;
 			
 		} elseif ( 0 === strpos( strtolower( $sMethod ), 'escget' ) ) {
 			
 			// apply escapeHtml() method to result of get*()
 			$sCall = substr_replace( $sMethod, 'thisget', 0, 6 );
+			
 			return $this->escapeHtml( $this->__call( $sCall, $aArgs ) );
 			
 		} elseif ( 0 === strpos( strtolower( $sMethod ), 'escecho' ) ) {
@@ -936,6 +1026,7 @@ abstract class Geko_Entity
 			// apply escapeHtml() method to echo of get*()
 			$sCall = substr_replace( $sMethod, 'thisget', 0, 7 );
 			echo $this->escapeHtml( $this->__call( $sCall, $aArgs ) );
+			
 			return TRUE;
 			
 		} elseif ( 0 === strpos( strtolower( $sMethod ), 'fileurl' ) ) {
@@ -943,6 +1034,7 @@ abstract class Geko_Entity
 			// return the full URL, assuming entity property corresponds to a file
 			$sProp = substr( $sMethod, 7 );
 			$sCall = sprintf( 'thisget%s', $sProp );
+			
 			return $this->_getFileUrl( $this->__call( $sCall, $aArgs ), $sProp, $aArgs );
 			
 		} elseif ( 0 === strpos( strtolower( $sMethod ), 'filepath' ) ) {
@@ -950,6 +1042,7 @@ abstract class Geko_Entity
 			// return the full URL, assuming entity property corresponds to a file
 			$sProp = substr( $sMethod, 8 );
 			$sCall = sprintf( 'thisget%s', $sProp );
+			
 			return $this->_getFilePath( $this->__call( $sCall, $aArgs ), $sProp, $aArgs );
 			
 		} elseif ( 0 === strpos( strtolower( $sMethod ), 'filesize' ) ) {
@@ -957,6 +1050,7 @@ abstract class Geko_Entity
 			// return the full URL, assuming entity property corresponds to a file
 			$sProp = substr( $sMethod, 8 );
 			$sCall = sprintf( 'thisget%s', $sProp );
+			
 			return $this->_getFileSize( $this->__call( $sCall, $aArgs ), $sProp, $aArgs );
 			
 		} elseif ( 0 === strpos( strtolower( $sMethod ), 'fileis' ) ) {
@@ -964,6 +1058,7 @@ abstract class Geko_Entity
 			// return the full URL, assuming entity property corresponds to a file
 			$sProp = substr( $sMethod, 6 );
 			$sCall = sprintf( 'thisget%s', $sProp );
+			
 			return $this->_getFileIs( $this->__call( $sCall, $aArgs ), $sProp, $aArgs );
 			
 		}

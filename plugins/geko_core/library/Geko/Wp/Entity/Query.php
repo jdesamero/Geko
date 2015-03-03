@@ -12,11 +12,9 @@ abstract class Geko_Wp_Entity_Query extends Geko_Entity_Query
 		
 		$this->initHooks();
 		
-		global $wp_query;
+		parent::init();
 		
-		$this->_sSqlQuery = $this->constructQuery( $this->_aParams );
-		$this->_aEntities = $this->getEntities( $this->_sSqlQuery );	
-		$this->_iTotalRows = $this->getFoundRows();
+		global $wp_query;
 		
 		// HACK!!! Hackity hack hack...
 		$iItemsPerPage = intval( $this->_aParams[ 'posts_per_page' ] );

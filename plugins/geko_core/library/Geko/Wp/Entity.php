@@ -4,8 +4,6 @@
 abstract class Geko_Wp_Entity extends Geko_Entity
 {
 	
-	protected $_sServiceClass = '';
-	
 	//
 	protected $_aMetaHandlers = array();
 	
@@ -15,10 +13,6 @@ abstract class Geko_Wp_Entity extends Geko_Entity
 	public function init() {
 		
 		parent::init();
-		
-		$this->_sServiceClass = Geko_Class::resolveRelatedClass(
-			$this->_sEntityClass, '', '_Service', $this->_sServiceClass
-		);
 		
 		do_action( sprintf( '%s::init', $this->_sEntityClass ), $this );
 		
