@@ -4,10 +4,10 @@ class Geko_Wp_Language_Manage_Post_QueryPlugin extends Geko_Entity_Query_Plugin
 {
 	
 	//
-	public function modifyQuery( $oQuery, $aParams ) {
+	public function modifyQuery( $oQuery, $aParams, $oEntityQuery ) {
 		
 		// apply super-class manipulations
-		$oQuery = parent::modifyQuery( $oQuery, $aParams );
+		$oQuery = parent::modifyQuery( $oQuery, $aParams, $oEntityQuery );
 		
 		if (
 			( $sLang = $aParams[ 'lang' ] ) ||

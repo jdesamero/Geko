@@ -6,10 +6,10 @@ class Geko_Wp_Post_Query_Plugin_Comment extends Geko_Entity_Query_Plugin
 	
 	
 	//
-	public function modifyQuery( $oQuery, $aParams ) {
+	public function modifyQuery( $oQuery, $aParams, $oEntityQuery ) {
 		
 		// apply super-class manipulations
-		$oQuery = parent::modifyQuery( $oQuery, $aParams );
+		$oQuery = parent::modifyQuery( $oQuery, $aParams, $oEntityQuery );
 		
 		
 		$bCommentLatest = $aParams[ 'add_comment_latest_date_field' ];

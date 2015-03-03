@@ -6,9 +6,16 @@ class Geko_Entity_Query_Plugin extends Geko_Singleton_Abstract
 	
 	
 	//
-	public function modifyQuery( $oQuery, $aParams ) {
+	public function modifyQuery( $oQuery, $aParams, $oEntityQuery ) {
 		
 		return $oQuery;
+	}
+	
+	// called right after getEntities() is called
+	public function afterGetEntities( $aEntities, $aParams, $sInvoker, $oEntityQuery ) {
+		
+		// $sInvoker can either be: Geko_Entity_Query::init, or Geko_Entity_Query::getSingleEntity
+		
 	}
 	
 	
@@ -37,6 +44,7 @@ class Geko_Entity_Query_Plugin extends Geko_Singleton_Abstract
 		
 		return $sDefOrder;
 	}
+	
 	
 	
 }
