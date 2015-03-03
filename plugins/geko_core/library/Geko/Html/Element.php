@@ -139,10 +139,14 @@ class Geko_Html_Element
 	//
 	public function append( $mElem ) {
 		
-		if ( is_object( $mElem ) && is_a( $mElem, __CLASS__ ) ) {
+		if ( $mElem instanceof Geko_Html_Element ) {
 			
 			$this->_aChildren[] = $mElem;
-		
+			
+		} elseif ( $mElem instanceof Geko_Html_Widget ) {
+						
+			$this->_aChildren[] = $mElem->get();
+			
 		} elseif ( is_array( $mElem ) ) {
 			
 			foreach ( $mElem as $oElem ) {

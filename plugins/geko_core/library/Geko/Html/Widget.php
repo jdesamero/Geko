@@ -201,12 +201,8 @@ class Geko_Html_Widget
 	}
 	
 	
-	//
+	// do nothing, for now
 	public function formatAppendValue( $mValue ) {
-		
-		if ( $mValue instanceof Geko_Html_Widget ) {
-			return $mValue->get();
-		}
 		
 		return $mValue;
 	}
@@ -229,6 +225,13 @@ class Geko_Html_Widget
 		}
 		
 		return $sValue;
+	}
+	
+	
+	// long way: $bStriped = $oFormat->has( 'striped' ) || $this->formatAtt( 'striped:bool' );
+	// shorter equivalent: $bStriped = $this->hasFlag( 'striped', $oFormat );
+	public function hasFlag( $sKey, $oFlag ) {
+		return $oFlag->has( $sKey ) || $this->formatAtt( sprintf( '%s:bool', $sKey ) );
 	}
 	
 	
