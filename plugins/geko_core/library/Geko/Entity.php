@@ -198,7 +198,7 @@ abstract class Geko_Entity
 		
 		$aParams = array( $this->_sEntitySlugVarName => $sEntitySlug );
 		
-		return $oQuery->getSingleEntity( $aParams );
+		return $this->getSingleEntity( $aParams );
 	}
 	
 	// hook method
