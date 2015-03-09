@@ -3,7 +3,19 @@
 //
 class Geko_Wp_Form_Plugin_LangMeta extends Geko_Entity_Plugin
 {
-
+	
+	//
+	public function setupEntity( $oEntity, $aParams ) {
+		
+		parent::setupEntity( $oEntity, $aParams );
+		
+		if ( is_array( $aFields = $aParams[ 'fields' ] ) ) {
+			$oEntity->setData( 'lang_meta_fields', $aFields );
+		}
+	}
+	
+	
+	
 	// constructEnd action hook
 	public function constructEnd( $oEntity, $oRawEntity, $oQuery, $aData, $aQueryParams, $oPrimaryTable ) {
 		
@@ -25,7 +37,7 @@ class Geko_Wp_Form_Plugin_LangMeta extends Geko_Entity_Plugin
 		// multi-language capability
 		if (
 			( $aLangMeta = $oEntity->getData( 'lang_meta' ) ) && 
-			( $aLangMetaFields = $oEntity->getData( 'lang_meta_fields' ) ) && 
+			( is_array( $aLangMetaFields = $oEntity->getData( 'lang_meta_fields' ) ) ) && 
 			( in_array( $sProperty, $aLangMetaFields ) )
 		) {
 			$mContent = Geko_String::coalesce( $aLangMeta[ $sProperty ], $mContent );

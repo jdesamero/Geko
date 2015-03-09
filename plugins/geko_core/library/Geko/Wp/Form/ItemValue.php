@@ -19,7 +19,9 @@ class Geko_Wp_Form_ItemValue extends Geko_Wp_Entity
 		
 		$this
 			
-			->addPlugin( 'Geko_Wp_Form_Plugin_LangMeta' )
+			->addPlugin( 'Geko_Wp_Form_Plugin_LangMeta', array(
+				'fields' => array( 'label', 'help' )
+			) )
 			->addPlugin( 'Geko_Wp_Form_Plugin_Placeholder' )
 			
 			->setEntityMapping( 'title', 'label' )
@@ -28,7 +30,6 @@ class Geko_Wp_Form_ItemValue extends Geko_Wp_Entity
 			->setEntityMapping( 'item_id', 'fmitm_id' )
 			->setEntityMapping( 'item_value_index', 'fmitmval_idx' )
 			
-			->setData( 'lang_meta_fields', array( 'label', 'help' ) )
 		;
 		
 		return $this;
