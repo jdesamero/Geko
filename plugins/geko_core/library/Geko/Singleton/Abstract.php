@@ -64,6 +64,8 @@ abstract class Geko_Singleton_Abstract
 			call_user_func_array( array( $this, 'postStart' ), $aArgs );
 			
 			$this->_bCalledInit = TRUE;
+			
+			call_user_func_array( array( $this, 'afterCalledInit' ), $aArgs );
 		}
 		
 		return $this;
@@ -92,6 +94,7 @@ abstract class Geko_Singleton_Abstract
 	public function preStart() { }						// before start
 	public function start() { }							// during start
 	public function postStart() { }						// after start
+	public function afterCalledInit() { }				// called right after the called init flag is set
 	
 	
 	// public function end() { }						// ???

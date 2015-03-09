@@ -141,9 +141,15 @@ abstract class Geko_Wp_Entity_Query extends Geko_Entity_Query
 	//
 	public function getFoundRows() {
 		
-		$oDb = Geko_Wp::get( 'db' );
+		if ( !$this->_bEmptyInit ) {
 		
-		return $oDb->fetchOne( 'SELECT FOUND_ROWS()' );
+			$oDb = Geko_Wp::get( 'db' );
+			
+			return $oDb->fetchOne( 'SELECT FOUND_ROWS()' );
+		
+		}
+		
+		return parent::getFoundRows();
 	}
 	
 	//

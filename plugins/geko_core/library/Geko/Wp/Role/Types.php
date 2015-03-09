@@ -15,8 +15,8 @@ class Geko_Wp_Role_Types
 	
 	
 	//
-	public function register( $mType )
-	{
+	public function register( $mType ) {
+		
 		if ( is_scalar( $mType ) && class_exists( $mType ) ) {
 			$oType = Geko_Singleton_Abstract::getInstance( $mType );
 		} elseif ( is_object( $mType ) ) {
@@ -35,8 +35,8 @@ class Geko_Wp_Role_Types
 	
 	
 	//
-	public function getRoleTypeObject( $sTypeCode )
-	{
+	public function getRoleTypeObject( $sTypeCode ) {
+		
 		if ( isset( $this->_aRoleTypeHash[ $sTypeCode ] ) ) {
 			return $this->_aRoleTypeHash[ $sTypeCode ];
 		} else {
@@ -45,8 +45,8 @@ class Geko_Wp_Role_Types
 	}
 
 	//
-	public function getRoleTypeOffset( $sTypeCode )
-	{
+	public function getRoleTypeOffset( $sTypeCode ) {
+		
 		if ( isset( $this->_aOffsets[ $sTypeCode ] ) ) {
 			return $this->_aOffsets[ $sTypeCode ];
 		} else {
@@ -55,8 +55,8 @@ class Geko_Wp_Role_Types
 	}
 	
 	// call reconcileAssigned() on all registered types
-	public function reconcileAssigned()
-	{
+	public function reconcileAssigned() {
+		
 		foreach ( $this->_aRoleTypes as $oRoleTypes ) {
 			$oRoleTypes->reconcileAssigned();
 		}
@@ -65,8 +65,8 @@ class Geko_Wp_Role_Types
 	}
 	
 	//
-	public function getPseudoRoleTypeId( $mParam )
-	{
+	public function getPseudoRoleTypeId( $mParam ) {
+		
 		if ( is_string( $mParam ) ) {
 			$sSuffix = $mParam;
 		} else {
@@ -81,8 +81,8 @@ class Geko_Wp_Role_Types
 	}
 	
 	//
-	public function getCurrentType()
-	{
+	public function getCurrentType() {
+		
 		foreach ( $this->_aRoleTypes as $iOffset => $oType ) {
 			if (
 				( $oRewrite = $oType->getRoleRewrite() ) && 
@@ -102,32 +102,27 @@ class Geko_Wp_Role_Types
 	//// Iterator interface methods
 	
 	//
-	public function rewind()
-	{
+	public function rewind() {
 		$this->_iPos = 0;
 	}
 	
 	//
-	public function current()
-	{
+	public function current() {
 		return $this->_aRoleTypes[ $this->_iPos ];
 	}
 
 	//
-	public function key()
-	{
+	public function key() {
 		return $this->_iPos;
 	}
 	
 	//
-	public function next()
-	{
+	public function next() {
 		++$this->_iPos;
 	}
 
 	//
-	public function valid()
-	{
+	public function valid() {
 		return isset( $this->_aRoleTypes[ $this->_iPos ] );
 	}
 
@@ -135,29 +130,27 @@ class Geko_Wp_Role_Types
 	//// ArrayAccess interface methods
 	
 	//
-	public function offsetSet( $iOffset, $mValue )
-	{
+	public function offsetSet( $iOffset, $mValue ) {
 		$this->_aRoleTypes[ $iOffset ] = $mValue;
 	}
 	
 	//
-	public function offsetExists( $iOffset )
-	{
+	public function offsetExists( $iOffset ) {
 		return isset( $this->_aRoleTypes[ $iOffset ] );
 	}
 	
 	//
-	public function offsetUnset( $iOffset )
-	{
+	public function offsetUnset( $iOffset ) {
 		unset( $this->_aRoleTypes[ $iOffset ] );
 	}
 	
 	//
-	public function offsetGet( $iOffset )
-	{
+	public function offsetGet( $iOffset ) {
+		
 		return isset( $this->_aRoleTypes[ $iOffset ] ) ? 
 			$this->_aRoleTypes[ $iOffset ] :
-			NULL;
+			NULL
+		;
 	}
 	
 	

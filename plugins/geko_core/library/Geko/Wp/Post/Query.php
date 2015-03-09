@@ -100,7 +100,12 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 	
 	//
 	public function getFoundRows() {
-		return $this->oWpQuery->found_posts;
+
+		if ( !$this->_bEmptyInit ) {
+			return $this->oWpQuery->found_posts;
+		}
+		
+		return parent::getFoundRows();
 	}
 	
 	

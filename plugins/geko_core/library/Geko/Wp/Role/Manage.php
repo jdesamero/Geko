@@ -22,6 +22,7 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 	
 	//// init
 	
+	//
 	public function add() {
 		
 		parent::add();
@@ -46,16 +47,25 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 	//
 	public function addAdmin() {
 		
-		$oDb = Geko_Wp::get( 'db' );
-		
 		parent::addAdmin();
+		
+		$oDb = Geko_Wp::get( 'db' );
 		
 		add_action( $oDb->replacePrefixPlaceholder( 'update_option_##pfx##user_roles' ), array( $this, 'updateRole' ), 10, 2 );
 		
+		
+		return $this;
+	}
+	
+	//
+	public function afterCalledInit() {
+		
+		parent::afterCalledInit();
+		
+		// IMPORTANT!!!: This is called here to prevent a nasty infinite loop
 		// reconcile assigned for the types that need it
 		Geko_Wp_Role_Types::getInstance()->reconcileAssigned();
 		
-		return $this;
 	}
 	
 	
