@@ -60,8 +60,7 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 			$this->oWpQuery = new WP_Query( $aParams );
 		}
 		
-		$this->_aEntities = $this->oWpQuery->posts;
-		$this->_iTotalRows = $this->oWpQuery->found_posts;
+		$this->setRawEntities( $this->oWpQuery->posts );
 		
 		
 		// HACK!!! Hackity hack hack...
@@ -99,27 +98,12 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 		return $this->oWpQuery;
 	}
 	
-	
 	//
-	public function getSingleEntity( $mParam ) {
-		
-		if ( is_string( $mParam ) ) {
-			$aParams = array();
-			parse_str( $mParam, $aParams );
-		} else {
-			$aParams = $mParam;
-		}
-		
-		$aParams = $this->setUpWpQueryFilters( $aParams );
-		
-		$oWpQuery = new WP_Query( $aParams );
-		
-		if ( count( $oWpQuery->posts ) > 0 ) {
-			return $oWpQuery->posts[ 0 ];
-		}
-		
-		return NULL;
+	public function getFoundRows() {
+		return $this->oWpQuery->found_posts;
 	}
+	
+	
 	
 	// only kicks in when "use_non_native_query" is set to TRUE
 	public function modifyQuery( $oQuery, $aParams ) {

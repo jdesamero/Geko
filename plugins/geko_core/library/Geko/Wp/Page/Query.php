@@ -14,22 +14,7 @@ class Geko_Wp_Page_Query extends Geko_Wp_Post_Query
 	}
 	
 	
-	//
-	public function getSingleEntity( $mParam ) {
-		
-		$aParams = array();
-		
-		if ( is_string( $mParam ) ) {
-			parse_str( $mParam, $aParams );
-		} elseif ( is_array( $mParam ) ) {
-			$aParams = $mParam;
-		}
-
-		$aParams[ 'post_type' ] = 'page';
-		
-		return parent::getSingleEntity( $aParams );
-	}
-
+	
 }
 
 

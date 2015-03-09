@@ -164,16 +164,6 @@ abstract class Geko_Wp_Entity_Query extends Geko_Entity_Query
 		}
 	}
 	
-	//
-	public function getSingleEntity( $mParam ) {
-		
-		$oDb = Geko_Wp::get( 'db' );
-		
-		return $oDb->fetchRowObj(
-			$this->getEntityQuery( $mParam )
-		);
-	}
-	
 	
 	
 	

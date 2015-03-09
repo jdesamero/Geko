@@ -12,8 +12,8 @@ class Geko_Wp_Tag_Query extends Geko_Wp_Entity_Query
 		}
 		
 		// defer to get_tags() function
-		$this->_aEntities = get_tags( $this->_aParams );
-		$this->_iTotalRows = count( $this->_aEntities );
+		$this->setRawEntities( get_tags( $this->_aParams ) );
+		
 		
 		return $this;
 		
@@ -77,18 +77,6 @@ class Geko_Wp_Tag_Query extends Geko_Wp_Entity_Query
 	}
 	
 	
-	//
-	public function getSingleEntity( $mParam ) {
-		
-		$aRes = get_tags( $mParam );
-		
-		if ( count( $aRes ) > 0 ) {
-			return $aRes[ 0 ];
-		}
-		
-		return NULL;
-	}
-
 	
 }
 
