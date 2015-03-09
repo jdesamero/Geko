@@ -15,6 +15,7 @@
 			position: 'center',
 			popupClass: 'bubble',
 			markerClass: 'point',
+			imageAreaSelector: null,
 			popup: true,
 			cookies: true,
 			caption: true,
@@ -46,13 +47,26 @@
 				$this.wrapInner( $( '<div \/>' ).addClass( 'imgContent' ).css( { zIndex: '1', position: 'absolute' } ) );
 				
 				var content = $this.find( '.imgContent' );
-				var image = $this.find( 'img' );
-				var title = image.attr( 'alt' );
+				
+				var imageArea, title;
+				
+				if ( sets.imageAreaSelector ) {
+
+					imageArea = content.find( sets.imageAreaSelector );
+					title = $this.find( 'img' ).first().attr( 'alt' );
+					
+				} else {
+					
+					// default
+					imageArea = $this.find( 'img' );
+					title = imageArea.attr( 'alt' );
+				}
+				
 				var point = $this.find( '.' + sets.markerClass );
 				var mouseDown = false;
 				var mx, my, ex, ey;
-				var imgw = image.width();
-				var imgh = image.height();
+				var imgw = imageArea.width();
+				var imgh = imageArea.height();
 				var divw = $this.width();
 				var divh = $this.height();
 				
@@ -86,6 +100,8 @@
 						return null;
 					}
 				};
+				
+				// var yyy = false;
 				
 				var map = {
 					check: function( x, y ) {
@@ -158,43 +174,73 @@
 						
 					},
 					preloader: function() {
+						
 						var loadimg = new Image();
-						var src = image.attr( 'src' );
-						image.css( { visibility: 'hidden' } );
-						$this.append( $( '<div \/>' ).addClass( 'loader' ).css( {
-							position: 'absolute',
-							zIndex: '10',
-							top: '0',
-							left: '0',
-							width: '100%',
-							height: '100%'
-						} ) );
-						$( loadimg ).load( function() {
-							image.css( { visibility: 'visible' } );
-							$this.find( '.loader' ).fadeOut( 1000, function() {
-								$( this ).remove();
-								if ( sets.caption ) {
-									$this.append( $( '<div \/>' ).addClass( 'imgCaption' ).html( title ).hide() );
-									captiond = $this.find( '.imgCaption' );
-									captionh = captiond.innerHeight();
-									captiond.css( {
-										bottom: -captionh + 'px',
-										position: 'absolute',
-										zIndex: '7'
-									} ).show().animate( { bottom: 0 } );
-								}
-								sets.onMapLoad.call( this );
-							} )
-						} ).attr( 'src', src );
-						image.removeAttr( 'alt' );
+						
+						$this.find( 'img' ).each( function() {
+							
+							var image = $( this );
+							
+							var src = image.attr( 'src' );
+							image.css( { visibility: 'hidden' } );
+							
+							$this.append( $( '<div \/>' ).addClass( 'loader' ).css( {
+								position: 'absolute',
+								zIndex: '10',
+								top: '0',
+								left: '0',
+								width: '100%',
+								height: '100%'
+							} ) );
+							
+							$( loadimg ).load( function() {
+								image.css( { visibility: 'visible' } );
+								$this.find( '.loader' ).fadeOut( 1000, function() {
+									$( this ).remove();
+									if ( sets.caption ) {
+										$this.append( $( '<div \/>' ).addClass( 'imgCaption' ).html( title ).hide() );
+										captiond = $this.find( '.imgCaption' );
+										captionh = captiond.innerHeight();
+										captiond.css( {
+											bottom: -captionh + 'px',
+											position: 'absolute',
+											zIndex: '7'
+										} ).show().animate( { bottom: 0 } );
+									}
+									sets.onMapLoad.call( this );
+								} )
+							} ).attr( 'src', src );
+							
+							image.removeAttr( 'alt' );
+							
+						} );
+						
 					},
 					mouse: function( e ) {
-						var x = e.pageX;
-						var y = e.pageY;
+						
+						var x, y;
+						
+						if (
+							( ( 'touchmove' === e.type ) || ( 'touchstart' === e.type ) ) && 
+							e.originalEvent &&
+							e.originalEvent.touches							
+						) {
+							
+							var touch = e.originalEvent.touches[ 0 ];
+							x = touch.pageX;
+							y = touch.pageY;
+														
+						} else {
+							x = e.pageX;
+							y = e.pageY;						
+						}
+						
 						return { x:x, y:y };
 					},
 					update: function( e ) {
+						
 						var mouse = map.mouse( e );
+						
 						var x = mouse.x;
 						var y = mouse.y;
 						var movex = x - mx;
@@ -202,6 +248,7 @@
 						var top = ey + movey;
 						var left = ex + movex;
 						var check = map.check( left, top );
+						
 						content.css( {
 							top: check.y + 'px',
 							left: check.x + 'px'
@@ -210,6 +257,7 @@
 						if ( sets.cookies ) {
 							cookies.create( 'position', check.x + ',' + check.y, 7 );
 						}
+						
 					},
 					navigation: {
 						buttons: function() {
@@ -261,8 +309,9 @@
 					map.navigation.move();
 				}
 				
-				content.bind( {
-					mousedown: function( e ) {
+				
+				content
+					.on( 'mousedown touchstart', function( e ) {
 						e.preventDefault();
 						mouseDown = true;
 						var mouse = map.mouse(e);
@@ -272,28 +321,24 @@
 						ex = element.left;
 						ey = element.top;
 						map.update( e );
-					},
-					mousemove: function( e ) {
+					} )
+					.on( 'mousemove touchmove', function( e ) {
 						if ( mouseDown ) map.update( e );
 						return false;
-					},
-					mouseup: function() {
+					} )
+					.on( 'mouseup mouseout touchend', function() {
 						if ( mouseDown ) mouseDown = false;
 						return false;
-					},
-					mouseout: function() {
-						if ( mouseDown ) mouseDown = false;
-						return false;
-					},
-					mouseenter: function() {
+					} )
+					.on( 'mouseenter', function() {
 						if ( sets.caption ) captiond.animate( { bottom: -captionh + 'px' } );
 						return false;
-					},
-					mouseleave: function() {
+					} )
+					.on( 'mouseleave', function() {
 						if ( sets.caption ) captiond.animate( { bottom: 0 } );
 						return false;
-					}
-				} );
+					} )
+				;
 				
 				map.init( sets.position );
 				point.each( function() {
@@ -309,7 +354,7 @@
 					} )
 				} ).wrapInner( $( '<div \/>' ).addClass( 'markerContent' ).css( { display: 'none' } ) );
 				
-				point.click( function() {
+				point.on( 'click touchstart', function() {
 					
 					var $this = $( this );
 					var pointw = $this.width();

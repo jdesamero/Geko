@@ -107,6 +107,30 @@
 			
 		};
 		
+		//
+		var calculateCenter = function( iXTarget, iYTarget, eMap, eMapImg ) {
+			
+			var iMapWinWdt = opts.viewPortWidth;
+			if ( !iMapWinWdt ) iMapWinWdt = eMap.width();
+			
+			var iMapWinHgt = opts.viewPortHeight;
+			if ( !iMapWinHgt ) iMapWinHgt = eMap.height();
+			
+			var iCenXpos = parseInt( iXTarget - ( iMapWinWdt / 2 ) );
+			var iCenYpos = parseInt( iYTarget - ( iMapWinHgt / 2 ) );
+			
+			var iMapWdt = eMapImg.width();
+			var iMapHgt = eMapImg.height();
+			
+			if ( iCenXpos < 0 ) iCenXpos = 0;
+			else if ( iCenXpos > iMapWdt ) iCenXpos = iMapWdt;
+			
+			if ( iCenYpos < 0 ) iCenYpos = 0;
+			else if ( iCenYpos > iMapHgt ) iCenYpos = iMapHgt;
+			
+			return { x: iCenXpos, y: iCenYpos };
+		};
+		
 		
 		// main
 		return this.each( function() {
@@ -123,6 +147,17 @@
 			
 			var fScaleFactor = null;
 			var sMiniMarkerClass = null;
+			
+			//
+			if ( opts.position_center ) {
+				
+				var aPos = opts.position_center.split( ' ' );
+				var oCenCoords = calculateCenter( parseInt( aPos[ 0 ] ), parseInt( aPos[ 1 ] ), eMap, eMapImg );
+				
+				opts.position = '%d %d'.printf( oCenCoords.x + iInitXOffset, oCenCoords.y + iInitYOffset );
+				
+				delete opts.position_center;
+			}
 			
 			if ( oMmOpts ) {
 				
@@ -148,7 +183,6 @@
 				if ( oMmOpts.markerClass ) {
 					sMiniMarkerClass = oMmOpts.markerClass;
 				}
-				
 				
 			}
 			
@@ -182,25 +216,9 @@
 						
 						var oCenPos = oMapProj.getCoords( iCenterLat, iCenterLng );
 						
-						var iMapWinWdt = opts.viewPortWidth;
-						if ( !iMapWinWdt ) iMapWinWdt = eMap.width();
+						var oCenCoords = calculateCenter( oCenPos.x, oCenPos.y, eMap, eMapImg );
 						
-						var iMapWinHgt = opts.viewPortHeight;
-						if ( !iMapWinHgt ) iMapWinHgt = eMap.height();
-						
-						var iCenXpos = parseInt( oCenPos.x - ( iMapWinWdt / 2 ) );
-						var iCenYpos = parseInt( oCenPos.y - ( iMapWinHgt / 2 ) );
-						
-						var iMapWdt = eMapImg.width();
-						var iMapHgt = eMapImg.height();
-						
-						if ( iCenXpos < 0 ) iCenXpos = 0;
-						else if ( iCenXpos > iMapWdt ) iCenXpos = iMapWdt;
-						
-						if ( iCenYpos < 0 ) iCenYpos = 0;
-						else if ( iCenYpos > iMapHgt ) iCenYpos = iMapHgt;
-						
-						opts.position = '%d %d'.printf( iCenXpos + iInitXOffset, iCenYpos + iInitYOffset );
+						opts.position = '%d %d'.printf( oCenCoords.x + iInitXOffset, oCenCoords.y + iInitYOffset );
 					}
 					
 					
@@ -459,13 +477,13 @@
 						
 						// apply event handlers
 						eImageContent
-							.on( 'mousedown', fnStopMap )
-							.on( 'mouseup', fnStopMapDelay )
+							.on( 'mousedown touchstart', fnStopMap )
+							.on( 'mouseup touchend', fnStopMapDelay )
 						;
 						
 						//
 						if ( oMoveOpts.stopOnMarkerMousedown ) {
-							eMap.find( '.point' ).on( 'mousedown', fnStopMap );
+							eMap.find( '.point' ).on( 'mousedown touchstart', fnStopMap );
 						}
 						
 					}
@@ -565,8 +583,8 @@
 						if ( fnStopMap ) {
 							
 							eViewer
-								.on( 'mousedown', fnStopMap )
-								.on( 'mouseup', fnStopMapDelay )
+								.on( 'mousedown touchstart', fnStopMap )
+								.on( 'mouseup touchend', fnStopMapDelay )
 							;
 						}
 						
@@ -577,15 +595,17 @@
 					var isDragging = false;
 					
 					// moves viewer when map is dragged
-					eImageContent.on( 'mousedown', function() {
-
+					eImageContent.on( 'mousedown touchstart', function() {
+						
+						// console.log( 'aaaaa' );
+						
 						isDragging = true;
-					
-					} ).on( 'mouseup', function() {
+						
+					} ).on( 'mouseup touchend', function() {
 
 						isDragging = false;
-					
-					} ).on('mousemove', function( e ) {
+						
+					} ).on( 'mousemove touchmove', function( e ) {
 						
 						if ( isDragging ) {
 							
@@ -595,6 +615,8 @@
 								// console.log( eImageContent.position() );
 								
 								var pos = eImageContent.position();
+								
+								// console.log( [ pos.left, pos.top ] );
 								
 								eMap.trigger( 'reposition', [ pos.left, pos.top, xRFactor, yRFactor ] );
 								
