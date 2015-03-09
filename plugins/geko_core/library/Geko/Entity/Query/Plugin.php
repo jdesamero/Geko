@@ -5,16 +5,26 @@ class Geko_Entity_Query_Plugin extends Geko_Singleton_Abstract
 {
 	
 	
+	// called right after addPlugin() is invoked on entity query
+	public function setupEntityQuery( $oEntityQuery, $aParams ) {
+		
+	}
+	
+	
+	
 	//
 	public function modifyQuery( $oQuery, $aParams, $oEntityQuery ) {
 		
 		return $oQuery;
 	}
 	
-	// called right after getEntities() is called
-	public function afterGetEntities( $aEntities, $aParams, $sInvoker, $oEntityQuery ) {
+	// called after raw entities and total rows are set
+	public function setRawEntities( $aEntities, $aParams, $aData, $oPrimaryTable, $oEntityQuery ) {
 		
-		// $sInvoker can either be: Geko_Entity_Query::init, or Geko_Entity_Query::getSingleEntity
+	}
+	
+	// called after new entities are added and total rows are recalculated
+	public function addRawEntities( $aNewEntities, $aAllEntities, $aParams, $aData, $oPrimaryTable, $oEntityQuery ) {
 		
 	}
 	

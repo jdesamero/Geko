@@ -10,11 +10,17 @@ abstract class Geko_App_Entity_Query extends Geko_Entity_Query
 	//
 	public function getFoundRows() {
 		
-		$oDb = Geko_App::get( 'db' );
+		if ( !$this->_bEmptyInit ) {
+			
+			$oDb = Geko_App::get( 'db' );
+			
+			$sFoundRowsQuery = $oDb->gekoQueryFoundRows( $this );
+			
+			return $oDb->fetchOne( $sFoundRowsQuery );
+			
+		}
 		
-		$sFoundRowsQuery = $oDb->gekoQueryFoundRows( $this );
-		
-		return $oDb->fetchOne( $sFoundRowsQuery );
+		return parent::getFoundRows();
 	}
 	
 	
@@ -38,15 +44,6 @@ abstract class Geko_App_Entity_Query extends Geko_Entity_Query
 		
 	}
 	
-	//
-	public function getSingleEntity( $mParam ) {
-		
-		$oDb = Geko_App::get( 'db' );
-		
-		return $oDb->fetchRow(
-			$this->getEntityQuery( $mParam )
-		);
-	}
 	
 	
 	//

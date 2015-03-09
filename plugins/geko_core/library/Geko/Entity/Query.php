@@ -7,6 +7,7 @@ abstract class Geko_Entity_Query
 	
 	protected $_aParams = array();
 	protected $_bAddToDefaultParams = TRUE;
+	protected $_bEmptyInit = FALSE;							
 	protected $_aData = array();							// arbitrary data
 	
 	protected $_sSqlQuery;
@@ -15,8 +16,10 @@ abstract class Geko_Entity_Query
 	protected $_aEntities = array();
 	protected $_iPos = 0;	
 	
-	protected $_sEntityClass = '';
 	protected $_sQueryClass = '';
+	protected $_sEntityClass = '';
+	protected $_sMetaClass = '';
+	protected $_sMetaQueryClass = '';
 	protected $_sManageClass = '';
 	
 	protected $_sDefaultField = 'Link';
@@ -47,12 +50,22 @@ abstract class Geko_Entity_Query
 		$this->_bAddToDefaultParams = $bAddToDefaultParams;
 		$this->_aData = $aData;
 		
+		$this->_bEmptyInit = ( ( NULL === $mParams ) && ( FALSE === $bAddToDefaultParams ) ) ? TRUE : FALSE ;
+		
 		$this->_sQueryClass = get_class( $this );
 		
 		$this->_sEntityClass = Geko_Class::resolveRelatedClass(
 			$this, '_Query', '', $this->_sEntityClass
 		);
-
+		
+		$this->_sMetaClass = Geko_Class::resolveRelatedClass(
+			$this->_sEntityClass, '', '_Meta', $this->_sMetaClass
+		);
+		
+		$this->_sMetaQueryClass = Geko_Class::resolveRelatedClass(
+			$this->_sMetaClass, '', '_Query', $this->_sMetaQueryClass
+		);
+		
 		$this->_sManageClass = Geko_Class::resolveRelatedClass(
 			$this->_sEntityClass, '', '_Manage', $this->_sManageClass
 		);
@@ -103,10 +116,7 @@ abstract class Geko_Entity_Query
 		
 		$this->_sSqlQuery = $this->constructQuery( $this->_aParams );
 		
-		$this->_aEntities = $this->getEntities( $this->_aParams );
-		$this->doPluginAction( 'afterGetEntities', $this->_aEntities, $this->_aParams, __METHOD__, $this );
-		
-		$this->_iTotalRows = $this->getFoundRows();
+		$this->setRawEntities( $this->getEntities( $this->_aParams ) );
 		
 		return $this;
 	}
@@ -289,7 +299,7 @@ abstract class Geko_Entity_Query
 	}
 	
 	
-	//// accessors
+	//// main accessors
 	
 	// should be result of SQL_CALC_FOUND_ROWS
 	public function getTotalRows() {
@@ -325,10 +335,52 @@ abstract class Geko_Entity_Query
 	
 	//
 	public function setRawEntities( $aEntities ) {
+		
 		$this->_aEntities = $aEntities;
-		$this->_iTotalRows = count( $aEntities );
+		$this->_iTotalRows = $this->getFoundRows();
+		
+		$this->doPluginAction(
+			'setRawEntities',
+			$this->_aEntities,
+			$this->_aParams,
+			$this->_aData,
+			$this->_oPrimaryTable,
+			$this
+		);
+		
 		return $this;
 	}
+	
+	//
+	public function addRawEntities( $aEntities ) {
+		
+		$aEntities = Geko_Array::wrap( $aEntities );
+		
+		foreach ( $aEntities as $oEntity ) {
+			
+			$oRawEntity = ( $oEntity instanceof Geko_Entity ) ? $oEntity->getRawEntity() : $oEntity ;
+			
+			$this->_aEntities[] = $oRawEntity;
+			$this->_iTotalRows++;
+			
+			$this->subsetAddedEntity( $this->wrapEntity( $this->count() - 1 ) );
+		}
+		
+		$this->doPluginAction(
+			'addRawEntities',
+			$aEntities,
+			$this->_aEntities,
+			$this->_aParams,
+			$this->_aData,
+			$this->_oPrimaryTable,
+			$this
+		);
+		
+		// adjust subsets, if any
+		
+		return $this;
+	}
+	
 	
 	//
 	public function getRawEntities( $bFormatEntities = FALSE ) {
@@ -377,6 +429,28 @@ abstract class Geko_Entity_Query
 		
 		return new $this->_sEntityClass;
 	}
+	
+	
+	
+	//// helper accessors
+	
+	//
+	public function getMetaClass() {
+		return $this->_sMetaClass;
+	}
+	
+	//
+	public function getMetaQueryClass() {
+		return $this->_sMetaQueryClass;
+	}
+	
+	//
+	public function getManageClass() {
+		return $this->_sManageClass;
+	}
+	
+	
+	
 	
 	
 	//// Iterator interface methods
@@ -610,27 +684,8 @@ abstract class Geko_Entity_Query
 		return array();
 	}
 	
-	//
-	public function getSingleEntity( $mParam ) {
-		
-		$aEntities = $this->getEntities( $mParam );
-		$this->doPluginAction( 'afterGetEntities', $aEntities, $mParam, __METHOD__, $this );
-		
-		if ( $aEntities[ 0 ] ) {
-			return $aEntities[ 0 ];
-		} else {
-			return NULL;
-		}
-	}
 	
 	
-	
-	//// hooks
-	
-	// hook to allow subsets to be modified after init
-	public function modifySubset( $sField ) {
-		
-	}
 	
 	
 	
@@ -638,14 +693,12 @@ abstract class Geko_Entity_Query
 	
 	//// plugin methods (should be a mix-in)
 	
-	// common with Geko_Entity, Geko_Entity_Query
+	// common with Geko_Entity, Geko_Entity_Query, Geko_Delegate
 	
 	//
-	public function addPlugin( $sClassName ) {
+	public function addPlugin( $sClassName, $mParams = NULL ) {
 		
-		if ( is_string( $sClassName ) && !in_array( $sClassName, $this->_aPlugins ) ) {
-			$this->_aPlugins[] = $sClassName;
-		}
+		Geko_Plugin::add( $sClassName, $mParams, $this, &$this->_aPlugins, 'setupEntityQuery' );
 		
 		return $this;
 	}
@@ -655,59 +708,175 @@ abstract class Geko_Entity_Query
 		
 		$aArgs = func_get_args();
 		
-		$sMethod = array_shift( $aArgs );
-		
-		// perform filtering if there are plugins
-		if ( count( $this->_aPlugins ) > 0 ) {
-			
-			foreach ( $this->_aPlugins as $sPluginClass ) {
-				
-				$oPlugin = Geko_Singleton_Abstract::getInstance( $sPluginClass );
-				
-				if ( method_exists( $oPlugin, $sMethod ) ) {
-					$mRetVal = call_user_func_array( array( $oPlugin, $sMethod ), $aArgs );
-					$aArgs[ 0 ] = $mRetVal;
-				}
-			}
-		}
-		
-		return $aArgs[ 0 ];
+		return Geko_Plugin::applyFilter( $aArgs, $this->_aPlugins );
 	}
 	
 	//
 	public function doPluginAction() {
-
+		
 		$aArgs = func_get_args();
 		
-		$sMethod = array_shift( $aArgs );
+		Geko_Plugin::doAction( $aArgs, $this->_aPlugins );
 		
-		// perform filtering if there are plugins
-		if ( count( $this->_aPlugins ) > 0 ) {
-			
-			foreach ( $this->_aPlugins as $sPluginClass ) {
-				
-				$oPlugin = Geko_Singleton_Abstract::getInstance( $sPluginClass );
-				
-				if ( method_exists( $oPlugin, $sMethod ) ) {
-					call_user_func_array( array( $oPlugin, $sMethod ), $aArgs );
-				}
-			}
-		}
-		
+		return $this;
 	}
 	
 	
 	
 	
 	
-	//// custom subset callbacks
-	
-	//
+	//// query subsets
+
+	// set custom subset callbacks
 	public function setCustomSubsetCallback( $sKey, $fCallback ) {
 		
 		$this->_aCustomSubsetCallbacks[ $sKey ] = $fCallback;
 		
 		return $this;
+	}
+	
+	
+	//
+	public function subset() {
+		
+		$aArgs = func_get_args();
+		
+		$mField = array_shift( $aArgs );					// name of field to subset
+		$mSubsetKey = array_shift( $aArgs );				// get a paticular subset
+		
+		if ( is_array( $mField ) ) {
+			
+			// pair mode
+			list( $sField, $sSuffix ) = $mField;
+			
+		} else {
+			
+			// inflected mode
+			$sField = $mField;
+			$sSuffix = Geko_Inflector::camelize( $sField );		
+		}
+		
+		
+		// create subsets based on the given field, if it does not exist
+		
+		if ( !is_array( $this->_aSubsets[ $sField ] ) ) {
+			
+			$aSubset = array();
+
+			$sMethod = sprintf( 'get%s', $sSuffix );
+			
+			foreach ( $this as $oEntity ) {
+				
+				$mGroupRet = $this->getSubsetGrouping( $oEntity, $sField, $aArgs );
+				
+				if ( $mGroupRet instanceof Geko_Util_Value ) {
+					$aSubset[ $mGroupRet->get() ][] = $oEntity;
+				}
+				
+			}
+			
+			// create a "synthetic" sub-queries based on the formed subsets
+			
+			foreach ( $aSubset as $mGroupSubsetKey => $aSubGroup ) {
+				
+				$oQuery = new $this->_sQueryClass( NULL, FALSE );
+				$oQuery->setRawEntities( $aSubGroup );
+				
+				$this->_aSubsets[ $sField ][ $mGroupSubsetKey ] = $oQuery;
+			}
+			
+			
+		}
+		
+		
+		
+		//// return something meaningful
+		
+		if ( '__ALL__' == $mSubsetKey ) {
+			
+			// a particular subset wasn't requested, but creation of subsets would have been performed
+			// return my instance
+			return $this;
+		
+		} elseif ( ( FALSE !== $mSubsetKey ) && ( NULL !== $mSubsetKey ) ) {
+			
+			// return the requested subset
+			return $this->_aSubsets[ $sField ][ $mSubsetKey ];			
+		}
+		
+		
+		// no subset key was given, so return the keys that were gathered for the field
+		return array_keys( $this->_aSubsets[ $sField ] );
+		
+	}
+	
+	
+	//
+	public function subsetAddedEntity( $oEntity ) {
+		
+		if ( is_array( $this->_aSubsets ) ) {
+			
+			// TO DO: Is there a situation args are passed?
+			$aArgs = array();				// ??????????????
+			
+			// iterate through each subset
+			foreach ( $this->_aSubsets as $sField => $aSubGroup ) {
+								
+				$mGroupRet = $this->getSubsetGrouping( $oEntity, $sField, $aArgs );
+				
+				// update
+				if ( $mGroupRet instanceof Geko_Util_Value ) {
+					
+					$mGroupVal = $mGroupRet->get();
+					
+					if ( !$oSubQuery = $this->_aSubsets[ $sField ][ $mGroupVal ] ) {
+						
+						// create a new subset grouping, if it does not exist
+						$oSubQuery = new $this->_sQueryClass( NULL, FALSE );
+						
+						$this->_aSubsets[ $sField ][ $mGroupVal ] = $oSubQuery;						
+					}
+					
+					$oSubQuery->addRawEntities( $oEntity );
+				}
+				
+			}
+			
+		}
+		
+	}
+	
+	
+	// helper
+	public function getSubsetGrouping( $oEntity, $sField, $aArgs ) {
+
+		$bGroup = TRUE;
+		
+		if ( $fCustomCb = $this->_aCustomSubsetCallbacks[ $sField ] ) {
+			
+			// a matching custom callback was found
+			$mGroupVal = call_user_func( $fCustomCb, $oEntity, $aArgs );
+			
+		} elseif ( method_exists( $oEntity, $sMethod ) ) {
+			
+			// call get<SomeValue>() on entity
+			$mGroupVal = call_user_func_array( array( $oEntity, $sMethod ), $aArgs );
+		
+		} elseif ( $oEntity->hasEntityProperty( $sField ) ) {
+			
+			// see if a corresponding entity value can be found
+			$mGroupVal = $oEntity->getEntityPropertyValue( $sField );
+		
+		} else {
+		
+			$bGroup = FALSE;
+			
+		}
+		
+		// wrap, so we know we have a valid grouping value
+		if ( $bGroup ) return new Geko_Util_Value( $mGroupVal );
+		
+		return FALSE;
 	}
 	
 	
@@ -757,84 +926,32 @@ abstract class Geko_Entity_Query
 			}
 		}
 		
-		//// subset
-		
-		if ( 0 === strpos( strtolower( $sMethod ), 'subset' ) ) {
+		//// subset, subsetOne
+
+		if ( 0 === strpos( strtolower( $sMethod ), 'subsetone' ) ) {
 			
-			// requested subset key, rest of the args are passed to the appropriate handler method
-			$mSubsetKey = array_shift( $aArgs );
+			$sSuffix = substr( $sMethod, 9 );
 			
+			$aSubset = $this->__call( sprintf( 'subset%s', $sSuffix ), $aArgs );
 			
-			$sSuffix = substr_replace( $sMethod, '', 0, 6 );
+			if (
+				( $aSubset ) && 
+				( $oOne = $aSubset->getOne() ) && 
+				( $oOne->isValid() )
+			) {
+				return $oOne;
+			}
+			
+			return NULL;
+			
+		} elseif ( 0 === strpos( strtolower( $sMethod ), 'subset' ) ) {
+			
+			$sSuffix = substr( $sMethod, 6 );
 			$sField = Geko_Inflector::underscore( $sSuffix );
 			
+			array_unshift( $aArgs, array( $sField, $sSuffix ) );
 			
-			// create subsets based on the given field, if it does not exist
-			
-			if ( !is_array( $this->_aSubsets[ $sField ] ) ) {
-				
-				$aSubset = array();
-
-				$sMethod = sprintf( 'get%s', $sSuffix );
-				
-				foreach ( $this as $oEntity ) {
-										
-					$bGroup = TRUE;
-					
-					if ( $fCustomCb = $this->_aCustomSubsetCallbacks[ $sField ] ) {
-						
-						// a matching custom callback was found
-						$mGroupVal = call_user_func( $fCustomCb, $oEntity, $aArgs );
-						
-					} elseif ( method_exists( $oEntity, $sMethod ) ) {
-						
-						// call get<SomeValue>() on entity
-						$mGroupVal = call_user_func_array( array( $oEntity, $sMethod ), $aArgs );
-					
-					} elseif ( $oEntity->hasEntityProperty( $sField ) ) {
-						
-						// see if a corresponding entity value can be found
-						$mGroupVal = $oEntity->getEntityPropertyValue( $sField );
-					
-					} else {
-						
-						$bGroup = FALSE;
-						
-					}
-					
-					// keep the original entity, so it doesn't have to be "re-wrapped"
-					if ( $bGroup ) $aSubset[ $mGroupVal ][] = $oEntity;
-					
-				}
-				
-				$this->_aSubsets[ $sField ] = $aSubset;
-				$this->modifySubset( $sField );
-				
-			}
-			
-			
-			
-			//// return something meaningful
-			
-			if ( '__ALL__' == $mSubsetKey ) {
-				
-				// a particular subset wasn't requested, but creation of subsets would have been performed
-				// return my instance
-				return $this;
-			
-			} elseif ( ( FALSE !== $mSubsetKey ) && ( NULL !== $mSubsetKey ) ) {
-				
-				// create a "synthetic" query instance based on the "requested" subset
-				
-				$sEntityQueryClass = get_class( $this );
-				$oQuery = new $sEntityQueryClass( NULL, FALSE );
-				
-				return $oQuery->setRawEntities( $this->_aSubsets[ $sField ][ $mSubsetKey ] );			
-			}
-			
-			
-			// no subset key was given, so return the keys that were gathered for the field
-			return array_keys( $this->_aSubsets[ $sField ] );
+			return call_user_func_array( array( $this, 'subset' ), $aArgs );
 		}
 		
 		throw new Exception( sprintf( 'Invalid method %s::%s() called.', get_class( $this ), $sMethod ) );

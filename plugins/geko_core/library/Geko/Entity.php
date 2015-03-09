@@ -104,8 +104,15 @@ abstract class Geko_Entity
 			$mEntity = $this->getDefaultEntityValue();
 		}
 		
+		// formatEntity() may set $this->_oQuery
 		$this->_oEntity = $this->formatEntity( $mEntity );
-		if ( $oQuery ) $this->_oQuery = $oQuery;	
+		
+		// query was provided via the constructor
+		if ( $oQuery ) $this->_oQuery = $oQuery;
+		
+		if ( $this->_oQuery ) {
+			$this->_oPrimaryTable = $this->_oQuery->getPrimaryTable();
+		}
 		
 		$this->constructEnd();
 	}
@@ -214,13 +221,19 @@ abstract class Geko_Entity
 		}
 		
 		$aParams = $this->modifySingleEntityQueryParams( $aParams );
-		$oQuery = new $this->_sQueryClass( NULL, FALSE );
 		
-		$oEntity = $oQuery->getSingleEntity( $aParams );
+		$oQuery = new $this->_sQueryClass( $aParams, FALSE );
 		
-		$this->_oQuery = $oQuery;
+		$oEntity = $oQuery->getOne();
 		
-		return $oEntity;
+		if ( $oEntity->isValid() ) {
+			
+			$this->_oQuery = $oQuery;
+			
+			return $oEntity->getRawEntity();
+		}
+		
+		return NULL;
 	}
 	
 	
@@ -368,15 +381,21 @@ abstract class Geko_Entity
 	
 	// multi-key support
 	public function getIds() {
+		
 		$aIds = array();
+		
 		if ( count( $this->_aEntityIdVarNames ) > 0 ) {
+			
 			foreach ( $this->_aEntityIdVarNames as $sField ) {
 				$aIds[ $sField ] = $this->getEntityPropertyValue( $sField );
 			}
+			
 		} else {
+			
 			// !!!!!!!!! may be flaky
 			$aIds[ $this->_sEntityIdVarName ] = $this->getEntityPropertyValue( 'id' );
 		}
+		
 		return $aIds;
 	}
 	
@@ -792,14 +811,12 @@ abstract class Geko_Entity
 	
 	//// plugin methods (should be a mix-in)
 	
-	// common with Geko_Entity, Geko_Entity_Query
+	// common with Geko_Entity, Geko_Entity_Query, Geko_Delegate
 	
 	//
-	public function addPlugin( $sClassName ) {
+	public function addPlugin( $sClassName, $mParams = NULL ) {
 		
-		if ( is_string( $sClassName ) && !in_array( $sClassName, $this->_aPlugins ) ) {
-			$this->_aPlugins[] = $sClassName;
-		}
+		Geko_Plugin::add( $sClassName, $mParams, $this, &$this->_aPlugins, 'setupEntity' );
 		
 		return $this;
 	}
@@ -809,45 +826,17 @@ abstract class Geko_Entity
 		
 		$aArgs = func_get_args();
 		
-		$sMethod = array_shift( $aArgs );
-		
-		// perform filtering if there are plugins
-		if ( count( $this->_aPlugins ) > 0 ) {
-			
-			foreach ( $this->_aPlugins as $sPluginClass ) {
-				
-				$oPlugin = Geko_Singleton_Abstract::getInstance( $sPluginClass );
-				
-				if ( method_exists( $oPlugin, $sMethod ) ) {
-					$mRetVal = call_user_func_array( array( $oPlugin, $sMethod ), $aArgs );
-					$aArgs[ 0 ] = $mRetVal;
-				}
-			}
-		}
-		
-		return $aArgs[ 0 ];
+		return Geko_Plugin::applyFilter( $aArgs, $this->_aPlugins );
 	}
 	
 	//
 	public function doPluginAction() {
-
+		
 		$aArgs = func_get_args();
 		
-		$sMethod = array_shift( $aArgs );
+		Geko_Plugin::doAction( $aArgs, $this->_aPlugins );
 		
-		// perform filtering if there are plugins
-		if ( count( $this->_aPlugins ) > 0 ) {
-			
-			foreach ( $this->_aPlugins as $sPluginClass ) {
-				
-				$oPlugin = Geko_Singleton_Abstract::getInstance( $sPluginClass );
-				
-				if ( method_exists( $oPlugin, $sMethod ) ) {
-					call_user_func_array( array( $oPlugin, $sMethod ), $aArgs );
-				}
-			}
-		}
-		
+		return $this;
 	}
 	
 	
@@ -962,13 +951,7 @@ abstract class Geko_Entity
 			if ( method_exists( $this, $sCall ) ) {
 				return call_user_func_array( array( $this, $sCall ), $aArgs );
 			}
-			
-			// see if a corresponding entity value can be found
-			$sEntityProperty = Geko_Inflector::underscore( substr( $sMethod, 3 ) );
-			if ( $this->hasEntityProperty( $sEntityProperty ) ) {
-				return $this->getEntityPropertyValue( $sEntityProperty );
-			}
-			
+						
 			// attempt to call echo*() method if it exists
 			$sCall = substr_replace( $sMethod, 'echo', 0, 3 );
 			if ( method_exists( $this, $sCall ) ) {
@@ -997,11 +980,19 @@ abstract class Geko_Entity
 						Geko_Inflector::underscore( $sFormatSubject )
 					);
 					
-					// if there are any digits between 1 to 9, then timestamp is no 0
+					// if there are any digits between 1 to 9, then timestamp is not 0
 					return ( preg_match( '/[1-9]+/', $sDbTimeStamp ) ) ? strtotime( $sDbTimeStamp ) : 0 ;
 				}
 				
 			}
+			
+			
+			// see if a corresponding entity value can be found
+			$sEntityProperty = Geko_Inflector::underscore( substr( $sMethod, 3 ) );
+			if ( $mValue = $this->getValue( $sEntityProperty ) ) {
+				return $mValue;
+			}
+			
 			
 			// prevent exeception from being thrown
 			if ( $this->_bAllowNonExistentEntities ) return NULL;

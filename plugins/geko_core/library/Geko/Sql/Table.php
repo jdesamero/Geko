@@ -15,6 +15,10 @@ class Geko_Sql_Table
 	
 	
 	// properties
+	
+	protected $_sPrefixedTableName = NULL;
+	protected $_sNoPrefixTableName = NULL;
+	
 	protected $_iClause;
 	protected $_aTable = array();
 	protected $_aFields = array();
@@ -149,6 +153,29 @@ class Geko_Sql_Table
 	//// accessors
 	
 	//
+	public function initTableName() {
+		
+		if ( !$this->_sPrefixedTableName && !$this->_sNoPrefixTableName ) {
+
+			$sTable = $this->getRawTableName();
+			
+			// auto-prefix replacement
+			if ( $oDb = $this->_oDb ) {
+				
+				$this->_sPrefixedTableName = $oDb->replacePrefixPlaceholder( $sTable );			
+				$this->_sNoPrefixTableName = $oDb->replacePrefixPlaceholder( $sTable, TRUE );			
+				
+			} else {
+				
+				$this->_sPrefixedTableName = $sTable;
+				$this->_sNoPrefixTableName = $sTable;				
+			}
+			
+		}
+		
+	}
+	
+	//
 	public function getRawTableName() {
 		return $this->_aTable[ 0 ];
 	}
@@ -156,15 +183,19 @@ class Geko_Sql_Table
 	// Can be called a number of times!!!
 	public function getTableName() {
 		
-		$sTable = $this->getRawTableName();
+		$this->initTableName();
 		
-		// auto-prefix replacement
-		if ( $oDb = $this->_oDb ) {
-			$sTable = $oDb->replacePrefixPlaceholder( $sTable );			
-		}
-		
-		return $sTable;
+		return $this->_sPrefixedTableName;
 	}
+	
+	// Can be called a number of times!!!
+	public function getNoPrefixTableName() {
+		
+		$this->initTableName();
+		
+		return $this->_sNoPrefixTableName;
+	}
+	
 	
 	//
 	public function getFields( $bUseKey = FALSE ) {

@@ -3,8 +3,11 @@
 // "Active Record" implementation of Geko_Entity, set up as a delegate
 class Geko_Entity_Record extends Geko_Delegate
 {
-
-
+	
+	protected $_aOrigValues = NULL;
+	
+	
+	
 	//
 	public function canHandleMethod( $sMethod ) {
 		
@@ -23,6 +26,12 @@ class Geko_Entity_Record extends Geko_Delegate
 		
 		$aArgs = func_get_args();
 		
+		if ( NULL === $this->_aOrigValues ) {
+
+			$oRawEntity = $oSubject->initRawEntity();
+			$this->_aOrigValues = get_object_vars( $oRawEntity );
+		}
+		
 		if ( is_array( $aValues = $aArgs[ 0 ] ) ) {
 			
 			// associative array method
@@ -37,7 +46,7 @@ class Geko_Entity_Record extends Geko_Delegate
 			
 			// key/value pair method
 			
-			$oRawEntity = $oSubject->initRawEntity();
+			$oRawEntity = $oSubject->getRawEntity();
 			$oRawEntity->$sKey = $mValue;
 						
 		}
@@ -49,13 +58,12 @@ class Geko_Entity_Record extends Geko_Delegate
 	//
 	public function save() {
 		
-		$oDb = Geko::get( 'db' );
-		
 		$oSubject = $this->_oSubject;
 		
 		if ( $oTable = $oSubject->getPrimaryTable() ) {
 			
-			$sTableName = $oTable->getTableName();
+			
+			$aEntityKeys = array_keys( get_object_vars( $oSubject->getRawEntity() ) );
 			
 			
 			// get field values
@@ -63,17 +71,24 @@ class Geko_Entity_Record extends Geko_Delegate
 			$aFields = $oTable->getFields( TRUE );
 			
 			$aValues = array();
+			$aOtherValues = array();			// track values that do not belong to the main table
 			
-			foreach ( $aFields as $sFieldName => $oField ) {
+			foreach ( $aEntityKeys as $sFieldName ) {
 				
-				if ( $oSubject->hasEntityProperty( $sFieldName ) ) {
-					
+				if ( $oField = $aFields[ $sFieldName ] ) {
+
 					$aValues[ $sFieldName ] = $oField->getAssertedValue(
 						$oSubject->getEntityPropertyValue( $sFieldName )
 					);
+				
+				} else {
+					
+					$aOtherValues[ $sFieldName ] = $oSubject->getEntityPropertyValue( $sFieldName );
 				}
 				
 			}
+			
+			$aAllValues = array_merge( $aValues, $aOtherValues );
 			
 			
 			// are we creating a new record or updating an existing record?
@@ -84,84 +99,17 @@ class Geko_Entity_Record extends Geko_Delegate
 				
 				if ( !$oSubject->hasEntityProperty( $sPkfName ) ) {
 					
-					// implement some "auto" functionality
-					
-					if ( $oTable->hasField( 'date_created' ) && !$aValues[ 'date_created' ] ) {
-						$aValues[ 'date_created' ] = $oDb->getTimestamp();
-					}
-
-					if ( $oTable->hasField( 'date_modified' ) && !$aValues[ 'date_modified' ] ) {
-						$aValues[ 'date_modified' ] = $oDb->getTimestamp();
-					}
-					
-										
-					
-					// try-catch any possible database errors
-					
-					try {
-						
-						// run validation hook
-						$this->throwValidate( $aValues );
-					
-						// insert
-						$oDb->insert( $sTableName, $aValues );
-						
-						$iLastInsertId = $oDb->lastInsertId();
-						
-						$this->setEntityPropertyValue( $sPkfName, $oField->getAssertedValue( $iLastInsertId ) );
-					
-					} catch ( Zend_Db_Statement_Exception $e ) {
-						
-						$eFmt = new Geko_Entity_Record_Exception( 'Insert failed!' );
-						$eFmt
-							->setErrorType( 'db' )
-							->setOrigMessage( $e->getMessage() )
-						;
-						
-						throw $eFmt;
-					}
+					$this->insert( $oTable, $aAllValues, $aValues, $aOtherValues );
 					
 				} else {
-					
-					if ( $mId = $aValues[ $sPkfName ] ) {
 
-						// run validation hook
-						$this->throwValidate( $aValues, 'update' );
+					if ( $mId = $aValues[ $sPkfName ] ) {
 						
-						
-						$aWhere[ $sPkfName ] = $mId;
+						$aWhere = array( $sPkfName => $mId );
 						
 						unset( $aValues[ $sPkfName ] );
-
-						// implement some "auto" functionality
 						
-						if ( $oTable->hasField( 'date_created' ) && $aValues[ 'date_created' ] ) {
-							unset( $aValues[ 'date_created' ] );		// retain original
-						}
-						
-						if ( $oTable->hasField( 'date_modified' ) ) {
-							$aValues[ 'date_modified' ] = $oDb->getTimestamp();
-						}
-						
-						
-						
-						// try-catch any possible database errors
-						
-						try {
-						
-							// update
-							$oDb->update( $sTableName, $aValues, $this->formatWhere( $aWhere ) );
-
-						} catch ( Zend_Db_Statement_Exception $e ) {
-							
-							$eFmt = new Geko_Entity_Record_Exception( 'Update failed!' );
-							$eFmt
-								->setErrorType( 'db' )
-								->setOrigMessage( $e->getMessage() )
-							;
-							
-							throw $eFmt;
-						}
+						$this->update( $oTable, $aAllValues, $aValues, $aOtherValues, $aWhere );
 						
 					} else {
 						throw new Exception( sprintf( 'Entity "%s" has no primary key value.', $this->_sSubjectClass ) );
@@ -184,6 +132,118 @@ class Geko_Entity_Record extends Geko_Delegate
 		
 		return $oSubject;
 	}
+	
+	
+	//
+	public function insert( $oTable, $aAllValues, $aValues, $aOtherValues ) {
+		
+		$oDb = Geko::get( 'db' );
+		
+		$sTableName = $oTable->getTableName();
+		
+		
+		// implement some "auto" functionality
+		
+		if ( $oTable->hasField( 'date_created' ) && !$aValues[ 'date_created' ] ) {
+			$aValues[ 'date_created' ] = $oDb->getTimestamp();
+		}
+
+		if ( $oTable->hasField( 'date_modified' ) && !$aValues[ 'date_modified' ] ) {
+			$aValues[ 'date_modified' ] = $oDb->getTimestamp();
+		}
+		
+
+		// run validation hook
+		$this->throwValidate( $aAllValues );							
+		
+		
+		// try-catch any possible database errors
+		
+		try {
+			
+			// insert
+			$oDb->insert( $sTableName, $aValues );
+			
+			// if primary key field name was provided, then get last insert id
+			if ( $oPkf = $oTable->getPrimaryKeyField() ) {
+				
+				$sPkfName = $oPkf->getName();
+				$iLastInsertId = $oDb->lastInsertId();
+				
+				$this->setEntityPropertyValue( $sPkfName, $oPkf->getAssertedValue( $iLastInsertId ) );
+			}
+			
+			// hook method
+			$this->handleOtherValues( $aOtherValues );
+			
+			
+		} catch ( Zend_Db_Statement_Exception $e ) {
+			
+			$oRecordException = new Geko_Entity_Record_Exception( 'Insert failed!' );
+			$oRecordException
+				->setErrorType( 'db' )
+				->setOrigMessage( $e->getMessage() )
+			;
+			
+			throw $oRecordException;
+		}
+
+	}
+	
+	//
+	public function update( $oTable, $aAllValues, $aValues, $aOtherValues, $aWhere ) {
+		
+		$oDb = Geko::get( 'db' );
+		
+		$sTableName = $oTable->getTableName();
+		
+		// run validation hook
+		$this->throwValidate( $aAllValues, 'update' );
+		
+		
+		// implement some "auto" functionality
+		
+		if ( $oTable->hasField( 'date_created' ) && $aValues[ 'date_created' ] ) {
+			unset( $aValues[ 'date_created' ] );		// retain original
+		}
+		
+		if ( $oTable->hasField( 'date_modified' ) ) {
+			$aValues[ 'date_modified' ] = $oDb->getTimestamp();
+		}
+		
+		
+		
+		// try-catch any possible database errors
+		
+		try {
+		
+			// update
+			$oDb->update( $sTableName, $aValues, $this->formatWhere( $aWhere ) );
+			
+			// hook method
+			$this->handleOtherValues( $aOtherValues, 'update' );
+			
+			
+		} catch ( Zend_Db_Statement_Exception $e ) {
+			
+			$oRecordException = new Geko_Entity_Record_Exception( 'Update failed!' );
+			$oRecordException
+				->setErrorType( 'db' )
+				->setOrigMessage( $e->getMessage() )
+			;
+			
+			throw $oRecordException;
+		}
+		
+	}
+	
+	
+	// TO DO:
+	public function delete() {
+	
+	
+	}
+	
 	
 	
 	
@@ -209,15 +269,27 @@ class Geko_Entity_Record extends Geko_Delegate
 			( count( $aErrors ) > 0 )
 		) {
 			
-			$eFmt = new Geko_Entity_Record_Exception( 'Validation failed!' );
-			$eFmt
+			$oRecordException = new Geko_Entity_Record_Exception( 'Validation failed!' );
+			$oRecordException
 				->setErrorType( 'validation' )
 				->setErrorDetail( $aErrors )
 			;
 			
-			throw $eFmt;
+			$oRecordException = $this->applyPluginFilter(
+				'modifyValidateException',
+				$oRecordException,
+				$aErrors,
+				$aValues,
+				$sMode,
+				$this->_oSubject,
+				$this
+			);
+			
+			throw $oRecordException;
 						
 		}
+
+		$this->doPluginAction( 'throwValidate', $aValues, $sMode, $this->_oSubject, $this );
 		
 	}
 	
@@ -227,6 +299,13 @@ class Geko_Entity_Record extends Geko_Delegate
 	//
 	public function validate( $aValues, $sMode = 'insert' ) { }
 	
+	
+	//
+	public function handleOtherValues( $aOtherValues, $sMode = 'insert' ) {
+		
+		$this->doPluginAction( 'handleOtherValues', $aOtherValues, $sMode, $this->_oSubject, $this );
+		
+	}
 	
 	
 	
