@@ -260,7 +260,9 @@ class Geko_Wp_Post extends Geko_Wp_Entity
 	
 	//
 	public function getRawMeta( $sMetaKey ) {
-		return get_post_meta( $this->getId(), $sMetaKey, TRUE );
+		
+		// IMPORTANT!!! Can't use $this->getId() below as it will cause a nasty infinite loop
+		return get_post_meta( $this->getEntityPropertyValue( 'id' ), $sMetaKey, TRUE );
 	}
 	
 	//

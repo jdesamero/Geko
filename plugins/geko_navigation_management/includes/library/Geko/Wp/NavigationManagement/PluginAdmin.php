@@ -474,7 +474,7 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 			}
 			
 			$this->updateOption( 'groups', Zend_Json::encode( $aNavGroups ) );
-						
+			
 		} elseif ( isset( $_POST[ 'serialized_data' ] ) ) {
 			
 			$this->initPageManager();

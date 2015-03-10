@@ -14,20 +14,24 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 		
 		parent::add();
 		
-		// Geko_Wp_Language_Manage_Post_QueryHooks::register();		
+		Geko_Wp_Language_Manage_Post_QueryHooks::register();		
 		
+		/* /
 		$aPrefixes = array( 'Gloc_', 'Geko_Wp_' );
 		
 		$sPostQueryClass = Geko_Class::getBestMatch( $aPrefixes, array( 'Post_Query' ) );		
 		add_action( sprintf( '%s::init', $sPostQueryClass ), array( $this, 'initQuery' ) );
+		/* */
 		
 		return $this;
 	}
 	
+	/* /
 	//
 	public function initQuery( $oQuery ) {
 		$oQuery->addPlugin( 'Geko_Wp_Language_Manage_Post_QueryPlugin' );
 	}
+	/* */
 
 	
 	//

@@ -199,8 +199,6 @@ class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 			$aNewNavGroup = $this->getSiblings( $aNewNavGroup );
 			$aReconcile = array();
 			
-			print_r( $aNewNavGroup );
-			
 			foreach ( $aNewNavGroup as $sLangCode => $aParams ) {
 				
 				if ( $this->getDefLangCode() == $sLangCode ) {

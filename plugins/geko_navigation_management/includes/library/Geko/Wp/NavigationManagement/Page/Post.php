@@ -57,7 +57,7 @@ class Geko_Wp_NavigationManagement_Page_Post
 	public function getPost() {
 		
 		if ( !$this->oPost ) {
-			$this->oPost = new Geko_Wp_Post();;
+			$this->oPost = new Geko_Wp_Post();
 		}
 		
 		return $this->oPost;
@@ -106,7 +106,7 @@ class Geko_Wp_NavigationManagement_Page_Post
 				$iMatchId = NULL;
 			}
 			
-			$aArgs = array( __METHOD__ . '::single', $bMatch, $this->_postTypeId, $iMatchId, $oPost );
+			$aArgs = array( sprintf( '%s::single', __METHOD__ ), $bMatch, $this->_postTypeId, $iMatchId, $oPost );
 			
 			return call_user_func_array( 'apply_filters', $aArgs );
 			

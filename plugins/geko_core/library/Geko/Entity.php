@@ -589,17 +589,19 @@ abstract class Geko_Entity
 	
 	//
 	public function getMeta( $sMetaKey ) {
+		
 		if ( isset( $this->_oEntity->$sMetaKey ) ) {
 			return $this->_oEntity->$sMetaKey;
-		} else {
-			if (
-				( $this->_sEntityPropertyPrefix ) && 
-				( $mValue = $this->getRawMeta( sprintf( '%s%s', $this->_sEntityPropertyPrefix, $sMetaKey ) ) )
-			) {
-				return $mValue;
-			}
-			return $this->getRawMeta( $sMetaKey );
 		}
+		
+		if (
+			( $this->_sEntityPropertyPrefix ) && 
+			( $mValue = $this->getRawMeta( sprintf( '%s%s', $this->_sEntityPropertyPrefix, $sMetaKey ) ) )
+		) {
+			return $mValue;
+		}
+		
+		return $this->getRawMeta( $sMetaKey );
 	}
 	
 	// access a meta value that is expected to be JSON formatted
