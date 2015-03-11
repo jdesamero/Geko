@@ -991,7 +991,8 @@ abstract class Geko_Entity
 			
 			// see if a corresponding entity value can be found
 			$sEntityProperty = Geko_Inflector::underscore( substr( $sMethod, 3 ) );
-			if ( $mValue = $this->getValue( $sEntityProperty ) ) {
+			$mValue = $this->getValue( $sEntityProperty );
+			if ( NULL !== $mValue ) {
 				return $mValue;
 			}
 			

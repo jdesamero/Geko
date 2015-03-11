@@ -201,26 +201,20 @@ class Geko_Array
 	// flatten a multi-dimensional array
 	// indexes become, eg: [foo[att][val][30]]
 	public static function flatten( $aSubject, $sParentKey = '', &$aReturn = array() ) {
-		
 		if ( is_array( $aSubject ) ) {
-			
 			foreach ( $aSubject as $sKey => $mChild ) {
-				
 				if ( TRUE == is_array( $mChild ) ) {
 					self::flatten( $mChild, self::flattenGetKey( $sParentKey, $sKey ), $aReturn );
 				} else {
 					$aReturn[ self::flattenGetKey( $sParentKey, $sKey ) ] = $mChild;
 				}
-				
 			}
 		}
-		
 		return $aReturn;
 	}
 	
 	// construct the flattened key for the function above
 	private static function flattenGetKey( $sParentKey, $sKey ) {
-		
 		if ( '' == $sParentKey ) {
 			return $sKey;
 		} else {
@@ -235,9 +229,7 @@ class Geko_Array
 		$aMerged = array();
 		
 		foreach ( $aArgs as $mArg ) {
-			
 			if ( !is_array( $mArg ) ) $mArg = array( $mArg );			
-			
 			$mArg = self::flatten( $mArg );
 			$aMerged = array_merge( $mArg, $aMerged );
 		}
@@ -248,13 +240,10 @@ class Geko_Array
 	
 	// create a normalized hash from an array of keys
 	public static function createNormalizedHashFromKeys( $aKeys, $fNormalizeCallback = 'strtolower' ) {
-		
 		$aHash = array();
-		
 		foreach ( $aKeys as $sValue ) {
 			$aHash[ call_user_func( $fNormalizeCallback, $sValue ) ] = $sValue;
 		}
-		
 		return $aHash;
 	}
 	
@@ -299,9 +288,10 @@ class Geko_Array
 				$sTrimChars
 			);
 			
-			$fTrimFunc = function( $sSubject ) use ( $sTrimChars ) {
-				return trim( $sSubject, $sTrimChars );
-			};
+			$fTrimFunc = create_function(
+				'$sSubject',
+				sprintf( 'return trim( $sSubject, "%s" );', $sTrimChars )
+			);
 		}
 		
 		$aRet = array_map(
@@ -475,68 +465,6 @@ class Geko_Array
 		
 		return $aRes;
 	}
-	
-	
-	
-	//// squash/release
-	
-	// squash() is similar to flatten(), a little simpler implementation
-	// $aSubject['a']['b']['c'] = 123   ==>   $aSubject['a|b|c'] = 123
-	// this is a recusive function
-	public static function squash( $aSubject, $sDelim = '|', $mParentKey = NULL ) {
-		
-		$aRes = array();
-		
-		foreach ( $aSubject as $mKey => $mValue ) {
-			
-			if ( NULL !== $mParentKey ) {
-				$mKey = sprintf( '%s%s%s', $mParentKey, $sDelim, $mKey );
-			}
-			
-			if ( is_array( $mValue ) ) {
-				$aRes = array_merge( $aRes, self::squash( $mValue, $sDelim, $mKey ) );
-			} else {
-				$aRes[ $mKey ] = $mValue;
-			}			
-		}
-		
-		return $aRes;
-	}
-	
-	// release() does the opposite of squash()
-	public static function release( $aFlat, $sDelim = '|' ) {
-		
-		$aRes = array();
-		
-		foreach ( $aFlat as $sKey => $mValue ) {
-			
-			$aKeys = explode( $sDelim, $sKey );
-			
-			$iKeyCount = count( $aKeys );
-			
-			$aCurrent =& $aRes;
-			foreach ( $aKeys as $i => $mKey ) {
-				
-				if ( $i < ( $iKeyCount - 1 ) ) {
-					
-					if ( !$aCurrent[ $mKey ] ) {
-						$aCurrent[ $mKey ] = array();
-					}
-					
-					$aCurrent =& $aCurrent[ $mKey ];
-				
-				} else {
-					
-					$aCurrent[ $mKey ] = $mValue;
-				}
-				
-			}
-			
-		}
-		
-		return $aRes;
-	}
-	
 	
 	
 	

@@ -800,8 +800,17 @@ abstract class Geko_Entity_Query
 		
 		} elseif ( ( FALSE !== $mSubsetKey ) && ( NULL !== $mSubsetKey ) ) {
 			
+			if ( !$oSubQuery = $this->_aSubsets[ $sField ][ $mSubsetKey ] ) {
+				
+				// create an empty set
+				$oSubQuery = new $this->_sQueryClass( NULL, FALSE );
+				
+				// welcome to the family!
+				$this->_aSubsets[ $sField ][ $mSubsetKey ] = $oSubQuery;
+			}
+			
 			// return the requested subset
-			return $this->_aSubsets[ $sField ][ $mSubsetKey ];			
+			return $oSubQuery;
 		}
 		
 		
