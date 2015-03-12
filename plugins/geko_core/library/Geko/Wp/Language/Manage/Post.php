@@ -323,6 +323,7 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 			$oMetaKeyQuery
 				->field( 'mk.mkey_id', 'mkey_id' )
 				->from( '##pfx##geko_meta_key', 'mk' )
+				->where( 'mk.meta_key = ?', 'post' )
 			;
 			
 			$oQuery = new Geko_Sql_Select();
