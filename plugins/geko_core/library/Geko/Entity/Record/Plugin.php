@@ -25,6 +25,16 @@ class Geko_Entity_Record_Plugin extends Geko_Singleton_Abstract
 	
 	}
 	
+	// action
+	public function beforeDelete( $oSubject, $oRecord ) {
+	
+	}
+	
+	// action
+	public function afterDelete( $oSubject, $oRecord ) {
+	
+	}
+	
 	
 }
 

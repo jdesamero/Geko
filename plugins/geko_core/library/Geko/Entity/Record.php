@@ -55,7 +55,9 @@ class Geko_Entity_Record extends Geko_Delegate
 	}
 	
 	
-	//
+	//// entity record methods: save and destroy
+	
+	// will figure itself out whether to insert or update database entry
 	public function save() {
 		
 		$oSubject = $this->_oSubject;
@@ -120,7 +122,7 @@ class Geko_Entity_Record extends Geko_Delegate
 			} else {
 				
 				// TO DO: multi-key support
-				// getKeyFields
+				// $oTable->getKeyFields
 				
 				throw new Exception( 'Multi-key support is not yet implemented!' );
 				
@@ -133,6 +135,49 @@ class Geko_Entity_Record extends Geko_Delegate
 		return $oSubject;
 	}
 	
+	//
+	public function destroy() {
+		
+		$oDb = Geko::get( 'db' );
+		
+		$oSubject = $this->_oSubject;
+		
+		if ( $oTable = $oSubject->getPrimaryTable() ) {
+			
+			if ( $oPkf = $oTable->getPrimaryKeyField() ) {
+				
+				$sPkfName = $oPkf->getName();
+				
+				if ( $mId = $oSubject->getEntityPropertyValue( $sPkfName ) ) {
+					
+					$aWhere = array( $sPkfName => $mId );
+					
+					$this->delete( $oTable, $aWhere );
+					
+				} else {
+					
+					throw new Exception( 'Entity could not be deleted, no primary key was given!' );
+					
+				}
+				
+			} else {
+
+				// TO DO: multi-key support
+				// $oTable->getKeyFields
+				
+				throw new Exception( 'Multi-key support is not yet implemented!' );
+				
+			}
+			
+		} else {
+			throw new Exception( sprintf( 'Entity "%s" requires a primary table.', $this->_sSubjectClass ) );
+		}
+
+		return $oSubject;
+	}
+	
+	
+	//// db crud methods: insert, update, and delete
 	
 	//
 	public function insert( $oTable, $aAllValues, $aValues, $aOtherValues ) {
@@ -237,11 +282,39 @@ class Geko_Entity_Record extends Geko_Delegate
 		
 	}
 	
-	
-	// TO DO:
-	public function delete() {
-	
-	
+	//
+	public function delete( $oTable, $aWhere ) {
+		
+		$oDb = Geko::get( 'db' );
+		
+		$sTableName = $oTable->getTableName();
+		
+		// Invoke deletion hook
+		$this->beforeDelete();
+		
+		// try-catch any possible database errors
+		
+		try {
+		
+			// update
+			$oDb->delete( $sTableName, $this->formatWhere( $aWhere ) );
+			
+			// Invoke deletion hook
+			$this->afterDelete();
+			
+			
+		} catch ( Zend_Db_Statement_Exception $e ) {
+			
+			$oRecordException = new Geko_Entity_Record_Exception( 'Delete failed!' );
+			$oRecordException
+				->setErrorType( 'db' )
+				->setOrigMessage( $e->getMessage() )
+			;
+			
+			throw $oRecordException;
+		}
+		
+		
 	}
 	
 	
@@ -304,9 +377,19 @@ class Geko_Entity_Record extends Geko_Delegate
 	public function handleOtherValues( $aOtherValues, $sMode = 'insert' ) {
 		
 		$this->doPluginAction( 'handleOtherValues', $aOtherValues, $sMode, $this->_oSubject, $this );
-		
 	}
 	
+	//
+	public function beforeDelete() {
+		
+		$this->doPluginAction( 'beforeDelete', $this->_oSubject, $this );
+	}
+	
+	//
+	public function afterDelete() {
+		
+		$this->doPluginAction( 'afterDelete', $this->_oSubject, $this );
+	}
 	
 	
 	//

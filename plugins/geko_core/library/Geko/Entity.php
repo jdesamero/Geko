@@ -252,15 +252,50 @@ abstract class Geko_Entity
 	
 	
 	
+	//// should be a mix-in
+	
 	//
-	public function setData( $sKey, $mValue ) {
-		$this->_aData[ $sKey ] = $mValue;
+	public function setData() {
+		
+		$aArgs = func_get_args();
+		
+		if ( is_array( $aData = $aArgs[ 0 ] ) ) {
+			
+			$this->_aData = array_merge( $this->_aData, $aData );
+			
+		} else {
+			
+			list( $sKey, $mValue ) = $aArgs;
+			$this->_aData[ $sKey ] = $mValue;
+		}
+		
 		return $this;
 	}
 	
 	//
-	public function getData( $sKey ) {
-		return $this->_aData[ $sKey ];
+	public function getData( $sKey = NULL ) {
+		
+		if ( NULL !== $sKey ) return $this->_aData[ $sKey ];
+		
+		return $this->_aData;
+	}
+	
+	//
+	public function unsetData( $sKey = NULL ) {
+		
+		if ( NULL !== $sKey ) {
+			
+			// one parameter onlu
+			unset( $this->_aData[ $sKey ] );
+		
+		} else {
+			
+			// remove everything
+			unset( $this->_aData );
+			$this->_aData = array();
+		}
+		
+		return $this;
 	}
 	
 	
@@ -747,21 +782,30 @@ abstract class Geko_Entity
 	
 	//
 	public function _getFileSize( $sValue, $sProp, $aArgs ) {
+		
 		if ( $sFile = $this->_getFilePath( $sValue, $sProp, $aArgs ) ) {
 			return Geko_File::getSizeFormatted( $sFile );
 		}
+		
 		return '';	
 	}
 	
 	//
 	public function _getFileIs( $sValue, $sProp, $aArgs ) {
+		
 		if ( $sFile = $this->_getFilePath( $sValue, $sProp, $aArgs ) ) {
 			return is_file( $sFile );
 		}
+		
 		return FALSE;	
 	}
 	
+	// other helper accessors
 	
+	//
+	public function _getMetaClass() {
+		return $this->_sMetaClass;
+	}
 	
 	
 	
