@@ -12,7 +12,7 @@ class Geko_Navigation_Renderer
 			$oView = new Zend_View();
 			
 			if ( defined( 'GEKO_VIEW_HELPER_PATH' ) ) {
-				$oView->addHelperPath( GEKO_VIEW_HELPER_PATH . '/Geko/View/Helper', 'Geko_View_Helper' );
+				$oView->addHelperPath( sprintf( '%s/Geko/View/Helper', GEKO_VIEW_HELPER_PATH ), 'Geko_View_Helper' );
 			}			
 		}
 		
@@ -168,7 +168,7 @@ class Geko_Navigation_Renderer
 				foreach ( $oDoc[ 'a' ] as $a ) {
 					$oPqA = pq( $a );
 					$sHtml = $oPqA->html();
-					$oPqA->html( '<span>' . $sHtml . '</span>' );
+					$oPqA->html( sprintf( '<span>%s</span>', $sHtml ) );
 				}
 				
 			}
@@ -208,13 +208,19 @@ class Geko_Navigation_Renderer
 		$sOutput = trim( strval( $oBreadcrumb ) );
 		
 		if ( !$sOutput && $aParams[ 'showRoot' ] ) {
+			
 			foreach ( $oNav as $oItem ) {
+				
 				if ( $oItem->isActive() ) {
+					
 					$sClass = 'breadcrumb_root';
+					
 					if ( ( method_exists( $oItem, 'getCssClass' ) ) && ( $sNavClass = $oItem->getCssClass() ) ) {
-						$sClass .= ' ' . $sNavClass;
+						$sClass .= sprintf( ' %s', $sNavClass );
 					}
+					
 					$sOutput = sprintf( '<span class="%s">%s</span>', $sClass, strval( $oItem ) );
+					
 					break;
 				}
 			}
@@ -236,14 +242,20 @@ class Geko_Navigation_Renderer
 		
 		$sOut = '';
 		foreach ( $oNav as $oItem ) {
+			
 			if ( $oItem->isActive( TRUE ) ) {
+				
 				$sOut .= $oItem->getCssClass();
+				
 				if ( $oItem->hasChildren() ) {
-					$sOut .= ' ' . self::classChainIterate( $oNav->getChildren(), $aParams );
+					$sOut .= sprintf( ' %s', self::classChainIterate( $oNav->getChildren(), $aParams ) );
 				}
+				
 				break;
 			}
+			
 		}
+		
 		return $sOut;
 	}
 	

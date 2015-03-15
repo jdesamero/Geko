@@ -117,7 +117,9 @@ class Geko_Wp_User extends Geko_Wp_Entity
 	
 	//
 	public function getRawMeta( $sMetaKey ) {
-		return get_usermeta( $this->getId(), $sMetaKey );
+		
+		// can't use $this->getId(), will cause a nasty infinite loop
+		return get_usermeta( $this->getEntityPropertyValue( 'id' ), $sMetaKey );
 	}
 	
 	//

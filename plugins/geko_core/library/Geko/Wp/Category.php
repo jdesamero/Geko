@@ -202,8 +202,9 @@ class Geko_Wp_Category extends Geko_Wp_Entity
 		
 		$oMeta = Geko_Singleton_Abstract::getInstance( $this->_sMetaClass );
 		
+		// can't use $this->getId(), will cause a nasty infinite loop
 		return $oMeta->getInheritedValue(
-			$this->getId(), $oMeta->getPrefixWithSep() . $sMetaKey
+			$this->getEntityPropertyValue( 'id' ), sprintf( '%s%s', $oMeta->getPrefixWithSep(), $sMetaKey )
 		);
 	}
 	

@@ -12,6 +12,7 @@ class Geko_Wp_Page extends Geko_Wp_Post
 		
 		// if page aliasing is activated, return the apparent page
 		$oPageAlias = Geko_Wp_Page_Alias::getInstance();
+		
 		if (
 			( $oPageAlias->getCalledInit() ) && 
 			( is_page() ) && 
@@ -30,10 +31,12 @@ class Geko_Wp_Page extends Geko_Wp_Post
 		
 		// if page aliasing is activated, return the actual page
 		$oPageAlias = Geko_Wp_Page_Alias::getInstance();
+		
+		// use of $this->getId() causes an infinite loop
 		if (
 			( $oPageAlias->getCalledInit() ) && 
 			( is_page() ) && 
-			( $this->getId() == $oPageAlias->getApparentPage()->getId() )
+			( $this->getEntityPropertyValue( 'id' ) == $oPageAlias->getApparentPage()->getId() )
 		) {
 			return $oPageAlias->getActualPage()->getRawEntity();
 		}
@@ -43,9 +46,11 @@ class Geko_Wp_Page extends Geko_Wp_Post
 	
 	//
 	public function getParent() {
+		
 		if ( $iPostParent = $this->getPostParent() ) {
 			return new $this->_sEntityClass( $iPostParent );
 		}
+		
 		return NULL;
 	}
 	

@@ -28,8 +28,9 @@ class Geko_Navigation_Renderer_Template
 		$sUlClass = $aParams[ 'ulClass' ];
 		
 		$sUlClass = trim( $sUlClass );
-		$sUlClass = ( $sUlClass ) ? ' class="' . $sUlClass . '"' : '';
-		return '<ul' . $sUlClass . '>';
+		$sUlClass = ( $sUlClass ) ? sprintf( ' class="%s"', $sUlClass ) : '' ;
+		
+		return sprintf( '<ul%s>', $sUlClass );
 	}
 	
 	//
@@ -45,13 +46,13 @@ class Geko_Navigation_Renderer_Template
 		$sLiClass = $aParams[ 'liClass' ];
 		
 		if ( $sCustomClass = trim( $oPage->getCssClass() ) ) {
-			$sLiClass .= ' ' . $sCustomClass;
+			$sLiClass .= sprintf( ' %s', $sCustomClass );
 		}
 		
 		$sLiClass = trim( $sLiClass );
-		$sLiClass = ( $sLiClass ) ? ' class="' . $sLiClass . '"' : '';
+		$sLiClass = ( $sLiClass ) ? sprintf( ' class="%s"', $sLiClass ) : '' ;
 		
-		return '<li' . $sLiClass . '>';
+		return sprintf( '<li%s>', $sLiClass );
 	}
 	
 	//
