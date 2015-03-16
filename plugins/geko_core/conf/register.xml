@@ -31,7 +31,7 @@
 		
 		<!-- backstab enhancements -->
 		<file id="geko-backstab-base" src="##geko_core_uri##/js/backstab/base.js" dependencies="geko-backbone geko" />
-		<file id="geko-backstab-util" src="##geko_core_uri##/js/backstab/util.js" dependencies="geko-string_format geko-underscore geko-backstab-base" />
+		<file id="geko-backstab-util" src="##geko_core_uri##/js/backstab/util.js" dependencies="geko-string_format geko-jquery-geko_util geko-underscore geko-backstab-base" />
 		<file id="geko-backstab-model" src="##geko_core_uri##/js/backstab/model.js" dependencies="geko-backstab-util" />
 		<file id="geko-backstab-collection" src="##geko_core_uri##/js/backstab/collection.js" dependencies="geko-backstab-util" />
 		<file id="geko-backstab-view" src="##geko_core_uri##/js/backstab/view.js" dependencies="geko-backstab-util" />

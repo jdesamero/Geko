@@ -244,7 +244,7 @@ class Geko_String
 	
 	
 	//
-	public static function inList ( $sNeedle, $mHaystack, $sDelim = ',' ) {
+	public static function inList( $sNeedle, $mHaystack, $sDelim = ',' ) {
 		
 		if ( !is_array( $mHaystack ) ) {
 			$mHaystack = Geko_Array::explodeTrim( $sDelim, $mHaystack );

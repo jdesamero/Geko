@@ -57,7 +57,11 @@
 		} else {
 			
 			// try these selectors
-			var sels = [ '.%s'.printf( prop ), '#%s'.printf( prop ) ];
+			var sels = [
+				'.%s'.printf( prop ),
+				'#%s'.printf( prop ),
+				'input[name="%s"]'.printf( prop )
+			];
 			
 			$.each( sels, function( i, sel2 ) {
 				
@@ -72,41 +76,80 @@
 			
 		}
 		
+		/* /
+		if ( _target ) {
+			console.log( '%s - %s - %d'.printf( _target.getTagName(), prop, _target.length ) );
+		} else {
+			console.log( 'no target - %s', prop );
+		}
+		/* */
+		
 		return [ _target, fcont, defer ];
 	};
 	
-	var setTargetValue = function( target, val, cb ) {
+	var setTargetValue = function( eTarget, mValue, fTargetCallback ) {
 		
-		if ( target ) {
+		if ( eTarget ) {
 			
-			if ( cb ) {
+			if ( fTargetCallback ) {
 				
-				cb.call( this, target, val );
+				fTargetCallback.call( this, eTarget, mValue );
 				
 			} else {
 				
-				var tag = target.prop( 'tagName' ).toLowerCase();
+				var sTag = eTarget.getTagName();
 				
-				if ( -1 !== $.inArray( tag, [ 'input', 'textarea', 'select' ] ) ) {
-					target.val( val );
+				if ( -1 !== $.inArray( sTag, [ 'input', 'textarea', 'select' ] ) ) {
+					eTarget.val( mValue );
 				} else {
-					target.html( val );						
+					eTarget.html( mValue );						
 				}
 			}
 		}
 		
 	};
 	
-	var getTargetValue = function( target ) {
+	var getTargetValue = function( eTarget ) {
 		
-		var tag = target.prop( 'tagName' ).toLowerCase();
+		var sTag = eTarget.getTagName();
 		
-		// TO DO!!!!!!
-		if ( -1 !== $.inArray( tag, [ 'input', 'textarea', 'select' ] ) ) {
-			return target.val();
+		// TO DO: refactor this later so it's "pluggable"
+		if ( -1 !== $.inArray( sTag, [ 'input', 'textarea', 'select' ] ) ) {
+			
+			var sId = eTarget.attr( 'id' );
+			var sName = eTarget.attr( 'name' );
+
+			// see if we're dealing with a checkbox or checkbox group
+			if ( 'checkbox' == eTarget.attr( 'type' ) ) {
+				
+				if ( sId == sName ) {
+					
+					return ( eTarget.is( ':checked' ) ) ? eTarget.val() : null ;
+					
+				} else {
+					
+					var aRes = [];
+					
+					eTarget.each( function() {
+						
+						var eCheckbox = $( this );
+						
+						if ( eCheckbox.is( ':checked' ) ) {
+							aRes.push( eCheckbox.val() );
+						}
+						
+					} );
+				
+				}
+				
+				return aRes;
+			}
+
+						
+			return eTarget.val();
 		}
 		
-		return target.html();
+		return eTarget.html();
 	};
 	
 	
