@@ -28,11 +28,18 @@ class Geko_Wp_Category extends Geko_Wp_Entity
 	// the standard get_category_ID() function works with the category name only
 	public static function get_ID( $mKey ) {
 		
+		if ( is_int( $mKey ) ) {
+			return $mKey;
+		}
+		
 		if ( is_array( $mKey ) ) {
+			
 			$aRet = array();
+			
 			foreach ( $mKey as $sKey ) {
 				$aRet[] = self::get_ID( $sKey );
 			}
+			
 			return $aRet;
 		}
 		
@@ -72,12 +79,24 @@ class Geko_Wp_Category extends Geko_Wp_Entity
 	// allows to take a list of categories, either as comma delimited or as an array
 	public static function in( $mArg, $iPostId = NULL ) {
 		
+		if ( is_int( $mArg ) ) {
+			
+			if ( self::_in( $mArg, $iPostId ) ) {
+				return TRUE;
+			}
+		}
+		
 		if ( FALSE == is_array( $mArg ) ) {
 			$mArg = explode( ',', $mArg );
 		}
 		
 		foreach ( $mArg as $sKey ) {
-			if ( self::_in( trim( $sKey ), $iPostId ) ) {
+			
+			if ( is_string( $sKey ) ) {
+				$sKey = trim( $sKey );
+			}
+			
+			if ( self::_in( $sKey, $iPostId ) ) {
 				return TRUE;
 			}
 		}
@@ -111,7 +130,7 @@ class Geko_Wp_Category extends Geko_Wp_Entity
 				$sSortDir = strtoupper( trim( $aRule[ 2 ] ) );
 				if ( '' == $sSortDir ) $sSortDir = 'ASC';
 				
-				$sQueryOrderArgs = '&orderby=' . $sSortField . '&order=' . $sSortDir;
+				$sQueryOrderArgs = sprintf( '&orderby=%s&order=%s', $sSortField, $sSortDir );
 			}
 			
 		}
@@ -127,8 +146,11 @@ class Geko_Wp_Category extends Geko_Wp_Entity
 		$aParentIds = explode( ',', $sCatList );
 		
 		foreach ( $aParentIds as $iParentCatId ) {
+			
 			$aDescendantIds = get_term_children( trim( $iParentCatId ), 'category' );
+			
 			if ( '' != $sDescendantIds ) $sDescendantIds .= ',';
+			
 			$sDescendantIds .= implode( ',', $aDescendantIds );
 		}
 		

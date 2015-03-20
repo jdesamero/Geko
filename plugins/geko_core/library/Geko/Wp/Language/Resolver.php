@@ -316,15 +316,20 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 	
 	//
 	public function getSiblingId( $aParams ) {
+		
 		$oSib = Geko_Wp_Language_Member::getOne( $aParams );
+		
 		if (
 			$oSib->isValid() && 
 			( $iSiblingId = $oSib->getObjId() )
 		) {
 			return $iSiblingId;
 		}
+		
 		return FALSE;
 	}
+	
+	
 	
 }
 
