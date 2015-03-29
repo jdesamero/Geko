@@ -167,25 +167,23 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 		
 		add_action( 'wp_print_scripts', function( $oLoadExt ) use ( &$aModelFields, $oThis ) {
 			
+			$aBackstabFields = array();
+			
 			foreach ( $aModelFields as $sKey => $null ) {
 				
 				$sCompKey = sprintf( '%s.mng', $sKey );
 				
-				if ( !$oMng = Geko_App::get( $sCompKey ) ) {
-					
-					// attempt to load component and try again
-					$oThis->loadComponent( $sCompKey, TRUE );
-					
-					$oMng = Geko_App::get( $sCompKey );
-				}
-				
-				if ( $oMng ) {
-					$aModelFields[ $sKey ] = $oMng->getPrimaryTable();
+				// only get primary table info if component was init'ed
+				if (
+					( $oMng = Geko_App::get( $sCompKey ) ) && 
+					( $oMng->getCalledInit() )
+				) {
+					$aBackstabFields[ $sKey ] = $oMng->getPrimaryTable();
 				}
 				
 			}
 			
-			if ( count( $aModelFields ) > 0 ): ?>
+			if ( count( $aBackstabFields ) > 0 ): ?>
 				<script type="text/javascript">
 					( function() {
 					
@@ -193,7 +191,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 						
 						var Backstab = this.Backstab;
 						
-						Backstab.ModelFields = <?php echo Geko_Json::encode( $aModelFields ); ?>;
+						Backstab.ModelFields = <?php echo Geko_Json::encode( $aBackstabFields ); ?>;
 						
 					} ).call( this );
 				</script>
