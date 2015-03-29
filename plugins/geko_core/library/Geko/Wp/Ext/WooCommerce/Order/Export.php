@@ -29,6 +29,8 @@ class Geko_Wp_Ext_WooCommerce_Order_Export extends Geko_Wp_Entity_ExportExcelHel
 				'postal_code' => TRUE,
 				'email' => TRUE,
 				'telephone' => TRUE,
+				'referral_type' => TRUE,
+				'referral_name' => TRUE,
 				'amount' => TRUE,
 				'discount' => TRUE,
 				'tax' => TRUE,

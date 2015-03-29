@@ -126,17 +126,24 @@ class Geko_Wp_Ext_WooCommerce_Order_Operation extends Geko_Wp_Options_Operation
 		
 		if ( $bContinue ) {
 			
+			$sTransMinDate = sprintf( '%s 00:00:00', str_replace( '/', '-', $_REQUEST[ 'transaction_min_date' ] ) );
+			$sTransMaxDate = sprintf( '%s 23:59:59', str_replace( '/', '-', $_REQUEST[ 'transaction_max_date' ] ) );
+			
+			
 			$aParams = array(
 				'posts_per_page' => -1,
 				'showposts' => -1,
 				'add_item_fields' => TRUE,
-				'transaction_min_date' => $_REQUEST[ 'transaction_min_date' ],
-				'transaction_max_date' => $_REQUEST[ 'transaction_max_date' ],
+				'transaction_min_date' => $sTransMinDate,
+				'transaction_max_date' => $sTransMaxDate,
 				'product_id' => $_REQUEST[ 'product_id' ],
 				'status' => $_REQUEST[ 'status' ],
 				'orderby' => 'transaction_date',
 				'order' => 'DESC'
 			);
+			
+			//print_r( $aParams );
+			//die();
 			
 			$oOrders = new Geko_Wp_Ext_WooCommerce_Order_Query( $aParams, FALSE );
 			

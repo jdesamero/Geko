@@ -99,6 +99,16 @@ class Geko_Wp_Ext_WooCommerce_Order_Query extends Geko_Wp_Entity_Query
 					->on( 'm11.post_id = o.ID' )	
 					->on( 'm11.meta_key = ?', '_billing_phone' )
 				
+				->field( 'm12.meta_value', 'referral_type' )
+				->joinLeft( '##pfx##postmeta', 'm12' )
+					->on( 'm12.post_id = o.ID' )	
+					->on( 'm12.meta_key = ?', '_billing_referral' )
+					
+				->field( 'm13.meta_value', 'referral_name' )
+				->joinLeft( '##pfx##postmeta', 'm13' )
+					->on( 'm13.post_id = o.ID' )	
+					->on( 'm13.meta_key = ?', '_billing_referral_name' )
+
 			;
 			
 			

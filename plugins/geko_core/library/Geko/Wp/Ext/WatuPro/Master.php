@@ -81,7 +81,7 @@ class Geko_Wp_Ext_WatuPro_Master extends Geko_Wp_Entity
 		$iScheduleFromTs = $this->getScheduleFromTs();
 		$iScheduleToTs = $this->getScheduleToTs();
 		
-		$iCurrentTs = time();
+		$iCurrentTs = current_time( 'timestamp' );
 		
 		// the current ts is less than schedule from ts
 		if ( $iCurrentTs < $iScheduleFromTs ) {

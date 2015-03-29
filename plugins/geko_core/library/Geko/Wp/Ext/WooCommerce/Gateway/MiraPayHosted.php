@@ -21,6 +21,9 @@ class Geko_Wp_Ext_WooCommerce_Gateway_MiraPayHosted extends WC_Payment_Gateway
 		'unknown' => 'An unknown Mirapay status was sent ("%s"). Please send an email to %s and report the error.'
 	);
 	
+	protected $_sMode = '';
+	
+	
 	
 	
 	//
@@ -36,6 +39,7 @@ class Geko_Wp_Ext_WooCommerce_Gateway_MiraPayHosted extends WC_Payment_Gateway
 		$this->init_settings();
 		
 		$this->title = $this->get_option( 'title' );
+		$this->_sMode = $this->get_option( 'mode' );
 		
 		add_action( sprintf( 'woocommerce_update_options_payment_gateways_%s', $this->id ), array( $this, 'process_admin_options' ) );
 		
@@ -49,10 +53,7 @@ class Geko_Wp_Ext_WooCommerce_Gateway_MiraPayHosted extends WC_Payment_Gateway
 	
 	//
 	public function getModePrefix() {
-		
-		$sMode = $this->get_option( 'mode' );
-		
-		return sprintf( '%s_', $sMode );
+		return sprintf( '%s_', $this->_sMode );
 	}
 	
 	// apply mode prefix
@@ -167,7 +168,16 @@ class Geko_Wp_Ext_WooCommerce_Gateway_MiraPayHosted extends WC_Payment_Gateway
 				'description' => __( 'Email used when displaying a "please contact admin" error.', 'woocommerce' ),
 				'default' => get_bloginfo( 'admin_email' ),
 				'desc_tip' => TRUE
+			),
+			
+			'log_file' => array(
+				'title' => __( 'Log File', 'woocommerce' ),
+				'type' => 'text',
+				'description' => __( 'Path to log file where transactions are logged. If it does not exist, nothing is logged.', 'woocommerce' ),
+				'default' => '',
+				'desc_tip' => TRUE
 			)
+			
 			
 		);
 		
@@ -182,7 +192,6 @@ class Geko_Wp_Ext_WooCommerce_Gateway_MiraPayHosted extends WC_Payment_Gateway
 		$oOrder = new WC_Order( $iOrderId );
 		$oCustomer = $oOrder->get_user();
 		
-		// $sLogin = $this->getModeOption( 'login' );
 		$sMerchantId = $this->getModeOption( 'merchant_id' );
 		$sPassword = $this->getModeOption( 'password' );
 		$sOrderPrefix = $this->getModeOption( 'order_prefix' );
@@ -208,7 +217,7 @@ class Geko_Wp_Ext_WooCommerce_Gateway_MiraPayHosted extends WC_Payment_Gateway
 		
 		// set-up the gateway url
 		
-		$sGatewayUrl = ( 'live' == $sMode ) ? $this->_sLiveGatwayUrl : $this->_sStagingGatwayUrl ;
+		$sGatewayUrl = ( 'live' == $this->_sMode ) ? $this->_sLiveGatwayUrl : $this->_sStagingGatwayUrl ;
 		
 		$oGatewayUrl = new Geko_Uri( $sGatewayUrl );
 		$oGatewayUrl
@@ -222,26 +231,14 @@ class Geko_Wp_Ext_WooCommerce_Gateway_MiraPayHosted extends WC_Payment_Gateway
 		;
 		
 		
-		/* */
+		//// log request
 		
-		$sLogFile = '/var/www/vhosts/geekoracle.com/dev.geekoracle.com/emondexamprep/foo.txt';
+		$sData = sprintf(
+			"MTID: %s\nMerchant_ID: %s\nMKEY: %s\nSuccessURL: %s\nFailURL: %s\nEMail: %s\nAmount1: %s",
+			$sMtId, $sMerchantId, $sMkey, $sReturnUrl, $sReturnUrl, $sCustomerEmail, $sAmount
+		);
 		
-		$sOut =
-			"==========================\n" .
-			sprintf( "Date: %s\n\n", date( 'D, j M Y H:i:s' ) ).
-			sprintf( "MTID: %s\n", $sMtId ) . 
-			sprintf( "Merchant_ID: %s\n", $sMerchantId ) . 
-			sprintf( "MKEY: %s\n", $sMkey ) . 
-			sprintf( "SuccessURL: %s\n", $sReturnUrl ) . 
-			sprintf( "FailURL: %s\n", $sReturnUrl ) . 
-			sprintf( "EMail: %s\n", $sCustomerEmail ) . 
-			sprintf( "Amount1: %s\n", $sAmount ) . 
-			"\n\n";
-		;
-		
-		file_put_contents( $sLogFile, $sOut, FILE_APPEND );
-		
-		/* */
+		$this->logToFile( 'Request', $sData );
 		
 		
 		// Return thankyou redirect
@@ -263,6 +260,17 @@ class Geko_Wp_Ext_WooCommerce_Gateway_MiraPayHosted extends WC_Payment_Gateway
 		$sMtId = trim( $_GET[ 'MTID' ] );
 		$sMiraId = trim( $_GET[ 'MiraID' ] );
 		$sResponse = trim( $_GET[ 'Response' ] );
+		
+		
+		//// set-up logging data
+		
+		$sScriptStatus = '';
+		
+		$sData = sprintf(
+			"MKEY Check: %s\nPost MKEY: %s\nMTID: %s\nMiraID: %s\nResponse: %s",
+			$sMkeyCheck, $sPostMkey, $sMtId, $sMiraId, $sResponse
+		);
+		
 		
 		$oRedirectUrl = NULL;
 		
@@ -349,13 +357,25 @@ class Geko_Wp_Ext_WooCommerce_Gateway_MiraPayHosted extends WC_Payment_Gateway
 					
 				}
 				
+				$sScriptStatus = 'Has Response';
+				
 			} else {
 				
 				// mkey mismatch
 				$oRedirectUrl->setVar( $this->_sMiraStatusKey, 'key_mismatch' );
+				
+				$sScriptStatus = 'MKEY Mismatch';
 			}
 			
 		}
+		
+		
+		// only log stuff if script status was set
+		if ( $sScriptStatus ) {
+			$sData .= sprintf( "\nScript Status: %s", $sScriptStatus );
+			$this->logToFile( 'Response', $sData );
+		}
+		
 		
 		// redirect, if needed
 		if ( $oRedirectUrl ) {
@@ -390,6 +410,33 @@ class Geko_Wp_Ext_WooCommerce_Gateway_MiraPayHosted extends WC_Payment_Gateway
 
 	
 	}
+	
+	
+	//
+	public function logToFile( $sTitle, $sData ) {
+		
+		$sLogFile = $this->get_option( 'log_file' );
+		
+		if ( $sLogFile && is_file( $sLogFile ) ) {
+			
+			$sOut = "==========================\n\n";
+			
+			$sOut .= sprintf( "Title: %s\n", $sTitle );
+			$sOut .= sprintf( "Date: %s\n", date( 'D, j M Y H:i:s' ) );
+			$sOut .= sprintf( "Mode: %s\n", $this->_sMode );
+			$sOut .= sprintf( "Remote IP: %s\n", $_SERVER[ 'REMOTE_ADDR' ] );
+			$sOut .= sprintf( "User Agent: %s\n\n", $_SERVER[ 'HTTP_USER_AGENT' ] );
+			
+			$sOut .= $sData;
+			
+			$sOut .= "\n\n==========================\n\n";
+			
+			file_put_contents( $sLogFile, $sOut, FILE_APPEND );
+		}
+		
+		return $this;
+	}
+	
 	
 	
 }

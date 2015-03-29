@@ -40,18 +40,29 @@ class Geko_Wp_Ext_WatuPro_Timing extends Geko_Wp_Entity
 		
 		$iEndTs = 0;
 		
+		$sStat = '';
+		
 		if ( 'paused' == $sStatus ) {
+			
 			$iEndTs = $oTiming->getMaxPauseTimeTs();		
+			$iEndTs = $iEndTs + ( 60 * 60 * get_option( 'gmt_offset' ) );
+		
 		} elseif ( 'complete' == $sStatus ) {
+			
 			$iEndTs = $oTiming->getEndTimeTs();
+		
 		} else {
+			
 			// we're running
-			$iEndTs = time();
+			$iEndTs = current_time( 'timestamp' );
 		}
+		
 		
 		$iStartTs = $oTiming->getStartTimeTs();
 		
 		$iPauseInterval = intval( $oTiming->getEntityPropertyValue( 'pause_interval' ) );
+		
+		// printf( '%s - %s - %s - %d ', $sStat, date( 'h:i:s A', $iEndTs ), date( 'h:i:s A', $iStartTs ), $iEndTs - $iStartTs );
 		
 		return ( $iEndTs - $iStartTs ) - $iPauseInterval;
 	}

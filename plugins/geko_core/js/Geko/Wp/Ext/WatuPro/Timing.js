@@ -55,6 +55,11 @@
 					.append( eTimerLoading )
 				;
 				
+				//callback to execute stuff after timer initialized
+				if ( oParams.on_timer_initialize ) {
+					oParams.on_timer_initialize();
+				}
+				
 				
 				var iCurTs = 0;
 				var iCurElapsed = 0;
@@ -171,7 +176,7 @@
 				
 				
 				// prompt for leaving exam
-				$( window ).on( 'beforeunload', function() {
+				$( window ).on( 'beforeunload unload', function() {
 					
 					// pause timer if it's running
 					if ( bTimerRunning ) {
@@ -253,7 +258,7 @@
 			
 			// submit button was clicked
 			if ( -1 != xhr.responseText.indexOf( 'startOutput' ) ) {
-				window.location = '%s/exam-results/exam-review/?id=%d'.printf( oParams.script.url, iTheTakingId );
+				window.location = '%s/exam-results/results-summary/?id=%d'.printf( oParams.script.url, iTheTakingId );
 			}
 			
 		} );
