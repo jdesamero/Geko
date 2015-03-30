@@ -104,6 +104,38 @@ class Geko_Navigation_Page_Uri
 		}	
 	}
 	
+	//
+	public function getHref() {
+		
+		$sHref = parent::getHref();
+		
+		if ( FALSE !== strpos( $sHref, '##' ) ) {
+			
+			$aPlaceholders = Geko_Wp::getStandardPlaceholders();
+			$aRegs = array();
+			
+			preg_match_all( '/##([^#]+)##/', $sHref, $aRegs );
+			
+			if ( is_array( $aKeys = $aRegs[ 1 ] ) ) {
+				
+				foreach ( $aKeys as $sKey ) {
+					if ( $sReplace = $aPlaceholders[ $sKey ] ) {
+						$sHref = str_replace(
+							sprintf( '##%s##', $sKey ),
+							$sReplace,
+							$sHref
+						);
+					}
+				}
+				
+			}
+			
+		}
+		
+		return $sHref;
+	}
+	
+	
 	
 	//
 	public function isCurrentUri() {
