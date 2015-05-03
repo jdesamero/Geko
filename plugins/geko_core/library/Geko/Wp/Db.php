@@ -31,9 +31,9 @@ class Geko_Wp_Db
 			$sSlugField,
 			$sTable,
 			$sSlugField,
-			$wpdb->escape( $sName ),
+			$oDb->quote( $sName ),
 			$sSlugField,
-			$wpdb->escape( $sName )
+			$oDb->quote( $sName )
 		
 		) );
 		
@@ -119,6 +119,7 @@ class Geko_Wp_Db
 	public static function keywordSearch( $sKeywords, $aFields ) {
 		
 		global $wpdb;
+		$oDb = Geko_Wp::get( 'db' );
 		
 		$aKeywords = Geko_Array::explodeTrim(
 			' ', $sKeywords, array( 'remove_empty' => TRUE )
@@ -128,7 +129,7 @@ class Geko_Wp_Db
 		foreach ( $aKeywords as $sKeyword ) {
 			$aExp = array();
 			foreach ( $aFields as $sField ) {
-				$aExp[] = sprintf( " ( %s LIKE '%%%s%%' ) ", $sField, $wpdb->escape( $sKeyword ) );	
+				$aExp[] = sprintf( " ( %s LIKE '%%%s%%' ) ", $sField, $oDb->quote( $sKeyword ) );	
 			}
 			$aMain[] = sprintf( ' ( %s ) ', implode( ' OR ', $aExp ) );
 		}

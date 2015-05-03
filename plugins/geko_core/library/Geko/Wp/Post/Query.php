@@ -100,8 +100,8 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 	
 	//
 	public function getFoundRows() {
-
-		if ( !$this->_bEmptyInit ) {
+		
+		if ( $this->oWpQuery ) {
 			return $this->oWpQuery->found_posts;
 		}
 		
@@ -123,7 +123,7 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 		
 		$oQuery
 			
-			->field( 'p.ID', 'id' )
+			->field( 'p.ID' )
 			->field( 'p.post_author' )
 			->field( 'p.post_date' )
 			->field( 'p.post_date_gmt' )
@@ -148,7 +148,9 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 			->field( 'p.comment_count' )
 			
 			->from( '##pfx##posts', 'p' )
+			
 		;
+		
 		
 		if ( isset( $aParams[ 'id' ] ) ) {
 			$oQuery->where( 'p.ID * ($)', $aParams[ 'id' ] );
@@ -157,6 +159,7 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 		if ( isset( $aParams[ 'post_type' ] ) ) {
 			$oQuery->where( 'p.post_type * ($)', $aParams[ 'post_type' ] );
 		}
+		
 		
 		return $oQuery;
 		
