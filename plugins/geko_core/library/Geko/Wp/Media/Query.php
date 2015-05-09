@@ -92,15 +92,33 @@ class Geko_Wp_Media_Query extends Geko_Wp_Post_Query
 				$oQuery->where( 'gkpf.ID * ($)', $aParams[ 'file_ids' ] );
 			}
 			
-			if ( $sOrderBy = $aParams[ 'orderby' ] ) {
-				$sOrder = ( strtoupper( $aParams[ 'order' ] ) == 'DESC' ) ? 'DESC' : 'ASC' ;
-				$oQuery->order( $sOrderBy, $sOrder );
+			if ( $mOrderBy = $aParams[ 'orderby' ] ) {
+				
+				if ( is_array( $mOrderBy ) ) {
+					$aOrderBy = $mOrderBy;				
+				} else {
+					$aOrderBy = array( $mOrderBy => $aParams[ 'order' ] );
+				}
+				
+				foreach ( $aOrderBy as $sField => $sOrder ) {
+					$this->setQueryOrder( $oQuery, $sField, $sOrder );
+				}
 			}
 			
 		}
 		
 		
 		return $oQuery;
+	}
+	
+	
+	// Hackish!!!
+	public function setQueryOrder( $oQuery, $sField, $sOrder ) {
+		
+		$sOrder = ( strtoupper( $sOrder ) == 'DESC' ) ? 'DESC' : 'ASC' ;
+		$oQuery->order( $sField, $sOrder );	
+		
+		return $this;
 	}
 	
 	
