@@ -87,7 +87,7 @@ abstract class Geko_Wp_Rewrite_Abstract
 		};
 		
 		$fnGenerateRule( $this->_sListVarName, $this->_sListKeyTag );
-		$fnGenerateRule( $this->_sSingleKeyTag, $this->_sSingleKeyTag );
+		$fnGenerateRule( $this->_sSingleVarName, $this->_sSingleKeyTag );
 		
 		if ( $this->_aExtraRules ) {
 			
