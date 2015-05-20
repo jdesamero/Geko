@@ -244,6 +244,26 @@ class Geko_Array
 		
 		return $aMerged;
 	}
+
+	
+	//
+	public static function mergePreserveKeys() {
+
+		$aArgs = func_get_args();
+		
+		$aFirst = array_shift( $aArgs );
+		
+		foreach ( $aArgs as $mArg ) {
+			
+			if ( is_array( $mArg ) ) {
+				foreach ( $mArg as $mKey => $mValue ) {
+					$aFirst[ $mKey ] = $mValue;
+				}
+			}
+		}
+		
+		return $aFirst;
+	}
 	
 	
 	// create a normalized hash from an array of keys

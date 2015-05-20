@@ -48,8 +48,6 @@ class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 		
 		$oQuery
 			
-			->distinct( TRUE )
-			
 			->field( 't.term_id' )
 			->field( 't.name' )
 			->field( 't.slug' )
@@ -64,15 +62,75 @@ class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 			->from( '##pfx##terms', 't' )
 			->joinLeft( '##pfx##term_taxonomy', 'tx' )
 				->on( 'tx.term_id = t.term_id' )
-			->joinLeft( '##pfx##term_relationships', 'tr' )
-				->on( 'tr.term_taxonomy_id = tx.term_taxonomy_id' )
 			
 			->where( 'tx.taxonomy = ?', 'category' )
 			
 		;
 		
+		
+		////
+		
+		if ( !$aParams[ 'not_distinct' ] ) {
+			$oQuery->distinct( TRUE );
+		}
+		
+		if ( !$aParams[ 'dont_join_term_relationships' ] ) {
+			
+			$oQuery
+				->joinLeft( '##pfx##term_relationships', 'tr' )
+					->on( 'tr.term_taxonomy_id = tx.term_taxonomy_id' )			
+			;
+			
+		}
+		
+		
+		
+		////
+		
 		if ( $iParentId = $aParams[ 'parent' ] ) {
 			$oQuery->where( 'tx.parent = ?', $iParentId );
+		}
+
+		if ( $iCatWithPosts = $aParams[ 'has_posts_in_cat' ] ) {
+			
+			
+			$oHasPostsQuery = new Geko_Sql_Select();
+			$oHasPostsQuery
+				
+				->field( 'wptx.term_id' )
+				->field( 'COUNT( wptr.object_id )', 'num_posts' )
+				
+				->from( '##pfx##term_relationships', 'wptr' )
+				
+				->joinLeft( '##pfx##term_taxonomy', 'wptx' )
+					->on( 'wptx.term_taxonomy_id = wptr.term_taxonomy_id' )
+
+				->joinLeft( '##pfx##term_relationships', 'wp2tr' )
+					->on( 'wp2tr.object_id = wptr.object_id' )
+
+				->joinLeft( '##pfx##term_taxonomy', 'wp2tx' )
+					->on( 'wp2tx.term_taxonomy_id = wp2tr.term_taxonomy_id' )
+					
+				
+				->where( 'wp2tx.term_id = ?', $iCatWithPosts )
+				
+				->where( 'wptx.taxonomy = ?', 'category' )
+				->where( 'wp2tx.taxonomy = ?', 'category' )
+				
+				->group( 'wptx.term_id' )
+			;
+			
+			$oQuery
+				
+				// ->field( 'wpt.num_posts' )
+				
+				->joinLeft( $oHasPostsQuery, 'wpt' )
+					->on( 'wpt.term_id = t.term_id' )
+				
+				->where( 'wpt.num_posts > 0' )
+			;
+			
+			
 		}
 		
 		return $oQuery;
