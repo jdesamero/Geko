@@ -7,7 +7,7 @@ class Geko_Wp_Post_Clone extends Geko_Wp_Initialize
 	protected $_sButtonTitle = 'Clone Post';
 	protected $_sLinkTitle = 'Clone this post';
 	
-
+	
 	//
 	public function addAdmin() {
 		
@@ -60,7 +60,7 @@ class Geko_Wp_Post_Clone extends Geko_Wp_Initialize
 			
 			$iCopyId = $this->clonePost( $iPostId );
 			
-			wp_redirect( admin_url( 'post.php?action=edit&post=' . $iCopyId ) );
+			wp_redirect( admin_url( sprintf( 'post.php?action=edit&post=%d', $iCopyId ) ) );
 			
 			die();
 		}
@@ -134,7 +134,7 @@ class Geko_Wp_Post_Clone extends Geko_Wp_Initialize
 		
 		$aInsertData = array(
 			'post_content' => $aOrigData[ 'post_content' ],
-			'post_title' => $aOrigData[ 'post_title' ] . ' Copy',
+			'post_title' => sprintf( '%s Copy', $aOrigData[ 'post_title' ] ),
 			'post_excerpt' => $aOrigData[ 'post_excerpt' ],
 			'post_status' => $aOrigData[ 'post_status' ],
 			'comment_status' => $aOrigData[ 'comment_status' ],
@@ -340,7 +340,7 @@ class Geko_Wp_Post_Clone extends Geko_Wp_Initialize
 			->where( 'p.post_type = ?', 'attachment' )
 		;
 		
-		$aAtts = $oDb->fetchAllAssoc( array( $oQuery ) );
+		$aAtts = $oDb->fetchAllAssoc( strval( $oQuery ) );
 		
 		foreach ( $aAtts as $i => $aRow ) {
 			$aAtts[ $i ][ 'path' ] = str_replace( $sUrl, $sPath, $aRow[ 'guid' ] );
@@ -355,8 +355,8 @@ class Geko_Wp_Post_Clone extends Geko_Wp_Initialize
 		$sDirName = dirname( $aPost[ 'path' ] );
 		$sBaseName = basename( $aPost[ 'path' ] );
 		
-		$sTmpFile = md5( $aPost[ 'path' ] . time() );
-		$sTmpName = $sDirName . '/' . $sTmpFile;
+		$sTmpFile = md5( sprintf( '%s%s', $aPost[ 'path' ], time() ) );
+		$sTmpName = sprintf( '%s/%s', $sDirName, $sTmpFile );
 		
 		copy( $aPost[ 'path' ], $sTmpName );
 		
@@ -481,27 +481,34 @@ class Geko_Wp_Post_Clone extends Geko_Wp_Initialize
 	public function debugClonePost( $iPostId ) {
 
 		echo '<pre>';
-
+		
+		echo "Post Data:\n";
 		print_r( $this->getPostData( $iPostId ) );			
 		echo "\n\n";
 		
+		echo "Post Attachments:\n";
 		print_r( $this->getPostAttachments( $iPostId ) );			
 		echo "\n\n";
 		
+		echo "Post Meta:\n";
 		$aMeta = $this->getPostMeta( $iPostId );
 		print_r( $aMeta );
 		echo "\n\n";
 		
+		echo "Post Meta IDs:\n";
 		$aMetaIds = $this->getMetaIds( $aMeta );
 		print_r( $aMetaIds );
 		echo "\n\n";
 		
+		echo "Post Categories:\n";
 		print_r( wp_get_post_categories( $iPostId ) );
 		echo "\n\n";
 		
+		echo "Post Meta Members:\n";
 		print_r( $this->getPostMetaMembers( $aMetaIds ) );
 		echo "\n\n";
 		
+		echo "Post Attachment Fields:\n";
 		print_r( $this->getAttachmentFields( $iPostId ) );
 		echo "\n\n";
 		
