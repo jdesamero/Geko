@@ -18,6 +18,21 @@ class Geko_Service extends Geko_Singleton_Abstract
 	
 	
 	
+	//// accessors
+	
+	//
+	public static function get( $sKey ) {
+		return Geko::getBoot()->get( $sKey );
+	}
+	
+	//
+	public static function getVal( $sKey ) {
+		return Geko::getBoot()->getVal( $sKey );
+	}
+	
+	
+	
+	
 	//// call hooks
 	
 	//
