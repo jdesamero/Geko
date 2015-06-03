@@ -11,9 +11,26 @@ class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 			return parent::init();
 		}
 		
+		
+		// fix for Wordpress as of version of 4.2.2
+		// sanitize passed parameters
+		
+		$aGetCatParamKeys = array(
+			'type', 'child_of', 'parent', 'orderby', 'order', 'hide_empty', 'hierarchical', 
+			'exclude', 'include', 'number', 'taxonomy', 'pad_counts'
+		);
+		
+		$aSanitizedParams = array();
+		foreach ( $aGetCatParamKeys as $sKey ) {
+			if ( isset( $this->_aParams[ $sKey ] ) ) {
+				$aSanitizedParams[ $sKey ] = $this->_aParams[ $sKey ];
+			}
+		}
+		
+		
 		$this->_aEntities = ( 0 === $this->_aParams[ 'number' ] ) ?
 			array() : 
-			array_values( get_categories( $this->_aParams ) )
+			array_values( get_categories( $aSanitizedParams ) )
 		;
 		
 		$this->_iTotalRows = count( $this->_aEntities );
