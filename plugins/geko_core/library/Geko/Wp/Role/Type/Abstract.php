@@ -32,19 +32,21 @@ abstract class Geko_Wp_Role_Type_Abstract extends Geko_Singleton_Abstract
 		
 		if ( !$this->_sRoleEntityClass ) {
 			$sClass = $sBaseClass;
-			$this->_sRoleEntityClass = @class_exists( $sClass ) ? $sClass : '';
+			$this->_sRoleEntityClass = @class_exists( $sClass ) ? $sClass : '' ;
 		}
 		
 		if ( !$this->_sRewriteClass ) {
-			$sClass = $sBaseClass . '_Rewrite';
-			$this->_sRewriteClass = @class_exists( $sClass ) ? $sClass : '';
+			$sClass = sprintf( '%s_Rewrite', $sBaseClass );
+			$this->_sRewriteClass = @class_exists( $sClass ) ? $sClass : '' ;
 		}
 		
 		if ( !$this->_sManageClass ) {
-			$sClass = $sBaseClass . '_Manage';
-			$this->_sManageClass = @class_exists( $sClass ) ? $sClass : '';
+			$sClass = sprintf( '%s_Manage', $sBaseClass );
+			$this->_sManageClass = @class_exists( $sClass ) ? $sClass : '' ;
 		}
+		
 	}
+	
 	
 	// calling init() ensures add() is only called once while in admin mode
 	public function init() {

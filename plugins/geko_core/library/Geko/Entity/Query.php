@@ -735,7 +735,7 @@ abstract class Geko_Entity_Query
 	//
 	public function addPlugin( $sClassName, $mParams = NULL ) {
 		
-		Geko_Plugin::add( $sClassName, $mParams, $this, &$this->_aPlugins, 'setupEntityQuery' );
+		Geko_Plugin::add( $sClassName, $mParams, $this, $this->_aPlugins, 'setupEntityQuery' );
 		
 		return $this;
 	}

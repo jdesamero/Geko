@@ -75,7 +75,7 @@ class Geko_Delegate
 	//
 	public function addPlugin( $sClassName, $mParams = NULL ) {
 		
-		Geko_Plugin::add( $sClassName, $mParams, $this, &$this->_aPlugins, 'setupDelegate' );
+		Geko_Plugin::add( $sClassName, $mParams, $this, $this->_aPlugins, 'setupDelegate' );
 		
 		return $this;
 	}

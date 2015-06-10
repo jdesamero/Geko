@@ -172,35 +172,35 @@ class Geko_Wp_Post_Query extends Geko_Wp_Entity_Query
 	
 	// wp-includes/query.php
 	
-	// do_action_ref_array('pre_get_posts', array(&$this));
-	// $search = apply_filters_ref_array( 'posts_search', array( $search, &$this ) );
-	// $where = apply_filters_ref_array('posts_where', array( $where, &$this ) );
-	// $join = apply_filters_ref_array('posts_join', array( $join, &$this ) );
+	// do_action_ref_array('pre_get_posts', array($this));
+	// $search = apply_filters_ref_array( 'posts_search', array( $search, $this ) );
+	// $where = apply_filters_ref_array('posts_where', array( $where, $this ) );
+	// $join = apply_filters_ref_array('posts_join', array( $join, $this ) );
 	
 	//// first
 	
-	// $where		= apply_filters_ref_array( 'posts_where_paged',	array( $where, &$this ) );
-	// $groupby	= apply_filters_ref_array( 'posts_groupby',		array( $groupby, &$this ) );
-	// $join		= apply_filters_ref_array( 'posts_join_paged',	array( $join, &$this ) );
-	// $orderby	= apply_filters_ref_array( 'posts_orderby',		array( $orderby, &$this ) );
-	// $distinct	= apply_filters_ref_array( 'posts_distinct',	array( $distinct, &$this ) );
-	// $limits		= apply_filters_ref_array( 'post_limits',		array( $limits, &$this ) );
-	// $fields		= apply_filters_ref_array( 'posts_fields',		array( $fields, &$this ) );
+	// $where		= apply_filters_ref_array( 'posts_where_paged',	array( $where, $this ) );
+	// $groupby	= apply_filters_ref_array( 'posts_groupby',		array( $groupby, $this ) );
+	// $join		= apply_filters_ref_array( 'posts_join_paged',	array( $join, $this ) );
+	// $orderby	= apply_filters_ref_array( 'posts_orderby',		array( $orderby, $this ) );
+	// $distinct	= apply_filters_ref_array( 'posts_distinct',	array( $distinct, $this ) );
+	// $limits		= apply_filters_ref_array( 'post_limits',		array( $limits, $this ) );
+	// $fields		= apply_filters_ref_array( 'posts_fields',		array( $fields, $this ) );
 	
 	// do_action( 'posts_selection', $where . $groupby . $orderby . $limits . $join );
 
 	//// second, caching plugins
 	
-	// $where		= apply_filters_ref_array( 'posts_where_request',		array( $where, &$this ) );
-	// $groupby	= apply_filters_ref_array( 'posts_groupby_request',		array( $groupby, &$this ) );
-	// $join		= apply_filters_ref_array( 'posts_join_request',		array( $join, &$this ) );
-	// $orderby	= apply_filters_ref_array( 'posts_orderby_request',		array( $orderby, &$this ) );
-	// $distinct	= apply_filters_ref_array( 'posts_distinct_request',	array( $distinct, &$this ) );
-	// $fields		= apply_filters_ref_array( 'posts_fields_request',		array( $fields, &$this ) );
-	// $limits		= apply_filters_ref_array( 'post_limits_request',		array( $limits, &$this ) );
+	// $where		= apply_filters_ref_array( 'posts_where_request',		array( $where, $this ) );
+	// $groupby	= apply_filters_ref_array( 'posts_groupby_request',		array( $groupby, $this ) );
+	// $join		= apply_filters_ref_array( 'posts_join_request',		array( $join, $this ) );
+	// $orderby	= apply_filters_ref_array( 'posts_orderby_request',		array( $orderby, $this ) );
+	// $distinct	= apply_filters_ref_array( 'posts_distinct_request',	array( $distinct, $this ) );
+	// $fields		= apply_filters_ref_array( 'posts_fields_request',		array( $fields, $this ) );
+	// $limits		= apply_filters_ref_array( 'post_limits_request',		array( $limits, $this ) );
 
 	// Filter all clauses at once, for convenience
-	// $clauses = (array) apply_filters_ref_array( 'posts_clauses_request', array( compact( $pieces ), &$this ) );
+	// $clauses = (array) apply_filters_ref_array( 'posts_clauses_request', array( compact( $pieces ), $this ) );
 
 	
 	//

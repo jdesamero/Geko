@@ -862,7 +862,7 @@ abstract class Geko_Entity
 	//
 	public function addPlugin( $sClassName, $mParams = NULL ) {
 		
-		Geko_Plugin::add( $sClassName, $mParams, $this, &$this->_aPlugins, 'setupEntity' );
+		Geko_Plugin::add( $sClassName, $mParams, $this, $this->_aPlugins, 'setupEntity' );
 		
 		return $this;
 	}
