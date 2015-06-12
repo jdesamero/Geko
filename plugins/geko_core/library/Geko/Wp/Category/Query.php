@@ -63,6 +63,10 @@ class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
 		
+		
+		$sTaxonomy = ( $aParams[ 'taxonomy' ] ) ? $aParams[ 'taxonomy' ] : 'category' ;
+		
+		
 		$oQuery
 			
 			->field( 't.term_id' )
@@ -80,7 +84,7 @@ class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 			->joinLeft( '##pfx##term_taxonomy', 'tx' )
 				->on( 'tx.term_id = t.term_id' )
 			
-			->where( 'tx.taxonomy = ?', 'category' )
+			->where( 'tx.taxonomy = ?', $sTaxonomy )
 			
 		;
 		
@@ -107,7 +111,27 @@ class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 		if ( $iParentId = $aParams[ 'parent' ] ) {
 			$oQuery->where( 'tx.parent = ?', $iParentId );
 		}
-
+		
+		
+		// "ps" stands for "parent slug"
+		if ( $sParentSlug = $aParams[ 'parent_slug' ] ) {
+			
+			$oQuery
+				
+				->joinLeft( '##pfx##term_taxonomy', 'pstx' )
+					->on( 'pstx.term_taxonomy_id = tx.parent' )
+					
+				->joinLeft( '##pfx##terms', 'pst' )
+					->on( 'pst.term_id = pstx.term_id' )
+				
+				->where( 'pst.slug = ?', $sParentSlug )
+				
+			;
+			
+		}
+		
+		
+		// "wp" stands for "with posts"
 		if ( $iCatWithPosts = $aParams[ 'has_posts_in_cat' ] ) {
 			
 			
@@ -131,8 +155,8 @@ class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 				
 				->where( 'wp2tx.term_id = ?', $iCatWithPosts )
 				
-				->where( 'wptx.taxonomy = ?', 'category' )
-				->where( 'wp2tx.taxonomy = ?', 'category' )
+				->where( 'wptx.taxonomy = ?', $sTaxonomy )
+				->where( 'wp2tx.taxonomy = ?', $sTaxonomy )
 				
 				->group( 'wptx.term_id' )
 			;
