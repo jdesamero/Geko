@@ -227,6 +227,7 @@
 			return Backbone.View.prototype.delegateEvents.apply( this, arguments );
 		},
 		
+		// get values from model and populate elements (usually form elements)
 		extractModelValues: function( oModel, eElem, oParams ) {
 			
 			var _this = this;
@@ -288,6 +289,7 @@
 			
 		},
 		
+		// returned value is a regular object
 		getModelDataFromElem: function( oModel, eElem, oParams ) {
 			
 			var _this = this;
@@ -324,6 +326,7 @@
 				oFormat = oModel.fieldFormats;
 			}
 			
+			// oldval is not used, just the keys
 			$.each( data, function( prop, oldval ) {
 				
 				var sIntCidKey = 'intcid:%s'.printf( prop );
