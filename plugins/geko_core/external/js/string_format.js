@@ -555,6 +555,16 @@
 	};
 	
 	
+	// http://stackoverflow.com/questions/1026069/capitalize-the-first-letter-of-string-in-javascript
+	
+	var ucfirst = function( str ) {
+		return str.charAt( 0 ).toUpperCase() + str.slice( 1 );
+	};
+	
+	String.prototype.ucfirst = function() {
+		return ucfirst( this );
+	};
+	
 	
 	
 	
