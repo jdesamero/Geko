@@ -1,7 +1,7 @@
 <?php
 
 abstract class Geko_Entity_Query
-	implements Iterator, ArrayAccess, Countable
+	implements Iterator, ArrayAccess, Countable, Geko_Json_Encodable
 {
 	protected $_oPrimaryTable = NULL;
 	
@@ -549,6 +549,16 @@ abstract class Geko_Entity_Query
 	public function count() {
 		return count( $this->_aEntities );
 	}
+	
+	
+	//// Geko_Json_Encodable interface methods
+	
+	//
+	public function toJsonEncodable() {
+		return $this->getRawEntities( TRUE );
+	}
+	
+	
 	
 	
 	

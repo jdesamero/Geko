@@ -236,6 +236,10 @@ class Geko_Service extends Geko_Singleton_Abstract
 	//
 	public function setResponseValue( $sKey, $mValue ) {
 		
+		if ( $mValue instanceof Geko_Json_Encodable ) {
+			$mValue = $mValue->toJsonEncodable();
+		}
+		
 		$this->aAjaxResponse[ $sKey ] = $mValue;
 		
 		return $this;

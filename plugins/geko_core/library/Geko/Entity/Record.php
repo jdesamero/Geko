@@ -99,7 +99,10 @@ class Geko_Entity_Record extends Geko_Delegate
 				
 				$sPkfName = $oPkf->getName();
 				
-				if ( !$oSubject->hasEntityProperty( $sPkfName ) ) {
+				if (
+					!$oSubject->hasEntityProperty( $sPkfName ) || 
+					!$oSubject->getEntityPropertyValue( $sPkfName )
+				) {
 					
 					$this->insert( $oTable, $aAllValues, $aValues, $aOtherValues );
 					

@@ -1,8 +1,9 @@
 <?php
 
 //
-abstract class Geko_Entity
+abstract class Geko_Entity implements Geko_Json_Encodable
 {
+	
 	protected $_oPrimaryTable = NULL;
 	
 	protected $_oEntity;
@@ -1104,10 +1105,22 @@ abstract class Geko_Entity
 		throw new Exception( sprintf( 'Invalid method %s::%s() called.', $this->_sEntityClass, $sMethod ) );
 	}
 	
+	
 	//
 	public function __toString() {
 		return $this->getTitle();
 	}
+	
+	
+	
+	//// Geko_Json_Encodable interface methods
+	
+	//
+	public function toJsonEncodable() {
+		return $this->getRawEntity();
+	}
+	
+	
 	
 }
 

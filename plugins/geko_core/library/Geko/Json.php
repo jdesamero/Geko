@@ -24,35 +24,9 @@ class Geko_Json
 				$mValue[ $mKey ] = self::encodeFormat( $mSubValue );
 			}
 			
-		} else if ( $mValue instanceof Geko_Entity_Query ) {
+		} else if ( $mValue instanceof Geko_Json_Encodable ) {
 			
-			// re-assign
-			$oQuery = $mValue;
-			
-			$mValue = $oQuery->getRawEntities( TRUE );
-			
-		} else if ( $mValue instanceof Geko_Sql_Table ) {
-
-			// re-assign
-			$oTable = $mValue;
-			
-			$mValue = array();
-			
-			$aFields = $oTable->getFields( TRUE );
-			
-			foreach ( $aFields as $sKey => $oField ) {
-				
-				$mDefValue = $oField->getDefaultValue();
-				
-				$mValue[ $sKey ] = array(
-					'value' => $oField->getAssertedValue( $mDefValue ),
-					'format' => $oField->getAssertedType()
-				);
-				
-				if ( $oField->hasFlag( 'uniquecheck' ) ) {
-					$mValue[ $sKey ][ 'uniqueCheck' ] = TRUE;
-				}
-			}
+			$mValue = $mValue->toJsonEncodable();
 			
 		}
 		

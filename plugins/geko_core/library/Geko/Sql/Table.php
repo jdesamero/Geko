@@ -1,7 +1,7 @@
 <?php
 
 //
-class Geko_Sql_Table
+class Geko_Sql_Table implements Geko_Json_Encodable
 {
 	
 	//// constants
@@ -431,6 +431,40 @@ class Geko_Sql_Table
 		
 		return trim( $sOutput );
 	}
+	
+	
+	
+	
+	
+	//// Geko_Json_Encodable interface methods
+	
+	//
+	public function toJsonEncodable() {
+		
+		$aRet = array();
+		
+		$aFields = $this->getFields( TRUE );
+		
+		foreach ( $aFields as $sKey => $oField ) {
+			
+			$mDefValue = $oField->getDefaultValue();
+			
+			$aRet[ $sKey ] = array(
+				'value' => $oField->getAssertedValue( $mDefValue ),
+				'format' => $oField->getAssertedType()
+			);
+			
+			if ( $oField->hasFlag( 'uniquecheck' ) ) {
+				$aRet[ $sKey ][ 'uniqueCheck' ] = TRUE;
+			}
+		}
+		
+		return $aRet;
+	}
+	
+	
+	
+	
 	
 }
 
