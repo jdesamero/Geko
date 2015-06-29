@@ -77,7 +77,7 @@ class Geko_Wp_Role_Types
 		
 		// prefix with 'all-'
 		// is 'all-' the only available pseudo type ???
-		return ( $sSuffix ) ? 'all-' . $sSuffix : '';
+		return ( $sSuffix ) ? sprintf( 'all-%s', $sSuffix ) : '' ;
 	}
 	
 	//

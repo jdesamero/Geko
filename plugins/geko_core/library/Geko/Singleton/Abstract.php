@@ -9,16 +9,9 @@ abstract class Geko_Singleton_Abstract
 	protected $_sInstanceClass;
 	
 	protected $_bCalledInit = FALSE;
+	protected $_bAutoInit = FALSE;			// call init() after constructing singleton
 	
 	
-	
-	
-	
-	// prevent external instantiation
-	protected function __construct() {
-		
-		$this->_sInstanceClass = get_class( $this );
-	}
 	
 	
 	// It will always belong to the superclass
@@ -50,7 +43,22 @@ abstract class Geko_Singleton_Abstract
 	}
 	
 	
+	
+	
+	
 	////
+	
+	// prevent external instantiation
+	protected function __construct() {
+		
+		$this->_sInstanceClass = get_class( $this );
+		
+		if ( $this->_bAutoInit ) {
+			$this->init();
+		}
+		
+	}
+	
 	
 	// ensure init is called once
 	public function init() {

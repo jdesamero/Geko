@@ -20,17 +20,28 @@ class Geko_Entity_Record extends Geko_Delegate
 	
 	
 	//
+	public function _setOrigValues() {
+		
+		if ( NULL === $this->_aOrigValues ) {
+			
+			$oSubject = $this->_oSubject;
+
+			$oRawEntity = $oSubject->initRawEntity();
+			$this->_aOrigValues = get_object_vars( $oRawEntity );			
+		}
+		
+		return $this;
+	}
+	
+	
+	//
 	public function setEntityPropertyValue() {
 		
 		$oSubject = $this->_oSubject;
 		
 		$aArgs = func_get_args();
 		
-		if ( NULL === $this->_aOrigValues ) {
-
-			$oRawEntity = $oSubject->initRawEntity();
-			$this->_aOrigValues = get_object_vars( $oRawEntity );
-		}
+		$this->_setOrigValues();
 		
 		if ( is_array( $aValues = $aArgs[ 0 ] ) ) {
 			
@@ -41,14 +52,29 @@ class Geko_Entity_Record extends Geko_Delegate
 			}
 			
 		} else {
+
+			// key/value pair method
 			
 			list( $sKey, $mValue ) = $aArgs;
 			
-			// key/value pair method
+			// get where key is mapped to
+			$mProp = $oSubject->getEntityMapping( $sKey );
 			
+			// get the raw entity, remember, the Geko_Entity class knows nothing about mutating
+			// the value of the raw entity
 			$oRawEntity = $oSubject->getRawEntity();
-			$oRawEntity->$sKey = $mValue;
-						
+			
+			if ( is_string( $mProp ) ) {
+				
+				$oRawEntity->$mProp = $mValue;
+			
+			} elseif ( is_array( $mProp ) ) {
+				
+				foreach ( $mProp as $i => $sProp ) {
+					$oRawEntity->$sProp = Geko_String::coalesce( $mValue[ $sProp ], $mValue[ $i ] );
+				}
+			}
+					
 		}
 		
 		return $oSubject;
@@ -60,37 +86,13 @@ class Geko_Entity_Record extends Geko_Delegate
 	// will figure itself out whether to insert or update database entry
 	public function save() {
 		
+		// $oSubject is a Geko_Entity
 		$oSubject = $this->_oSubject;
 		
 		if ( $oTable = $oSubject->getPrimaryTable() ) {
 			
-			
-			$aEntityKeys = array_keys( get_object_vars( $oSubject->getRawEntity() ) );
-			
-			
-			// get field values
-			
-			$aFields = $oTable->getFields( TRUE );
-			
-			$aValues = array();
-			$aOtherValues = array();			// track values that do not belong to the main table
-			
-			foreach ( $aEntityKeys as $sFieldName ) {
-				
-				if ( $oField = $aFields[ $sFieldName ] ) {
-
-					$aValues[ $sFieldName ] = $oField->getAssertedValue(
-						$oSubject->getEntityPropertyValue( $sFieldName )
-					);
-				
-				} else {
-					
-					$aOtherValues[ $sFieldName ] = $oSubject->getEntityPropertyValue( $sFieldName );
-				}
-				
-			}
-			
-			$aAllValues = array_merge( $aValues, $aOtherValues );
+			// format values
+			list( $aAllValues, $aValues, $aOtherValues ) = $this->formatValues( $oTable, $oSubject );
 			
 			
 			// are we creating a new record or updating an existing record?
@@ -202,7 +204,7 @@ class Geko_Entity_Record extends Geko_Delegate
 		
 
 		// run validation hook
-		$this->throwValidate( $aAllValues );							
+		$this->throwValidate( $aAllValues );
 		
 		
 		// try-catch any possible database errors
@@ -227,15 +229,10 @@ class Geko_Entity_Record extends Geko_Delegate
 			
 		} catch ( Zend_Db_Statement_Exception $e ) {
 			
-			$oRecordException = new Geko_Entity_Record_Exception( 'Insert failed!' );
-			$oRecordException
-				->setErrorType( 'db' )
-				->setOrigMessage( $e->getMessage() )
-			;
+			throw $this->newException( 'db', 'Insert failed!', $e->getMessage() );
 			
-			throw $oRecordException;
 		}
-
+		
 	}
 	
 	//
@@ -274,13 +271,8 @@ class Geko_Entity_Record extends Geko_Delegate
 			
 		} catch ( Zend_Db_Statement_Exception $e ) {
 			
-			$oRecordException = new Geko_Entity_Record_Exception( 'Update failed!' );
-			$oRecordException
-				->setErrorType( 'db' )
-				->setOrigMessage( $e->getMessage() )
-			;
+			throw $this->newException( 'db', 'Update failed!', $e->getMessage() );
 			
-			throw $oRecordException;
 		}
 		
 	}
@@ -308,48 +300,24 @@ class Geko_Entity_Record extends Geko_Delegate
 			
 		} catch ( Zend_Db_Statement_Exception $e ) {
 			
-			$oRecordException = new Geko_Entity_Record_Exception( 'Delete failed!' );
-			$oRecordException
-				->setErrorType( 'db' )
-				->setOrigMessage( $e->getMessage() )
-			;
+			throw $this->newException( 'db', 'Delete failed!', $e->getMessage() );
 			
-			throw $oRecordException;
 		}
 		
 		
-	}
-	
-	
-	
-	
-	//// helpers
-	
-	//
-	protected function formatWhere( $aWhere ) {
-		
-		$aWhereFmt = array();
-		
-		foreach ( $aWhere as $sKey => $mValue ) {
-			$aWhereFmt[ sprintf( '%s = ?', $sKey ) ] = $mValue;
-		}
-		
-		return $aWhereFmt;
 	}
 	
 	//
 	protected function throwValidate( $aValues, $sMode = 'insert' ) {
+		
+		$this->_setOrigValues();
 		
 		if (
 			( is_array( $aErrors = $this->validate( $aValues, $sMode ) ) ) && 
 			( count( $aErrors ) > 0 )
 		) {
 			
-			$oRecordException = new Geko_Entity_Record_Exception( 'Validation failed!' );
-			$oRecordException
-				->setErrorType( 'validation' )
-				->setErrorDetail( $aErrors )
-			;
+			$oRecordException = $this->newException( 'validation', 'Validation failed!', '', $aErrors );
 			
 			$oRecordException = $this->applyPluginFilter(
 				'modifyValidateException',
@@ -370,7 +338,48 @@ class Geko_Entity_Record extends Geko_Delegate
 	}
 	
 	
-	// hook methods, to be implemented by sub-class
+	
+	
+	
+	//// overridable methods for custom behaviour
+	
+	// get raw entity values of subject and format according to table structure
+	// data should now be good for insert/update
+	protected function formatValues( $oTable, $oSubject ) {
+		
+		// get the field keys contained in the entity
+		$aEntityKeys = array_keys( get_object_vars( $oSubject->getRawEntity() ) );
+		
+		// get field values of associated primary database table
+		$aFields = $oTable->getFields( TRUE );
+		
+		$aValues = array();
+		$aOtherValues = array();			// track values that do not belong to the main table
+		
+		foreach ( $aEntityKeys as $sFieldName ) {
+			
+			if ( $oField = $aFields[ $sFieldName ] ) {
+		
+				$aValues[ $sFieldName ] = $oField->getAssertedValue(
+					$oSubject->getEntityPropertyValue( $sFieldName )
+				);
+			
+			} else {
+				
+				$aOtherValues[ $sFieldName ] = $oSubject->getEntityPropertyValue( $sFieldName );
+			}
+			
+		}
+		
+		// return in sequence: $aAllValues, $aValues, $aOtherValues
+		return array( array_merge( $aValues, $aOtherValues ), $aValues, $aOtherValues );
+	}
+		
+	
+	
+	
+	
+	//// hook methods, to be implemented by sub-class
 	
 	//
 	public function validate( $aValues, $sMode = 'insert' ) { }
@@ -395,6 +404,44 @@ class Geko_Entity_Record extends Geko_Delegate
 	}
 	
 	
+	
+	
+	
+	//// helpers
+	
+	//
+	protected function formatWhere( $aWhere ) {
+		
+		$aWhereFmt = array();
+		
+		foreach ( $aWhere as $sKey => $mValue ) {
+			$aWhereFmt[ sprintf( '%s = ?', $sKey ) ] = $mValue;
+		}
+		
+		return $aWhereFmt;
+	}
+	
+	// shortcut for creating new exception
+	protected function newException( $sType, $sMessage, $sOrigMessage = '', $aDetails = NULL ) {
+
+		$oRecordException = new Geko_Entity_Record_Exception( $sMessage );
+		
+		$oRecordException->setErrorType( $sType );
+		
+		if ( $sOrigMessage ) {
+			$oRecordException->setOrigMessage( $sOrigMessage );
+		}
+		
+		// $aDetails is a key/value pair of field keys and corresponding error messages
+		if ( is_array( $aDetails ) ) {
+			$oRecordException->setErrorDetail( $aDetails );
+		}
+		
+		return $oRecordException;
+	}
+	
+	
+	
 	//
 	public function __call( $sMethod, $aArgs ) {
 		
@@ -408,7 +455,9 @@ class Geko_Entity_Record extends Geko_Delegate
 		
 		throw new Exception( sprintf( 'Invalid method %s::%s() called.', $this->_sDelegateClass, $sMethod ) );
 	}
-
+	
+	
+	
 }
 
 

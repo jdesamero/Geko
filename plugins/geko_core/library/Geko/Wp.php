@@ -530,7 +530,8 @@ class Geko_Wp extends Geko
 			'curpage' => strval( $oUrl ),
 			'template_dir' => get_bloginfo( 'template_directory' ),
 			'url' => self::getUrl(),
-			'wp_login' => Geko_Uri::getUrl( 'wp_login' )
+			'wp_login' => Geko_Uri::getUrl( 'wp_login' ),
+			'wp_logout' => wp_logout_url( self::getUrl() )
 			
 		);
 		

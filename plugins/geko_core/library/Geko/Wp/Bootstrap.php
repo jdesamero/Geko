@@ -505,6 +505,8 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 			
 			$oUser = $this->newUser( $user_ID );
 			
+			// ensure user has been activated, ie: geko_activation_key is not set
+			
 			if ( $oUser->getIsActivated() ) {
 				
 				$this->set( 'user', $oUser );

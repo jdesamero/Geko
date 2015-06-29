@@ -9,16 +9,15 @@ class Geko_Wp_User extends Geko_Wp_Entity
 	//
 	public static function getLoggedIn( $aData = array(), $aQueryParams = NULL ) {
 		
-		global $current_user;
-		get_currentuserinfo();
+		global $user_ID;
 		
 		$sClass = get_called_class();
 		
 		if ( $current_user ) {
 			if ( is_array( $aQueryParams ) ) {
-				return new $sClass( $current_user->ID, NULL, $aData, $aQueryParams );
+				return new $sClass( $user_ID, NULL, $aData, $aQueryParams );
 			} else {
-				return new $sClass( $current_user );
+				return new $sClass( $user_ID );
 			}
 		} else {
 			return NULL;
@@ -40,10 +39,8 @@ class Geko_Wp_User extends Geko_Wp_Entity
 		parent::init();
 		
 		$this
-			->setEntityMapping( 'id', 'ID' )
-			->setEntityMapping( 'title', 'display_name' )
-			->setEntityMapping( 'slug', 'user_nicename' )
-			->setEntityMapping( 'date_created', 'user_registered' )
+			->addDelegate( 'Geko_Wp_User_Record' )
+			->setEntityMapping( 'Geko_Wp_User_EntityMap' )
 		;
 		
 		return $this;
@@ -148,17 +145,11 @@ class Geko_Wp_User extends Geko_Wp_Entity
 			return $oEntity;
 		}
 		
-		global $current_user;
 		
-		get_currentuserinfo();
+		global $user_ID;
 		
-		if ( $current_user && $current_user->ID ) {
-			if ( is_array( $this->_aQueryParams ) ) {
-				return $current_user->ID;
-			} else {
-				return $current_user;			
-			}
-		}
+		if ( $user_ID ) return $user_ID;
+		
 		
 		return NULL;
 		

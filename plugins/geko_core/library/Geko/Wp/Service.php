@@ -142,7 +142,7 @@ class Geko_Wp_Service extends Geko_Service
 		// raw database fields
 		$aRawDbFields = array( 'user_login' );
 		
-		// standard wp_users tables
+		// keys used in wp_insert_user() or wp_update_user()
 		$aUserFields = array(
 			'user_pass', 'user_nicename', 'user_url', 'user_email', 'display_name', 'nickname',
 			'first_name', 'last_name', 'description', 'rich_editing', 'user_registered', 'role',

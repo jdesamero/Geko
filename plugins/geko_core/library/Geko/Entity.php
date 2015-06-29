@@ -40,6 +40,8 @@ abstract class Geko_Entity implements Geko_Json_Encodable
 		'parent_entity_id' => 'parent_entity_id'
 	);
 	
+	protected $_aEntityMaps = array();
+	
 	protected $_sFileBaseDir = '';
 	protected $_aFileSubdirMap = array();
 	
@@ -52,7 +54,8 @@ abstract class Geko_Entity implements Geko_Json_Encodable
 	
 	//// construction
 	
-	//
+	// if $mEntity === FALSE, then it would force creation of blank entity
+	// $mEntity === NULL, may be blank, but it may load default parameters as well
 	public function __construct( $mEntity = NULL, $oQuery = NULL, $aData = array(), $aQueryParams = NULL ) {
 		
 		// $aQueryParams is used with getEntityFromId or getEntityFromSlug
@@ -101,6 +104,8 @@ abstract class Geko_Entity implements Geko_Json_Encodable
 		
 		$this->init();
 		
+		
+		// $mEntity is NULL, get the default entity
 		if ( is_null( $mEntity ) ) {
 			$mEntity = $this->getDefaultEntityValue();
 		}
@@ -120,6 +125,11 @@ abstract class Geko_Entity implements Geko_Json_Encodable
 	
 	// hook to "format" entity, in case object was not given
 	public function formatEntity( $mEntity ) {
+		
+		// force the creation of a "blank" entity
+		if ( FALSE === $mEntity ) {
+			return NULL;
+		}
 		
 		if ( is_scalar( $mEntity ) ) {
 			if ( $mEntityId = $this->assertEntityId( $mEntity ) ) {
@@ -318,25 +328,54 @@ abstract class Geko_Entity implements Geko_Json_Encodable
 	//
 	public function setEntityMapping( $sIndex, $sProperty ) {
 		
-		// multi-key support
-		$mProperty = ( FALSE !== strpos( $sProperty, ':' ) ) ?
-			 explode( ':', $sProperty ) : $sProperty
-		;
+		$aArgs = func_get_args();
 		
-		$this->_aEntityPropertyNames[ $sIndex ] = $mProperty;
+		if ( 1 == count( $aArgs ) ) {
+			
+			$mEntityMapClass = $aArgs[ 0 ];
+			
+			if ( is_string( $mEntityMapClass ) ) {
+				$this->_aEntityMaps[] = Geko_Singleton_Abstract::getInstance( $mEntityMapClass );
+			} elseif ( is_object( $mEntityMapClass ) ) {
+				$this->_aEntityMaps[] = $mEntityMapClass;
+			}
+			
+		} else {
+			
+			list( $sIndex, $sProperty ) = $aArgs;
+			
+			// multi-key support
+			$mProperty = ( FALSE !== strpos( $sProperty, ':' ) ) ?
+				 explode( ':', $sProperty ) : $sProperty
+			;
+			
+			$this->_aEntityPropertyNames[ $sIndex ] = $mProperty;
+			
+		}
+		
 		return $this;
 	}
 	
 	//
 	public function getEntityMapping( $sIndex ) {
-		return $this->_aEntityPropertyNames[ $sIndex ];
+		
+		// iterate map objects
+		foreach ( $this->_aEntityMaps as $oMap ) {
+			if ( $mProp = $oMap->getKeyMapping( $sIndex ) ) {
+				return $mProp;
+			}
+		}
+		
+		// get local mapping, if any
+		$mProperty = $this->_aEntityPropertyNames[ $sIndex ];
+		
+		return ( $mProperty ) ? $mProperty : $sIndex ;
 	}
 	
 	//
 	public function getEntityPropertyValue( $sIndex ) {
 		
 		$mProperty = $this->getEntityMapping( $sIndex );
-		if ( !$mProperty ) $mProperty = $sIndex;
 		
 		
 		//// get results
@@ -373,9 +412,9 @@ abstract class Geko_Entity implements Geko_Json_Encodable
 	
 	//
 	public function hasEntityProperty( $sIndex ) {
-
+		
 		$mProperty = $this->getEntityMapping( $sIndex );
-		if ( !$mProperty ) $mProperty = $sIndex;
+		
 		
 		// muti-key support
 		if ( is_array( $mProperty ) ) {
@@ -441,6 +480,15 @@ abstract class Geko_Entity implements Geko_Json_Encodable
 	public function getRawEntity() {
 		return $this->_oEntity;
 	}
+	
+	//
+	public function setRawEntity( $oEntity ) {
+		
+		$this->_oEntity = $oEntity;
+		
+		return $this;
+	}
+	
 	
 	//
 	public function isValid() {

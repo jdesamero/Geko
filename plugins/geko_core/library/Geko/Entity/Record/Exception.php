@@ -79,4 +79,13 @@ class Geko_Entity_Record_Exception extends Exception
 	}
 	
 	
+	//
+	public function getOrigMessage() {
+		
+		return $this->_sOrigMessage;
+	}
+	
+	
 }
+
+

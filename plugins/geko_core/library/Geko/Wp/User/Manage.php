@@ -63,6 +63,45 @@ class Geko_Wp_User_Manage extends Geko_Wp_Options_Manage
 	}
 	
 	
+	//// init
+	
+	//
+	public function add() {
+		
+		parent::add();
+		
+		$oSqlTable = new Geko_Sql_Table();
+		$oSqlTable
+			->create( '##pfx##users', 'u' )
+			->fieldBigInt( 'ID', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
+			->fieldVarChar( 'user_login', array( 'size' => 60 ) )
+			->fieldVarChar( 'user_pass', array( 'size' => 64 ) )
+			->fieldVarChar( 'user_nicename', array( 'size' => 50 ) )
+			->fieldVarChar( 'user_email', array( 'size' => 100 ) )
+			->fieldVarChar( 'user_url', array( 'size' => 100 ) )
+			->fieldDateTime( 'user_registered' )
+			->fieldVarChar( 'user_activation_key', array( 'size' => 60 ) )
+			->fieldInt( 'user_status' )
+			->fieldVarChar( 'display_name', array( 'size' => 250 ) )
+		;
+		
+		$this->addTable( $oSqlTable );
+		
+		return $this;
+		
+	}
+	
+	
+	// create table
+	public function install() {
+		
+		parent::install();
+		
+		$this->createTableOnce();
+		
+		return $this;
+	}
+	
 	
 	//
 	public function addAdmin() {

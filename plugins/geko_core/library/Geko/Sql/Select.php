@@ -366,6 +366,16 @@ class Geko_Sql_Select
 	// kvp methods
 	
 	//
+	public function fieldKvpArray( $aValues ) {
+		
+		foreach ( $aValues as $sKey => $mValue ) {
+			$this->fieldKvp( $mValue, $sKey );
+		}
+		
+		return $this;
+	}
+	
+	//
 	public function fieldKvp( $mValue, $sKey = NULL ) {
 		
 		return $this

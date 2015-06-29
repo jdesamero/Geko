@@ -4,6 +4,10 @@
 class Geko_Wp_User_Query extends Geko_Wp_Entity_Query
 {
 	
+	protected $_bUseManageQuery = TRUE;
+	
+	
+	
 	// implement by sub-class to process $aParams
 	public function modifyParams( $aParams ) {
 		
@@ -38,25 +42,15 @@ class Geko_Wp_User_Query extends Geko_Wp_Entity_Query
 		
 		$oQuery
 			
-			// primary
+			// primary table now handled by Geko_Wp_User_Manage
 			
-			->field( 'u.ID' )
-			->field( 'u.user_login' )
-			->field( 'u.user_pass' )
-			->field( 'u.user_nicename' )
-			->field( 'u.user_email' )
-			->field( 'u.user_url' )
-			->field( 'u.user_registered' )
-			->field( 'u.user_activation_key' )
-			->field( 'u.user_status' )
-			->field( 'u.display_name' )
-			->from( '##pfx##users', 'u' )
 			
 			// secondary
 			
 			->field( 'CAST( r.meta_value AS UNSIGNED )', 'role_id' )
 			->field( 'gr.title', 'role_title' )
 			->field( 'gr.slug', 'role_slug' )
+			->field( 'gr.slug', 'role' )						// synonymous with "role_slug"
 			
 			->joinLeft( '##pfx##usermeta', 'r' )
 				->on( 'r.user_id = u.ID' )

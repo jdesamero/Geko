@@ -6,6 +6,9 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	
 	protected $_sTypeName = 'User role';	
 	
+	protected $_aRoleHash = NULL;
+	
+	
 	
 	//
 	public function getRoleAssignedCountUrl( Geko_Wp_Role $oRole ) {
@@ -474,18 +477,29 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	//// helpers
 	
 	//
-	protected function getRoleHash() {
+	public function getRoleHash() {
 		
-		// create a role hash
-		$aRoles = new Geko_Wp_Role_Query( array( 'role_type' => $this->getName() ) );
-		$aRoleHash = array();
-		
-		foreach ( $aRoles as $oRole ) {
-			$aRoleHash[ $oRole->getSlug() ] = $oRole->getId();
+		if ( NULL === $this->_aRoleHash ) {
+			
+			// create a role hash
+			$aRoles = new Geko_Wp_Role_Query( array( 'role_type' => $this->getName() ) );
+			$aRoleHash = array();
+			
+			foreach ( $aRoles as $oRole ) {
+				$aRoleHash[ $oRole->getSlug() ] = $oRole->getId();
+			}
+			
+			$this->_aRoleHash = $aRoleHash;
 		}
 		
-		return $aRoleHash;
+		return $this->_aRoleHash;
 	}
+	
+	//
+	public function hasRoleSlug( $sRoleSlug ) {
+		return array_key_exists( $sRoleSlug, $this->getRoleHash() );
+	}
+	
 	
 	//
 	public static function getRoleIdFromMetaArray( $aMeta, $aRoleHash ) {
@@ -532,13 +546,16 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 		sort( $aCapsTemp );
 		
 		foreach ( $aCapsTemp as $sCap ) {
+			
 			$aCap = array(
 				'key' => $sCap,
-				'label' => ucwords( str_replace( array('_','-') , ' ', $sCap) )
+				'label' => ucwords( str_replace( array( '_','-' ) , ' ', $sCap) )
 			);
+			
 			if ( isset( $aOtherCaps[ $sCap ] ) ) {
 				$aCap[ 'other' ] = 1;
 			}
+			
 			$aCaps[] = $aCap;
 		}
 		
