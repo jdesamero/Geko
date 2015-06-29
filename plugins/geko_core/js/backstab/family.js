@@ -273,6 +273,9 @@
 					if ( ivPrms.postInit ) {
 						ivPrms.postInit.call( this, options2 );
 					}
+					
+					this.$el.data( 'backbone-model', this.model );
+					
 				},
 				
 				// hook method

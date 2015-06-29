@@ -270,6 +270,32 @@
 			
 			// return all the new models
 			return aNewModels;
+		},
+		
+		
+		
+		// locate the given model in a collection and do stuff accordingly
+		// usage:
+		// 		fMatchCb( collection, model ), "this" context is model
+		// 		fNoMatchCb( collection, model ), "this" context is model
+		
+		handleMatch: function( oToMatch, fMatchCb, fNoMatchCb ) {
+			
+			var _this = this;
+			var bMatched = false;
+			
+			this.each( function( oModel ) {
+				
+				if ( oModel === oToMatch ) {
+					fMatchCb.call( oModel, _this, oModel );
+					bMatched = true;			// indicates there was a match
+				} else {
+					fNoMatchCb.call( oModel, _this, oModel );
+				}
+				
+			} );
+			
+			this.trigger( 'afterMatch', oToMatch, bMatched );
 		}
 		
 		
