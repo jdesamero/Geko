@@ -101,14 +101,30 @@ class Geko_Wp_Post_Meta extends Geko_Wp_Options_Meta
 	
 	//
 	public function getCurPost() {
+		
 		$iPostId = $this->resolvePostId();
+		
 		if ( !$this->_oCurPost && $iPostId ) {
 			$this->_oCurPost = $this->newPost( $iPostId );
 		}
+		
 		return $this->_oCurPost;
 	}
 	
-	
+	//
+	public function getPostType() {
+		
+		if ( $oPost = $this->getCurPost() ) {
+			return $oPost->getPostType();
+		}
+		
+		if ( $sPostType = $_GET[ 'post_type' ] ) {
+			return $sPostType;
+		}
+		
+		// default
+		return 'post';
+	}
 	
 	
 	

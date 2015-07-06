@@ -513,6 +513,8 @@ class Geko_Wp extends Geko
 		
 		$oUrl = Geko_Uri::getGlobal();
 		
+		$sPluginDir = sprintf( '%s/wp-content/plugins', self::getUrl() );
+		
 		$aRet = array(
 			
 			'export' => Geko_Uri::getUrl( 'geko_export' ),
@@ -529,6 +531,8 @@ class Geko_Wp extends Geko
 			
 			'curpage' => strval( $oUrl ),
 			'template_dir' => get_bloginfo( 'template_directory' ),
+			'plugin_dir' => $sPluginDir,
+			'geko_core_plugin_dir' => sprintf( '%s/geko_core', $sPluginDir ),
 			'url' => self::getUrl(),
 			'wp_login' => Geko_Uri::getUrl( 'wp_login' ),
 			'wp_logout' => wp_logout_url( self::getUrl() )

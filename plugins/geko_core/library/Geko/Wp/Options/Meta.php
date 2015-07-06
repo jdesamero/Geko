@@ -428,6 +428,17 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 	
 	
 	
+	//
+	public function echoImagePickerItems( $aImages ) {
+		$aThumbParams = array( 'w' => 75, 'h' => 75 );
+		foreach ( $aImages as $oAtt ): ?>
+			<a href="<?php $oAtt->echoUrl(); ?>" title="<?php $oAtt->escechoTitle(); ?>" id="<?php $oAtt->echoId(); ?>">
+				<img src="<?php $oAtt->echoTheImageUrl( $aThumbParams ); ?>" width="75" height="75" />
+			</a><?php
+		endforeach;
+	}
+	
+	
 	
 	////
 	
