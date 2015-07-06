@@ -142,8 +142,10 @@
 				}
 				
 				return oFamily;
-			}
+			},
 			
+			getTmplElem: getTmplElem,
+			localDispatcher: oLocalDispatcher
 			
 		};
 		

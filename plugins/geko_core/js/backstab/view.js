@@ -400,7 +400,27 @@
 			// ---------------------------------------------------------------------------------
 			
 			oModel.set( this.getModelDataFromElem( oFields, eElem, oParams ) );
+		},
+		
+		
+		// update the sort order of models base on the given:
+		// sSel: list element selector, sFldKey: sort field key
+		updateModelSortOrder: function( sSel, sFldKey ) {
+			
+			// set sort order of collection based on order of table rows
+			this.$( sSel ).each( function( i ) {
+					
+				var eItem = $( this );
+				var oModel = eItem.data( 'backbone-model' );
+				
+				if ( oModel ) {
+					oModel.set( sFldKey, i + 1 );
+				}
+				
+			} );
+			
 		}
+		
 		
 	} ) );
 	
@@ -417,7 +437,7 @@
 		//// properties
 		
 		_props: null,
-		_maxLevels: 3,					// maximum number of descendant levels to traverse
+		_maxLevels: 5,					// maximum number of descendant levels to traverse
 		_backboneExtend: null,			// reference to the orginal Backbone.View.extend() method
 				
 		

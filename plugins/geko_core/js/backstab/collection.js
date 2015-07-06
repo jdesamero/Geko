@@ -106,6 +106,85 @@
 			return this;
 		},
 		
+		
+		
+		// create a "parted" collection from scratch (ie: create segments)
+		// not to be confused with createPart() which does something else
+		createParted: function( sNoun, oParams ) {
+			
+			var _this = this;
+			
+			var oParted = new Backstab.Collection();
+			
+			var sSetMethod = 'set%sPart'.printf( sNoun );
+			var sGetMethod = 'get%sPart'.printf( sNoun );
+			var sDestroyMethod = 'destroy%sPart'.printf( sNoun );
+			
+			var sPartedCollectionKey = '__parted_collection';
+			
+			var oMethods = {};
+			
+			
+			var fCreatePassParams = function( ag ) {
+
+				var oPassParams = {};
+				var i = 0;
+				
+				$.each( oParams, function( k, v ) {
+					
+					var val = v;
+					if ( i < ag.length ) {
+						val = ag[ i ];
+					}
+					
+					oPassParams[ k ] = val;
+					
+					i++;
+				} );
+				
+				return oPassParams;
+			};
+			
+			
+			// set method
+			oMethods[ sSetMethod ] = function() {
+				
+				
+				return _this.createPart( sPartedCollectionKey, this, fCreatePassParams( arguments ) );
+			};
+			
+			// get method
+			oMethods[ sGetMethod ] = function() {
+				
+				return this.findAndGet( sPartedCollectionKey, fCreatePassParams( arguments ) );
+			};
+			
+			
+			// destroy method
+			oMethods[ sDestroyMethod ] = function() {
+				
+				var oPartModel = this.findAndGet( sPartedCollectionKey, fCreatePassParams( arguments ), true );
+				
+				if ( oPartModel ) {
+					
+					var oPartCollection = oPartModel.get( sPartedCollectionKey );
+					if ( oPartCollection ) {
+						oPartCollection.destroyEach();
+					}
+					
+					oPartModel.destroy();
+				}
+				
+			};
+			
+			
+			$.extend( oParted, oMethods );
+			
+			return oParted;
+		},
+		
+		
+		// creates an entry in the "parted" collection
 		createPart: function( sKey, oPartedCollection, oFindParams ) {
 			
 			var oPart = new this.constructor( this.where( oFindParams ) );
@@ -119,10 +198,44 @@
 			return oPart;
 		},
 		
-		findAndGet: function( sGetKey, oFindParams ) {
-			return this.findWhere( oFindParams ).get( sGetKey );
+		// sGetKey is the collection key
+		findAndGet: function( sGetKey, oFindParams, bReturnModel ) {
+			
+			var oModel = this.findWhere( oFindParams );
+			
+			if ( bReturnModel ) {
+				// no need for sGetKey, return found oModel for possible deletion
+				return oModel;
+			}
+			
+			// return the parted collection
+			return oModel.get( sGetKey );
 		},
 		
+		
+		
+		// get the max value based on the given key
+		maxVal: function( sKey, mDefVal ) {
+			
+			var oMaxModel = null;
+			
+			if ( this.length > 0 ) {
+				
+				var oMaxModel = this.max( function( model ) {
+					return model.get( sKey );
+				} );
+			
+			}
+			
+			if ( oMaxModel ) {
+				return oMaxModel.get( sKey );
+			}
+			
+			return mDefVal;
+		},
+		
+		
+		//
 		addIfUniqueValues: function( oModel ) {
 			
 			var _this = this;
