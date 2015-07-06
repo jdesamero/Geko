@@ -427,7 +427,27 @@
 		}
 		
 		return false;
-	}
+	};
+	
+	
+	// attempt to set val() of element to JSON string if mValue supports it
+	$.fn.jsonVal = function( mValue ) {
+		
+		return this.each( function() {
+			
+			var eElem = $( this );
+			var mSetVal;
+			
+			if ( JSON && JSON.stringify && mValue.toJSON ) {
+				mSetVal = JSON.stringify( mValue.toJSON() );
+			} else {
+				mSetVal = mValue;
+			}
+			
+			eElem.val( mSetVal );
+			
+		} );
+	};
 	
 	
 	//// math functions

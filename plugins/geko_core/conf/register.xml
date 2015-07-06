@@ -26,6 +26,7 @@
 		<file id="geko-swipe" src="##geko_core_uri##/external/js/swipe.js" />
 		<file id="geko-sylvester" src="##geko_core_uri##/external/js/sylvester.js" />
 		<file id="geko-underscore" src="##geko_core_uri##/external/js/underscore-1.7.0.min.js" dependencies="jquery" />
+		<file id="geko-imagesloaded" src="##geko_core_uri##/external/js/imagesloaded.pkgd.min.js" dependencies="jquery" />
 		
 		
 		
@@ -177,7 +178,7 @@
 			<file id="geko-jquery-ui-menu" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.menu.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget" jquery-ui-version="1.9.2" />
 			<file id="geko-jquery-ui-progressbar" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.progressbar.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget" jquery-ui-version="1.9.2" />
 			<file id="geko-jquery-ui-slider" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.slider.js" dependencies="geko-jquery-ui-mouse" jquery-ui-version="1.9.2" />
-			<file id="geko-jquery-ui-spinner" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.spinner.js" dependencies="geko-jquery-ui-core" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-ui-spinner" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.spinner.js" dependencies="geko-jquery-ui-button" jquery-ui-version="1.9.2" />
 			<file id="geko-jquery-ui-tabs" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.tabs.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget" jquery-ui-version="1.9.2" />
 			<file id="geko-jquery-ui-tooltip" src="##geko_core_uri##/external/js/ui-1.9.2/jquery.ui.tooltip.js" dependencies="geko-jquery-ui-core geko-jquery-ui-widget geko-jquery-ui-position geko-jquery-fx-core" jquery-ui-version="1.9.2" />
 			

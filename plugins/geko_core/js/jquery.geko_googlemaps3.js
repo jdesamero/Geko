@@ -391,7 +391,47 @@
 								
 			}
 			
-		}
+		};
+		
+		
+		// resposition the map
+		this.geoCode = function( options ) {
+			
+			// possibly more than one, or none
+			oGeocoder.geocode(
+				
+				{ address: options.address },
+				
+				function( results, status ) {
+					
+					if ( results && ( results.length > 0 ) ) {
+						
+						var oRes = results[ 0 ];
+						
+						var oGeo = oRes.geometry;
+						
+						var oLoc = oGeo.location;
+						var oViewport = oGeo.viewport;
+						var oBounds = oGeo.bounds;
+						
+						gMap.setCenter( new GmLatLng( oLoc.lat(), oLoc.lng() ) );
+						
+						gMap.fitBounds( oBounds );
+						
+						if ( opts.geoCodeZoomAdjustment ) {
+							gMap.setZoom( gMap.getZoom() + opts.geoCodeZoomAdjustment );
+						}
+						
+						// console.log( oGeo );
+						// console.log( [ oLoc.lat(), oLoc.lng() ] );
+						// console.log( status );
+					}
+					
+				}
+			
+			);
+			
+		};
 		
 		
 		//// do stuff
@@ -424,13 +464,24 @@
 	
 	$.fn.gekoGooglemaps3 = function( options ) {
 		
-		// Fill default values where not set by instantiation code
-		var opts = $.extend( {}, GekoGMap3.defaults, options );
+		if ( 'string' === $.type( options ) ) {
+			
+			// return reference to GekoGMap3 instance
+			if ( 'gmap' === options ) {
+				return $( this ).data( 'geko-jquery-gmap3' );
+			}
+			
+		} else {
 		
-		//$.fn.googleMaps.includeGoogle( opts.key, opts.sensor );
-		return this.each( function() {
-			$( this ).data( 'geko-jquery-gmap3', new GekoGMap3( this, opts ) );
-		} );
+			// Fill default values where not set by instantiation code
+			var opts = $.extend( {}, GekoGMap3.defaults, options );
+			
+			// $.fn.googleMaps.includeGoogle( opts.key, opts.sensor );
+			return this.each( function() {
+				$( this ).data( 'geko-jquery-gmap3', new GekoGMap3( this, opts ) );
+			} );
+		
+		}
 		
 	};
 
