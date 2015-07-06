@@ -12,6 +12,9 @@
 		
 		<file id="gloc" src="##__bloginfo_stylesheet_directory##/style.css" />
 		
+		<file id="gloc-post_meta" src="##__bloginfo_stylesheet_directory##/styles/gloc_post_meta.css" />
+		<file id="gloc-page_meta" src="##__bloginfo_stylesheet_directory##/styles/gloc_page_meta.css" />
+		
 		<file id="gloc-gallery" src="##__bloginfo_stylesheet_directory##/styles/gallery.css" dependencies="gloc" />
 		<file id="gloc-pagination" src="##__bloginfo_stylesheet_directory##/styles/pagination.css" dependencies="gloc" />
 		

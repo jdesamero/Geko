@@ -9,7 +9,10 @@ class Gloc_Page_Meta extends Geko_Wp_Page_Meta
 		
 		parent::addAdmin();
 		
-		wp_enqueue_script( 'geko-jquery-geko_image_picker' );
+		if ( 'page' == $this->getPostType() ) {
+			wp_enqueue_style( 'gloc-page_meta' );
+			wp_enqueue_script( 'geko-jquery-geko_image_picker' );
+		}
 		
 		return $this;
 	}
@@ -26,66 +29,7 @@ class Gloc_Page_Meta extends Geko_Wp_Page_Meta
 		}
 		
 		?>
-		<style type="text/css">
-			
-			.fix {
-				clear: both;
-				height: 1px;
-				margin: 0 0 -1px 0;
-				overflow: hidden;
-			}
-			
-			#gloc_page_meta table.fields {
-				width: 100%;
-			}
-			
-			#gloc_page_meta table.fields input[type=text] {
-				width: 95%;
-			}
-
-			#gloc_page_meta table.fields input[type=text].short {
-				width: 30%;
-			}
-			
-			#gloc_page_meta table.fields textarea {
-				width: 95%;
-				height: 150px;
-			}
-			
-			#gloc_page_meta table.fields textarea.short {
-				width: 95%;
-				height: 30px;
-			}
-			
-			/* ---------------------------------------------------------------------------------- */
-			
-			#gloc_page_meta .image_picker {
-				border: solid 1px #dfdfdf;		
-				padding: 5px;
-				width: 346px;
-				height: 163px;
-				overflow: auto;
-				-moz-border-radius: 5px;
-				border-radius: 5px;
-			}
-
-			#gloc_page_meta .image_picker img {
-				border: solid 2px #dfdfdf;
-			}
-			
-			#gloc_page_meta .image_picker img.ip_not_selected {
-				border: solid 2px #fff;		
-			}
-			
-			#gloc_page_meta .image_picker img.ip_selected {
-				border: solid 2px red;
-			}
-			
-			#gloc_page_meta .selmulti {
-				height: 100px;
-			}
-			
-		</style>
+		<!-- styles are now located in <theme folder>/styles/gloc_page_meta.css -->
 		<script type="text/javascript">
 				
 			jQuery( document ).ready( function( $ ) {
