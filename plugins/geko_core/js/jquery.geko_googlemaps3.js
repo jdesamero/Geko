@@ -434,6 +434,12 @@
 		};
 		
 		
+		// get marker by id
+		this.getMarker = function( id ) {
+			return this.markers[ this.markerHash[ id ] ];
+		}
+		
+		
 		//// do stuff
 		
 		if ( opts.markers ) {

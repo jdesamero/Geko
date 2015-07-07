@@ -62,6 +62,7 @@ class Geko_Google_Map_Query_V2 extends Geko_Google_Map_Query
 				
 				$aDetRow = array(
 					'address' => $aLocInfo[ 'formatted_address' ],
+					'place_id' => $aLocInfo[ 'place_id' ],
 					'lat' => $aCenCoords[ 'lat' ],
 					'lng' => $aCenCoords[ 'lng' ],
 					'ne_lat' => $aNeCoords[ 'lat' ],
@@ -89,12 +90,14 @@ class Geko_Google_Map_Query_V2 extends Geko_Google_Map_Query
 				
 				$aDetRow[ 'type' ] = implode( ', ', $aTypes );
 				
+				// pass address components back
+				$aDetRow[ 'address_components' ] = $aComps;
+				
 				$aDetails[] = $aDetRow;
 			}
 			
 			$aResFmt[ 'details' ] = $aDetails;
 		}
-		
 		
 		return $aResFmt;
 	}
