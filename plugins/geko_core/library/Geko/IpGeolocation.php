@@ -12,10 +12,7 @@ class Geko_IpGeolocation extends Geko_Http
 	//
 	public function __construct( $aParams = array() ) {
 		
-		if (
-			( NULL === $this->_sApiKey ) && 
-			( $sApiKey = $aParams[ 'api_key' ] )
-		) {
+		if ( $sApiKey = $aParams[ 'api_key' ] ) {
 			$this->_sApiKey = $sApiKey;
 		}
 		

@@ -380,6 +380,22 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 	}
 	
 	
+	// know your money!
+	// independent
+	public function compCurrency( $aArgs ) {
+		
+		$oCurrency = Geko_Currency_Xml::getInstance();
+		
+		if ( defined( 'GEKO_CURRENCY_XML' ) ) {
+			$oCurrency->setFile( GEKO_CURRENCY_XML );
+		}
+		
+		$this->set( 'currency', $oCurrency );
+	}
+	
+	
+	
+	
 	// logger/debugger
 	// independent
 	public function compLogger( $aArgs ) {

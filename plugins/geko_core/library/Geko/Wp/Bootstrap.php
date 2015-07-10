@@ -36,6 +36,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 				
 				'path' => TRUE,
 				'geo' => TRUE,
+				'currency' => TRUE,
 				'load_ext' => TRUE,
 				'db' => TRUE,
 				'consts' => TRUE,

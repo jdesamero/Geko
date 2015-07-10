@@ -123,13 +123,19 @@ class Geko_CachedLookup
 		
 		$aArgs = func_get_args();
 		
+		// normalize the given arguments
 		$aArgs = $this->getNormalized( $aArgs );
 		
+		// create a single hash value representing the query/lookup
 		$mHash = call_user_func_array( array( $this, 'getHash' ), $aArgs );
 		
+		// see if a cached value can be retrieved
 		$mRes = $this->getCached( $mHash, $aArgs );
 		
+		
 		if ( !$mRes ) {
+			
+			// no cached value was found
 			
 			$oOrig = $this->_oOrig;
 			

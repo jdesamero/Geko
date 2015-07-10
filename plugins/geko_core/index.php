@@ -24,6 +24,7 @@ define( 'GEKO_CORE_URI', $sPluginUrl );
 define( 'GEKO_CORE_EXTERNAL_LIB_ROOT', realpath( sprintf( '%s/external/libs', GEKO_CORE_ROOT ) ) );
 define( 'GEKO_LOG', realpath( sprintf( '%s/wp-content/logs/logs.txt', ABSPATH ) ) );
 define( 'GEKO_REGISTER_XML', realpath( sprintf( '%s/conf/register.xml', GEKO_CORE_ROOT ) ) );
+define( 'GEKO_CURRENCY_XML', realpath( sprintf( '%s/conf/currency.xml', GEKO_CORE_ROOT ) ) );
 define( 'GEKO_GEOGRAPHY_XML', realpath( sprintf( '%s/conf/geography.xml', GEKO_CORE_ROOT ) ) );
 define( 'GEKO_VIEW_HELPER_PATH', realpath( sprintf( '%s/library', GEKO_CORE_ROOT ) ) );
 

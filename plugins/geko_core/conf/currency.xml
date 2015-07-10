@@ -1,0 +1,117 @@
+<?xml version="1.0" ?>
+<data>
+	<currencies>
+		<currency title="Albania Lek" code="ALL" symbol="76, 101, 107" />
+		<currency title="Afghanistan Afghani" code="AFN" symbol="1547" />
+		<currency title="Argentina Peso" code="ARS" symbol="36" />
+		<currency title="Aruba Guilder" code="AWG" symbol="402" />
+		<currency title="Australia Dollar" code="AUD" symbol="36" />
+		<currency title="Azerbaijan New Manat" code="AZN" symbol="1084, 1072, 1085" />
+		<currency title="Bahamas Dollar" code="BSD" symbol="36" />
+		<currency title="Barbados Dollar" code="BBD" symbol="36" />
+		<currency title="Belarus Ruble" code="BYR" symbol="112, 46" />
+		<currency title="Belize Dollar" code="BZD" symbol="66, 90, 36" />
+		<currency title="Bermuda Dollar" code="BMD" symbol="36" />
+		<currency title="Bolivia Boliviano" code="BOB" symbol="36, 98" />
+		<currency title="Bosnia and Herzegovina Convertible Marka" code="BAM" symbol="75, 77" />
+		<currency title="Botswana Pula" code="BWP" symbol="80" />
+		<currency title="Bulgaria Lev" code="BGN" symbol="1083, 1074" />
+		<currency title="Brazil Real" code="BRL" symbol="82, 36" />
+		<currency title="Brunei Darussalam Dollar" code="BND" symbol="36" />
+		<currency title="Cambodia Riel" code="KHR" symbol="6107" />
+		<currency title="Canada Dollar" code="CAD" symbol="36" />
+		<currency title="Cayman Islands Dollar" code="KYD" symbol="36" />
+		<currency title="Chile Peso" code="CLP" symbol="36" />
+		<currency title="China Yuan Renminbi" code="CNY" symbol="165" />
+		<currency title="Colombia Peso" code="COP" symbol="36" />
+		<currency title="Costa Rica Colon" code="CRC" symbol="8353" />
+		<currency title="Croatia Kuna" code="HRK" symbol="107, 110" />
+		<currency title="Cuba Peso" code="CUP" symbol="8369" />
+		<currency title="Czech Republic Koruna" code="CZK" symbol="75, 269" />
+		<currency title="Denmark Krone" code="DKK" symbol="107, 114" />
+		<currency title="Dominican Republic Peso" code="DOP" symbol="82, 68, 36" />
+		<currency title="East Caribbean Dollar" code="XCD" symbol="36" />
+		<currency title="Egypt Pound" code="EGP" symbol="163" />
+		<currency title="El Salvador Colon" code="SVC" symbol="36" />
+		<currency title="Estonia Kroon" code="EEK" symbol="107, 114" />
+		<currency title="Euro Member Countries" code="EUR" symbol="8364" />
+		<currency title="Falkland Islands (Malvinas) Pound" code="FKP" symbol="163" />
+		<currency title="Fiji Dollar" code="FJD" symbol="36" />
+		<currency title="Ghana Cedi" code="GHC" symbol="162" />
+		<currency title="Gibraltar Pound" code="GIP" symbol="163" />
+		<currency title="Guatemala Quetzal" code="GTQ" symbol="81" />
+		<currency title="Guernsey Pound" code="GGP" symbol="163" />
+		<currency title="Guyana Dollar" code="GYD" symbol="36" />
+		<currency title="Honduras Lempira" code="HNL" symbol="76" />
+		<currency title="Hong Kong Dollar" code="HKD" symbol="36" />
+		<currency title="Hungary Forint" code="HUF" symbol="70, 116" />
+		<currency title="Iceland Krona" code="ISK" symbol="107, 114" />
+		<currency title="India Rupee" code="INR" symbol="8377" />
+		<currency title="Indonesia Rupiah" code="IDR" symbol="82, 112" />
+		<currency title="Iran Rial" code="IRR" symbol="65020" />
+		<currency title="Isle of Man Pound" code="IMP" symbol="163" />
+		<currency title="Israel Shekel" code="ILS" symbol="8362" />
+		<currency title="Jamaica Dollar" code="JMD" symbol="74, 36" />
+		<currency title="Japan Yen" code="JPY" symbol="165" />
+		<currency title="Jersey Pound" code="JEP" symbol="163" />
+		<currency title="Kazakhstan Tenge" code="KZT" symbol="1083, 1074" />
+		<currency title="Korea (North) Won" code="KPW" symbol="8361" />
+		<currency title="Korea (South) Won" code="KRW" symbol="8361" />
+		<currency title="Kyrgyzstan Som" code="KGS" symbol="1083, 1074" />
+		<currency title="Laos Kip" code="LAK" symbol="8365" />
+		<currency title="Latvia Lat" code="LVL" symbol="76, 115" />
+		<currency title="Lebanon Pound" code="LBP" symbol="163" />
+		<currency title="Liberia Dollar" code="LRD" symbol="36" />
+		<currency title="Lithuania Litas" code="LTL" symbol="76, 116" />
+		<currency title="Macedonia Denar" code="MKD" symbol="1076, 1077, 1085" />
+		<currency title="Malaysia Ringgit" code="MYR" symbol="82, 77" />
+		<currency title="Mauritius Rupee" code="MUR" symbol="8360" />
+		<currency title="Mexico Peso" code="MXN" symbol="36" />
+		<currency title="Mongolia Tughrik" code="MNT" symbol="8366" />
+		<currency title="Mozambique Metical" code="MZN" symbol="77, 84" />
+		<currency title="Namibia Dollar" code="NAD" symbol="36" />
+		<currency title="Nepal Rupee" code="NPR" symbol="8360" />
+		<currency title="Netherlands Antilles Guilder" code="ANG" symbol="402" />
+		<currency title="New Zealand Dollar" code="NZD" symbol="36" />
+		<currency title="Nicaragua Cordoba" code="NIO" symbol="67, 36" />
+		<currency title="Nigeria Naira" code="NGN" symbol="8358" />
+		<currency title="Norway Krone" code="NOK" symbol="107, 114" />
+		<currency title="Oman Rial" code="OMR" symbol="65020" />
+		<currency title="Pakistan Rupee" code="PKR" symbol="8360" />
+		<currency title="Panama Balboa" code="PAB" symbol="66, 47, 46" />
+		<currency title="Paraguay Guarani" code="PYG" symbol="71, 115" />
+		<currency title="Peru Nuevo Sol" code="PEN" symbol="83, 47, 46" />
+		<currency title="Philippines Peso" code="PHP" symbol="8369" />
+		<currency title="Poland Zloty" code="PLN" symbol="122, 322" />
+		<currency title="Qatar Riyal" code="QAR" symbol="65020" />
+		<currency title="Romania New Leu" code="RON" symbol="108, 101, 105" />
+		<currency title="Russia Ruble" code="RUB" symbol="1088, 1091, 1073" />
+		<currency title="Saint Helena Pound" code="SHP" symbol="163" />
+		<currency title="Saudi Arabia Riyal" code="SAR" symbol="65020" />
+		<currency title="Serbia Dinar" code="RSD" symbol="1044, 1080, 1085, 46" />
+		<currency title="Seychelles Rupee" code="SCR" symbol="8360" />
+		<currency title="Singapore Dollar" code="SGD" symbol="36" />
+		<currency title="Solomon Islands Dollar" code="SBD" symbol="36" />
+		<currency title="Somalia Shilling" code="SOS" symbol="83" />
+		<currency title="South Africa Rand" code="ZAR" symbol="82" />
+		<currency title="Sri Lanka Rupee" code="LKR" symbol="8360" />
+		<currency title="Sweden Krona" code="SEK" symbol="107, 114" />
+		<currency title="Switzerland Franc" code="CHF" symbol="67, 72, 70" />
+		<currency title="Suriname Dollar" code="SRD" symbol="36" />
+		<currency title="Syria Pound" code="SYP" symbol="163" />
+		<currency title="Taiwan New Dollar" code="TWD" symbol="78, 84, 36" />
+		<currency title="Thailand Baht" code="THB" symbol="3647" />
+		<currency title="Trinidad and Tobago Dollar" code="TTD" symbol="84, 84, 36" />
+		<currency title="Turkey" code="TRY" symbol="8378" />
+		<currency title="Tuvalu Dollar" code="TVD" symbol="36" />
+		<currency title="Ukraine Hryvnia" code="UAH" symbol="8372" />
+		<currency title="United Kingdom Pound" code="GBP" symbol="163" />
+		<currency title="United States Dollar" code="USD" symbol="36" />
+		<currency title="Uruguay Peso" code="UYU" symbol="36, 85" />
+		<currency title="Uzbekistan Som" code="UZS" symbol="1083, 1074" />
+		<currency title="Venezuela Bolivar" code="VEF" symbol="66, 115" />
+		<currency title="Viet Nam Dong" code="VND" symbol="8363" />
+		<currency title="Yemen Rial" code="YER" symbol="65020" />
+		<currency title="Zimbabwe Dollar" code="ZWD" symbol="90, 36" />
+	</currencies>
+</data>

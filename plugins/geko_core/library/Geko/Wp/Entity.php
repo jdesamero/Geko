@@ -181,22 +181,33 @@ abstract class Geko_Wp_Entity extends Geko_Entity
 	}
 	
 	//
-	public function getMetaMemberIds( $sMetaKey ) {
+	public function getMetaMemberData( $sMetaKey, $sFldKey ) {
 		
 		$mRes = $this->getMeta( $sMetaKey );
 		
 		if (
 			( is_array( $mRes ) ) && 
 			( $oItem = $mRes[ 0 ] ) && 
-			( property_exists( $oItem, 'member_id' ) )
+			( property_exists( $oItem, $sFldKey ) )
 		) {
 			$aRet = array();
-			foreach ( $mRes as $oItem ) $aRet[] = $oItem->member_id;
+			foreach ( $mRes as $oItem ) $aRet[] = $oItem->$sFldKey;
 			return $aRet;
 		}
 		
 		return $mRes;
 	}
+	
+	//
+	public function getMetaMemberIds( $sMetaKey ) {
+		return $this->getMetaMemberData( $sMetaKey, 'member_id' );
+	}
+	
+	//
+	public function getMetaMemberValues( $sMetaKey ) {
+		return $this->getMetaMemberData( $sMetaKey, 'member_value' );
+	}
+	
 	
 	
 	

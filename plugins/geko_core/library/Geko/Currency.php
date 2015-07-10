@@ -1,0 +1,102 @@
+<?php
+
+//
+class Geko_Currency extends Geko_Singleton_Abstract
+{
+	
+	const FIELD_TITLE = 1;
+	const FIELD_SYMBOL_HTML = 2;
+	
+	
+	
+	protected $_bInitDb = FALSE;
+	
+	protected $_sTableName = '';
+	protected $_aCurrencies = NULL;
+	
+	protected $_oRates = NULL;					// rate converter class
+	
+	
+	
+	
+	//// initialization
+	
+	//
+	public function start() {
+		
+		parent::start();
+		
+		$oCurrencyXml = Geko_Currency_Xml::getInstance();
+		
+		Geko_Once::run( 'geko_currency_load_xml_data', array( $oCurrencyXml, 'loadData' ) );
+		
+	}
+	
+	
+	//
+	public function initRateCoverter( $aParams ) {
+		
+		$this->_oRates = new Geko_Currency_Rate_CachedLookup( array( $aParams ) );
+		
+		return $this;
+	}
+	
+	
+	
+	// alias of getCurrencies()
+	public function get() {
+		return $this->getCurrencies();
+	}
+	
+	
+	//
+	public function set( $aCurrencies ) {
+		
+		$this->_aCurrencies = $aCurrencies;
+		
+		return $this;
+	}
+	
+	
+	
+	//
+	public function getCurrencies() {
+		
+		$this->init();
+		
+		return $this->_aCurrencies;
+	}
+	
+	
+	
+	//
+	public function getTitle( $sCode ) {
+		
+		$this->init();
+		
+		return $this->_aCurrencies[ $sCode ][ self::FIELD_TITLE ];
+	}
+	
+	//
+	public function getSymbol( $sCode ) {
+		
+		$this->init();
+		
+		return $this->_aCurrencies[ $sCode ][ self::FIELD_SYMBOL_HTML ];	
+	}
+	
+	
+	// $sBase is USD by default
+	public function getConversionRate( $sTarget, $sBase = NULL ) {
+		
+		if ( $this->_oRates ) {
+			return $this->_oRates->getResult( $sTarget, $sBase );
+		}
+		
+		return NULL;
+	}
+	
+	
+}
+
+
