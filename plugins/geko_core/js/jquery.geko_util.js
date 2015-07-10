@@ -786,6 +786,27 @@
 	};
 	
 	
+	var oPostalRegex = {
+		'CA': /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/,
+		'US': /(^\d{5}$)|(^\d{5}-\d{4}$)/
+	};
+	
+	$.gekoValidatePostalCode = function( sValue, sCountryCode ) {
+		
+		if ( !sCountryCode ) sCountryCode = 'CA';		// default
+		sCountryCode = sCountryCode.toUpperCase();
+		
+		var oRegex = oPostalRegex[ sCountryCode ];
+		
+		if ( oRegex ) {
+			return oRegex.test( sValue );
+		}
+		
+		return false;
+	};
+	
+	
+	
 	
 	// prevent IE 9 from crapping out
 	if ( !( window.console && console.log ) ) {

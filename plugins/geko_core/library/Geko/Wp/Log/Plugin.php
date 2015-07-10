@@ -6,8 +6,9 @@ class Geko_Wp_Log_Plugin extends Geko_Wp_Initialize
 	protected $_sParentClass = '';
 	protected $_oParentLog;
 	
-	protected function __construct()
-	{
+	//
+	protected function __construct() {
+		
 		parent::__construct();
 		
 		$this->_sParentClass = Geko_Class::resolveRelatedClass(
