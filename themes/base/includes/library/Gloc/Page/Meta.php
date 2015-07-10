@@ -23,7 +23,7 @@ class Gloc_Page_Meta extends Geko_Wp_Page_Meta
 		$oPage = $this->getCurPage();
 		
 		$aJsonParams = array(
-			'template_directory' => get_bloginfo( 'template_directory' )
+			'script' => Geko_Wp::getScriptUrls()
 		);
 		
 		if ( $oPage ) {
