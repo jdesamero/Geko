@@ -22,6 +22,7 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 	protected $_sEntityClass;
 	protected $_sQueryClass;
 	protected $_sExportExcelHelperClass;
+	protected $_aExportExcelHelperClasses = array();			// allow for multiple Excel export formats
 	
 	protected $_bTrackSessionId = FALSE;
 	protected $_bAddMetaType = FALSE;
@@ -220,7 +221,7 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 			$this->_sEntityClass, '', '_ExportExcelHelper', $this->_sExportExcelHelperClass
 		);
 		
-
+		
 		$oWpRole = get_role( 'administrator' );
 		if ( !$oWpRole->has_cap( $this->_sExportCapability ) ) {
 			$oWpRole->add_cap( $this->_sExportCapability );
@@ -434,6 +435,10 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 		return $this->getTablePrimaryKeyField( $this->getPrimaryTable() );
 	}
 	
+	//
+	public function getExportExcelHelperClasses() {
+		return $this->_aExportExcelHelperClasses;
+	}
 	
 	
 	
@@ -566,6 +571,8 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 					)
 				);
 				
+				$aExportClasses = $oCurLog->getExportExcelHelperClasses();
+				
 				?><script type="text/javascript">
 					
 					jQuery( document ).ready( function( $ ) {
@@ -588,6 +595,19 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 				<form id="export_report_form" action="<?php echo $sAction; ?>" method="post">
 					<?php if ( function_exists( 'wp_nonce_field' ) ) wp_nonce_field( $sNonceField ); ?>
 					<table class="form-table">
+						<?php if ( count( $aExportClasses ) > 0 ): ?>
+							<tr>
+								<th><label for="export_format">Export Format</label></th>
+								<td>
+									<select name="export_format" id="export_format">
+										<?php foreach ( $aExportClasses as $iIdx => $aRow ): ?>
+											<option value="<?php echo $iIdx; ?>"><?php echo $aRow[ 1 ]; ?></option>
+										<?php endforeach; ?>
+									</select><br />
+									<span class="description">Select the export format of the report.</span>
+								</td>
+							</tr>						
+						<?php endif; ?>
 						<tr>
 							<th><label for="min_date">Start Date</label></th>
 							<td><input type="text" id="min_date" name="min_date" /></td>
@@ -661,7 +681,19 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 			$aParams = $this->modifyExportParams( $aParams );
 			
 			$sQueryClass = $this->_sQueryClass;
-			$sHelperClass = $this->_sExportExcelHelperClass;
+			
+			
+			
+			// determine the export helper class to use
+			$sHelperClass = '';
+			
+			if ( $iExportIdx = intval( $_POST[ 'export_format' ] ) ) {
+				$sHelperClass = $this->_aExportExcelHelperClasses[ $iExportIdx ][ 0 ];
+			}
+			
+			if ( !$sHelperClass ) $sHelperClass = $this->_sExportExcelHelperClass;
+			
+			
 			
 			$aRes = new $sQueryClass( $aParams );
 			$oHelper = new $sHelperClass( $aParams );
