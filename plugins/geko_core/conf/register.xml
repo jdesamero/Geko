@@ -218,6 +218,7 @@
 		<file id="geko-jquery-jscrollbar" src="##geko_core_uri##/external/js/jquery.jScrollbar.min.js" dependencies="geko-jquery-ui-draggable geko-jquery-mousewheel" />
 		<file id="geko-jquery-jscrollpane" src="##geko_core_uri##/external/js/jquery.jscrollpane.min.js" dependencies="jquery" />
 		<file id="geko-jquery-media" src="##geko_core_uri##/external/js/jquery.media.js" dependencies="jquery geko-jquery-metadata" />
+		<file id="geko-jquery-maskedinput" src="##geko_core_uri##/external/js/jquery.masked-input.min.js" dependencies="jquery" />
 		<file id="geko-jquery-metadata" src="##geko_core_uri##/external/js/jquery.metadata.js" dependencies="jquery" />
 		<file id="geko-jquery-mobilymap" src="##geko_core_uri##/external/js/jquery.mobilymap.js" dependencies="jquery" />
 		<file id="geko-jquery-mousewheel" src="##geko_core_uri##/external/js/jquery-mousewheel.js" dependencies="jquery" />
