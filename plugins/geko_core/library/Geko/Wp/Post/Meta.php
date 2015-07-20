@@ -59,6 +59,8 @@ class Geko_Wp_Post_Meta extends Geko_Wp_Options_Meta
 		add_action( 'admin_head_post', array( $this, 'addAdminHead' )  );
 		
 		add_action( 'wp_insert_post', array( $this, 'insert' ) );
+		add_action( 'delete_post', array( $this, 'deletePostData' ) );						// fires before post is deleted
+		add_action( 'after_delete_post', array( $this, 'afterDeletePostData' ) );			// fires after post is deleted
 		
 		return $this;
 	}
@@ -305,7 +307,18 @@ class Geko_Wp_Post_Meta extends Geko_Wp_Options_Meta
 		
 		$this->unsetMetaCache( $iPostId );
 	}
-
+	
+	
+	// When post is deleted, useful for cleaning up external tables
+	public function deletePostData( $iPostId ) {
+		
+	}
+	
+	
+	//
+	public function afterDeletePostData( $iPostId ) {
+		
+	}
 	
 	
 }

@@ -281,7 +281,7 @@
 		} );
 	}
 
-	// set form element value
+	// get form element value
 	$.fn.getFormElemVal = function() {
 		
 		var elem = this;

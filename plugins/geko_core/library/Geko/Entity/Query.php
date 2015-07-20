@@ -223,9 +223,10 @@ abstract class Geko_Entity_Query
 		
 		$aArgs = func_get_args();
 		
-		// $aArg[ 0 ] is a string that contains a bunch of patterns
-		// $aArg[ 1 ] is an array of args to call for pattern 0
-		// $aArg[ 2 ] for pattern 1, and so on
+		// $aArgs[ 0 ] is a string that contains a bunch of patterns
+		// $aArgs[ 1 ] is an array of args to call for pattern 0
+		// $aArgs[ 2 ] for pattern 1, and so on
+		
 		
 		$aRegs = array();
 		$aRet = array();
@@ -234,20 +235,25 @@ abstract class Geko_Entity_Query
 		$mPattern = array_shift( $aArgs );
 		
 		if ( is_array( $mPattern ) ) {
+			
+			// the delimiter is not needed
 			$sPattern = $mPattern[ 0 ];
+			
 		} else {
 			$sPattern = $mPattern;
 		}
-			
+		
 		if ( FALSE !== strpos( $sPattern, '%s' ) ) {
 			$sPattern = sprintf( $sPattern, sprintf( '##%s##', $this->_sDefaultField ) );
 		}
 		
-		if ( preg_match_all( '/##([a-zA-Z0-9_]+)##/s', $sPattern, $aArgs ) ) {
-			$aReplace = $aArgs[ 0 ];
-			$aSuffixes = $aArgs[ 1 ];
+		if ( preg_match_all( '/##([a-zA-Z0-9_]+)##/s', $sPattern, $aRegs ) ) {
+			$aReplace = $aRegs[ 0 ];
+			$aSuffixes = $aRegs[ 1 ];
 			$bSimple = FALSE;
 		}
+		
+		
 		
 		// gather
 		foreach ( $this as $oEntity ) {
@@ -280,13 +286,20 @@ abstract class Geko_Entity_Query
 						( method_exists( $oEntity, $sMethod ) ) && 
 						( 'value' != $sEntityProperty )
 					) {
-						$sReplacement = call_user_func_array( array( $oEntity, $sMethod ), $aArgs[ $i ] );
+						
+						$aMethodArgs = is_array( $aArgs[ $i ] ) ? $aArgs[ $i ] : array() ;
+						$sReplacement = call_user_func_array( array( $oEntity, $sMethod ), $aMethodArgs );
+						
 					} elseif ( $oEntity->hasEntityProperty( $sEntityProperty ) ) {
+						
 						// see if a corresponding entity value can be found
 						$sReplacement = $oEntity->getEntityPropertyValue( $sEntityProperty );
+					
 					} else {
+						
 						$bReplace = FALSE;
 					}
+					
 					
 					if ( $bReplace ) {
 						$aArgs[ $i ] = ( is_array( $aArgs[ $i ] ) ) ? $aArgs[ $i ] : array();
@@ -295,11 +308,13 @@ abstract class Geko_Entity_Query
 					
 				}
 			}
+			
 			$aRet[] = $sOut;
 		}
 		
 		return $aRet;
 	}
+	
 	
 	//
 	public function implode() {

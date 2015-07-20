@@ -15,6 +15,7 @@
 	
 	var GmMap = google.maps.Map;
 	var GmLatLng = google.maps.LatLng;
+	var GmLatLngBounds = google.maps.LatLngBounds;
 	var GmMarker = google.maps.Marker;
 	var GmInfoWin = google.maps.InfoWindow;
 	
@@ -134,6 +135,28 @@
 		
 		//// set-up options
 		
+		if ( opts.bounds ) {
+			
+			// get southwest and northeast bounds
+			var aSw = opts.bounds[ 0 ];
+			var aNe = opts.bounds[ 1 ];
+			
+			var gbounds = new GmLatLngBounds(
+				new GmLatLng(
+					parseFloat( aSw[ 0 ] ),
+					parseFloat( aSw[ 1 ] )
+				),
+				new GmLatLng(
+					parseFloat( aNe[ 0 ] ),
+					parseFloat( aNe[ 1 ] )
+				)
+			);
+			
+			delete opts.bounds;
+			opts.bounds = gbounds;
+			
+		}
+		
 		if ( opts.latitude && opts.longitude ) {
 			
 			opts.center = new GmLatLng(
@@ -163,6 +186,7 @@
 		
 		var gMap = new GmMap( elem, opts );
 		this.gMap = gMap;
+				
 		
 		// re-declare for use by methods
 		var _this = this;
@@ -260,6 +284,8 @@
 			
 			_this.markers[ iMarkerIdx ] = marker;
 			
+			// keep track of params for possible later use
+			marker.set( 'geko_params', params );
 			
 			//// info box
 			
@@ -285,8 +311,22 @@
 				// set up info window if there is content
 				if ( sContent ) {
 					
+					var mContent = null;
+					
+					if ( params.info.wrapContent ) {
+						
+						var eInfoContent = $( sContent );
+						mContent = eInfoContent.get( 0 );
+						
+						marker.set( 'geko_info_content', eInfoContent );
+						
+					} else {
+						mContent = sContent;
+					}
+					
+					//
 					var infoWin = new GmInfoWin( {
-						content: sContent
+						content: mContent
 					} );
 					
 					// open info box on load
@@ -437,11 +477,22 @@
 		// get marker by id
 		this.getMarker = function( id ) {
 			return this.markers[ this.markerHash[ id ] ];
+		};
+		
+		this.getMarkers = function() {
+			return this.markers;
+		};
+		
+		
+		
+		//// ------ actually do stuff to set initial state of map ----------------------------------
+		
+		// set bounds, if given
+		if ( opts.bounds ) {
+			gMap.fitBounds( opts.bounds );
 		}
 		
-		
-		//// do stuff
-		
+		// add markers
 		if ( opts.markers ) {
 			this.mapMarkers( opts.markers );
 		}
@@ -475,6 +526,8 @@
 			// return reference to GekoGMap3 instance
 			if ( 'gmap' === options ) {
 				return $( this ).data( 'geko-jquery-gmap3' );
+			} else if ( 'markers' === options ) {
+				return $( this ).data( 'geko-jquery-gmap3' ).getMarkers();			
 			}
 			
 		} else {

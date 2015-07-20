@@ -37,6 +37,15 @@ class Geko_Currency_Xml extends Geko_Singleton_Abstract
 				$sCode = strval( $oCurrency[ 'code' ] );
 				$sSymbol = strval( $oCurrency[ 'symbol' ] );
 				
+				$iConversionDecimalPlaces = $oCurrency[ 'conversion_decimal_places' ];
+				
+				if ( NULL === $iConversionDecimalPlaces ) {
+					$iConversionDecimalPlaces = 2;
+				} else {
+					$iConversionDecimalPlaces = intval( $iConversionDecimalPlaces );
+				}
+				
+				
 				$sSymbolHtml = '';
 				$aSymbols = explode( ',', $sSymbol );
 				foreach ( $aSymbols as $iChar ) {
@@ -45,7 +54,8 @@ class Geko_Currency_Xml extends Geko_Singleton_Abstract
 				
 				$aCurrency[ $sCode ] = array(
 					Geko_Currency::FIELD_TITLE => $sTitle,
-					Geko_Currency::FIELD_SYMBOL_HTML => $sSymbolHtml
+					Geko_Currency::FIELD_SYMBOL_HTML => $sSymbolHtml,
+					Geko_Currency::FIELD_CONVERSION_DECIMAL_PLACES => $iConversionDecimalPlaces
 				);
 				
 			}

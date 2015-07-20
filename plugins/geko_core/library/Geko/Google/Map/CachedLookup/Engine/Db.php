@@ -167,6 +167,28 @@ class Geko_Google_Map_CachedLookup_Engine_Db extends Geko_CachedLookup_Engine_Db
 				$aRes = NULL;
 			}
 			
+			// hacky, appy formatting
+			if ( is_array( $aRes ) ) {
+				
+				foreach ( $aRes as $i => $aRow ) {
+					
+					$aRow[ 'id' ] = intval( $aRow[ 'id' ] );
+					
+					$aRow[ 'lat' ] = floatval( $aRow[ 'lat' ] );
+					$aRow[ 'lng' ] = floatval( $aRow[ 'lng' ] );
+					
+					$aRow[ 'ne_lat' ] = floatval( $aRow[ 'ne_lat' ] );
+					$aRow[ 'ne_lng' ] = floatval( $aRow[ 'ne_lng' ] );
+					$aRow[ 'sw_lat' ] = floatval( $aRow[ 'sw_lat' ] );
+					$aRow[ 'sw_lng' ] = floatval( $aRow[ 'sw_lng' ] );
+					
+					$aRow[ 'country_id' ] = intval( $aRow[ 'country_id' ] );
+					
+					$aRes[ $i ] = $aRow;
+				}
+				
+			}
+			
 			return $aRes;
 		}
 		

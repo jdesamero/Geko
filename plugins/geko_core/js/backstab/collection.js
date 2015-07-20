@@ -209,7 +209,11 @@
 			}
 			
 			// return the parted collection
-			return oModel.get( sGetKey );
+			if ( oModel ) {
+				return oModel.get( sGetKey );
+			}
+			
+			return null;
 		},
 		
 		
@@ -315,6 +319,8 @@
 			$.each( aEach, function( i, v ) {
 				v.destroy();
 			} );
+			
+			return this;
 		},
 		
 		
@@ -409,6 +415,8 @@
 			} );
 			
 			this.trigger( 'afterMatch', oToMatch, bMatched );
+			
+			return this;
 		}
 		
 		

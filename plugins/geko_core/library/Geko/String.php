@@ -13,7 +13,7 @@ class Geko_String
 	// return the first non-empty value from argument list
 	public static function coalesce() {
 		
-		$aArgs = func_get_args();		
+		$aArgs = func_get_args();
 		foreach ( $aArgs as $mValue ) {
 			if ( is_array( $mValue ) ) {
 				$mValRec = call_user_func_array( array( __CLASS__, 'coalesce' ), $mValue );
@@ -388,6 +388,23 @@ class Geko_String
 		}
 		
 		return $sHaystack;
+	}
+	
+	
+	// TO DO: look at Geko_Wp_Db::keywordSearch() implementation later
+	public static function splitKeywordSearchTerms( $sKeywords ) {
+		
+		$aWords = preg_split( '/([^a-zA-Z0-9])/', $sKeywords );
+		
+		$aFiltered = array();
+		
+		foreach ( $aWords as $sWord ) {
+			if ( $sWord = trim( $sWord ) ) {
+				$aFiltered[] = strtolower( $sWord );
+			}
+		}
+		
+		return array_unique( $aFiltered );
 	}
 	
 	

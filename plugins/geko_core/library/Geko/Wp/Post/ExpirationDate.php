@@ -75,8 +75,8 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 		add_action( 'admin_init_post', array( $this, 'install' ) );		
 		add_action( 'admin_head_post', array( $this, 'addAdminHead' ) );
 		
-		add_action( 'save_post', array( $this, 'savePostdata' ) );	
-		add_action( 'delete_post', array( $this, 'deletePostdata' ) );
+		add_action( 'save_post', array( $this, 'savePostData' ) );	
+		add_action( 'delete_post', array( $this, 'deletePostData' ) );
 		
 		return $this;
 	}
@@ -352,7 +352,7 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 	//// crud methods
 	
 	// When the post is saved, saves our custom data
-	public function savePostdata( $post_id ) {
+	public function savePostData( $iPostId ) {
 		
 		$oDb = Geko_Wp::get( 'db' );
 		
@@ -360,17 +360,17 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 		// because save_post can be triggered at other times
 		
 		if ( FALSE == wp_verify_nonce( $_POST[ 'geko-expiry_noncename' ], plugin_basename( __FILE__ ) ) ) {
-			return $post_id;
+			return $iPostId;
 		}
 		
 		if ( 'page' == $_POST[ 'post_type' ] ) {
 			
-			if ( FALSE == current_user_can( 'edit_page', $post_id ) ) {
-				return $post_id;
+			if ( FALSE == current_user_can( 'edit_page', $iPostId ) ) {
+				return $iPostId;
 			}
 		} else {
-			if ( FALSE == current_user_can( 'edit_post', $post_id ) ) {
-				return $post_id;
+			if ( FALSE == current_user_can( 'edit_post', $iPostId ) ) {
+				return $iPostId;
 			}
 		}
 		
@@ -400,33 +400,33 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 		
 		// Clean-up first
 		$oDb->delete( '##pfx##geko_expiry', array(
-			'post_id = ?', $post_id
+			'post_id = ?', $iPostId
 		) );
 		
 		// Insert if present
 		if ( $_POST[ 'gexp-start-check' ] || $_POST[ 'gexp-expiry-check' ] ) {
 			
 			$oDb->insert( '##pfx##geko_expiry', array(
-				'post_id' => $post_id,
+				'post_id' => $iPostId,
 				'start_date' => $this->getMysqlDateInsertValue( 'gexp-start' ),
 				'expiry_date' => $this->getMysqlDateInsertValue( 'gexp-expiry' )
 			) );
 			
 		}
 		
-		return TRUE;	// ???
+		
 	}
 	
 	// When post is deleted
-	public function deletePostdata( $post_id ) {
+	public function deletePostData( $iPostId ) {
 		
 		$oDb = Geko_Wp::get( 'db' );
 		
 		$oDb->delete( '##pfx##geko_expiry', array(
-			'post_id = ?', $post_id
+			'post_id = ?', $iPostId
 		) );
 		
-		return TRUE;	// ???
+		
 	}
 	
 	
