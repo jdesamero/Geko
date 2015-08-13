@@ -17,8 +17,8 @@ abstract class Geko_Wp_Entity_ExportExcelHelper
 	// http://www.php.net/manual/en/mbstring.supported-encodings.php
 	// Common values: Windows-1251, Windows-1252, UTF-8, ISO-8859-1
 	
-	protected $_sApplyEncoding = NULL;
-	
+	protected $_sApplyEncoding = NULL;			// applies mb_convert_encoding() to values
+	protected $_sInputEncoding = NULL;			// apply setInputEncoding() on worksheet
 	
 	
 	
@@ -197,6 +197,11 @@ abstract class Geko_Wp_Entity_ExportExcelHelper
 		
 		// Creating a worksheet
 		$oWorksheet = $oWorkbook->addWorksheet( $this->_sWorksheetName );
+		
+		if ( $this->_sInputEncoding ) {
+			$oWorksheet->setInputEncoding( $this->_sInputEncoding );
+		}
+		
 		
 		$oBold = $oWorkbook->addFormat( array(
 			'Bold' => 1
