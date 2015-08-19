@@ -20,13 +20,15 @@
 		<file id="geko-get_scroll_xy" src="##geko_core_uri##/external/js/get_scroll_xy.js" />
 		<file id="geko-googlemaps" src="//maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=##GOOGLEMAPS_API_KEY##" />
 		<file id="geko-googlemaps3" src="//maps.googleapis.com/maps/api/js?sensor=false" />
+		<file id="geko-imagesloaded" src="##geko_core_uri##/external/js/imagesloaded.pkgd.min.js" dependencies="jquery" />
+		<file id="geko-moment" src="##geko_core_uri##/external/js/moment-2.5.0.min.js" />
+		<file id="geko-raphael" src="##geko_core_uri##/external/js/raphael-2.1.0.min.js" />
 		<file id="geko-sharethis" src="//w.sharethis.com/button/buttons.js" />
 		<file id="geko-string_format" src="##geko_core_uri##/external/js/string_format.min.js" />
 		<file id="geko-swf-object" src="##geko_core_uri##/external/js/swfobject.js" />
 		<file id="geko-swipe" src="##geko_core_uri##/external/js/swipe.js" />
 		<file id="geko-sylvester" src="##geko_core_uri##/external/js/sylvester.js" />
 		<file id="geko-underscore" src="##geko_core_uri##/external/js/underscore-1.7.0.min.js" dependencies="jquery" />
-		<file id="geko-imagesloaded" src="##geko_core_uri##/external/js/imagesloaded.pkgd.min.js" dependencies="jquery" />
 		
 		
 		
@@ -200,9 +202,16 @@
 		<file id="geko-jquery-cookie" src="##geko_core_uri##/external/js/jquery.cookie.js" dependencies="jquery" />
 		<file id="geko-jquery-crspline" src="##geko_core_uri##/external/js/jquery.crspline.js" dependencies="jquery" />
 		<file id="geko-jquery-cycle_all" src="##geko_core_uri##/external/js/jquery.cycle.all.js" dependencies="geko-jquery-easing" />
+		<file id="geko-jquery-daterangepicker" src="##geko_core_uri##/external/js/jquery.daterangepicker.js" dependencies="geko-moment jquery" />
 		<file id="geko-jquery-easing" src="##geko_core_uri##/external/js/jquery.easing.1.3.js" dependencies="jquery" />
 		<file id="geko-jquery-fixboxmodel" src="##geko_core_uri##/external/js/jquery.fixBoxModel.js" dependencies="jquery" />
 		<file id="geko-jquery-flexslider" src="##geko_core_uri##/external/js/jquery.flexslider-min.js" dependencies="jquery" />
+		<file id="geko-jquery-flot" src="##geko_core_uri##/external/js/jquery.flot.js" dependencies="jquery" />
+		<file id="geko-jquery-flot-pie" src="##geko_core_uri##/external/js/jquery.flot.pie.js" dependencies="geko-jquery-flot" />
+		<file id="geko-jquery-flot-resize" src="##geko_core_uri##/external/js/jquery.flot.resize.js" dependencies="geko-jquery-flot" />
+		<file id="geko-jquery-flot-stack" src="##geko_core_uri##/external/js/jquery.flot.stack.js" dependencies="geko-jquery-flot" />
+		<file id="geko-jquery-flot-tooltip" src="##geko_core_uri##/external/js/jquery.flot.tooltip.min.js" dependencies="geko-jquery-flot" />
+		<file id="geko-jquery-flotdemodata" src="##geko_core_uri##/external/js/jquery.flot-demo-data.js" dependencies="geko-jquery-flot-pie geko-jquery-flot-resize geko-jquery-flot-stack geko-jquery-flot-tooltip" />
 		<file id="geko-jquery-form" src="##geko_core_uri##/external/js/jquery.form.js" dependencies="jquery" />
 		<file id="geko-jquery-googlemaps" src="##geko_core_uri##/external/js/jquery.googlemaps-1.01.1.js" dependencies="geko-string_format geko-googlemaps jquery" />
 		<file id="geko-jquery-greensock" src="##geko_core_uri##/external/js/greensock.js" dependencies="jquery" />
@@ -221,6 +230,8 @@
 		<file id="geko-jquery-maskedinput" src="##geko_core_uri##/external/js/jquery.masked-input.min.js" dependencies="jquery" />
 		<file id="geko-jquery-metadata" src="##geko_core_uri##/external/js/jquery.metadata.js" dependencies="jquery" />
 		<file id="geko-jquery-mobilymap" src="##geko_core_uri##/external/js/jquery.mobilymap.js" dependencies="jquery" />
+		<file id="geko-jquery-morris" src="##geko_core_uri##/external/js/jquery.morris.js" dependencies="geko-raphael jquery" />
+		<file id="geko-jquery-morrisdemodata" src="##geko_core_uri##/external/js/jquery.morris-demo-data.js" dependencies="geko-jquery-morris" defer="defer" />
 		<file id="geko-jquery-mousewheel" src="##geko_core_uri##/external/js/jquery-mousewheel.js" dependencies="jquery" />
 		<file id="geko-jquery-pngfix" src="##geko_core_uri##/external/js/jquery.pngFix.js" dependencies="jquery" />
 		<file id="geko-jquery-popupwindow" src="##geko_core_uri##/external/js/jquery.popupWindow.js" dependencies="jquery" />
@@ -231,9 +242,10 @@
 		<file id="geko-jquery-sfhover" src="##geko_core_uri##/external/js/jquery.sfhover.js" dependencies="jquery" />
 		<file id="geko-jquery-simplemodal" src="##geko_core_uri##/external/js/jquery.simplemodal-1.4.4.1.min.js" dependencies="jquery" />
 		<file id="geko-jquery-smoothzoom" src="##geko_core_uri##/external/js/jquery.smoothZoom.min.js" dependencies="jquery" />
-		<file id="geko-jquery-swfobject" src="##geko_core_uri##/external/js/jquery.swfobject.1-1-1.min.js" dependencies="jquery" />
+		<file id="geko-jquery-sparkline" src="##geko_core_uri##/external/js/jquery.sparkline.min.js" dependencies="jquery" />
 		<file id="geko-jquery-supersized" src="##geko_core_uri##/external/js/jquery.supersized.3.2.7.js" dependencies="geko-jquery-easing" />
 		<file id="geko-jquery-supersized_shutter" src="##geko_core_uri##/external/js/jquery.supersized.shutter.js" dependencies="geko-jquery-supersized" />
+		<file id="geko-jquery-swfobject" src="##geko_core_uri##/external/js/jquery.swfobject.1-1-1.min.js" dependencies="jquery" />
 		<file id="geko-jquery-syger" src="##geko_core_uri##/external/js/jquery-syger.js" dependencies="jquery" />
 		<file id="geko-jquery-tabslideout" src="##geko_core_uri##/external/js/jquery.tabSlideOut.v1.3.1.js" dependencies="jquery" />
 		<file id="geko-jquery-tablesorter" src="##geko_core_uri##/external/js/jquery.tablesorter.js" dependencies="jquery" />
@@ -374,11 +386,13 @@
 		<file id="geko-swipe" src="##geko_core_uri##/external/styles/swipe/style.css" />
 		
 		<file id="geko-jquery-card" src="##geko_core_uri##/external/styles/card/style.css" />
+		<file id="geko-jquery-daterangepicker" src="##geko_core_uri##/external/styles/daterangepicker/style-bs3.css" />
 		<file id="geko-jquery-jcarousel" src="##geko_core_uri##/external/styles/jcarousel/style.css" />
 		<file id="geko-jquery-jcarousel-2006" src="##geko_core_uri##/external/styles/jcarousel/style-2006.css" />
 		<file id="geko-jquery-jscrollbar" src="##geko_core_uri##/external/styles/jScrollbar/style.css" />
 		<file id="geko-jquery-jscrollpane" src="##geko_core_uri##/external/styles/jscrollpane/style.css" />
 		<file id="geko-jquery-mobilymap" src="##geko_core_uri##/external/styles/mobilymap/style.css" />
+		<file id="geko-jquery-morris" src="##geko_core_uri##/external/styles/morris/style.css" />
 		<file id="geko-jquery-prettyphoto" src="##geko_core_uri##/external/styles/prettyPhoto/style.css" />
 		<file id="geko-jquery-scrollpath" src="##geko_core_uri##/external/styles/scrollpath/style.css" />
 		<file id="geko-jquery-smoothzoom" src="##geko_core_uri##/external/styles/smoothZoom/style.css" />

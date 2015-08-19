@@ -124,7 +124,11 @@ class Geko_Html_Widget
 		
 		//// apply formatting
 		
-		if ( $oFlags->has( 'str' ) ) {
+		if ( $mCustomAttVal = $this->getCustomAttVal( $sKey, $mAttVal, $mDefault, $oFlags, $aValueMap ) ) {
+			
+			return $mCustomAttVal;
+			
+		} elseif ( $oFlags->has( 'str' ) ) {
 			
 			$mAttVal = trim( $mAttVal );
 			
@@ -169,27 +173,7 @@ class Geko_Html_Widget
 		// $aValueMap
 		
 		if ( count( $aValueMap ) > 0 ) {
-			
-			// parse the value map
-			
-			$aValueMapFmt = array();
-			
-			foreach ( $aValueMap as $sValueMap ) {
-				
-				list( $sValueDest, $sValueAliases ) = Geko_Array::explodeTrimEmpty( ':', $sValueMap );
-				
-				$aValueAliases = Geko_Array::explodeTrimEmpty( '|', $sValueAliases );
-				
-				$aValueMapFmt[ $sValueDest ] = $sValueDest;
-				
-				foreach ( $aValueAliases as $sValueAlias ) {
-					$aValueMapFmt[ $sValueAlias ] = $sValueDest;				
-				}
-			}
-
-			if ( $mMapValue = $aValueMapFmt[ $mAttVal ] ) {
-				$mAttVal = $mMapValue;
-			}			
+			$mAttVal = $this->getValueFromMap( $mAttVal, $aValueMap );
 		}
 		
 		
@@ -200,6 +184,39 @@ class Geko_Html_Widget
 		return $mAttVal;
 	}
 	
+	
+	// TO DO: potentially cache this
+	public function getValueFromMap( $sValue, $aValueMap ) {
+	
+		// parse the value map
+		
+		$aValueMapFmt = array();
+		
+		foreach ( $aValueMap as $sValueMap ) {
+			
+			list( $sValueDest, $sValueAliases ) = Geko_Array::explodeTrimEmpty( ':', $sValueMap );
+			
+			$aValueAliases = Geko_Array::explodeTrimEmpty( '|', $sValueAliases );
+			
+			$aValueMapFmt[ $sValueDest ] = $sValueDest;
+			
+			foreach ( $aValueAliases as $sValueAlias ) {
+				$aValueMapFmt[ $sValueAlias ] = $sValueDest;				
+			}
+		}
+
+		if ( $sMapValue = $aValueMapFmt[ $sValue ] ) {
+			return $sMapValue;
+		}	
+		
+		return NULL;
+	}
+	
+	// hook method to be implemented by sub-class
+	public function getCustomAttVal( $sKey, $mAttVal, $mDefault, $oFlags, $aValueMap ) {
+		
+		return NULL;
+	}
 	
 	// do nothing, for now
 	public function formatAppendValue( $mValue ) {
