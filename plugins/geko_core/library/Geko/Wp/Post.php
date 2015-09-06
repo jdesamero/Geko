@@ -258,16 +258,94 @@ class Geko_Wp_Post extends Geko_Wp_Entity
 	
 	
 	
+	// support for Advanced Custom Fields Pro
+	public function getAcfProMetaValue( $sMetaKey, $iPostId ) {
+		
+		if ( $aRes = get_field_object( $sMetaKey, $iPostId ) ) {
+			
+			// allow for intelligent formatting of data based on field meta-data
+			
+			$sType = $aRes[ 'type' ];
+			$mValue = $aRes[ 'value' ];
+			$sReturnFormat = $aRes[ 'return_format' ];
+			
+			if ( 'repeater' == $sType ) {
+				
+				// wrap as Geko_Wp_Anonymous_Query/Geko_Wp_Anonymous
+				
+				$aRepVals = ( is_array( $mValue ) ) ? $mValue : array() ;
+				
+				$mValue = new Geko_Wp_Anonymous_Query( NULL, FALSE );
+				$mValue->setRawEntities( $aRepVals );
+				
+			} elseif ( ( 'image' == $sType ) && ( 'array' == $sReturnFormat ) ) {
+				
+				// wrap as Geko_Wp_Media
+				$aMediaVals = ( is_array( $mValue ) ) ? $mValue : array() ;
+				$aMediaVals[ 'ID' ] = $iPostId;			// parent_id, which is the post id
+				
+				$mValue = new Geko_Wp_Media( $aMediaVals );
+				
+			} elseif ( 'gallery' == $sType ) {
+				
+				// wrap as Geko_Wp_Media_Query
+				$aGalleryVals = ( is_array( $mValue ) ) ? $mValue : array() ;
+				foreach ( $aGalleryVals as $i => $a ) {
+					$aGalleryVals[ $i ][ 'ID' ] = $iPostId;			// parent_id, which is the post id
+				}
+				
+				$mValue = new Geko_Wp_Media_Query( NULL, FALSE );
+				$mValue->setRawEntities( $aGalleryVals );
+				
+			}
+			
+			return $mValue;
+		}
+		
+		return NULL;
+	}
+	
+	
+	
+	// parent::getMeta() uses meta handlers which can screw up get field
+	// do this to ensure get_field() gets called first
+	public function getMeta( $sMetaKey ) {
+
+		// IMPORTANT!!! Can't use $this->getId() below as it will cause a nasty infinite loop
+		$iPostId = $this->getEntityPropertyValue( 'id' );
+		
+		if ( !$mRes = $this->getAcfProMetaValue( $sMetaKey, $iPostId ) ) {
+			$mRes = parent::getMeta( $sMetaKey );
+		}
+		
+		return $mRes;
+	}
+	
+	
 	//
 	public function getRawMeta( $sMetaKey ) {
 		
 		// IMPORTANT!!! Can't use $this->getId() below as it will cause a nasty infinite loop
-		return get_post_meta( $this->getEntityPropertyValue( 'id' ), $sMetaKey, TRUE );
+		$iPostId = $this->getEntityPropertyValue( 'id' );
+		
+		if ( !$mRes = $this->getAcfProMetaValue( $sMetaKey, $iPostId ) ) {
+			$mRes = get_post_meta( $iPostId, $sMetaKey, TRUE );
+		}
+		
+		return $mRes;
 	}
 	
 	//
 	public function getMetaMulti( $sMetaKey ) {
-		return get_post_meta( $this->getId(), $sMetaKey );
+		
+		// IMPORTANT!!! Can't use $this->getId() below as it will cause a nasty infinite loop
+		$iPostId = $this->getEntityPropertyValue( 'id' );
+		
+		if ( !$mRes = $this->getAcfProMetaValue( $sMetaKey, $iPostId ) ) {
+			$mRes = get_post_meta( $iPostId, $sMetaKey );
+		}
+		
+		return $mRes;
 	}
 	
 	
@@ -427,6 +505,8 @@ class Geko_Wp_Post extends Geko_Wp_Entity
 			
 			$aParams[ 'file_ids' ] = $aFileIds;
 		}
+		
+		$aParams[ 'post_type' ] = $this->getPostType();
 		
 		return $aParams;
 	}

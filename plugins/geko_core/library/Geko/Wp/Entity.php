@@ -158,16 +158,18 @@ abstract class Geko_Wp_Entity extends Geko_Entity
 		
 		foreach ( $this->_aMetaHandlers as $i => $oMeta ) {
 			
+			$iEntityId = $this->getEntityPropertyValue( 'id' );
+			
 			// use getEntityPropertyValue() instead of getId() as it will cause a nasty infinite loop
 			
 			if ( is_array( $oMeta ) ) {
-				$oMeta[ 1 ][ 'object_id' ] = $this->getEntityPropertyValue( 'id' );			// hackish
+				$oMeta[ 1 ][ 'object_id' ] = $iEntityId;			// hackish
 				$oMeta = call_user_func( array( $oMeta[ 0 ], 'getOne' ), $oMeta[ 1 ] );
 				$this->_aMetaHandlers[ $i ] = $oMeta;
 			}
 			
 			if ( $oMeta instanceof Geko_Wp_Options_Meta ) {
-				if ( $mMeta = $oMeta->getMeta( $this->getEntityPropertyValue( 'id' ), $sMetaKey, TRUE ) ) {
+				if ( $mMeta = $oMeta->getMeta( $iEntityId, $sMetaKey, TRUE ) ) {
 					return $mMeta;
 				}
 			} elseif ( is_object( $oMeta ) ) {

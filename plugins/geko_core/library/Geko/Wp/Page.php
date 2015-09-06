@@ -65,16 +65,6 @@ class Geko_Wp_Page extends Geko_Wp_Post
 		return new $this->_sQueryClass( $aParams, FALSE );		
 	}
 	
-	//
-	protected function modifyGetAttachmentParams( $aParams ) {
-		
-		$aParams = parent::modifyGetAttachmentParams( $aParams );
-		
-		unset( $aParams[ 'p' ] );
-		$aParams[ 'page_id' ] = $this->getId();
-		
-		return $aParams;
-	}
 	
 	//
 	public function getEntityFromId( $iEntityId ) {

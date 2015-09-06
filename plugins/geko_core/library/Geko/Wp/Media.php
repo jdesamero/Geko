@@ -3,7 +3,65 @@
 //
 class Geko_Wp_Media extends Geko_Wp_Post
 {
-	protected $aAttachmentMeta = NULL;
+	
+	protected $_aAttachmentMeta = NULL;
+	
+	
+	
+	//
+	public function __construct( $mEntity = NULL, $oQuery = NULL, $aData = array(), $aQueryParams = NULL ) {
+		
+		if ( is_array( $mEntity ) ) {
+			
+			// format entity from ACF Pro
+			if ( $aSizes = $mEntity[ 'sizes' ] ) {
+				
+				$aFmt = array(
+					
+					'file_id' => $mEntity[ 'id' ],
+					'file_title' => $mEntity[ 'title' ],
+					'file_name' => $mEntity[ 'name' ],
+					'file_description' => $mEntity[ 'description' ],
+					'file_desc_excerpt' => $mEntity[ 'caption' ],
+					'file_created' => $mEntity[ 'date' ],
+					'file_modified' => $mEntity[ 'modified' ],
+					'file_mime_type' => $mEntity[ 'mime_type' ],
+					'file_alt_text' => $mEntity[ 'alt' ],
+					
+					'file_url' => $mEntity[ 'url' ],
+					'file_icon' => $mEntity[ 'icon' ]					
+					
+				);
+				
+				// not quite the same results as wp_get_attachment_metadata(), but close enough
+				$this->_aAttachmentMeta = array(
+					'width' => $mEntity[ 'width' ],
+					'height' => $mEntity[ 'height' ],
+					'file' => $mEntity[ 'filename' ],
+					'sizes' => array(
+						'thumbnail' => array(
+							'file' => $mEntity[ 'sizes' ][ 'thumbnail' ],
+							'width' => $mEntity[ 'sizes' ][ 'thumbnail-width' ],
+							'height' => $mEntity[ 'sizes' ][ 'thumbnail-height' ]
+						),
+						'medium' => array(
+							'file' => $mEntity[ 'sizes' ][ 'medium' ],
+							'width' => $mEntity[ 'sizes' ][ 'medium-width' ],
+							'height' => $mEntity[ 'sizes' ][ 'medium-height' ]
+						)
+					)
+				);
+				
+				// re-format
+				$mEntity = $aFmt;
+			}
+			
+		}
+		
+		parent::__construct( $mEntity, $oQuery, $aData, $aQueryParams );
+		
+	}
+
 	
 	//
 	public function init() {
@@ -50,7 +108,12 @@ class Geko_Wp_Media extends Geko_Wp_Post
 	
 	//
 	public function getMimeTypeIconSrc() {
-		return wp_mime_type_icon( $this->getMimeType() );
+
+		if ( !$sIconUrl = $this->getEntityPropertyValue( 'file_icon' ) ) {
+			$sIconUrl = wp_mime_type_icon( $this->getMimeType() );
+		}
+		
+		return $sIconUrl;
 	}
 
 	//
@@ -87,19 +150,39 @@ class Geko_Wp_Media extends Geko_Wp_Post
 		return ( 0 === strpos( $this->getMimeType(), 'image' ) );
 	}
 	
+	
+	
+	//// attachment meta
+	
 	//
 	public function getAttachmentMeta( $sMetaKey = NULL ) {
 		
-		if ( NULL === $this->aAttachmentMeta ) {
-			$this->aAttachmentMeta = wp_get_attachment_metadata( $this->getId() );
+		if ( NULL === $this->_aAttachmentMeta ) {
+			$this->_aAttachmentMeta = wp_get_attachment_metadata( $this->getId() );
 		}
 		
 		if ( NULL === $sMetaKey ) {
-			return $this->aAttachmentMeta;
+			return $this->_aAttachmentMeta;
 		} else {
-			return $this->aAttachmentMeta[ $sMetaKey ];		
+			return $this->_aAttachmentMeta[ $sMetaKey ];		
 		}
 	}
+	
+	//
+	public function getWidth() {
+		$aMeta = $this->getAttachmentMeta();
+		return $aMeta[ 'width' ];
+	}
+	
+	//
+	public function getHeight() {
+		$aMeta = $this->getAttachmentMeta();
+		return $aMeta[ 'height' ];
+	}
+	
+	
+	
+	
 	
 	// generates class string for use with jQuery metadata plugin
 	protected function formatMeta( $aMeta ) {

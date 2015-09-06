@@ -6,6 +6,16 @@ if ( defined( 'ABSPATH' ) ) {
 	// constants
 	define( 'GEKO_WP_ABSPATH', substr_replace( ABSPATH, '', strlen( ABSPATH ) - 1, strlen( ABSPATH ) ) );
 	
+	// advanced custom fields pro plugin
+	if ( !function_exists( 'get_field_object' ) ) {
+		
+		//
+		function get_field_object( $sSelector, $iPostId = FALSE, $bFormatValue = TRUE, $bLoadValue = TRUE ) {
+			return NULL;
+		}
+		
+	}
+	
 }
 
 // adds support for newer native functions in PHP
