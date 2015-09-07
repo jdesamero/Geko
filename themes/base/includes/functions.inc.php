@@ -45,7 +45,7 @@ $oBoot->config( array(
 	// 'cat.posttmpl' => TRUE,
 	
 	// 'post.meta' => TRUE,
-	'page.meta' => TRUE
+	// 'page.meta' => TRUE
 	
 ) )->init()->run();
 

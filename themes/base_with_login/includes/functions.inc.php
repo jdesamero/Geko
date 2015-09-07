@@ -39,14 +39,14 @@ $oBoot->config( array(
 	// 'user.mng' => TRUE,
 	'user.rewrite' => TRUE,
 	'user.photo' => TRUE,
-	'user.security' => TRUE,
+	// 'user.security' => TRUE,
 	
 	// 'cat.alias' => TRUE,
 	// 'cat.tmpl' => TRUE,
 	// 'cat.posttmpl' => TRUE,
 	
-	'post.meta' => TRUE,
-	'page.meta' => TRUE
+	// 'post.meta' => TRUE,
+	// 'page.meta' => TRUE
 	
 ) )->init()->run();
 

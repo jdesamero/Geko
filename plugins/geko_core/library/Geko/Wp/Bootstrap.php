@@ -9,6 +9,8 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	
 	protected $_aPrefixes = array( 'Gloc_', 'Geko_Wp_', 'Geko_' );
 	
+	protected $_sTemplateOverride = NULL;
+	
 	
 	
 	
@@ -41,7 +43,8 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 				'db' => TRUE,
 				'consts' => TRUE,
 				'setup' => TRUE,
-				'hooks' => TRUE
+				'hooks' => TRUE,
+				'acf' => TRUE
 				
 			) )
 			
@@ -72,6 +75,16 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	}
 	
 	
+	//// accessors
+	
+	
+	//
+	public function setTemplateOverride( $sTemplateOverride ) {
+		$this->_sTemplateOverride = $sTemplateOverride;
+		return $this;
+	}
+	
+	
 	
 	//// start
 	
@@ -85,7 +98,8 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	}
 	
 	
-	//// components
+	
+	//// hard-coded components
 	
 	
 	// file path/url configuration
@@ -430,10 +444,42 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	}
 	
 	
+	// for ACF Pro
+	public function compAcf( $aArgs ) {
+		
+		if (
+			( isset( $_GET[ 'page' ] ) ) && 
+			( 'gf_activation' == $_GET[ 'page' ] )
+		) {
+			
+			global $wp_filter;
+			
+			// remove existing template redirect
+			if ( is_array( $wp_filter ) ) {
+
+				foreach ( $wp_filter[ 'wp' ] as $i => $aFilters ) {
+					foreach ( $aFilters as $sKey => $cb ) {
+						if ( 'GFUser::maybe_activate_user' == $sKey ) {
+							
+							// name of template is hard-coded for now (activate.php)
+							$this->setTemplateOverride( sprintf( '%s/activate.php', TEMPLATEPATH ) );
+							
+							// unset
+							unset( $wp_filter[ 'wp' ][ $i ][ $sKey ] );
+							break 2;
+						}						
+					}
+				}
+			}
+					
+		}
+		
+	}
 	
 	
 	
-	//// components
+	
+	//// class-based components
 	
 	
 	// role type
@@ -568,6 +614,14 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	//
 	public function templateInclude( $sTemplate ) {
 		
+		
+		// override template, if there's one
+		if ( $this->_sTemplateOverride ) {
+			$sTemplate = $this->_sTemplateOverride;
+		}
+		
+		
+		//
 		$sCurTmplSuffix = $this->resolveTemplateSuffix( $sTemplate );
 		
 		//

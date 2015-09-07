@@ -37,15 +37,10 @@ class Gloc_Layout_Homepage extends Gloc_Layout
 		$oPage = $this->newPage();
 		
 		//
-		$aAtts = $oPage->getAttachments( array(
-			'file_group' => 'slideshow_images',
-			'orderby' => 'file_menu_order'
-		) );
+		$aAtts = $oPage->getSlideshowImages();
 		
 		//
-		$aBoxes = $oPage->getChildren( array(
-			'orderby' => 'menu_order'
-		) );
+		$aBoxes = $oPage->getHomeboxes();
 		
 		?>
 		<div class="gallery">
@@ -71,7 +66,7 @@ class Gloc_Layout_Homepage extends Gloc_Layout
 			<table width="100%" border="0" cellspacing="0" cellpadding="0">
 				<tr>
 					<?php foreach ( $aBoxes as $i => $oBoxPage ): ?>
-						<td class="<?php echo $i ? 'homesepline' : ''; ?>"><div class="boxcontent">
+						<td class="<?php echo $i ? 'homesepline' : '' ; ?>"><div class="boxcontent">
 							<h1><?php $oBoxPage->echoTitle(); ?></h1>
 							<?php $oBoxPage->echoContent(); ?>
 						</div></td>
@@ -79,8 +74,8 @@ class Gloc_Layout_Homepage extends Gloc_Layout
 				</tr>
 				<tr>
 					<?php foreach ( $aBoxes as $i => $oBoxPage ): ?>
-						<td class="<?php echo $i ? 'homesepline' : ''; ?>"><div class="boxcontent">
-							<div class="boxcontent"><span class="boxlinkout"><a href="<?php $oBoxPage->echoUrl(); ?>"><?php $this->l_101(); ?></a></span></div>
+						<td class="<?php echo $i ? 'homesepline' : '' ; ?>"><div class="boxcontent">
+							<div class="boxcontent"><span class="boxlinkout"><a href="<?php $oBoxPage->echoUrl(); ?>"><?php $this->e_101(); ?></a></span></div>
 						</div></td>
 					<?php endforeach; ?>
 				</tr>

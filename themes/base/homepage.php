@@ -37,15 +37,10 @@ class Gloc_Layout_Homepage extends Gloc_Layout
 		$oPage = $this->newPage();
 		
 		//
-		$aAtts = $oPage->getAttachments( array(
-			'file_group' => 'slideshow_images',
-			'orderby' => 'file_menu_order'
-		) );
+		$aAtts = $oPage->getSlideshowImages();
 		
 		//
-		$aBoxes = $oPage->getChildren( array(
-			'orderby' => 'menu_order'
-		) );
+		$aBoxes = $oPage->getHomeboxes();
 		
 		?>
 		<div class="gallery">
@@ -80,7 +75,7 @@ class Gloc_Layout_Homepage extends Gloc_Layout
 				<tr>
 					<?php foreach ( $aBoxes as $i => $oBoxPage ): ?>
 						<td class="<?php echo $i ? 'homesepline' : '' ; ?>"><div class="boxcontent">
-							<div class="boxcontent"><span class="boxlinkout"><a href="<?php $oBoxPage->echoUrl(); ?>"><?php $this->l_101(); ?></a></span></div>
+							<div class="boxcontent"><span class="boxlinkout"><a href="<?php $oBoxPage->echoUrl(); ?>"><?php $this->e_101(); ?></a></span></div>
 						</div></td>
 					<?php endforeach; ?>
 				</tr>
