@@ -53,7 +53,7 @@ class Geko_Wp_EmailMessage_Storage_Manage extends Geko_Wp_Options_Manage
 			->create( '##pfx##geko_emsg_storage', 't' )
 			->fieldBigInt( 'strg_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldLongText( 'label' )
-			->fieldVarChar( 'slug', array( 'size' => 256, 'unq' ) )
+			->fieldVarChar( 'slug', array( 'size' => 255, 'unq' ) )
 			->fieldTinyInt( 'type_id', array( 'unsgnd' ) )
 			->fieldVarChar( 'server', array( 'size' => 256 ) )
 			->fieldVarChar( 'security', array( 'size' => 64 ) )					// should be "ssl", but is a MySQL reserved word

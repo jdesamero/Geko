@@ -33,7 +33,7 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 			->create( '##pfx##geko_roles', 'r' )
 			->fieldSmallInt( 'role_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldVarChar( 'title', array( 'size' => 256 ) )
-			->fieldVarChar( 'slug', array( 'size' => 256, 'unq' ) )
+			->fieldVarChar( 'slug', array( 'size' => 255, 'unq' ) )
 			->fieldVarChar( 'type', array( 'size' => 64 ) )
 			->fieldLongText( 'description' )
 		;

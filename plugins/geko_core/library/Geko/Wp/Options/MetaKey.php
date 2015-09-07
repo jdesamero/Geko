@@ -21,7 +21,7 @@ class Geko_Wp_Options_MetaKey
 			$oSqlTable
 				->create( '##pfx##geko_meta_key', 'm' )
 				->fieldMediumInt( 'mkey_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
-				->fieldVarChar( 'meta_key', array( 'size' => 256, 'unq' ) )
+				->fieldVarChar( 'meta_key', array( 'size' => 255, 'unq' ) )
 			;			
 			
 			self::$oSqlTable = $oSqlTable;

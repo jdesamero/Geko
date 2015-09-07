@@ -17,7 +17,7 @@ class Geko_Wp_Custom_Taxonomy_Manage extends Geko_Wp_Options_Manage
 			->create( '##pfx##geko_custom_taxonomy', 'tx' )
 			->fieldBigInt( 'tx_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldLongText( 'title' )
-			->fieldVarChar( 'slug', array( 'size' => 256, 'unq' ) )
+			->fieldVarChar( 'slug', array( 'size' => 255, 'unq' ) )
 			->fieldLongText( 'description' )
 			->fieldDateTime( 'date_created' )
 			->fieldDateTime( 'date_modified' )

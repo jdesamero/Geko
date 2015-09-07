@@ -49,7 +49,7 @@ class Geko_Wp_Form_Manage extends Geko_Wp_Options_Manage
 			->create( '##pfx##geko_form', 'f' )
 			->fieldBigInt( 'form_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldLongText( 'title' )
-			->fieldVarChar( 'slug', array( 'size' => 256, 'unq' ) )
+			->fieldVarChar( 'slug', array( 'size' => 255, 'unq' ) )
 			->fieldLongText( 'description' )
 			->fieldLongText( 'notes' )
 			->fieldDateTime( 'date_created' )

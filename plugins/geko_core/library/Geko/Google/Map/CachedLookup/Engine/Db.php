@@ -73,7 +73,7 @@ class Geko_Google_Map_CachedLookup_Engine_Db extends Geko_CachedLookup_Engine_Db
 		$oSqlTable4
 			->create( '##pfx##geko_gmap_type', 't' )
 			->fieldInt( 'id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
-			->fieldVarChar( 'label', array( 'size' => 256, 'unq' ) )
+			->fieldVarChar( 'label', array( 'size' => 255, 'unq' ) )
 		;
 		
 		$oDb->tableCreateIfNotExists( $oSqlTable4 );

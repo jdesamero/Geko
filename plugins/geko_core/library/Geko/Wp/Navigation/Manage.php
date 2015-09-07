@@ -30,7 +30,7 @@ class Geko_Wp_Navigation_Manage extends Geko_Wp_Options_Manage
 			->create( '##pfx##geko_navigation', 'n' )
 			->fieldBigInt( 'nav_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldLongText( 'label' )
-			->fieldVarChar( 'code', array( 'size' => 256, 'unq' ) )
+			->fieldVarChar( 'code', array( 'size' => 255, 'unq' ) )
 			->fieldLongText( 'description' )
 			->fieldLongText( 'notes' )
 			->fieldDateTime( 'date_created' )

@@ -16,7 +16,7 @@ class Geko_App_Auth_Adapter extends Zend_Auth_Adapter_DbTable
 			$oAuthTable
 				->create( '##pfx##users', 'u' )
 				->fieldBigInt( 'user_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
-				->fieldVarChar( 'login', array( 'size' => 256, 'unq' ) )
+				->fieldVarChar( 'login', array( 'size' => 255, 'unq' ) )
 				->fieldChar( 'pass', array( 'size' => 32 ) )
 				->fieldDateTime( 'date_created' )
 				->fieldDateTime( 'date_modified' )

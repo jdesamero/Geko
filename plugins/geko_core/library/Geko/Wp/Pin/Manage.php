@@ -33,7 +33,7 @@ class Geko_Wp_Pin_Manage extends Geko_Wp_Options_Manage
 		$oSqlTable
 			->create( '##pfx##geko_pin', 'p' )
 			->fieldBigInt( 'pin_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
-			->fieldVarChar( 'pin', array( 'size' => 256, 'unq' ) )
+			->fieldVarChar( 'pin', array( 'size' => 255, 'unq' ) )
 			->fieldBool( 'redeemed' )
 			->fieldBool( 'testing' )
 			->fieldBool( 'npn' )		// no purchase necessary

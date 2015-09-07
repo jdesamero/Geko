@@ -40,7 +40,7 @@ class Geko_Wp_Enumeration_Manage extends Geko_Wp_Options_Manage
 			->create( '##pfx##geko_enumeration', 'e' )
 			->fieldInt( 'enum_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldVarChar( 'title', array( 'size' => 256 ) )
-			->fieldVarChar( 'slug', array( 'size' => 256, 'unq' ) )
+			->fieldVarChar( 'slug', array( 'size' => 255, 'unq' ) )
 			->fieldLongText( 'value' )
 			->fieldLongText( 'description' )
 			->fieldLongText( 'params' )
