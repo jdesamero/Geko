@@ -988,37 +988,21 @@ abstract class Geko_Entity implements Geko_Json_Encodable
 			
 			
 			// Auto date/time formatting
-			if ( 0 === strpos( $sMethod, 'getDateTime' ) ) {
+			if ( $sBeginMethod = Geko_Array::beginsWith( $sMethod, array( 'getDateTime', 'getTime', 'getDate' ), TRUE ) ) {
 				
-				$sPropName = sprintf( 'date_%s', Geko_Inflector::underscore( substr( $sMethod, 11 ) ) );
+				// get concrete method to call
+				$sDateMethod = sprintf( '%sFormat', lcfirst( substr( $sBeginMethod, 3 ) ) );
 				
-				if ( $this->hasEntityProperty( $sPropName ) ) {
-					
-					return $this->dateTimeFormat(
-						$this->getEntityPropertyValue( $sPropName ),
-						$aArgs[ 0 ]
-					);
+				$sPropName = Geko_Inflector::underscore( substr( $sMethod, strlen( $sBeginMethod ) ) );
+				$sDatePropName = sprintf( 'date_%s', $sPropName );
+				
+				if ( $this->hasEntityProperty( $sDatePropName ) ) {
+					$sPropName = $sDatePropName;		// use this instead
 				}
 				
-			} elseif ( 0 === strpos( $sMethod, 'getTime' ) ) {
-				
-				$sPropName = sprintf( 'date_%s', Geko_Inflector::underscore( substr( $sMethod, 7 ) ) );
-
 				if ( $this->hasEntityProperty( $sPropName ) ) {
 					
-					return $this->timeFormat(
-						$this->getEntityPropertyValue( $sPropName ),
-						$aArgs[ 0 ]
-					);
-				}
-				
-			} elseif ( 0 === strpos( $sMethod, 'getDate' ) ) {
-				
-				$sPropName = sprintf( 'date_%s', Geko_Inflector::underscore( substr( $sMethod, 7 ) ) );
-
-				if ( $this->hasEntityProperty( $sPropName ) ) {
-					
-					return $this->dateFormat(
+					return $this->$sDateMethod(
 						$this->getEntityPropertyValue( $sPropName ),
 						$aArgs[ 0 ]
 					);

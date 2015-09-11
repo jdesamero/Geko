@@ -107,12 +107,27 @@ class Geko_Wp_Initialize extends Geko_Singleton_Abstract
 			$sCall = substr_replace( $sMethod, 'echo', 0, 3 );
 			
 			if ( method_exists( $this, $sCall ) ) {
+				
 				ob_start();
 				call_user_func_array( array( $this, $sCall ), $aArgs );
 				$s = ob_get_contents();
 				ob_end_clean();
+				
 				return $s;
 			}
+			
+		} elseif ( 0 === strpos( $sMethod, 'echo' ) ) {
+						
+			// return results of an echo method as a string if there is a corresponding method
+			$sCall = substr_replace( $sMethod, 'get', 0, 4 );
+			
+			if ( method_exists( $this, $sCall ) ) {
+				
+				echo call_user_func_array( array( $this, $sCall ), $aArgs );
+				
+				return NULL;
+			}
+			
 		}
 		
 		throw new Exception( sprintf( 'Invalid method %s::%s() called.', get_class( $this ), $sMethod ) );

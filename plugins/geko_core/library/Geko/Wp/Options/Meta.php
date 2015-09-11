@@ -198,6 +198,26 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 	
 	
 	//
+	public function fieldSpan( $sName, $mParams = array() ) {
+		
+		if ( is_string( $mParams ) ) {
+			$sClass = '';
+			$sValue = $mParams;
+		} else {
+			$sClass = trim( sprintf( '%s regular-text', $aParams[ 'class' ] ) );
+			$sValue = $aParams[ 'value' ];
+		}
+		
+		echo strval( _gw( 'span', array(
+			'id' => $sName,
+			'name' => $sName,
+			'class' => $sClass
+		), $sValue )->get() );
+		
+		return $this;
+	}
+	
+	//
 	public function fieldText( $sName, $aParams = array() ) {
 		
 		$sClass = trim( sprintf( '%s regular-text', $aParams[ 'class' ] ) );
