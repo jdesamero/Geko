@@ -8,7 +8,13 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	
 	protected $_aRoleHash = NULL;
 	
+	protected $_bDisableUserAdditionalCaps = FALSE;
 	
+	
+	
+	
+	
+	//// accessors
 	
 	//
 	public function getRoleAssignedCountUrl( Geko_Wp_Role $oRole ) {
@@ -47,6 +53,13 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 	}
 	
 	
+	//
+	public function setDisableUserAdditionalCaps( $bDisableUserAdditionalCaps ) {
+		$this->_bDisableUserAdditionalCaps = $bDisableUserAdditionalCaps;
+		return $this;
+	}
+	
+	
 	
 	//// concrete implementations
 	
@@ -64,7 +77,10 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 		
 		add_action( 'admin_geko_roles_edit', array( $this, 'updateUserCaps' ), 10, 3 );
 		
-		add_action( 'edit_user_profile', array( $this, 'editUserProfile'), 9 );
+		if ( !$this->_bDisableUserAdditionalCaps ) {
+			add_action( 'edit_user_profile', array( $this, 'editUserProfile'), 9 );
+		}
+		
 		add_action( 'edit_user_profile_update', array( $this,'editUserProfileUpdate') );
 	}
 	
@@ -82,14 +98,6 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 			$oRole = new Geko_Wp_Role( current( $oWpUser->roles ) );
 		}
 		
-		//print_r( $oWpUser->roles );
-		//print_r( $oWpUser->caps );
-		//print_r( $oWpUser->data );
-		// var_dump( $oWpUser->get_role_caps() );
-		
-		//$oWpUser->add_cap( 'kloo', FALSE );
-		//$oWpUser->add_cap( 'kloo' );
-		//$oWpUser->remove_cap( 'kloo' );
 		
 		$aRoleCaps = ( $oRole ) ? $oRole->getCapabilities() : array();
 		$aUserCaps = $oWpUser->caps;
@@ -171,7 +179,7 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 									if ( $aCap ):
 										$sKey = $aCap[ 'key' ];
 										$sLabel = $aCap[ 'label' ];
-										$sChecked = ( $aRoleCaps[ $sKey ] ) ? ' checked="checked" ' : '';
+										$sChecked = ( $aRoleCaps[ $sKey ] ) ? ' checked="checked" ' : '' ;
 										?><td>
 											<input id="user_role_caps-<?php echo $sKey; ?>" name="user_role_caps[<?php echo $sKey; ?>]" type="checkbox" class="checkbox" value="1" <?php echo $sChecked; ?> /> 
 											<label class="side"><?php echo $sLabel; ?></label></td>
@@ -192,7 +200,7 @@ class Geko_Wp_User_RoleType extends Geko_Wp_Role_Type_Abstract
 					<select name="user_role_levels" id="user_role_levels">
 						<option value="none">None</option>
 						<?php for ( $i = 0; $i <= 10; $i++ ):
-							$sChecked = ( $iLevel === $i ) ? ' selected="selected" ' : '';
+							$sChecked = ( $iLevel === $i ) ? ' selected="selected" ' : '' ;
 							?><option value="<?php echo $i; ?>" <?php echo $sChecked; ?> >Level <?php echo $i; ?></option>
 						<?php endfor; ?>
 					</select><br />

@@ -486,7 +486,14 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	public function compRole_Types( $aArgs ) {
 		
 		$oRoleTypes = Geko_Wp_Role_Types::getInstance();
-		$oRoleTypes->register( 'Geko_Wp_User_RoleType' );
+		
+		$oRoleTypeUser = Geko_Wp_User_RoleType::getInstance();
+		
+		if ( $aArgs[ 'user' ][ 'disable_additional_caps' ] ) {
+			$oRoleTypeUser->setDisableUserAdditionalCaps( TRUE );
+		}
+		
+		$oRoleTypes->register( $oRoleTypeUser );
 		
 		$this->set( 'role.types', $oRoleTypes );
 	}
