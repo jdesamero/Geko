@@ -20,10 +20,10 @@ class Geko_File
 	//
 	public static function formatBytes( $iBytes ) {
 		
-		$iKB = 1024;		// Kilobyte
-		$iMB = 1024 * $iKB;	// Megabyte
-		$iGB = 1024 * $iMB;	// Gigabyte
-		$iTB = 1024 * $iGB;	// Terabyte
+		$iKB = 1024;			// Kilobyte
+		$iMB = 1024 * $iKB;		// Megabyte
+		$iGB = 1024 * $iMB;		// Gigabyte
+		$iTB = 1024 * $iGB;		// Terabyte
 		
 		$sRet = '';
 		

@@ -25,13 +25,13 @@ if ( $sQueryClass = $aParams[ 'entity_query' ] ) {
 	unset( $aParams[ 'entity_query' ] );
 }
 
-if ( !$sQueryClass && $sEntity ) $sQueryClass = $sEntity . '_Query';
+if ( !$sQueryClass && $sEntity ) $sQueryClass = sprintf( '%s_Query', $sEntity );
 
 if ( $sHelperClass = $aParams[ 'entity_export_excel_helper' ] ) {
 	unset( $aParams[ 'entity_export_excel_helper' ] );
 }
 
-if ( !$sHelperClass && $sEntity ) $sHelperClass = $sEntity . '_ExportExcelHelper';
+if ( !$sHelperClass && $sEntity ) $sHelperClass = sprintf( '%s_ExportExcelHelper', $sEntity );
 
 if ( !@class_exists( $sQueryClass ) ) die();						// must be valid query class
 if ( !@class_exists( $sHelperClass ) ) die();						// must be valid helper class
@@ -65,16 +65,16 @@ if ( 'csv' == $sExportMode ) {
 	
 	$aColumns = $oHelper->getTitles();
 	
-	$sOutput = '"' . implode( '","', array_map( 'GekoCsvEscape', $aColumns ) ) . '"' . "\n";
+	$sOutput = sprintf( '"%s"%s', implode( '","', array_map( 'GekoCsvEscape', $aColumns ) ), "\n" );
 	
 	foreach ( $aRes as $oItem ) {
 		$aOut = $oHelper->getValues( $oItem );
-		$sOutput .= '"' . implode( '","', array_map( 'GekoCsvEscape', $aOut ) ) . '"' . "\n";
+		$sOutput .= sprintf( '"%s"%s', implode( '","', array_map( 'GekoCsvEscape', $aOut ) ), "\n" );
 	}
 	
 	header( 'Content-Type: text/x-csv' );
-	header( 'Content-Disposition: attachment; filename="' . $sFileName . '"' );
-	header( 'Content-Length: ' . strlen( $sOutput ) );
+	header( sprintf( 'Content-Disposition: attachment; filename="%s"', $sFileName ) );
+	header( sprintf( 'Content-Length: %d', strlen( $sOutput ) ) );
 	
 	echo $sOutput;
 	

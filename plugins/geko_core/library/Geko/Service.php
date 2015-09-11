@@ -4,13 +4,26 @@
 class Geko_Service extends Geko_Singleton_Abstract
 {
 	
+	protected $_sOutputMethod = 'json';
+	
 	protected $_aPrefixes = array( 'Geko_' );
 	
-	protected $aLeftovers = array();
-	protected $aAjaxResponse = array(
+	protected $_aLeftovers = array();
+	protected $_aAjaxResponse = array(
 		'context' => 'service'
 	);
-	protected $sEncryptKey = '';
+	
+	protected $_aFileOutput = array(
+		'_headers' => array(
+			'Content-Description' => 'File Transfer',
+			'Content-Type' => 'application/octet-stream',
+			'Expires' => '0',
+			'Cache-Control' => 'must-revalidate',
+			'Pragma' => 'public'
+		)
+	);
+	
+	protected $_sEncryptKey = '';
 	
 	protected $_aMapMethods = array();
 	
@@ -124,7 +137,13 @@ class Geko_Service extends Geko_Singleton_Abstract
 	
 	//
 	public function output() {
-		echo Zend_Json::encode( $this->aAjaxResponse );
+		
+		if ( 'file' == $this->_sOutputMethod ) {
+			$this->outputFile();
+		} else {
+			$this->outputJson();
+		}
+		
 		return $this;
 	}
 	
@@ -135,7 +154,7 @@ class Geko_Service extends Geko_Singleton_Abstract
 	
 	//
 	public function setLeftovers( $aLeftovers ) {
-		 $this->aLeftovers = $aLeftovers;
+		 $this->_aLeftovers = $aLeftovers;
 		 return $this;
 	}
 	
@@ -143,7 +162,7 @@ class Geko_Service extends Geko_Singleton_Abstract
 	
 	
 	
-	//// action/status/response stuff
+	//// json action/status/response stuff
 	
 	// service/action paradigm
 	// eg: service: profile; action: register, update password, etc.
@@ -174,14 +193,14 @@ class Geko_Service extends Geko_Singleton_Abstract
 		
 		if ( $bArray ) {
 			
-			if ( !is_array( $this->aAjaxResponse[ 'status' ] ) ) {
-				$this->aAjaxResponse[ 'status' ] = array();
+			if ( !is_array( $this->_aAjaxResponse[ 'status' ] ) ) {
+				$this->_aAjaxResponse[ 'status' ] = array();
 			}
 			
-			$this->aAjaxResponse[ 'status' ][] = $iStatus;
+			$this->_aAjaxResponse[ 'status' ][] = $iStatus;
 			
 		} else {
-			$this->aAjaxResponse[ 'status' ] = $iStatus;		
+			$this->_aAjaxResponse[ 'status' ] = $iStatus;		
 		}
 		
 		return $this;
@@ -189,7 +208,7 @@ class Geko_Service extends Geko_Singleton_Abstract
 	
 	//
 	public function getStatus() {
-		return $this->aAjaxResponse[ 'status' ];
+		return $this->_aAjaxResponse[ 'status' ];
 	}
 	
 	//
@@ -201,8 +220,8 @@ class Geko_Service extends Geko_Singleton_Abstract
 	//
 	public function setIfNoStatus( $iStatus ) {
 		
-		if ( !$this->aAjaxResponse[ 'status' ] ) {
-			$this->aAjaxResponse[ 'status' ] = $iStatus;
+		if ( !$this->_aAjaxResponse[ 'status' ] ) {
+			$this->_aAjaxResponse[ 'status' ] = $iStatus;
 		}
 		
 		return $this;
@@ -210,7 +229,7 @@ class Geko_Service extends Geko_Singleton_Abstract
 	
 	//
 	public function hasStatus() {
-		return ( $this->aAjaxResponse[ 'status' ] ) ? TRUE : FALSE ;
+		return ( $this->_aAjaxResponse[ 'status' ] ) ? TRUE : FALSE ;
 	}
 	
 	//
@@ -240,7 +259,7 @@ class Geko_Service extends Geko_Singleton_Abstract
 			$mValue = $mValue->toJsonEncodable();
 		}
 		
-		$this->aAjaxResponse[ $sKey ] = $mValue;
+		$this->_aAjaxResponse[ $sKey ] = $mValue;
 		
 		return $this;
 	}
@@ -248,7 +267,7 @@ class Geko_Service extends Geko_Singleton_Abstract
 	//
 	public function setResponseValues( $aValues ) {
 		
-		$this->aAjaxResponse = array_merge( $this->aAjaxResponse, $aValues );
+		$this->_aAjaxResponse = array_merge( $this->_aAjaxResponse, $aValues );
 		
 		return $this;
 	}
@@ -271,6 +290,113 @@ class Geko_Service extends Geko_Singleton_Abstract
 	}
 	
 	
+	//
+	public function outputJson() {
+
+		// json, default
+		echo Zend_Json::encode( $this->_aAjaxResponse );
+		
+		return $this;
+	}
+	
+	
+	
+	
+	//// file output
+	
+	
+	//
+	public function setFileOutputErrorMessage( $sMessage ) {
+		
+		$this->setFileOutputValue( '_error_msg', $sMessage );
+		
+		return $this;
+	}
+	
+	// full path to output file
+	public function setFileOutputSource( $sSource ) {
+		
+		$this->setFileOutputValue( '_source', $sSource );
+		
+		return $this;
+	}
+	
+	//
+	public function setFileOutputName( $sName ) {
+		
+		$this->setFileOutputValue( '_name', $sName );
+		
+		return $this;	
+	}
+	
+	//
+	public function setFileOutputHeader( $sHeader, $sValue ) {
+		
+		if ( !is_array( $aHeaders = $this->_aFileOutput[ '_headers' ] ) ) {
+			$aHeaders = array();
+		}
+		
+		$aHeaders[ $sHeader ] = $sValue;
+		
+		$this->_aFileOutput[ '_headers' ] = $aHeaders;
+		
+		return $this;
+	}
+	
+	
+	//
+	public function setFileOutputValue( $sKey, $mValue ) {
+	
+		$this->_aFileOutput[ $sKey ] = $mValue;
+		
+		return $this;
+	}
+	
+	
+	//
+	public function outputFile() {
+
+		$aFileOutput = $this->_aFileOutput;
+		
+		if ( $sErrorMsg = $aFileOutput[ '_error_msg' ] ) {
+			
+			echo $sErrorMsg;
+		
+		} else {
+			
+			// get all the headers
+			$aHeaders = $aFileOutput[ '_headers' ];
+			
+			// get the file to read
+			$sSource = $aFileOutput[ '_source' ];
+			
+			if ( is_file( $sSource ) ) {
+
+				// determine the name
+				if ( !$sName = $aFileOutput[ '_name' ] ) {
+					$sName = basename( $sSource );
+				}
+				
+				$aHeaders[ 'Content-Disposition' ] = sprintf( 'attachment; filename="%s"', $sName );
+				$aHeaders[ 'Content-Length' ] = filesize( $sSource );
+				
+				foreach ( $aHeaders as $sHeader => $sValue ) {
+					$sHeaderFull = sprintf( '%s: %s', $sHeader, $sValue );
+					header( $sHeaderFull );
+				}
+				
+				readfile( $sSource );
+				
+			} else {
+				echo 'File does not exist!';
+			}
+		}
+		
+		return $this;
+	}
+	
+	
+	
 	
 	
 	//// encrypt/decrypt helpers
@@ -278,7 +404,7 @@ class Geko_Service extends Geko_Singleton_Abstract
 	//
 	public function encrypt( $sData, $sKey = '' ) {
 		
-		if ( !$sKey ) $sKey = $this->sEncryptKey;
+		if ( !$sKey ) $sKey = $this->_sEncryptKey;
 		
 		return base64_encode(
 			mcrypt_encrypt(
@@ -294,7 +420,7 @@ class Geko_Service extends Geko_Singleton_Abstract
 	//
 	public function decrypt( $sData, $sKey = '' ) {
 		
-		if ( !$sKey ) $sKey = $this->sEncryptKey;
+		if ( !$sKey ) $sKey = $this->_sEncryptKey;
 		
 		return rtrim( mcrypt_decrypt(
 			MCRYPT_RIJNDAEL_256,

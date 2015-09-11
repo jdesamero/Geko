@@ -147,7 +147,7 @@ class Geko_Wp_Entity_Service extends Geko_Wp_Service
 
 		// hook here maybe???
 		
-		$this->aAjaxResponse = $aAjaxResponse;
+		$this->_aAjaxResponse = $aAjaxResponse;
 		
 		return $this;
 		

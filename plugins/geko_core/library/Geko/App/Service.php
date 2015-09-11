@@ -15,7 +15,7 @@ class Geko_App_Service extends Geko_Service
 			return $sAction;
 		}
 		
-		if ( $sAction = trim( $this->aLeftovers[ 1 ] ) ) {
+		if ( $sAction = trim( $this->_aLeftovers[ 1 ] ) ) {
 			return $sAction;
 		}
 		
