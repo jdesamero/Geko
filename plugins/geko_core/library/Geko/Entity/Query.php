@@ -829,7 +829,7 @@ abstract class Geko_Entity_Query
 			
 			foreach ( $this as $oEntity ) {
 				
-				$mGroupRet = $this->getSubsetGrouping( $oEntity, $sField, $aArgs );
+				$mGroupRet = $this->getSubsetGrouping( $oEntity, $sField, $sMethod, $aArgs );
 				
 				if ( $mGroupRet instanceof Geko_Util_Value ) {
 					$aSubset[ $mGroupRet->get() ][] = $oEntity;
@@ -892,8 +892,10 @@ abstract class Geko_Entity_Query
 			
 			// iterate through each subset
 			foreach ( $this->_aSubsets as $sField => $aSubGroup ) {
-								
-				$mGroupRet = $this->getSubsetGrouping( $oEntity, $sField, $aArgs );
+				
+				$sMethod = sprintf( 'get%s', Geko_Inflector::camelize( $sField ) );
+				
+				$mGroupRet = $this->getSubsetGrouping( $oEntity, $sField, $sMethod, $aArgs );
 				
 				// update
 				if ( $mGroupRet instanceof Geko_Util_Value ) {
@@ -919,7 +921,7 @@ abstract class Geko_Entity_Query
 	
 	
 	// helper
-	public function getSubsetGrouping( $oEntity, $sField, $aArgs ) {
+	public function getSubsetGrouping( $oEntity, $sField, $sMethod, $aArgs ) {
 
 		$bGroup = TRUE;
 		
