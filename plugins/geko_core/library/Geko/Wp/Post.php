@@ -260,49 +260,11 @@ class Geko_Wp_Post extends Geko_Wp_Entity
 	
 	// support for Advanced Custom Fields Pro
 	public function getAcfProMetaValue( $sMetaKey, $iPostId ) {
-		
-		if ( $aRes = get_field_object( $sMetaKey, $iPostId ) ) {
-			
-			// allow for intelligent formatting of data based on field meta-data
-			
-			$sType = $aRes[ 'type' ];
-			$mValue = $aRes[ 'value' ];
-			$sReturnFormat = $aRes[ 'return_format' ];
-			
-			if ( 'repeater' == $sType ) {
+
+		// allow for intelligent formatting of data based on field meta-data
+		$oAcfPro = Geko_Wp_Ext_AcfPro::getInstance();
 				
-				// wrap as Geko_Wp_Anonymous_Query/Geko_Wp_Anonymous
-				
-				$aRepVals = ( is_array( $mValue ) ) ? $mValue : array() ;
-				
-				$mValue = new Geko_Wp_Anonymous_Query( NULL, FALSE );
-				$mValue->setRawEntities( $aRepVals );
-				
-			} elseif ( ( 'image' == $sType ) && ( 'array' == $sReturnFormat ) ) {
-				
-				// wrap as Geko_Wp_Media
-				$aMediaVals = ( is_array( $mValue ) ) ? $mValue : array() ;
-				$aMediaVals[ 'ID' ] = $iPostId;			// parent_id, which is the post id
-				
-				$mValue = new Geko_Wp_Media( $aMediaVals );
-				
-			} elseif ( 'gallery' == $sType ) {
-				
-				// wrap as Geko_Wp_Media_Query
-				$aGalleryVals = ( is_array( $mValue ) ) ? $mValue : array() ;
-				foreach ( $aGalleryVals as $i => $a ) {
-					$aGalleryVals[ $i ][ 'ID' ] = $iPostId;			// parent_id, which is the post id
-				}
-				
-				$mValue = new Geko_Wp_Media_Query( NULL, FALSE );
-				$mValue->setRawEntities( $aGalleryVals );
-				
-			}
-			
-			return $mValue;
-		}
-		
-		return NULL;
+		return $oAcfPro->getPostMetaValue( $sMetaKey, $iPostId );
 	}
 	
 	
