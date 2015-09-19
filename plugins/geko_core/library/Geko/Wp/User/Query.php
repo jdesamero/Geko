@@ -52,6 +52,8 @@ class Geko_Wp_User_Query extends Geko_Wp_Entity_Query
 			->field( 'gr.slug', 'role_slug' )
 			->field( 'gr.slug', 'role' )						// synonymous with "role_slug"
 			
+			->from( '##pfx##users', 'u' )
+			
 			->joinLeft( '##pfx##usermeta', 'r' )
 				->on( 'r.user_id = u.ID' )
 				->on( 'r.meta_key = ?', '_geko_role_id' )

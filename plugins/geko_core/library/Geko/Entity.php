@@ -326,7 +326,7 @@ abstract class Geko_Entity implements Geko_Json_Encodable
 	//// initial helpers
 	
 	//
-	public function setEntityMapping( $sIndex, $sProperty ) {
+	public function setEntityMapping() {
 		
 		$aArgs = func_get_args();
 		
