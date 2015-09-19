@@ -130,10 +130,11 @@ class Zend_Loader
         /**
          * Try finding for the plain filename in the include_path.
          */
+        // @ added by Joel, lots of logging noise generated if class file not found
         if ($once) {
-            include_once $filename;
+            @include_once $filename;
         } else {
-            include $filename;
+            @include $filename;
         }
 
         /**

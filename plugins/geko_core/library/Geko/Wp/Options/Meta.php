@@ -701,7 +701,7 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 	}
 	
 	// hook method
-	protected function commitMetaDataValue( $aVals, $oMeta ) {
+	protected function commitMetaDataValue( $aVals, $oMeta, $sMetaKey, $aParams ) {
 		return $aVals;
 	}
 	

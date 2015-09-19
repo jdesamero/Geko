@@ -194,14 +194,17 @@ class Geko_Layout extends Geko_Singleton_Abstract
 		$aArgs = func_get_args();
 		$aRet = array();
 		
-		foreach ( $this->_aTemplates  as $sTemplate => $aGroup ) {
+		foreach ( $this->_aTemplates as $sTemplate => $aGroup ) {
+			
 			$bMatch = TRUE;
+			
 			foreach ( $aArgs as $sMatchGroup ) {
 				if ( !in_array( $sMatchGroup, $aGroup ) ) {
 					$bMatch = FALSE;
 					break;
 				}
 			}
+			
 			if ( $bMatch ) $aRet[] = $sTemplate;
 		}
 		
@@ -266,14 +269,23 @@ class Geko_Layout extends Geko_Singleton_Abstract
 		
 		if ( is_array( $this->_aTemplates ) ) {
 			
-			foreach ( $this->_aTemplates as $mTmpl ) {
+			// rework array
+			$aTemplates = $this->_aTemplates;
+			$this->_aTemplates = array();			// reset
+			
+			foreach ( $aTemplates as $mKey => $mTmpl ) {
 				
 				if ( is_string( $mTmpl ) ) {
+					
 					$aTmpl = Geko_Array::explodeTrimEmpty( ' ', $mTmpl );
-				} else {
+				
+				} elseif ( is_array( $mTmpl ) ) {
+					
+					array_unshift( $mTmpl, $mKey );
 					$aTmpl = $mTmpl;
 				}
 				
+				// this populates $this->_aTemplates
 				call_user_func_array( array( $this, 'addTemplate' ), $aTmpl );				
 			}
 			

@@ -120,6 +120,7 @@
 		<currency title="Turkmenistan Manat" code="TMM" symbol="77" />
 		<currency title="Tuvalu Dollar" code="TVD" symbol="36" />
 		<currency title="Ukraine Hryvnia" code="UAH" symbol="8372" conversion_decimal_places="3" />
+		<currency title="United Arab Emirates" code="AED" symbol="32" />
 		<currency title="United Kingdom Pound" code="GBP" symbol="163" />
 		<currency title="United States Dollar" code="USD" symbol="36" />
 		<currency title="Uruguay Peso" code="UYU" symbol="36, 85" conversion_decimal_places="3" />

@@ -5,7 +5,7 @@ class Geko_Wp_Ext_PageNavi
 {
 
 	//
-	public function get( $aParams = array() ) {
+	public static function get( $aParams = array() ) {
 		
 		if ( function_exists( 'wp_pagenavi' ) ) {
 			
@@ -107,9 +107,12 @@ class Geko_Wp_Ext_PageNavi
 		return NULL;
 	}
 	
+	
 	//
-	public function show( $aParams = array() ) {
+	public static function show( $aParams = array() ) {
 		echo self::get( $aParams );
 	}
 
 }
+
+

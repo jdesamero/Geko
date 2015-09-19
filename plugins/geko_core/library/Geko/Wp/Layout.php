@@ -128,7 +128,15 @@ class Geko_Wp_Layout extends Geko_Layout
 	
 	//
 	public function getBodyClassCb() {
-		return Geko_Wp::getBodyClass();
+		
+		$aArgs = func_get_args();
+		
+		// do this to prevent noisy logs
+		if ( 0 == count( $aArgs ) ) {
+			$aArgs[] = '';
+		}
+		
+		return call_user_func_array( array( 'Geko_Wp', 'getBodyClass' ), $aArgs );
 	}
 	
 	

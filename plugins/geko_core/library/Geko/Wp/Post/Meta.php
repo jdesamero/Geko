@@ -79,7 +79,7 @@ class Geko_Wp_Post_Meta extends Geko_Wp_Options_Meta
 	//// accessors
 	
 	//
-	public function getStoredOptions() {
+	public function getStoredOptions( $oPlugin = NULL ) {
 		
 		global $post;
 		
