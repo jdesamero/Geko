@@ -65,19 +65,19 @@ class Geko_Wp_Media_Query extends Geko_Wp_Post_Query
 			
 			
 			if ( $sContentLike = $aParams[ 'content_like' ] ) {
-				$oQuery->where( sprintf( "gkpf.post_content LIKE '%%%s%%'", $oDb->quote( $sContentLike ) ) );
+				$oQuery->where( sprintf( "gkpf.post_content LIKE %s", $oDb->quote( sprintf( '%%%s%%', $sContentLike ) ) ) );
 			}
 			
 			if ( $sContentNotLike = $aParams[ 'content_not_like' ] ) {
-				$oQuery->where( sprintf( "gkpf.post_content NOT LIKE '%%%s%%'", $oDb->quote( $sContentNotLike ) ) );			
+				$oQuery->where( sprintf( "gkpf.post_content NOT LIKE %s", $oDb->quote( sprintf( '%%%s%%', $sContentNotLike ) ) ) );			
 			}
 			
 			if ( $sExcerptLike = $aParams[ 'excerpt_like' ] ) {
-				$oQuery->where( sprintf( "gkpf.post_excerpt LIKE '%%%s%%'", $oDb->quote( $sExcerptLike ) ) );
+				$oQuery->where( sprintf( "gkpf.post_excerpt LIKE %s", $oDb->quote( sprintf( '%%%s%%', $sExcerptLike ) ) ) );
 			}
 			
 			if ( $sExcerptNotLike = $aParams[ 'excerpt_not_like' ] ) {
-				$oQuery->where( sprintf( "gkpf.post_excerpt NOT LIKE '%%%s%%'", $oDb->quote( $sExcerptNotLike ) ) );
+				$oQuery->where( sprintf( "gkpf.post_excerpt NOT LIKE %s", $oDb->quote( sprintf( '%%%s%%', $sExcerptNotLike ) ) ) );
 			}
 			
 			if ( $aParams[ 'images_only' ] ) {
