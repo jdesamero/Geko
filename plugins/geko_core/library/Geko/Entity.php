@@ -401,7 +401,7 @@ abstract class Geko_Entity implements Geko_Json_Encodable
 			$sProperty = $mProperty;
 			
 			// only check for "real" properties, not "magic" properties
-			if ( property_exists( $this->_oEntity, $sProperty ) ) {
+			if ( is_object( $this->_oEntity ) && property_exists( $this->_oEntity, $sProperty ) ) {
 				$mContent = $this->_oEntity->$sProperty;
 			}
 		}
