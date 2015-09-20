@@ -88,8 +88,18 @@ class Geko_Wp_Media_Query extends Geko_Wp_Post_Query
 				$oQuery->where( "0 = LOCATE( 'image', gkpf.post_mime_type )" );			
 			}
 			
-			if ( $aParams[ 'file_ids' ] ) {
-				$oQuery->where( 'gkpf.ID * ($)', $aParams[ 'file_ids' ] );
+			
+			// this needs to be done to ensure query does not crap out
+			$bHasFileIds = $aParams[ 'has_file_ids' ];
+			$mFileIds = $aParams[ 'file_ids' ];
+			
+			if ( $bHasFileIds || $mFileIds ) {
+				
+				if ( $bHasFileIds && is_array( $mFileIds ) && ( 0 == count( $mFileIds ) ) ) {
+					$mFileIds = 0;
+				}
+				
+				$oQuery->where( 'gkpf.ID * ($)', $mFileIds );
 			}
 			
 			if ( $mOrderBy = $aParams[ 'orderby' ] ) {
