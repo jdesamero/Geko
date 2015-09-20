@@ -95,7 +95,13 @@ class Geko_Wp_Media_Query extends Geko_Wp_Post_Query
 			
 			if ( $bHasFileIds || $mFileIds ) {
 				
-				if ( $bHasFileIds && is_array( $mFileIds ) && ( 0 == count( $mFileIds ) ) ) {
+				if (
+					$bHasFileIds && 
+					(
+						( !$mFileIds ) || 
+						( is_array( $mFileIds ) && ( 0 == count( $mFileIds ) ) ) 
+					)
+				) {
 					$mFileIds = 0;
 				}
 				
