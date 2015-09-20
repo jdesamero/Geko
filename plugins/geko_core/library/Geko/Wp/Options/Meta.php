@@ -503,26 +503,33 @@ class Geko_Wp_Options_Meta extends Geko_Wp_Options
 		
 		$oDb = Geko_Wp::get( 'db' );
 		
+		$aSubVals = array();
+		
 		$aMetaIds = array();
 		
-		foreach ( $aItems as $oItem ) {
-			$aMetaIds[] = $oItem->$sMetaIdFieldName;
+		if ( is_array( $aItems ) && ( count( $aItems ) > 0 ) ) {
+			foreach ( $aItems as $oItem ) {
+				$aMetaIds[] = $oItem->$sMetaIdFieldName;
+			}
 		}
 		
-		$oQuery = new Geko_Sql_Select();
-		$oQuery
-			->field( 'mt.*' )
-			->from( $oDb->_p( $sMetaMemberTable ), 'mt' )
-			->where( sprintf( '%s * ($)', $sMetaIdFieldName ), $aMetaIds )
-			->order( 'member_id', 'ASC' )
-			->order( 'member_value', 'ASC' )
-		;
-		
-		$aSubFmt = $oDb->fetchAllObj( strval( $oQuery ) );
-		
-		$aSubVals = array();
-		foreach ( $aSubFmt as $oSubItem ) {
-			$aSubVals[ $oSubItem->$sMetaIdFieldName ][] = $oSubItem;
+		if ( count( $aMetaIds ) > 0 ) {
+
+			$oQuery = new Geko_Sql_Select();
+			$oQuery
+				->field( 'mt.*' )
+				->from( $oDb->_p( $sMetaMemberTable ), 'mt' )
+				->where( sprintf( '%s * ($)', $sMetaIdFieldName ), $aMetaIds )
+				->order( 'member_id', 'ASC' )
+				->order( 'member_value', 'ASC' )
+			;
+			
+			$aSubFmt = $oDb->fetchAllObj( strval( $oQuery ) );
+			
+			foreach ( $aSubFmt as $oSubItem ) {
+				$aSubVals[ $oSubItem->$sMetaIdFieldName ][] = $oSubItem;
+			}
+			
 		}
 		
 		return $aSubVals;

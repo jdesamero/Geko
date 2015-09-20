@@ -88,7 +88,7 @@ class Geko_Wp_Media_Query extends Geko_Wp_Post_Query
 				$oQuery->where( "0 = LOCATE( 'image', gkpf.post_mime_type )" );			
 			}
 			
-			if ( $aParams[ 'has_file_ids' ] || $aParams[ 'file_ids' ] ) {
+			if ( $aParams[ 'file_ids' ] ) {
 				$oQuery->where( 'gkpf.ID * ($)', $aParams[ 'file_ids' ] );
 			}
 			

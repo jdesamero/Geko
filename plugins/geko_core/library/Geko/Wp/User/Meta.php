@@ -166,20 +166,23 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 			
 			$aFmt = $oDb->fetchHashObj( strval( $oQuery ), 'meta_key' );
 			
-			////
-			$aRet = array();
-			$aSubVals = $this->gatherSubMetaValues( $aFmt, 'geko_user_meta_members', 'umeta_id' );
-			
-			foreach ( $aFmt as $sKey => $oItem ) {
-				$aRet[ $sKey ][ 0 ] = $oItem->umeta_id;
-				if ( isset( $aSubVals[ $oItem->umeta_id ] ) ) {
-					$aRet[ $sKey ][ 1 ] = $aSubVals[ $oItem->umeta_id ];
-				} else {
-					$aRet[ $sKey ][ 1 ] = maybe_unserialize( $oItem->meta_value );				
+			if ( is_array( $aFmt ) && ( count( $aFmt ) > 0 ) ) {
+
+				////
+				$aRet = array();
+				$aSubVals = $this->gatherSubMetaValues( $aFmt, 'geko_user_meta_members', 'umeta_id' );
+				
+				foreach ( $aFmt as $sKey => $oItem ) {
+					$aRet[ $sKey ][ 0 ] = $oItem->umeta_id;
+					if ( isset( $aSubVals[ $oItem->umeta_id ] ) ) {
+						$aRet[ $sKey ][ 1 ] = $aSubVals[ $oItem->umeta_id ];
+					} else {
+						$aRet[ $sKey ][ 1 ] = maybe_unserialize( $oItem->meta_value );				
+					}
 				}
+				
+				self::$aMetaCache[ $iUserId ] = $aRet;			
 			}
-			
-			self::$aMetaCache[ $iUserId ] = $aRet;
 		}
 		
 	}

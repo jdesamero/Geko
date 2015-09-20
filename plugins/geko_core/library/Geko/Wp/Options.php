@@ -769,11 +769,17 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 			( is_object( $aElem[ 'elem' ] ) ) && 
 			( $aElem[ 'elem' ]->attr( '_member_ids' ) )
 		) {
+			
 			$aRet = array();
-			foreach ( $mValue as $oItem ) {
-				$aRet[] = Geko_String::coalesce( $oItem->member_id, $oItem->member_value );
+			
+			if ( is_array( $mValue ) ) {
+				foreach ( $mValue as $oItem ) {
+					$aRet[] = Geko_String::coalesce( $oItem->member_id, $oItem->member_value );
+				}
 			}
+			
 			return Zend_Json::encode( $aRet );		
+		
 		} elseif ( 
 			( 'select:multiple' == $aElem[ 'type' ] ) && 
 			( is_array( $mValue ) ) && 

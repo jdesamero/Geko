@@ -95,21 +95,21 @@ class Geko_Currency_Rate extends Geko_Http
 		$sTrueBaseCountryCode = $this->_aRates[ 'base' ];							// this should be USD
 		if ( !$sBaseCountryCode ) $sBaseCountryCode = $sTrueBaseCountryCode;		// use the "true" base
 		
-		$fRate = $this->_aRates[ 'rates' ][ $sTargetCountryCode ];
+		if ( $fRate = $this->_aRates[ 'rates' ][ $sTargetCountryCode ] ) {
 		
-		if ( $sTrueBaseCountryCode != $sBaseCountryCode ) {
-			
-			// the base rate asked for is not the same as the "true" base
-			
-			// re-calculate base rate
-			$fBaseRate = $this->_aRates[ 'rates' ][ $sBaseCountryCode ];
-			
-			if ( $fBaseRate ) {
-				$fRate = $fBaseRate * ( 1 / $fRate );
+			if ( $sTrueBaseCountryCode != $sBaseCountryCode ) {
+				
+				// the base rate asked for is not the same as the "true" base
+				
+				// re-calculate base rate
+				$fBaseRate = $this->_aRates[ 'rates' ][ $sBaseCountryCode ];
+				
+				if ( $fBaseRate ) {
+					$fRate = $fBaseRate * ( 1 / $fRate );
+				}	
 			}
 			
 		}
-		
 		
 		return $fRate;
 	}
