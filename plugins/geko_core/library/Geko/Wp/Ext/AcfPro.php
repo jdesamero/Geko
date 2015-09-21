@@ -58,7 +58,9 @@ class Geko_Wp_Ext_AcfPro extends Geko_Singleton_Abstract
 			// TO DO: figure out parent_id of image attachment, maybe it's not required?
 			// $aMediaVals[ 'ID' ] = $iPostId;						// parent_id, which is the post id
 			
-			$mValue = new Geko_Wp_Media( $aMediaVals );
+			if ( count( $aMediaVals ) > 0 ) {
+				$mValue = new Geko_Wp_Media( $aMediaVals );
+			}
 			
 		} elseif ( 'gallery' == $sType ) {
 			
