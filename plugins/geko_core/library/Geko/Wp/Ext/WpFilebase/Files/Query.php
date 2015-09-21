@@ -21,6 +21,8 @@ class Geko_Wp_Ext_WpFilebase_Files_Query extends Geko_Wp_Entity_Query
 			->field( 'f.file_custom_license_terms', 'terms' )
 			->field( 'f.file_platform', 'platform' )
 			->field( 'f.file_version', 'version' )
+			->field( 'f.file_size', 'size' )
+			->field( 'f.file_offline', 'offline' )
 			
 			->field( 'c.cat_folder', 'folder' )
 			
@@ -30,6 +32,13 @@ class Geko_Wp_Ext_WpFilebase_Files_Query extends Geko_Wp_Entity_Query
 				->on( 'c.cat_id = f.file_category' )
 			
 		;
+		
+		
+		//
+		if ( $aParams[ 'exclude_offline' ] ) {
+			$oQuery->where( "f.file_offline = '0'" );
+		}
+		
 		
 		return $oQuery;
 	}
