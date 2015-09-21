@@ -316,7 +316,14 @@ class Geko_String
 	
 	//
 	public static function printNumberFormat() {
+		
 		$aArgs = func_get_args();
+		
+		// force format to float
+		if ( is_string( $aArgs[ 0 ] ) ) {
+			$aArgs[ 0 ] = floatval( $aArgs[ 0 ] );
+		}
+		
 		echo call_user_func_array( 'number_format', $aArgs );
 	}
 	
