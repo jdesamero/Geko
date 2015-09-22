@@ -27,12 +27,14 @@ class Gloc_Layout_Main extends Gloc_Layout
 		118 => 'Login failed. Please try again.',
 		119 => 'Error',
 		120 => 'You must be logged in to access this page.',
-		121 => 'This page cannot be accessed while you are logged-in.'
+		121 => 'This page cannot be accessed while you are logged-in.',
+		122 => 'Invalid credentials provided!',
+		123 => "Login successful! Please wait while you're redirected..."
 	);
 	
 	protected $_mBodyClass = '##body_class##';
 	protected $_mStyles = 'gloc';
-	protected $_mScripts = 'geko-jquery-geko_ajax_form';
+	protected $_mScripts = 'geko-jquery-geko_ajax_form gloc_login';
 	
 	protected $_aTemplates = array(
 		'page_template:homepage.php custom public',
@@ -203,7 +205,8 @@ class Gloc_Layout_Main extends Gloc_Layout
 		$aJsonParams = array(
 			'script' => $this->getScriptUrls(),
 			'status' => $oService->getStatusValues(),
-			'labels' => $this->_getLabels()
+			'labels' => $this->_getLabels(),
+			'form_sel' => '#loginform'
 		);
 		
 		?>
@@ -212,53 +215,8 @@ class Gloc_Layout_Main extends Gloc_Layout
 			jQuery( document ).ready( function( $ ) {
 				
 				var oParams = <?php echo Zend_Json::encode( $aJsonParams ); ?>;
-				var labels = oParams.labels;
 				
-				var loginForm = $( '#loginform' );
-				
-				loginForm.gekoAjaxForm( {
-					status: oParams.status,
-					process_script: oParams.script.process,
-					action: '&action=Gloc_Service_Profile&subaction=login',
-					validate: function( form, errors ) {
-						
-						var email = form.getTrimVal( '#email' );
-						var password = form.getTrimVal( '#password' );
-						
-						if ( !email ) {
-							errors.push( labels[ 113 ] );
-							form.errorField( '#email' );
-						} else {
-							if ( !form.isEmail( email ) ) {
-								errors.push( labels[ 114 ] );
-								form.errorField( '#email' );
-							}
-						}
-						
-						if ( !password ) {
-							errors.push( labels[ 115 ] );
-							form.errorField( '#password' );
-						} else {
-							if ( password.length < 6 ) {
-								errors.push( labels[ 116 ] );
-								form.errorField( '#password' );
-							}
-						}
-						
-						return errors;
-						
-					},
-					process: function( form, res, status ) {
-						if ( status.login == parseInt( res.status ) ) {
-							// reload page
-							window.location = oParams.script.curpage;
-						} else if ( status.not_activated == parseInt( res.status ) ) {
-							form.error( labels[ 117 ] );
-						} else {
-							form.error( labels[ 118 ] );
-						}
-					}
-				} );
+				Gloc.Login.run( oParams );
 				
 			} );
 			

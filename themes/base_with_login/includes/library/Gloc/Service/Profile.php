@@ -32,14 +32,18 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 	//
 	public function processLogin() {
 		
+		
+		$sError = 'Server Error';
+		$sErrorMsg = '';
+		
+		
 		$sEmail = trim( $_POST[ 'email' ] );
 		$sPassword = trim( $_POST[ 'password' ] );
 		
 		// do initial validation
-		if ( $sEmail && $sPassword && email_exists( $sEmail ) ) {
+		if ( $sEmail && $sPassword && ( $iUserId = email_exists( $sEmail ) ) ) {
 			
-			$sUserClass = $this->resolveClass( 'User' );
-			$oUser = new $sUserClass( $sEmail );
+			$oUser = $this->newUser( $iUserId );
 			
 			if ( $oUser->getIsActivated() ) {
 				
@@ -48,15 +52,29 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 					'user_password' => $sPassword
 				) );
 				
-				if ( !is_wp_error( $oWpUser ) ) {
-					$this->setStatus( self::STAT_LOGIN );
+				if ( is_wp_error( $oWpUser ) ) {
+					// $this->setStatus( self::STAT_LOGIN );
+					$sErrorMsg = 'You have provided invalid credentials!';
 				}
 				
 			} else {
-				$this->setStatus( self::STAT_NOT_ACTIVATED );
+				// $this->setStatus( self::STAT_NOT_ACTIVATED );
+				$sErrorMsg = 'Your account have not been activated!';
 			}
+			
+		} else {
+			$sErrorMsg = 'You have provided invalid credentials!';
 		}
 		
+		
+		//
+		if ( $sErrorMsg ) {
+			$this
+				->setResponseValue( 'error', $sError )
+				->setResponseValue( 'error_msg', $sErrorMsg )
+			;
+		}
+				
 	}
 	
 	//

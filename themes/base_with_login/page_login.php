@@ -32,7 +32,8 @@ class Gloc_Layout_PageLogin extends Gloc_Layout
 		$aJsonParams = array(
 			'script' => $this->getScriptUrls(),
 			'status' => $oService->getStatusValues(),
-			'labels' => $this->_getLabels()
+			'labels' => $this->_getLabels(),
+			'form_sel' => '#pageloginform'
 		);
 		
 		?>
@@ -41,60 +42,15 @@ class Gloc_Layout_PageLogin extends Gloc_Layout
 			jQuery( document ).ready( function( $ ) {
 				
 				var oParams = <?php echo Zend_Json::encode( $aJsonParams ); ?>;
-				var labels = oParams.labels;
 				
-				var loginForm = $( '#pageloginform' );
-				
-				loginForm.gekoAjaxForm( {
-					status: oParams.status,
-					process_script: oParams.script.process,
-					action: '&action=Gloc_Service_Profile&subaction=login',
-					validate: function( form, errors ) {
-						
-						var email = form.getTrimVal( '#email' );
-						var password = form.getTrimVal( '#password' );
-						
-						if ( !email ) {
-							errors.push( labels[ 106 ] );
-							form.errorField( '#email' );
-						} else {
-							if ( !form.isEmail( email ) ) {
-								errors.push( labels[ 107 ] );
-								form.errorField( '#email' );
-							}
-						}
-						
-						if ( !password ) {
-							errors.push( labels[ 108 ] );
-							form.errorField( '#password' );
-						} else {
-							if ( password.length < 6 ) {
-								errors.push( labels[ 109 ] );
-								form.errorField( '#password' );
-							}
-						}
-						
-						return errors;
-						
-					},
-					process: function( form, res, status ) {
-						if ( status.login == parseInt( res.status ) ) {
-							// reload page
-							window.location = oParams.script.curpage;
-						} else if ( status.not_activated == parseInt( res.status ) ) {
-							form.error( labels[ 110 ] );
-						} else {
-							form.error( labels[ 111 ] );
-						}
-					}
-				} );
+				Gloc.Login.run( oParams );
 				
 			} );
 			
 		</script>
 		<?php
 		
-	}	
+	}
 	
 	
 	//
