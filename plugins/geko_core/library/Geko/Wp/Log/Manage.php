@@ -16,6 +16,7 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 	protected $_sMetaTableName = '';
 	protected $_sLogTitle = '';
 	protected $_bReportOnly = FALSE;
+	protected $_aForceFields = array();
 	
 	protected $_bUseMetaTable = FALSE;
 	
@@ -865,7 +866,12 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 			$bFoundValue = FALSE;
 			$mValue = NULL;
 			
-			if ( isset( $_POST[ $sKey ] ) ) {
+			if ( in_array( $sKey, $this->_aForceFields ) ) {
+				$mValue = $aParams[ $sKey ];
+				$bFoundValue = TRUE;			
+			}
+			
+			if ( !$bFoundValue && isset( $_POST[ $sKey ] ) ) {
 				$mValue = $_POST[ $sKey ];
 				$bFoundValue = TRUE;
 			}
