@@ -5,6 +5,7 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 {
 	
 	protected $_aRegistry = array();
+	protected $_aRegAlias = array();
 	
 	
 	// dependency tree for the various bootstrap components
@@ -44,14 +45,19 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 	//
 	public function set( $sKey, $mValue ) {
 		
-		$this->_aRegistry[ $sKey ] = $mValue;
+		$sResolvedKey = $this->resolveKey( $sKey );
+		
+		$this->_aRegistry[ $sResolvedKey ] = $mValue;
 		
 		return $this;
 	}
 	
 	//
 	public function get( $sKey ) {
-		return $this->_aRegistry[ $sKey ];
+		
+		$sResolvedKey = $this->resolveKey( $sKey );
+		
+		return $this->_aRegistry[ $sResolvedKey ];
 	}
 	
 	
@@ -66,6 +72,39 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 	}
 	
 	
+	
+	// allow for resolution of both long and short forms
+	public function resolveKey( $sKey ) {
+		
+		// only do this if $sKey does not begin with "val:"
+		if ( 0 !== strpos( $sKey, 'val:' ) ) {
+			
+			// resolve key if it's not stored in $this->_aRegAlias
+			if ( !$sResolvedKey = $this->_aRegAlias[ $sKey ] ) {
+
+				$aResolved = array();
+				$aKeyParts = explode( '.', $sKey );
+				
+				foreach ( $aKeyParts as $sPart ) {
+					
+					if ( !( $sFull = $this->_aAbbrMap[ $sPart ] ) ) {
+						$sFull = Geko_Inflector::camelize( strtolower( $sPart ) );
+					}
+					
+					$aResolved[] = $sFull;
+				}
+				
+				$sResolvedKey = implode( '_', $aResolved );			// the un-prefixed class name
+				$this->_aRegAlias[ $sKey ] = $sResolvedKey;			// store
+				
+			}
+			
+			// return the resolved key
+			return $sResolvedKey; 
+		}
+		
+		return $sKey;
+	}
 	
 	
 	
@@ -560,7 +599,7 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 			sprintf( 'Loaded components: %s', implode( ', ', array_keys( $this->_aLoadedComponents ) ) ),
 			__METHOD__
 		);
-
+		
 		Geko_Debug::out(
 			sprintf( 'Registered modules: %s', implode( ', ', array_keys( $this->_aRegistry ) ) ),
 			__METHOD__
