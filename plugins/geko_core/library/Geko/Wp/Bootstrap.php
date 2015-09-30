@@ -54,6 +54,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 				'cont' => 'Contact',
 				'custhks' => 'CustomHooks',
 				'defcat' => 'DefaultCategory',
+				'dlhis' => 'DownloadHistory',
 				'expdate' => 'ExpirationDate',
 				'emsg' => 'EmailMessage',
 				'enum' => 'Enumeration',

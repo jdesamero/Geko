@@ -559,7 +559,20 @@ class Geko_Array
 	
 	
 	
+	// get the first key/value pair in an associative array
+	public static function getFirstKeyValue( $aSubject ) {
+		
+		if ( is_array( $aSubject ) && ( count( $aSubject ) > 0 ) ) {
+			foreach ( $aSubject as $sKey => $mValue ) {
+				return array( $sKey, $mValue );
+			}
+		}
+		
+		return NULL;
+	}
+	
 	
 }
+
 
 
