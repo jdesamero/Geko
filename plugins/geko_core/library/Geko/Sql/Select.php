@@ -961,21 +961,25 @@ class Geko_Sql_Select
 			$aReplace = array();
 			$aValues = array();
 			
-			// ? gets quoted and slashes added
-			$sQuoted = Geko_String_Slashes::add( $mArgs );
+			// ? gets escaped (slashes added) is string
+			if ( is_string( $mArgs ) ) {
+				$sEscaped = Geko_String_Slashes::add( $mArgs );
+			} else {
+				$sEscaped = $mArgs;
+			}
 			
 			$aReplace[] = '* (?)';
-			$aValues[] = sprintf( "= '%s'", $sQuoted );
+			$aValues[] = sprintf( "= '%s'", $sEscaped );
 			
 			$aReplace[] = '?';
-			$aValues[] = sprintf( "'%s'", $sQuoted );
+			$aValues[] = sprintf( "'%s'", $sEscaped );
 			
 			// $ is unchanged
 			$aReplace[] = '* ($)';
-			$aValues[] = sprintf( '= %s', $mArgs );
+			$aValues[] = sprintf( '= %s', $sEscaped );
 			
 			$aReplace[] = '$';
-			$aValues[] = $mArgs;
+			$aValues[] = $sEscaped;
 			
 			//
 			return str_replace( $aReplace, $aValues, $sExpression );

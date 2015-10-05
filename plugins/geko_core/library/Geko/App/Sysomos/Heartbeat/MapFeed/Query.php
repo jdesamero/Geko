@@ -48,7 +48,7 @@ class Geko_App_Sysomos_Heartbeat_MapFeed_Query extends Geko_App_Entity_Query
 		$aFilterWords = array( 'unknown', 'world', 'everywhere', 'nowhere', 'football-stadiums', 'earth', 'finanshul', 'twitterhq', 'global' );
 		
 		foreach ( $aFilterWords as $sWord ) {
-			$oQuery->where( sprintf( "l.location NOT LIKE '%%%s%%'", $sWord ) );
+			$oQuery->where( "l.location NOT LIKE '%$%'", $sWord );
 		}
 		
 		$oQuery

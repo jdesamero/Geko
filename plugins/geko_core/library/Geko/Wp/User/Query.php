@@ -167,12 +167,12 @@ class Geko_Wp_User_Query extends Geko_Wp_Entity_Query
 		
 		//
 		if ( isset( $aParams[ 'first_name' ] ) ) {
-			$oQuery->where( 'fn.meta_value LIKE ?', sprintf( '%%%s%%', $aParams[ 'first_name' ] ) );
+			$oQuery->where( "fn.meta_value LIKE '%$%'", $aParams[ 'first_name' ] );
 		}
 		
 		//
 		if ( isset( $aParams[ 'last_name' ] ) ) {
-			$oQuery->where( 'ln.meta_value LIKE ?', sprintf( '%%%s%%', $aParams[ 'last_name' ] ) );
+			$oQuery->where( "ln.meta_value LIKE '%$%'", $aParams[ 'last_name' ] );
 		}
 		
 		//
