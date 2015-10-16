@@ -78,17 +78,7 @@ class Geko_Service extends Geko_Singleton_Abstract
 		
 		parent::start();
 		
-		if ( $sData = $GLOBALS[ 'HTTP_RAW_POST_DATA' ] ) {
-			
-			try {
-				
-				$_POST = Zend_Json::decode( $sData );
-				$_GET = Geko_Uri::getGlobal()->getVars();
-				
-				$_REQUEST = array_merge( $_POST, $_GET );
-				
-			} catch ( Exception $e ) { }
-		}
+		Geko_Http_Var::formatHttpRawPostData();
 		
 	}
 	

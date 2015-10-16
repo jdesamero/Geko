@@ -80,14 +80,14 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 		if ( 0 !== strpos( $sKey, 'val:' ) ) {
 			
 			// resolve key if it's not stored in $this->_aRegAlias
-			if ( !$sResolvedKey = $this->_aRegAlias[ $sKey ] ) {
+			if ( !$sResolvedKey = Geko_Array::getValue( $this->_aRegAlias, $sKey ) ) {
 
 				$aResolved = array();
 				$aKeyParts = explode( '.', $sKey );
 				
 				foreach ( $aKeyParts as $sPart ) {
 					
-					if ( !( $sFull = $this->_aAbbrMap[ $sPart ] ) ) {
+					if ( !$sFull = Geko_Array::getValue( $this->_aAbbrMap, $sPart ) ) {
 						$sFull = Geko_Inflector::camelize( strtolower( $sPart ) );
 					}
 					
@@ -210,7 +210,7 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 		
 		$sDebugMsg = '';
 		
-		if ( $fComponent = $this->_aExtComponents[ $sComp ] ) {
+		if ( $fComponent = Geko_Array::getValue( $this->_aExtComponents, $sComp ) ) {
 			
 			// call external component first
 			call_user_func( $fComponent, $aArgs );
@@ -275,10 +275,10 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 	// recursive function
 	public function getDeps( $aConfig, $sKey ) {
 		
-		if ( is_array( $aDeps = $this->_aDeps[ $sKey ] ) ) {
+		if ( is_array( $aDeps = Geko_Array::getValue( $this->_aDeps, $sKey ) ) ) {
 			foreach ( $aDeps as $sDep ) {
 				
-				if ( !$aConfig[ $sDep ] ) {
+				if ( !Geko_Array::getValue( $aConfig, $sDep ) ) {
 					
 					$aConfig = Geko_Array::insertBeforeKey( $aConfig, $sKey, $sDep, TRUE );
 					$aConfig = $this->getDeps( $aConfig, $sDep );
@@ -314,7 +314,7 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 		
 		// special
 		
-		if ( $mArgs = $this->_aConfig[ 'debug' ] ) {
+		if ( $mArgs = Geko_Array::getValue( $this->_aConfig, 'debug' ) ) {
 			
 			// run debug immediately
 			$this->compDebug( $mArgs );

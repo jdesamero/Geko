@@ -3,6 +3,18 @@
 class Geko_Array
 {
 	
+	
+	// use this rather than $aSubject[ $mKey ] to prevent superfluous warnings
+	public static function getValue( $aSubject, $mKey ) {
+		
+		if ( array_key_exists( $mKey, $aSubject ) ) {
+			return $aSubject[ $mKey ];
+		}
+		
+		return NULL;
+	}
+	
+	
 	//
 	public static function keyExists( $sKey, $aSubject ) {
 		if ( !is_array( $aSubject ) ) return FALSE;
@@ -67,7 +79,7 @@ class Geko_Array
 	}
 	
 	// return TRUE if any of the subjects is contained in the value
-	public static function contains( $sValue, $aSubject ) {
+	public static function contains( $aSubject, $sValue ) {
 		
 		if ( !is_array( $aSubject ) ) return FALSE;
 		

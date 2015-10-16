@@ -37,6 +37,8 @@ class Geko_Layout extends Geko_Singleton_Abstract
 	//
 	public function init( $bUnshift = FALSE ) {
 		
+		Geko_Http_Var::formatHttpRawPostData();
+		
 		$this->_bUnshift = $bUnshift;
 		
 		return parent::init();
@@ -387,12 +389,6 @@ class Geko_Layout extends Geko_Singleton_Abstract
 	
 	//
 	public function echoAjaxContent() {
-		
-		if ( $sData = $GLOBALS[ 'HTTP_RAW_POST_DATA' ] ) {
-			try {
-				$_POST = $_REQUEST = Zend_Json::decode( $sData );
-			} catch ( Exception $e ) { }
-		}
 		
 		$aAjaxResponse = NULL;
 		

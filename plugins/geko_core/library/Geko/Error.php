@@ -7,7 +7,7 @@ class Geko_Error
 	//
 	public static function start( $iDefaultLevel = NULL, $iScreamLevel = NULL ) {
 		
-		if ( $_REQUEST[ '__enable_error_reporting' ] ) {
+		if ( Geko_Array::getValue( $_REQUEST, '__enable_error_reporting' ) ) {
 			
 			ini_set( 'display_errors', 1 );
 			ini_set( 'scream.enabled', 1 );

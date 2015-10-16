@@ -22,7 +22,7 @@ abstract class Geko_Singleton_Abstract
 			$sCalledClass = get_called_class();
 		}
 		
-		if ( $sCalledClass && !self::$aSingletonInstances[ $sCalledClass ] ) {
+		if ( $sCalledClass && !Geko_Array::getValue( self::$aSingletonInstances, $sCalledClass ) ) {
 			self::$aSingletonInstances[ $sCalledClass ] = new $sCalledClass;
 		}
 				
