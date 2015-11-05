@@ -30,6 +30,10 @@ class Geko_Wp_Ext_AcfPro extends Geko_Singleton_Abstract
 	//
 	public function getFormattedValue( $mValue, $sType, $sReturnFormat, $aSubFields = NULL ) {
 		
+		//$array = array( $mValue, $sType );
+		
+		//print_r( $array );
+		
 		if ( 'repeater' == $sType ) {
 			
 			// wrap as Geko_Wp_Anonymous_Query/Geko_Wp_Anonymous
@@ -50,7 +54,7 @@ class Geko_Wp_Ext_AcfPro extends Geko_Singleton_Abstract
 				$mValue->setData( 'acfpro_fields', $aSubFieldsFmt );
 			}
 			
-		} elseif ( ( 'image' == $sType ) && ( 'array' == $sReturnFormat ) ) {
+		} elseif ( ( in_array( $sType, array( 'image', 'file' ) ) ) && ( 'array' == $sReturnFormat ) ) {
 			
 			// wrap as Geko_Wp_Media
 			$aMediaVals = ( is_array( $mValue ) ) ? $mValue : array() ;
