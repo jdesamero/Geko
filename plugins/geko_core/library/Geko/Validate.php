@@ -1,6 +1,15 @@
 <?php
+/*
+ * "geko_core/library/Geko/Validate.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * a collection of basic input validation methods
+ */
 
-// a collection of basic input validation methods
+//
 class Geko_Validate
 {
 

@@ -1,4 +1,11 @@
 <?php
+/*
+ * "geko_core/library/Geko/Layout.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
 
 //
 class Geko_Layout extends Geko_Singleton_Abstract

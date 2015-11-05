@@ -1,6 +1,15 @@
 <?php
+/*
+ * "geko_core/library/Geko/PhpQuery.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * helper static methods for phpQuery
+ */
 
-// helper static methods for phpQuery
+//
 class Geko_PhpQuery
 {
 

@@ -1,4 +1,12 @@
 <?php
+/*
+ * "geko_core/library/Geko/Salesforce.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
+
 
 define( 'GEKO_SALESFORCE_LIB_DIR', sprintf(
 	'%s/external/libs/salesforce-soapclient',

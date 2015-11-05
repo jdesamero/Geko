@@ -1,6 +1,13 @@
 <?php
-
-// command line process class
+/*
+ * "geko_core/library/Geko/Proc.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * command line process class
+ */
 
 //
 class Geko_Proc

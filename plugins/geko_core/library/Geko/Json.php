@@ -1,6 +1,15 @@
 <?php
+/*
+ * "geko_core/library/Geko/Json.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * wrapper for Zend_Json
+ */
 
-// wrapper for Zend_Json
+//
 class Geko_Json
 {
 	

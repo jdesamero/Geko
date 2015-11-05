@@ -1,7 +1,16 @@
 <?php
+/*
+ * "geko_core/library/Geko/Hooks.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * concept of hooks derived from Wordpress,
+ * essentially, a callback registry system
+ */
 
-// concept of hooks derived from Wordpress
-// essentially, a callback registry system
+// 
 class Geko_Hooks
 {
 	const STATIC_CALLBACK = TRUE;

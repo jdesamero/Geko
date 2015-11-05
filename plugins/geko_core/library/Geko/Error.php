@@ -1,6 +1,15 @@
 <?php
+/*
+ * "geko_core/library/Geko/Error.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * configure error reporting
+ */
 
-// configure error reporting
+//
 class Geko_Error
 {
 	

@@ -1,6 +1,15 @@
 <?php
+/*
+ * "geko_core/library/Geko.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * static class container for WP functions for Geek Oracle themes/plugins
+ */
 
-// static class container for WP functions for Geek Oracle themes
+//
 class Geko_Wp extends Geko
 {	
 	

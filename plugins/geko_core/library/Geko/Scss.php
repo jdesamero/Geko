@@ -1,4 +1,11 @@
 <?php
+/*
+ * "geko_core/library/Geko/Scss.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
 
 require_once( sprintf(
 	'%s/external/libs/scssphp/scss.inc.php',

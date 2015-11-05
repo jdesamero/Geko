@@ -1,4 +1,11 @@
 <?php
+/*
+ * "geko_core/library/Geko/Entity.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
 
 //
 abstract class Geko_Entity implements Geko_Json_Encodable

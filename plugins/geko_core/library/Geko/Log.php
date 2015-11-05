@@ -1,6 +1,15 @@
 <?php
+/*
+ * "geko_core/library/Geko/Log.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * integrated Zend_Log and Zend_Writer_*
+ */
 
-// integrated Zend_Log and Zend_Writer_*
+//
 class Geko_Log
 {
 	

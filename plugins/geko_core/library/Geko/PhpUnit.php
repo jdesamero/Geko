@@ -1,4 +1,11 @@
 <?php
+/*
+ * "geko_core/library/Geko/PhpUnit.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
 
 require_once( sprintf(
 	'%s/external/libs/pearpkgs/PHPUnit-3.4.14/library/PHPUnit/Framework.php',

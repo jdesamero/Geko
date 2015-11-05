@@ -1,6 +1,13 @@
 <?php
-
-// class that handles cached lookups
+/*
+ * "geko_core/library/Geko/CachedLookup.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * class that handles cached lookups
+ */
 
 //
 class Geko_CachedLookup

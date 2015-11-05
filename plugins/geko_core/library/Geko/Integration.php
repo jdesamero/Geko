@@ -1,7 +1,15 @@
 <?php
+/*
+ * "geko_core/library/Geko/Integration.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * contains shared code/constants between various integration classes
+ */
 
-// contains shared code/constants between various integration classes
-
+//
 class Geko_Integration
 {
 	
@@ -17,45 +25,45 @@ class Geko_Integration
 	
 	
 	//
-	public function _setSuperValue($iType, $sKey, $sValue) {
+	public function _setSuperValue( $iType, $sKey, $sValue ) {
 		switch ($iType) {
 			case self::GLOBALS:
-				$GLOBALS[$sKey] = $sValue;
+				$GLOBALS[ $sKey ] = $sValue;
 				break;
 			case self::SERVER:
-				$_SERVER[$sKey] = $sValue;
+				$_SERVER[ $sKey ] = $sValue;
 				break;
 			case self::GET:
-				$_GET[$sKey] = $sValue;
+				$_GET[ $sKey ] = $sValue;
 				break;
 			case self::POST:
-				$_POST[$sKey] = $sValue;
+				$_POST[ $sKey ] = $sValue;
 				break;
 			case self::FILES:
-				$_FILES[$sKey] = $sValue;
+				$_FILES[ $sKey ] = $sValue;
 				break;
 			case self::COOKIE:
-				$_COOKIE[$sKey] = $sValue;
+				$_COOKIE[ $sKey ] = $sValue;
 				break;
 			case self::SESSION:
-				$_SESSION[$sKey] = $sValue;
+				$_SESSION[ $sKey ] = $sValue;
 				break;
 			case self::REQUEST:
-				$_REQUEST[$sKey] = $sValue;
+				$_REQUEST[ $sKey ] = $sValue;
 				break;
 			case self::ENV:
-				$_ENV[$sKey] = $sValue;
+				$_ENV[ $sKey ] = $sValue;
 				break;
 		}
 		return $this;
 	}
 
 	//
-	public function _getSuperValue($iType, $sKey = '') {
+	public function _getSuperValue( $iType, $sKey = '' ) {
 		
 		if ( '' == $sKey ) {
 			
-			switch ($iType) {
+			switch ( $iType ) {
 				case self::GLOBALS:
 					return $GLOBALS;
 				case self::SERVER:
@@ -78,25 +86,25 @@ class Geko_Integration
 			
 		} else {
 			
-			switch ($iType) {
+			switch ( $iType ) {
 				case self::GLOBALS:
-					return $GLOBALS[$sKey];
+					return $GLOBALS[ $sKey ];
 				case self::SERVER:
-					return $_SERVER[$sKey];
+					return $_SERVER[ $sKey ];
 				case self::GET:
-					return $_GET[$sKey];
+					return $_GET[ $sKey ];
 				case self::POST:
-					return $_POST[$sKey];
+					return $_POST[ $sKey ];
 				case self::FILES:
-					return $_FILES[$sKey];
+					return $_FILES[ $sKey ];
 				case self::COOKIE:
-					return $_COOKIE[$sKey];
+					return $_COOKIE[ $sKey ];
 				case self::SESSION:
-					return $_SESSION[$sKey];
+					return $_SESSION[ $sKey ];
 				case self::REQUEST:
-					return $_REQUEST[$sKey];
+					return $_REQUEST[ $sKey ];
 				case self::ENV:
-					return $_ENV[$sKey];
+					return $_ENV[ $sKey ];
 			}
 			
 		}

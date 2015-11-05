@@ -1,6 +1,15 @@
 <?php
+/*
+ * "geko_core/library/Geko/Data.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * data formatting utility for associative data
+ */
 
-// data formatting utility for associative data
+//
 class Geko_Data
 {
 	
