@@ -1,4 +1,11 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/Archive.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
 
 //
 class Geko_Wp_Archive extends Geko_Wp_Entity
@@ -16,9 +23,7 @@ class Geko_Wp_Archive extends Geko_Wp_Entity
 		
 		parent::init();
 		
-		$this
-			->setEntityMapping( ???, ??? )
-		;
+		$this->setEntityMapping( ???, ??? );
 		
 		return $this;
 	}
@@ -27,10 +32,11 @@ class Geko_Wp_Archive extends Geko_Wp_Entity
 	
 	//
 	public function getMonth( $sFormat = '' ) {
+		
 		$sMonth = $this->getEntityPropertyValue( 'month' );
 		
 		if ( $sFormat ) {
-			return date( $sFormat, strtotime( '1980-' . $sMonth . '-01' ) );
+			return date( $sFormat, strtotime( sprintf( '1980-%s-01', $sMonth ) ) );
 		}
 		
 		return $sMonth;

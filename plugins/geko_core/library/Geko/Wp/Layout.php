@@ -1,4 +1,11 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/Layout.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
 
 //
 class Geko_Wp_Layout extends Geko_Layout

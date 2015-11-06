@@ -1,7 +1,16 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/Category.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * static class category related stuff
+ * object oriented wrapper for a local $post object
+ */
 
-// static class category related stuff
-// object oriented wrapper for a local $post object
+//
 class Geko_Wp_Category extends Geko_Wp_Entity
 {
 	

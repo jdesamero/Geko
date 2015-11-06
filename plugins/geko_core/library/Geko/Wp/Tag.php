@@ -1,6 +1,15 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/Tag.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * object oriented wrapper for a tag object
+ */
 
-// object oriented wrapper for a tag object
+//
 class Geko_Wp_Tag extends Geko_Wp_Entity
 {
 	//// implement concrete methods for tag

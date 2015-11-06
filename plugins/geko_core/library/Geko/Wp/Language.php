@@ -1,4 +1,11 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/Language.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
 
 //
 class Geko_Wp_Language extends Geko_Wp_Entity
@@ -8,9 +15,10 @@ class Geko_Wp_Language extends Geko_Wp_Entity
 	
 	protected $_sEditEntityIdVarName = 'lang_id';
 	
+	
 	//
-	public function init()
-	{
+	public function init() {
+		
 		parent::init();
 		
 		$this

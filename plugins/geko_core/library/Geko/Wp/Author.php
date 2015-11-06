@@ -1,8 +1,17 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/Author.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * static class author related stuff
+ * wrapper for the sem_author_image plugin
+ * object oriented wrapper for a $user object
+ */
 
-// static class author related stuff
-// wrapper for the sem_author_image plugin
-// object oriented wrapper for a $user object
+//
 class Geko_Wp_Author extends Geko_Wp_User
 {	
 	//// static methods

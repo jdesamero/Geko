@@ -1,6 +1,15 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/Resolver.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * a simple class resolver
+ */
 
-// a simple class resolver
+//
 class Geko_Wp_Resolver
 {
 	

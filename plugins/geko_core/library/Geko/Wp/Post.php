@@ -1,7 +1,16 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/Post.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * static class container for WP $post object functions
+ * object oriented wrapper for a local $post object
+ */
 
-// static class container for WP $post object functions
-// object oriented wrapper for a local $post object
+// 
 class Geko_Wp_Post extends Geko_Wp_Entity
 {
 	private static $oPost = NULL;

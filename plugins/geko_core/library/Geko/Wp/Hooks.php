@@ -1,6 +1,15 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/Hooks.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * add more useful hooks
+ */
 
-// add more useful hooks
+//
 class Geko_Wp_Hooks
 {
 	protected static $bCalledInit = FALSE;

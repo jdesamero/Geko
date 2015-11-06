@@ -1,12 +1,19 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/CheckModifiedFiles.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
 
 //
 class Geko_Wp_CheckModifiedFiles extends Geko_File_CheckModified
 {
 
 	//
-	public function changed( $sOptionKey )
-	{
+	public function changed( $sOptionKey ) {
+		
 		if ( '' != $sOptionKey ) {
 		
 			$sOptionVal = get_option( $sOptionKey );
@@ -25,7 +32,7 @@ class Geko_Wp_CheckModifiedFiles extends Geko_File_CheckModified
 			}
 		
 		} else {
-			throw new Exception('Empty option key provided for ' . __CLASS__ . '::' . $sMethod . '.');
+			throw new Exception( sprintf( 'Empty option key provided for %s::%s.', __CLASS__, $sMethod ) );
 		}
 		
 	}

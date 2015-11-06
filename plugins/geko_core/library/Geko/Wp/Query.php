@@ -1,6 +1,15 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/Query.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * static class container for WP functions for Geek Oracle themes
+ */
 
-// static class container for WP functions for Geek Oracle themes
+//
 class Geko_Wp_Query
 {	
 	private static $oWpQuery = NULL;

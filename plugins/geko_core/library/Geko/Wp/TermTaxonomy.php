@@ -1,6 +1,15 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/TermTaxonomy.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * static class container for functions relating to the term_taxonomy table
+ */
 
-// static class container for functions relating to the term_taxonomy table
+//
 class Geko_Wp_TermTaxonomy
 {	
 	private static $bCalledInit = FALSE;

@@ -1,6 +1,15 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/Options.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * base class for options
+ */
 
-// base class for options
+//
 class Geko_Wp_Options extends Geko_Wp_Initialize
 {	
 	protected $_aPrefixes = array( 'Gloc_', 'Geko_Wp_', 'Geko_' );

@@ -1,4 +1,11 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/Generic.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
 
 //
 class Geko_Wp_Generic extends Geko_Wp_Entity
@@ -11,13 +18,10 @@ class Geko_Wp_Generic extends Geko_Wp_Entity
 	
 	
 	//
-	public function init()
-	{
+	public function init() {
 		parent::init();
 		
-		$this
-			->setEntityMapping( 'id', 'generic_id' )
-		;
+		$this->setEntityMapping( 'id', 'generic_id' );
 		
 		return $this;
 	}
