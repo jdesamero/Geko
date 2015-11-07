@@ -6,9 +6,9 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
 {
 	
 	
-	protected $_renderDepth = null;
-	protected $_renderRelevantOnly = false;
-	protected $_renderDescendants = false;
+	protected $_renderDepth = NULL;
+	protected $_renderRelevantOnly = FALSE;
+	protected $_renderDescendants = FALSE;
 	protected $_liClass;
 	protected $_defaultMenuTemplate;
 	protected $_menuTemplates = array();
@@ -18,7 +18,7 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
 	
 	
 	//
-	protected function setRenderDepth($iDepth = 0) {
+	protected function setRenderDepth( $iDepth = 0 ) {
 		$this->_renderDepth = $iDepth;
 		return $this;
 	}
@@ -31,8 +31,8 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
 	
 	
 	//
-	protected function setRenderRelevantOnly($flag = true) {
-		$this->_renderRelevantOnly = (bool) $flag;
+	protected function setRenderRelevantOnly( $bFlag = TRUE ) {
+		$this->_renderRelevantOnly = (bool) $bFlag;
 		return $this;
 	}
 
@@ -44,8 +44,8 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
 	
 	
 	//
-	protected function setRenderDescendants($flag = true) {
-		$this->_renderDescendants = (bool) $flag;
+	protected function setRenderDescendants( $bFlag = TRUE ) {
+		$this->_renderDescendants = (bool) $bFlag;
 		return $this;
 	}
 
@@ -57,8 +57,8 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
 	
 	
 	//
-	protected function setLiClass( $liClass ) {
-		$this->_liClass = $liClass;
+	protected function setLiClass( $sLiClass ) {
+		$this->_liClass = $sLiClass;
 		return $this;
 	}
 
@@ -69,9 +69,9 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
     
     
     
-    //
-    protected function setDefaultMenuTemplate( $defaultMenuTemplate ) {
-        $this->_defaultMenuTemplate = $defaultMenuTemplate;
+    // $mDefaultMenuTemplate can be class or object instance
+    protected function setDefaultMenuTemplate( $mDefaultMenuTemplate ) {
+        $this->_defaultMenuTemplate = $mDefaultMenuTemplate;
         return $this;
     }
     
@@ -83,8 +83,8 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
     
     
     //
-    protected function setMenuTemplates( $menuTemplates ) {
-        $this->_menuTemplates = $menuTemplates;
+    protected function setMenuTemplates( $aMenuTemplates ) {
+        $this->_menuTemplates = $aMenuTemplates;
         return $this;
     }
     
@@ -97,21 +97,25 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
     
     
 	//
-	protected function inActiveBranch( Zend_Navigation_Page $oPage, $iDepthCheck = 0 )
-	{
-		if ( FALSE == $oPage->isActive(TRUE) ) {
+	protected function inActiveBranch( Zend_Navigation_Page $oPage, $iDepthCheck = 0 ) {
+		
+		if ( FALSE == $oPage->isActive( TRUE ) ) {
+			
 			// check parent
-			if ( ( $parent = $oPage->getParent() ) instanceof Zend_Navigation_Page ) {
+			if ( ( $oParent = $oPage->getParent() ) instanceof Zend_Navigation_Page ) {
+				
 				if ( 0 == $iDepthCheck ) {
 					// stop checking
-					return $parent->isActive(TRUE);
+					return $oParent->isActive(TRUE);
 				} else {
 					// recursive
-					return self::inActiveBranch( $parent, $iDepthCheck-- );	// decrement
+					return self::inActiveBranch( $oParent, $iDepthCheck-- );	// decrement
 				}
+				
 			} else {
 				return FALSE;
 			}
+			
 		} else {
 			return TRUE;
 		}
@@ -120,319 +124,369 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
 	
 	
 	//
-    protected function _renderMenu(Zend_Navigation_Container $container,
-                                   $ulClass,
-                                   $indent,
-                                   $innerIndent,
-                                   $minDepth,
-                                   $maxDepth,
-                                   $onlyActive,
-                                   $expandSibs,
-                                   $ulId,
-                                   $addPageClassToLi,
-                                   $activeClass,
-                                   $parentClass,
-                                   $renderParentClass)
-    {
-        $html = '';
-
-        // find deepest active
-        if ($found = $this->findActive($container, $minDepth, $maxDepth)) {
-            $foundPage = $found['page'];
-            $foundDepth = $found['depth'];
-        } else {
-            $foundPage = null;
-        }
-
-        // create iterator
-        $iterator = new RecursiveIteratorIterator($container,
-                            RecursiveIteratorIterator::SELF_FIRST);
-        if (is_int($maxDepth)) {
-            $iterator->setMaxDepth($maxDepth);
-        }
+	protected function _renderMenu(
+		Zend_Navigation_Container $oContainer, $sUlClass, $sIndent, $sInnerIndent, $iMinDepth, $iMaxDepth,
+		$bOnlyActive, $bExpandSibs, $sUlId, $bAddPageClassToLi, $sActiveClass, $sParentClass, $bRenderParentClass
+	) {
+		
+		$sHtml = '';
+		
+		// find deepest active
+		if ( $aFound = $this->findActive( $oContainer, $iMinDepth, $iMaxDepth ) ) {
+			$oFoundPage = $aFound[ 'page' ];
+			$iFoundDepth = $aFound[ 'depth' ];
+		} else {
+			$oFoundPage = NULL;
+		}
+		
+		
+		// create iterator
+		$oIterator = new RecursiveIteratorIterator( $oContainer, RecursiveIteratorIterator::SELF_FIRST );
+		
+		if ( is_int( $iMaxDepth ) ) {
+			$oIterator->setMaxDepth( $iMaxDepth );
+		}
 		
 		
 		
-		$options = $this->_options;
+		$aOptions = $this->_options;
 		
 		
 		
-        // iterate container
-        
-        $oTemplateStack = new Geko_Navigation_Renderer_TemplateStack( $this, $options['defaultMenuTemplate'] );
-        $oTemplateStack->setTemplates( $options['menuTemplates'] );
-        
-        $prevDepth = -1;
-        
-        foreach ($iterator as $page) {
-            
-            $depth = $iterator->getDepth();
-            $isActive = $page->isActive(true);
-            
-            if (
-            	(
-					($page instanceof Geko_Navigation_Page) ||
-					($page instanceof Geko_Navigation_Page_Uri)
-				) && (
-					$page->getHide()
-				)
-            ) {
+		// iterate container
+		
+		$oTemplateStack = new Geko_Navigation_Renderer_TemplateStack( $this, $aOptions[ 'defaultMenuTemplate' ] );
+		$oTemplateStack->setTemplates( $aOptions[ 'menuTemplates' ] );
+		
+		$iPrevDepth = -1;
+		
+		
+		//
+		foreach ( $oIterator as $oPage ) {
+			
+			$iDepth = $oIterator->getDepth();
+			$bIsActive = $oPage->isActive( TRUE );
+			
+			if (
+				(
+					( $oPage instanceof Geko_Navigation_Page ) || 
+					( $oPage instanceof Geko_Navigation_Page_Uri )
+				) &&
+				( $oPage->getHide() )
+			) {
 				continue;
-            }
-            
-            if ($depth < $minDepth || !$this->accept($page)) {
-                // page is below minDepth or not accepted by acl/visibilty
-                continue;
-            } else if ($expandSibs && $depth > $minDepth) {
-                // page is not active itself, but might be in the active branch
-                $accept = false;
-                if ($foundPage) {
-                    if ($foundPage->hasPage($page)) {
-                        // accept if page is a direct child of the active page
-                        $accept = true;
-                    } else if ($page->getParent()->isActive(true)) {
-                        // page is a sibling of the active branch...
-                        $accept = true;
-                    }
-                }
-                if (!$isActive && !$accept) {
-                    continue;
-                }
-            } else if ($onlyActive && !$isActive) {
-                // page is not active itself, but might be in the active branch
-                $accept = false;
-                if ($foundPage) {
-                    if ($foundPage->hasPage($page)) {
-                        // accept if page is a direct child of the active page
-                        $accept = true;
-                    } else if ($foundPage->getParent()->hasPage($page)) {
-                        // page is a sibling of the active page...
-                        if (!$foundPage->hasPages() ||
-                            is_int($maxDepth) && $foundDepth + 1 > $maxDepth) {
-                            // accept if active page has no children, or the
-                            // children are too deep to be rendered
-                            $accept = true;
-                        }
-                    }
-                }
-
-                if (!$accept) {
-                    continue;
-                }
-            }
-            
-            
-            
-            
-            $parent = $page->getParent();
-            
-            
-            // rendering depth was specified
-            if ( null !== $options['renderDepth'] ) {        
-            	
-            	if ( $options['renderDescendants'] ) {
-            		
-            		// render specified menu if active and all its descendants
-            		// $iDepthCheck ensures we only check up to the current depth, otherwise we trigger active on unwanted items
-            		
-            		if ( $options['renderDepth'] > $depth ) {
-            			$iDepthCheck = $depth - $options['renderDepth'];
-            		} else {
-            			$iDepthCheck = 0;
-            		}
-            		
-            		if (
-            			( $depth < $options['renderDepth'] ) ||
-            			( !self::inActiveBranch( $page, $iDepthCheck ) )
-            		) {
-            			continue;
-            		}
-            		
-            	} else {
-            		
-            		// only render the specified depth (for stratified menus)
-            		if (
-						( $options['renderDepth'] != $depth ) || (
-							( false == ($parent instanceof Zend_Navigation) ) &&
-							( false == $parent->isActive(true) )
-						)            		
-            		) {
-            			continue;
-            		}
-            		
-            	}
-            	
-            }
-            
-            if (
-            	( $options['renderRelevantOnly'] ) && 
-            	( false == ($parent instanceof Zend_Navigation) ) &&
-            	( false == $parent->isActive(true) )
-            ) {
-            	continue;
-            }
-            
-            
-            $ulClassRep = str_replace( '##depth##', $depth, $ulClass );
-            $liClassRep = str_replace( '##depth##', $depth, $options['liClass'] );
-            
-            
-            
-            // make sure indentation is correct
-            $depth   -= $minDepth;
-            $myIndent = $indent . str_repeat($innerIndent, $depth * 2);
+			}
 			
 			
-			$oCurTemplate = $oTemplateStack->get( $depth );
+			if ( $iDepth < $iMinDepth || !$this->accept( $oPage ) ) {
+				
+				// page is below minDepth or not accepted by acl/visibilty
+				continue;
+				
+			} else if ( $bExpandSibs && $iDepth > $iMinDepth ) {
+				
+				// page is not active itself, but might be in the active branch
+				
+				$bAccept = FALSE;
+				
+				if ( $oFoundPage ) {
+					
+					if ( $oFoundPage->hasPage( $oPage ) ) {
+						
+						// accept if page is a direct child of the active page
+						$bAccept = TRUE;
+						
+					} else if ( $oPage->getParent()->isActive( TRUE ) ) {
+						
+						// page is a sibling of the active branch...
+						$bAccept = TRUE;
+					}
+				}
+				
+				if ( !$bIsActive && !$bAccept ) {
+					continue;
+				}
+				
+			} else if ( $bOnlyActive && !$bIsActive ) {
+				
+				// page is not active itself, but might be in the active branch
+				$bAccept = FALSE;
+				
+				if ( $oFoundPage ) {
+					
+					if ( $oFoundPage->hasPage( $oPage ) ) {
+						
+						// accept if page is a direct child of the active page
+						$bAccept = TRUE;
+						
+					} else if ( $oFoundPage->getParent()->hasPage( $oPage ) ) {
+						
+						// page is a sibling of the active page...
+						if (
+							( !$oFoundPage->hasPages() ) || (
+								( is_int( $iMaxDepth ) ) && 
+								( ( $iFoundDepth + 1 ) > $iMaxDepth )
+							)
+						) {
+							// accept if active page has no children, or the
+							// children are too deep to be rendered
+							$bAccept = TRUE;
+						}
+					}
+				}
+				
+				if ( !$bAccept ) {
+					continue;
+				}
+			}
 			
 			
-            if ($depth > $prevDepth) {
-                $attribs = array();
+			
+			
+			$oParent = $oPage->getParent();
+			
+			
+			// rendering depth was specified
+			if ( NULL !== $aOptions[ 'renderDepth' ] ) {		
+				
+				if ( $aOptions[ 'renderDescendants' ] ) {
+					
+					// render specified menu if active and all its descendants
+					// $iDepthCheck ensures we only check up to the current depth, otherwise we trigger active on unwanted items
+					
+					if ( $aOptions[ 'renderDepth' ] > $iDepth ) {
+						$iDepthCheck = $iDepth - $aOptions[ 'renderDepth' ];
+					} else {
+						$iDepthCheck = 0;
+					}
+					
+					if (
+						( $iDepth < $aOptions[ 'renderDepth' ] ) ||
+						( !self::inActiveBranch( $oPage, $iDepthCheck ) )
+					) {
+						continue;
+					}
+					
+				} else {
+					
+					// only render the specified depth (for stratified menus)
+					if (
+						( $aOptions[ 'renderDepth' ] != $iDepth ) || (
+							( FALSE == ( $oParent instanceof Zend_Navigation ) ) &&
+							( FALSE == $oParent->isActive( TRUE ) )
+						)					
+					) {
+						continue;
+					}
+					
+				}
+				
+			}
+			
+			if (
+				( $aOptions[ 'renderRelevantOnly' ] ) && 
+				( FALSE == ( $oParent instanceof Zend_Navigation ) ) &&
+				( FALSE == $oParent->isActive( TRUE ) )
+			) {
+				continue;
+			}
+			
+			
+			$sUlClassRep = str_replace( '##depth##', $iDepth, $sUlClass );
+			$sLiClassRep = str_replace( '##depth##', $iDepth, $aOptions[ 'liClass' ] );
+			
+			
+			
+			// make sure indentation is correct
+			$iDepth -= $iMinDepth;
+			$sMyIndent = sprintf( '%s%s', $sIndent, str_repeat( $sInnerIndent, $iDepth * 2 ) );
+			
+			
+			$oCurTemplate = $oTemplateStack->get( $iDepth );
+			
+			
+			if ( $iDepth > $iPrevDepth ) {
+				
+				$aAttribs = array();
+				
+				// start new ul tag
+				if ( 0 == $iDepth ) {
+					$aAttribs = array(
+						'class' => $sUlClass,
+						'id' => $sUlId
+					);
+				}
+				
+				// We don't need a prefix for the menu ID (backup)
+				$bSkipValue = $this->_skipPrefixForId;
+				$this->skipPrefixForId();
 
-                // start new ul tag
-                if (0 == $depth) {
-                    $attribs = array(
-                        'class' => $ulClass,
-                        'id'    => $ulId,
-                    );
-                }
-
-                // We don't need a prefix for the menu ID (backup)
-                $skipValue = $this->_skipPrefixForId;
-                $this->skipPrefixForId();
-
-                /* $html .= $myIndent . '<ul'
-                                   . $this->_htmlAttribs($attribs)
-                                   . '>'
-                                   . $this->getEOL(); */
-                
+				// $sHtml .= sprintf( '%s<ul%s>%s', $sMyIndent, $this->_htmlAttribs( $aAttribs ), $this->getEOL() );
+				
 				// start new container
-				$html .= $oCurTemplate->containerStart( array( 'depth' => $depth, 'page' => $page, 'ulClass' => $ulClassRep, 'isActive' => $isActive ) );
-                
-                
-                // Reset prefix for IDs
-                $this->_skipPrefixForId = $skipValue;
-            
-            } else if ($prevDepth > $depth) {
-                
-                // close li/ul tags until we're at current depth
-                for ($i = $prevDepth; $i > $depth; $i--) {
-                    
-                    /* $ind   = $indent . str_repeat($innerIndent, $i * 2);
-                    $html .= $ind . $innerIndent . '</li>' . $this->getEOL();
-                    $html .= $ind . '</ul>' . $this->getEOL(); */
-                    
-                    $oTemplate = $oTemplateStack->get( $i );
-                    $html .= $oTemplate->itemEnd( array( 'depth' => $i, 'page' => $page ) )
-                          .  $oTemplate->containerEnd( array( 'depth' => $i, 'page' => $page ) );
-                }
-                
-                // close previous li tag
-                // $html .= $myIndent . $innerIndent . '</li>' . $this->getEOL();
-                $html .= $oCurTemplate->itemEnd( array( 'depth' => $depth, 'page' => $page, 'isActive' => $isActive ) );
-                
-            } else {
-                
-                // close previous li tag
-                // $html .= $myIndent . $innerIndent . '</li>' . $this->getEOL();
-                $html .= $oCurTemplate->itemEnd( array( 'depth' => $depth, 'page' => $page, 'isActive' => $isActive ) );
-                
-            }
-
-            // render li tag and page
-            $liClasses = array();
-            // Is page active?
-            if ($isActive) {
-                $liClasses[] = $activeClass;
-                $liClassRep .= ' active';
-            }
-            // Add CSS class from page to LI?
-            if ($addPageClassToLi) {
-                $liClasses[] = $page->getClass();
-            }
-            // Add CSS class for parents to LI?
-            if ($renderParentClass && $page->hasChildren()) {
-                // Check max depth
-                if ((is_int($maxDepth) && ($depth + 1 < $maxDepth))
-                    || !is_int($maxDepth)
-                ) {
-                    $liClasses[] = $parentClass;
-                }
-            }
-
-            /* $html .= $myIndent . $innerIndent . '<li'
-                   . $this->_htmlAttribs(array('class' => implode(' ', $liClasses)))
-                   . '>' . $this->getEOL()
-                   . $myIndent . str_repeat($innerIndent, 2)
-                   . $this->htmlify($page)
-                   . $this->getEOL(); */
-            
-            $html .= $oCurTemplate->itemStart( array( 'depth' => $depth, 'page' => $page, 'liClass' => $liClassRep, 'isActive' => $isActive ) ) 
-                  .  $oCurTemplate->link( array( 'depth' => $depth, 'page' => $page, 'isActive' => $isActive ) );
-            
-            // store as previous depth for next iteration
-            $prevDepth = $depth;
-        }
-
-        if ($html) {
-            
-            // done iterating container; close open ul/li tags
-            
-            for ($i = $prevDepth+1; $i > 0; $i--) {
-                
-                /* $myIndent = $indent . str_repeat($innerIndent . $innerIndent, $i - 1);
-                $html    .= $myIndent . $innerIndent . '</li>' . $this->getEOL()
-                         . $myIndent . '</ul>' . $this->getEOL(); */
-                
-                $oTemplate = $oTemplateStack->get( $i );
-                $html .= $oTemplate->itemEnd( array( 'depth' => $i, 'page' => $page ) )
-                      .  $oTemplate->containerEnd( array( 'depth' => $i, 'page' => $page ) );
-                
-            }
-            
-            $html = rtrim($html, $this->getEOL());
-        }
-
-        return $html;
-    }
-    
-
-    //
-    protected function _normalizeOptions(array $options = array())
-    {
-    	$options = parent::_normalizeOptions( $options );
-    	
-        if ( !isset($options['renderDepth']) ) {
-            $options['renderDepth'] = $this->getRenderDepth();
-        }
-
-        if ( !isset($options['renderRelevantOnly']) ) {
-            $options['renderRelevantOnly'] = $this->getRenderRelevantOnly();
-        }
-
-        if ( !isset($options['renderDescendants']) ) {
-            $options['renderDescendants'] = $this->getRenderDescendants();
-        }
+				$sHtml .= $oCurTemplate->containerStart( array(
+					'depth' => $iDepth,
+					'page' => $oPage,
+					'ulClass' => $sUlClassRep,
+					'isActive' => $bIsActive
+				) );
+				
+				
+				// Reset prefix for IDs
+				$this->_skipPrefixForId = $bSkipValue;
+				
+			} else if ( $iPrevDepth > $iDepth ) {
+				
+				// close li/ul tags until we're at current depth
+				for ( $i = $iPrevDepth; $i > $iDepth; $i-- ) {
+					
+					/* /
+					$sInd = sprintf( '%s%s', $sIndent, str_repeat( $sInnerIndent, $i * 2 ) );
+					$sHtml .= sprintf( '%s%s</li>%s', $sInd, $sInnerIndent, $this->getEOL() );
+					$sHtml .= sprintf( '%s</ul>%s', $sInd, $this->getEOL() );
+					/* */
+					
+					$oTemplate = $oTemplateStack->get( $i );
+					$sHtml .= $oTemplate->itemEnd( array( 'depth' => $i, 'page' => $oPage ) );
+					$sHtml .= $oTemplate->containerEnd( array( 'depth' => $i, 'page' => $oPage ) );
+				}
+				
+				// close previous li tag
+				// $sHtml .= sprintf( '%s%s</li>%s', $sMyIndent, $sInnerIndent, $this->getEOL() );
+				$sHtml .= $oCurTemplate->itemEnd( array( 'depth' => $iDepth, 'page' => $oPage, 'isActive' => $bIsActive ) );
+				
+			} else {
+				
+				// close previous li tag
+				// $sHtml .= sprintf( '%s%s</li>%s', $sMyIndent, $sInnerIndent, $this->getEOL() );
+				$sHtml .= $oCurTemplate->itemEnd( array( 'depth' => $iDepth, 'page' => $oPage, 'isActive' => $bIsActive ) );
+				
+			}
+			
+			// render li tag and page
+			$aLiClasses = array();
+			
+			// Is page active?
+			if ( $bIsActive ) {
+				$aLiClasses[] = $sActiveClass;
+				$sLiClassRep .= ' active';
+			}
+			
+			// Add CSS class from page to LI?
+			if ( $bAddPageClassToLi ) {
+				$aLiClasses[] = $oPage->getClass();
+			}
+			
+			// Add CSS class for parents to LI?
+			if ( $bRenderParentClass && $oPage->hasChildren() ) {
+				
+				// Check max depth
+				if (
+					(
+						( is_int( $iMaxDepth ) ) &&
+						( ( $iDepth + 1 ) < $iMaxDepth )
+					) || ( !is_int( $iMaxDepth ) )
+				) {
+					$aLiClasses[] = $sParentClass;
+				}
+			}
+			
+			/* /
+			$sHtml .= sprintf(
+				'%s%s<li%s>%s%s%s%s%s',
+				$sMyIndent,
+				$sInnerIndent,
+				$this->_htmlAttribs( array( 'class' => implode( ' ', $aLiClasses ) ) ),
+				$this->getEOL(),
+				$sMyIndent,
+				str_repeat( $sInnerIndent, 2 ),
+				$this->htmlify( $oPage ),
+				$this->getEOL()
+			);
+			/* */
+			
+			
+			$sHtml .= $oCurTemplate->itemStart( array( 'depth' => $iDepth, 'page' => $oPage, 'liClass' => $sLiClassRep, 'isActive' => $bIsActive ) );
+			$sHtml .= $oCurTemplate->link( array( 'depth' => $iDepth, 'page' => $oPage, 'isActive' => $bIsActive ) );
+			
+			// store as previous depth for next iteration
+			$iPrevDepth = $iDepth;
+		}
 		
-        if ( !isset($options['liClass']) ) {
-            $options['liClass'] = $this->getLiClass();
-        }
-        
-        if ( !isset($options['defaultMenuTemplate']) ) {
-            $options['defaultMenuTemplate'] = $this->getDefaultMenuTemplate();
-        }
-        
-        if ( !isset($options['menuTemplates']) ) {
-            $options['menuTemplates'] = $this->getMenuTemplates();
-        }
-        
-        $this->_options = $options;
-        
-    	return $options;
-    }
+		
+		//
+		if ( $sHtml ) {
+			
+			// done iterating container; close open ul/li tags
+			
+			for ( $i = ( $iPrevDepth + 1 ) ; $i > 0; $i-- ) {
+				
+				/* /
+				$sMyIndent = sprintf(
+					'%s%s',
+					$sIndent,
+					str_repeat( sprintf( '%s%s', $sInnerIndent, $sInnerIndent ), $i - 1 )
+				);
+				
+				$sHtml .= sprin$sMyIndenttf(
+					'%s%s</li>%s%s</ul>%s' 
+					$sMyIndent,
+					$sInnerIndent,
+					$this->getEOL(),
+					$sMyIndent,
+					$this->getEOL()
+				);
+				/* */
+				
+				$oTemplate = $oTemplateStack->get( $i );
+				$sHtml .= $oTemplate->itemEnd( array( 'depth' => $i, 'page' => $oPage ) );
+				$sHtml .= $oTemplate->containerEnd( array( 'depth' => $i, 'page' => $oPage ) );
+				
+			}
+			
+			$sHtml = rtrim( $sHtml, $this->getEOL() );
+		}
+		
+		return $sHtml;
+	}
+	
+	
+	//
+	protected function _normalizeOptions( array $aOptions = array() ) {
+		
+		$aOptions = parent::_normalizeOptions( $aOptions );
+		
+		if ( !isset( $aOptions[ 'renderDepth' ] ) ) {
+			$aOptions[ 'renderDepth' ] = $this->getRenderDepth();
+		}
+		
+		if ( !isset( $aOptions[ 'renderRelevantOnly' ] ) ) {
+			$aOptions[ 'renderRelevantOnly' ] = $this->getRenderRelevantOnly();
+		}
+		
+		if ( !isset($aOptions[ 'renderDescendants' ] ) ) {
+			$aOptions[ 'renderDescendants' ] = $this->getRenderDescendants();
+		}
+		
+		if ( !isset( $aOptions[ 'liClass' ] ) ) {
+			$aOptions[ 'liClass' ] = $this->getLiClass();
+		}
+		
+		if ( !isset( $aOptions[ 'defaultMenuTemplate' ] ) ) {
+			$aOptions[ 'defaultMenuTemplate' ] = $this->getDefaultMenuTemplate();
+		}
+		
+		if ( !isset( $aOptions[ 'menuTemplates' ] ) ) {
+			$aOptions[ 'menuTemplates' ] = $this->getMenuTemplates();
+		}
+		
+		$this->_options = $aOptions;
+		
+		return $aOptions;
+	}
 
 
-    
+	
 }
 
 
