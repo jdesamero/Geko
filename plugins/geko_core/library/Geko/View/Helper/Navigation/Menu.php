@@ -151,6 +151,8 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
 		
 		$aOptions = $this->_options;
 		
+		$iRenderDepth = $aOptions[ 'renderDepth' ];							// rendering depth was specified
+		$mRenderDescendants = $aOptions[ 'renderDescendants' ];
 		
 		
 		// iterate container
@@ -159,6 +161,7 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
 		$oTemplateStack->setTemplates( $aOptions[ 'menuTemplates' ] );
 		
 		$iPrevDepth = -1;
+		
 		
 		
 		//
@@ -245,33 +248,49 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
 			
 			$oParent = $oPage->getParent();
 			
-			
-			// rendering depth was specified
-			if ( NULL !== $aOptions[ 'renderDepth' ] ) {		
+						
+			if ( NULL !== $iRenderDepth ) {		
 				
-				if ( $aOptions[ 'renderDescendants' ] ) {
+				if ( $mRenderDescendants ) {
 					
-					// render specified menu if active and all its descendants
+					// render specified menu if active and its immediate descendants
 					// $iDepthCheck ensures we only check up to the current depth, otherwise we trigger active on unwanted items
 					
-					if ( $aOptions[ 'renderDepth' ] > $iDepth ) {
-						$iDepthCheck = $iDepth - $aOptions[ 'renderDepth' ];
+					if ( $iRenderDepth > $iDepth ) {
+						$iDepthCheck = $iDepth - $iRenderDepth;
 					} else {
 						$iDepthCheck = 0;
 					}
 					
-					if (
-						( $iDepth < $aOptions[ 'renderDepth' ] ) ||
-						( !self::inActiveBranch( $oPage, $iDepthCheck ) )
-					) {
-						continue;
+
+					$bInActiveBranch = self::inActiveBranch( $oPage, $iDepthCheck );
+					
+					$bDontShow = FALSE;
+					
+					if ( $iDepth < $iRenderDepth ) $bDontShow = TRUE;
+					
+					if ( !$bInActiveBranch ) {
+						
+						$bDontShow = TRUE;
+						
+						// "all" renders descendants, not just active
+						if (
+							( 'all' === $mRenderDescendants ) &&
+							( $iDepth > $iRenderDepth )
+						) {
+							$bDontShow = FALSE;
+						}
 					}
+					
+					
+					if ( $bDontShow ) continue;
+					
 					
 				} else {
 					
 					// only render the specified depth (for stratified menus)
 					if (
-						( $aOptions[ 'renderDepth' ] != $iDepth ) || (
+						( $iRenderDepth != $iDepth ) || (
 							( FALSE == ( $oParent instanceof Zend_Navigation ) ) &&
 							( FALSE == $oParent->isActive( TRUE ) )
 						)					
@@ -464,7 +483,7 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
 			$aOptions[ 'renderRelevantOnly' ] = $this->getRenderRelevantOnly();
 		}
 		
-		if ( !isset($aOptions[ 'renderDescendants' ] ) ) {
+		if ( !isset( $aOptions[ 'renderDescendants' ] ) ) {
 			$aOptions[ 'renderDescendants' ] = $this->getRenderDescendants();
 		}
 		
