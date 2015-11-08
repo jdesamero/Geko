@@ -12,9 +12,11 @@ plugins\
 	geko_password_protect\
 		...
 themes\
-	base\
+	geko_bare_minimum\
 		...
-	base_with_login\
+	geko_base\
+		...
+	geko_base_with_login\
 		...
 ```
 
