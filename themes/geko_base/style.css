@@ -1,7 +1,7 @@
 /*
-Theme Name: Base Theme with Login
+Theme Name: Geko Base Theme
 Theme URI: http://www.geekoracle.com
-Description: Base Wordpress Theme with Login/Registration/Password Reset for Geek Oracle Projects
+Description: Base Wordpress Theme for Geek Oracle Projects
 Version: TRUNK
 Author: Geek Oracle
 Author URI: http://www.geekoracle.com
@@ -91,46 +91,14 @@ p#ll.linklove {
 	margin-top: 25px;
 	margin-bottom: 25px;
 }
-
 #topnav {
-
 }
-
-
 #header {
-	margin: 0 0 12px 0;
-	position: relative;
-	height: 100px;
 }
-
-#header .logo {
-	position: absolute;
-	left: 0;
-}
-
-#login {
-	position: absolute;
-	right: 300px;
-}
-
-.loginform th {
-	text-align: left;
-	padding-right: 9px;
-	font-size: 14px;
-}
-
-.loginform td.center {
-	text-align: center;
-}
-
 #search {
-	position: absolute;
-	right: 0;
-	top: 26px;
+	float: right;
+	margin-top: 26px;
 }
-
-
-
 #mainnav {
 	margin-top: 25px;
 }
@@ -388,5 +356,9 @@ li.comment.bypostauthor {
 	float: left;
 	padding: 0 18px 6px 0;
 }
+
+
+
+
 
 
