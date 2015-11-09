@@ -51,7 +51,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 				'consts' => TRUE,
 				'setup' => TRUE,
 				'hooks' => TRUE,
-				'acf' => TRUE
+				'gf' => TRUE
 				
 			) )
 			
@@ -453,7 +453,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 	
 	
 	// for ACF Pro
-	public function compAcf( $aArgs ) {
+	public function compGf( $aArgs ) {
 		
 		if (
 			( isset( $_GET[ 'page' ] ) ) && 
