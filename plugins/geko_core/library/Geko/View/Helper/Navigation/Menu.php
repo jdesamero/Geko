@@ -97,7 +97,7 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
     
     
 	//
-	protected function inActiveBranch( Zend_Navigation_Page $oPage, $iDepthCheck = 0 ) {
+	protected static function inActiveBranchDepthCheck( Zend_Navigation_Page $oPage, $iDepthCheck = 0 ) {
 		
 		if ( FALSE == $oPage->isActive( TRUE ) ) {
 			
@@ -106,11 +106,31 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
 				
 				if ( 0 == $iDepthCheck ) {
 					// stop checking
-					return $oParent->isActive(TRUE);
+					return $oParent->isActive( TRUE );
 				} else {
 					// recursive
-					return self::inActiveBranch( $oParent, $iDepthCheck-- );	// decrement
+					return self::inActiveBranchDepthCheck( $oParent, $iDepthCheck-- );	// decrement
 				}
+				
+			} else {
+				return FALSE;
+			}
+			
+		} else {
+			return TRUE;
+		}
+	}
+	
+	
+	//
+	protected static function inActiveBranch( $oPage ) {
+		
+		if ( FALSE == $oPage->isActive( TRUE ) ) {
+			
+			// check parent
+			if ( ( $oParent = $oPage->getParent() ) instanceof Zend_Navigation_Page ) {
+				
+				return self::inActiveBranch( $oParent );
 				
 			} else {
 				return FALSE;
@@ -138,6 +158,10 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
 		} else {
 			$oFoundPage = NULL;
 		}
+		
+		
+		// echo gettype( $oFoundPage );
+		
 		
 		
 		// create iterator
@@ -253,34 +277,36 @@ class Geko_View_Helper_Navigation_Menu extends Zend_View_Helper_Navigation_Menu
 				
 				if ( $mRenderDescendants ) {
 					
-					// render specified menu if active and its immediate descendants
-					// $iDepthCheck ensures we only check up to the current depth, otherwise we trigger active on unwanted items
-					
-					if ( $iRenderDepth > $iDepth ) {
-						$iDepthCheck = $iDepth - $iRenderDepth;
+					if ( 'all' === $mRenderDescendants ) {
+						
+						$bInActiveBranch = self::inActiveBranch( $oPage );
+						
 					} else {
-						$iDepthCheck = 0;
+					
+						// render specified menu if active and its immediate descendants
+						// $iDepthCheck ensures we only check up to the current depth, otherwise we trigger active on unwanted items
+						
+						if ( $iRenderDepth > $iDepth ) {
+							$iDepthCheck = $iRenderDepth - $iDepth;
+						} else {
+							$iDepthCheck = 0;
+						}
+						
+						$bInActiveBranch = self::inActiveBranchDepthCheck( $oPage, $iDepthCheck );
 					}
 					
-
-					$bInActiveBranch = self::inActiveBranch( $oPage, $iDepthCheck );
 					
 					$bDontShow = FALSE;
 					
-					if ( $iDepth < $iRenderDepth ) $bDontShow = TRUE;
+					if ( $iDepth < $iRenderDepth ) {
+						$bDontShow = TRUE;
+					}
 					
 					if ( !$bInActiveBranch ) {
-						
 						$bDontShow = TRUE;
-						
-						// "all" renders descendants, not just active
-						if (
-							( 'all' === $mRenderDescendants ) &&
-							( $iDepth > $iRenderDepth )
-						) {
-							$bDontShow = FALSE;
-						}
 					}
+					
+					// printf( '%d:%d - %d:%d:%d - %s<br />', $bInActiveBranch, $bDontShow, $iRenderDepth, $iDepth, $iDepthCheck, $oPage->getTitle() );
 					
 					
 					if ( $bDontShow ) continue;
