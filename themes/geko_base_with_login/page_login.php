@@ -8,17 +8,22 @@ class Gloc_Layout_PageLogin extends Gloc_Layout
 {
 
 	protected $_aLabels = array(
+		
 		101 => 'Email:',
 		102 => 'Password:',
 		103 => 'Login',
 		104 => 'Register',
 		105 => 'Forgot Password?',
-		106 => 'Please enter your email address',
-		107 => 'Please enter a valid email address',
-		108 => 'Please enter a password',
-		109 => 'Password must be at least 6 characters long',
 		110 => 'Please activate your account first.',
-		111 => 'Login failed. Please try again.'
+		111 => 'Login failed. Please try again.',
+		
+		200 => 'Please enter your email address',
+		201 => 'Please enter a valid email address',
+		202 => 'Please enter a password',
+		203 => 'Password must be at least 6 characters long',
+		204 => 'Invalid credentials provided!',
+		205 => "Login successful! Please wait while you're redirected..."
+		
 	);
 	
 	
@@ -65,7 +70,7 @@ class Gloc_Layout_PageLogin extends Gloc_Layout
 			<div class="entry-content">
 				
 				<?php $oPage->echoTheContent(); ?>
-
+				
 				<form id="pageloginform" class="loginform">
 					<div class="loading"><img src="<?php bloginfo( 'template_directory' ); ?>/images/loader.gif" /></div>
 					<div class="error"></div>

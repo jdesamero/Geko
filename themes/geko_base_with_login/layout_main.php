@@ -7,6 +7,7 @@ class Gloc_Layout_Main extends Gloc_Layout
 	protected $_oUser = NULL;
 	
 	protected $_aLabels = array(
+		
 		101 => 'Copyright %s',
 		102 => 'Posts RSS feed',
 		103 => 'Comments RSS feed',
@@ -19,17 +20,19 @@ class Gloc_Layout_Main extends Gloc_Layout
 		110 => 'Logged in as:',
 		111 => 'Update Profile',
 		112 => 'Log-out',
-		113 => 'Please enter your email address',
-		114 => 'Please enter a valid email address',
-		115 => 'Please enter a password',
-		116 => 'Password must be at least 6 characters long',
 		117 => 'Please activate your account first.',
 		118 => 'Login failed. Please try again.',
 		119 => 'Error',
 		120 => 'You must be logged in to access this page.',
 		121 => 'This page cannot be accessed while you are logged-in.',
-		122 => 'Invalid credentials provided!',
-		123 => "Login successful! Please wait while you're redirected..."
+		
+		200 => 'Please enter your email address',
+		201 => 'Please enter a valid email address',
+		202 => 'Please enter a password',
+		203 => 'Password must be at least 6 characters long',
+		204 => 'Invalid credentials provided!',
+		205 => "Login successful! Please wait while you're redirected..."
+		
 	);
 	
 	protected $_mBodyClass = '##body_class##';

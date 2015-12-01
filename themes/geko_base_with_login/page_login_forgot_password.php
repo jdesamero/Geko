@@ -14,8 +14,11 @@ class Gloc_Layout_PageLoginForgotPassword extends Gloc_Layout
 		104 => 'Please enter your email address',
 		105 => 'Please enter a valid email address',
 		106 => "The password reset email could not be sent. Please contact the site's administrator.",
-		107 => 'Invalid email specified. Please try again.'
+		107 => 'Invalid email specified. Please try again.',
+		108 => 'There was a problem with your request!'
 	);
+	
+	protected $_mScripts = 'gloc_forgot_password';
 	
 	
 	
@@ -27,7 +30,9 @@ class Gloc_Layout_PageLoginForgotPassword extends Gloc_Layout
 		$aJsonParams = array(
 			'script' => $this->getScriptUrls(),
 			'status' => $oService->getStatusValues(),
-			'labels' => $this->_getLabels()
+			'labels' => $this->_getLabels(),
+			'form_sel' => '#forgotpassform',
+			'success_div_sel' => '#successdiv'
 		);
 		
 		?>
@@ -36,47 +41,9 @@ class Gloc_Layout_PageLoginForgotPassword extends Gloc_Layout
 			
 			jQuery( document ).ready( function( $ ) {
 				
-				///// form
-				
 				var oParams = <?php echo Zend_Json::encode( $aJsonParams ); ?>;
-				var labels = oParams.labels;
 				
-				var forgotPassForm = $( '#forgotpassform' );
-				var successDiv = $( '#successdiv' );
-				
-				forgotPassForm.gekoAjaxForm( {
-					status: oParams.status,
-					process_script: oParams.script.process,
-					action: '&action=Gloc_Service_Profile&subaction=forgot_password',
-					validate: function( form, errors ) {
-						
-						var email = form.getTrimVal( '#email' );
-						
-						if ( !email ) {
-							errors.push( labels[ 104 ] );
-							form.errorField( '#email' );
-						} else {
-							if ( !form.isEmail( email ) ) {
-								errors.push( labels[ 105 ] );
-								form.errorField( '#email' );
-							}
-						}
-						
-						return errors;
-						
-					},
-					process: function( form, res, status ) {
-						if ( status.forgot_password == parseInt( res.status ) ) {
-							form.hide();
-							successDiv.show();
-						} else if ( status.send_notification_failed == parseInt( res.status ) ) {
-							form.error( labels[ 106 ] );
-						} else {
-							form.error( labels[ 107 ] );
-						}
-					}
-					
-				} );
+				Gloc.ForgotPassword.run( oParams );
 				
 			} );
 			
@@ -102,7 +69,7 @@ class Gloc_Layout_PageLoginForgotPassword extends Gloc_Layout
 				<p>&nbsp;</p>
 				
 				<form id="forgotpassform" class="loginform">
-						
+					
 					<div class="loading"><img src="<?php bloginfo( 'template_directory' ); ?>/images/loader.gif" /></div>
 					<div class="error"></div>
 					<div class="success"></div>

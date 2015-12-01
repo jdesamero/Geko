@@ -294,13 +294,17 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 	//
 	public function processForgotPassword() {
 		
+		
+		$sError = 'Server Error';
+		$sErrorMsg = '';
+		
+		
 		// do checks
 		$sEmail = strtolower( trim( $_REQUEST[ 'email' ] ) );
 		
 		if ( email_exists( $sEmail ) ) {
 			
-			$sUserClass = $this->resolveClass( 'User' );
-			$oUser = new $sUserClass( $sEmail );
+			$oUser = $this->newUser( $sEmail );
 			
 			$iUserId = $oUser->getId();
 			
@@ -321,29 +325,46 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 					)
 				) )->send();
 				
-				$this->setStatus( self::STAT_FORGOT_PASSWORD );
-				
 			} catch ( Zend_Mail_Transport_Exception $e ) {
-				$this->setStatus( self::STAT_SEND_NOTIFICATION_FAILED );
+				$sErrorMsg = 'Notification email cannot be sent!';
 			}
 			
+		}
+		
+		
+		//
+		if ( $sErrorMsg ) {
+			$this
+				->setResponseValue( 'error', $sError )
+				->setResponseValue( 'error_msg', $sErrorMsg )
+			;
 		}
 		
 	}
 	
 	
+	
 	//
 	public function processSetPassword() {
+		
+		
+		$sError = 'Server Error';
+		$sErrorMsg = '';
+		
 		
 		// do checks
 		$sKey = $_REQUEST[ 'key' ];
 		$sPassword = trim( $_REQUEST[ 'password' ] );
 		$sConfirmPass = trim( $_REQUEST[ 'confirm_pass' ] );
 		
-		$sUserClass = $this->resolveClass( 'User' );
-		$oUser = call_user_func( array( $sUserClass, 'getOne' ), array( 'geko_password_reset_key' => $sKey ), FALSE );
+		$oUser = NULL;
+		$aUsers = $this->newUser_Query( array( 'geko_password_reset_key' => $sKey ), FALSE );
+		if ( 1 == $aUsers->count() ) {
+			$oUser = $aUsers->getOne();
+		}
 		
-		if ( $oUser->isValid() && ( $sPassword == $sConfirmPass ) ) {
+		
+		if ( $oUser && $oUser->isValid() && ( $sPassword == $sConfirmPass ) ) {
 			
 			$iUserId = $oUser->getId();
 			
@@ -362,12 +383,20 @@ class Gloc_Service_Profile extends Geko_Wp_Service
 					)
 				) )->send();
 				
-				$this->setStatus( self::STAT_SET_PASSWORD );
 				
 			} catch ( Zend_Mail_Transport_Exception $e ) {
-				$this->setStatus( self::STAT_SEND_NOTIFICATION_FAILED );
+				$sErrorMsg = 'Notification email cannot be sent!';
 			}
 			
+		}
+		
+		
+		//
+		if ( $sErrorMsg ) {
+			$this
+				->setResponseValue( 'error', $sError )
+				->setResponseValue( 'error_msg', $sErrorMsg )
+			;
 		}
 		
 	}

@@ -9,15 +9,15 @@
 	
 	// main
 	
-	Gloc.setNamespace( 'Login.Family', Backstab.family( {
+	Gloc.setNamespace( 'SetPassword.Family', Backstab.family( {
 		
 		model: {
 
 			extend: {
 				
 				defaults: {
-					'email': '',
-					'password': ''
+					'password': '',
+					'confirm_pass': ''
 				},
 				
 				validate: function( attrs ) {
@@ -27,20 +27,15 @@
 					
 					var err = {};
 					
-					if ( !attrs.email ) {
-						err.email = labels[ 200 ];
-					} else {
-						
-						if ( !$.gekoValidateEmail( attrs.email ) ) {
-							err.email = labels[ 201 ];					
-						}
-					}
-					
 					if ( !attrs.password ) {
-						err.password = labels[ 202 ];
+						err.password = labels[ 107 ];
 					} else {
 						if ( attrs.password.length < 6 ) {
-							err.password = labels[ 203 ];
+							err.password = labels[ 108 ];
+						} else {
+							if ( attrs.password != attrs.confirm_pass ) {
+								err.confirm_pass = labels[ 109 ];					
+							}
 						}
 					}
 					
@@ -56,7 +51,7 @@
 					// dirty, model or collection may be passed, but not both
 					var oData = {
 						'_service': 'Gloc_Service_Profile',
-						'_action': 'login'
+						'_action': 'set_password'
 					};
 					
 					oData = $.extend( oData, model.toJSON() );
@@ -85,11 +80,11 @@
 			extend: {
 				
 				events: {
-					'submit form; click input[type="submit"]': 'authenticate',
+					'submit form; click input[type="submit"]': 'send',
 					'model:invalid this': 'error'
 				},
 				
-				authenticate: function( e ) {
+				send: function( e ) {
 					
 					var _this = this;
 					
@@ -107,8 +102,9 @@
 																
 							} else {
 								
-								_this.status.success( labels[ 205 ] );
-								window.location = oParams.script.curpage;
+								_this.$el.hide();
+								$( oParams.success_div_sel ).show();
+								
 							}
 							
 							_this.status.loading( false );
@@ -124,7 +120,7 @@
 					var oParams = this.family.data.params;
 					var labels = oParams.labels;
 					
-					this.status.errors( oError, labels[ 204 ] ).loading( false );
+					this.status.errors( oError, labels[ 111 ] ).loading( false );
 				}
 				
 			}
@@ -141,17 +137,17 @@
 	
 	
 	//
-	Gloc.setNamespace( 'Login', {
+	Gloc.setNamespace( 'SetPassword', {
 		
 		run: function( oParams ) {
 			
-			Gloc.Login.Family.setData( 'params', oParams );
+			Gloc.SetPassword.Family.setData( 'params', oParams );
 			
-			var oLoginModel = new Gloc.Login.Family.Model();
+			var oSetPasswordModel = new Gloc.SetPassword.Family.Model();
 			
-			var oLoginView = new Gloc.Login.Family.ItemView( {
+			var oSetPasswordView = new Gloc.SetPassword.Family.ItemView( {
 				el: $( oParams.form_sel ),
-				model: oLoginModel
+				model: oSetPasswordModel
 			} );
 			
 		}

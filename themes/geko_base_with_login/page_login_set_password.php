@@ -20,8 +20,11 @@ class Gloc_Layout_PageLoginSetPassword extends Gloc_Layout
 		107 => 'Please enter a password',
 		108 => 'Password must be at least 6 characters long',
 		109 => 'Passwords must match',
-		110 => 'Your password cannot be reset. Please try again.'
+		110 => 'Your password cannot be reset. Please try again.',
+		111 => 'There was a problem with your request!'
 	);
+	
+	protected $_mScripts = 'gloc_set_password';
 	
 	
 	
@@ -58,7 +61,9 @@ class Gloc_Layout_PageLoginSetPassword extends Gloc_Layout
 		$aJsonParams = array(
 			'script' => $this->getScriptUrls(),
 			'status' => $oService->getStatusValues(),
-			'labels' => $this->_getLabels()
+			'labels' => $this->_getLabels(),
+			'form_sel' => '#setpasswordform',
+			'success_div_sel' => '#successdiv'
 		);
 		
 		?>
@@ -70,50 +75,8 @@ class Gloc_Layout_PageLoginSetPassword extends Gloc_Layout
 				///// form
 				
 				var oParams = <?php echo Zend_Json::encode( $aJsonParams ); ?>;
-				var labels = oParams.labels;
 				
-				var setPasswordForm = $( '#setpasswordform' );
-				var successDiv = $( '#successdiv' );
-				
-				setPasswordForm.gekoAjaxForm( {
-					status: oParams.status,
-					process_script: oParams.script.process,
-					action: '&action=Gloc_Service_Profile&subaction=set_password',
-					validate: function( form, errors ) {
-						
-						var password = form.getTrimVal( '#password' );
-						var confirmPass = form.getTrimVal( '#confirm_pass' );
-						
-						if ( !password ) {
-							errors.push( labels[ 107 ] );
-							form.errorField( '#password' );
-						} else {
-							if ( password.length < 6 ) {
-								errors.push( labels[ 108 ] );
-								form.errorField( '#password' );
-							} else {
-								if ( password != confirmPass ) {
-									errors.push( labels[ 109 ] );
-									form.errorField( '#confirm_pass' );							
-								}
-							}
-						}
-						
-						return errors;
-						
-					},
-					process: function( form, res, status ) {
-						if (
-							( status.set_password == parseInt( res.status ) ) || 
-							( status.send_notification_failed == parseInt( res.status ) )
-						) {
-							form.hide();
-							successDiv.show();
-						} else {
-							form.error( labels[ 110 ] );
-						}
-					}
-				} );
+				Gloc.SetPassword.run( oParams );
 				
 			} );
 			

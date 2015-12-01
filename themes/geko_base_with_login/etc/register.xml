@@ -9,6 +9,8 @@
 		<file id="gloc_status" src="##__bloginfo_template_directory##/js/Gloc/Status.js" dependencies="gloc" />
 		
 		<file id="gloc_login" src="##__bloginfo_template_directory##/js/Gloc/Login.js" dependencies="gloc_status geko-backstab-family" />
+		<file id="gloc_forgot_password" src="##__bloginfo_template_directory##/js/Gloc/ForgotPassword.js" dependencies="gloc_status geko-backstab-family" />
+		<file id="gloc_set_password" src="##__bloginfo_template_directory##/js/Gloc/SetPassword.js" dependencies="gloc_status geko-backstab-family" />
 		
 	</scripts>
 	
