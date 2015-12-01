@@ -16,6 +16,7 @@
 			extend: {
 				
 				defaults: {
+					'key': '',
 					'password': '',
 					'confirm_pass': ''
 				},
