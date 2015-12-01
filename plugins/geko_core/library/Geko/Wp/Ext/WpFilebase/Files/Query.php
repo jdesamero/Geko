@@ -18,7 +18,6 @@ class Geko_Wp_Ext_WpFilebase_Files_Query extends Geko_Wp_Entity_Query
 			->field( 'f.file_name', 'filename' )
 			->field( 'f.file_display_name', 'display_name' )
 			->field( 'f.file_category_name', 'category' )
-			->field( 'f.file_custom_license_terms', 'terms' )
 			->field( 'f.file_platform', 'platform' )
 			->field( 'f.file_version', 'version' )
 			->field( 'f.file_size', 'size' )

@@ -360,7 +360,7 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	}
 	
 	//
-	public function getProvincePair() {
+	public function getProvincePair( $bUseAbbr = FALSE ) {
 	
 		if ( !isset( self::$aCache[ 'province_pair' ] ) ) {
 			
@@ -368,7 +368,10 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 			$aProvs = $this->getProvinces();
 			
 			foreach ( $aProvs as $oProv ) {
-				self::$aCache[ 'province_pair' ][ $oProv->province_id ] = $oProv->province_name;
+				
+				$mKey = ( $bUseAbbr ) ? $oProv->province_abbr : $oProv->province_id ;
+				
+				self::$aCache[ 'province_pair' ][ $mKey ] = $oProv->province_name;
 			}
 		}
 		
@@ -1108,6 +1111,47 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		
 		return $this;
 	}
+	
+	
+	
+	// get map bounds based on the coordinates of the provided markers
+	public function getBounds( $aMarkers ) {
+		
+		$fMinLat = $fMinLng = $fMaxLat = $fMaxLng = NULL;
+		
+		//
+		foreach ( $aMarkers as $aMarker ) {
+			
+			$fLat = $aMarker[ 'latitude' ];
+			$fLng = $aMarker[ 'longitude' ];
+			
+			if ( $fLat && $fLng ) {
+				
+				if ( !is_float( $fLat ) ) $fLat = floatval( $fLat );
+				if ( !is_float( $fLng ) ) $fLng = floatval( $fLng );
+
+				if ( NULL === $fMinLat ) {
+					$fMinLat = $fMaxLat = $fLat;
+					$fMinLng = $fMaxLng = $fLng;
+				}
+				
+				if ( $fLat < $fMinLat ) $fMinLat = $fLat;
+				if ( $fLat > $fMaxLat ) $fMaxLat = $fLat;
+				if ( $fLng < $fMinLng ) $fMinLng = $fLng;
+				if ( $fLng > $fMaxLng ) $fMaxLng = $fLng;
+				
+			}
+			
+		}
+		
+		// return bounds
+		return array(
+			array( $fMinLat, $fMinLng ),		// southwest bounds
+			array( $fMaxLat, $fMaxLng )			// northeast bounds
+		);
+	}
+	
+	
 	
 	
 	////// rail functionality
