@@ -33,8 +33,22 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 	protected $_aValues = array(
 		'live' => array(),
 		'dev' => array(),
+		// stage => array(),				// arbitrary optional conditional values
+		// other => array(),
 		'any' => array()
 	);
+	
+	protected $_aValRules = NULL;
+	
+	/* /
+	// sample
+	protected $_aValRules = array(
+		'live' => 'livedomain.com|www.livedomain.com',
+		'stage' => 'stage.livedomain.com',
+		'dev' => 'dev.geekoracle.com'
+	);
+	/* */
+	
 	
 	protected $_aLoadedComponents = NULL;
 	
@@ -147,15 +161,49 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 		$aValues = $this->_aValues[ 'any' ];
 		if ( !is_array( $aValues ) ) $aValues = array();
 		
-		if ( $this->isLiveServer() ) {
-			if ( is_array( $this->_aValues[ 'live' ] ) ) {
-				$aValues = array_merge( $aValues, $this->_aValues[ 'live' ] );
+		
+		// figure out live/dev/etc.
+		
+		if ( NULL !== $this->_aValRules ) {
+			
+			// do exact matching of $_SERVER[ 'SERVER_NAME' ] for now
+			// we can add additional rules later if need be
+			
+			$sServerName = $_SERVER[ 'SERVER_NAME' ];
+			
+			foreach ( $this->_aValRules as $sRuleKey => $mRules ) {
+				
+				if ( is_string( $mRules ) ) {
+					$aRules = Geko_Array::explodeTrim( '|', $mRules );
+				} else {
+					$aRules = $mRules;
+				}
+				
+				if ( !is_array( $aRules ) ) {
+					$aRules = array();
+				}
+				
+				if ( in_array( $sServerName, $aRules ) ) {
+					$aValues = array_merge( $aValues, $this->_aValues[ $sRuleKey ] );
+					break;
+				}
+				
 			}
+			
 		} else {
-			if ( is_array( $this->_aValues[ 'dev' ] ) ) {
-				$aValues = array_merge( $aValues, $this->_aValues[ 'dev' ] );
+			
+			if ( $this->isLiveServer() ) {
+				if ( is_array( $this->_aValues[ 'live' ] ) ) {
+					$aValues = array_merge( $aValues, $this->_aValues[ 'live' ] );
+				}
+			} else {
+				if ( is_array( $this->_aValues[ 'dev' ] ) ) {
+					$aValues = array_merge( $aValues, $this->_aValues[ 'dev' ] );
+				}
 			}
+			
 		}
+		
 		
 		foreach ( $aValues as $sKey => $mVal ) {
 			$this->setVal( $sKey, $mVal );
