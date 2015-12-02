@@ -378,7 +378,7 @@ class Geko_Wp_Post extends Geko_Wp_Entity
 	//
 	public function getCategories( $mParams = NULL ) {
 		
-		if ( ( $this->isValid() ) && ( 'post' == $this->getPostType() ) ) {
+		if ( ( $this->isValid() ) ) {
 			
 			if ( is_string( $mParams ) ) {
 				$aParams = array();
@@ -387,8 +387,16 @@ class Geko_Wp_Post extends Geko_Wp_Entity
 				$aParams = is_array( $mParams ) ? $mParams : array();
 			}
 			
-			$aCatIds = wp_get_post_categories( $this->getId(), $aParams );
 			
+			if ( $sTaxonomy = $aParams[ 'taxonomy' ] ) {
+				
+				$aCatIds = wp_get_object_terms( $this->getId(), $sTaxonomy, array( 'fields' => 'ids' ) );
+			} else {
+				
+				$aCatIds = wp_get_post_categories( $this->getId(), $aParams );
+			}
+			
+		
 			$aParams = array_merge( $aParams, array( 'include' => $aCatIds ) );
 			
 			// hack
@@ -418,6 +426,7 @@ class Geko_Wp_Post extends Geko_Wp_Entity
 		
 		return new $this->_sCategoryQueryClass( NULL, FALSE );
 	}
+	
 	
 	//
 	public function getCategory() {

@@ -1,13 +1,19 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/Language/Manage/Category.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
 
 //
 class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 {
-	protected $bHasTagId = TRUE;
 	
 	protected $_aSubOptions = array();
 	
-	protected $sFilterLangCode = '';
+	protected $_sFilterLangCode = '';
 	
 	
 	
@@ -15,10 +21,7 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 	
 	// HACK!!!
 	public function _getCatId() {
-		return ( $this->bHasTagId ) ?
-			intval( Geko_String::coalesce( $_GET[ 'tag_ID' ], $_GET[ 'cat_ID' ] ) ) :
-			0
-		;
+		return intval( $_GET[ 'tag_ID' ] );
 	}
 	
 	
@@ -27,13 +30,6 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 	public function add() {
 		
 		parent::add();
-		
-		// HACK!!!
-		if ( !$_GET[ 'tag_ID' ] ) {
-			$_GET[ 'tag_ID' ] = 1;
-			$_REQUEST[ 'tag_ID' ] = 1;
-			$this->bHasTagId = FALSE;
-		}
 		
 		add_action( 'get_terms', array( $this, 'categoryFilterQuery' ), 10, 3 );
 		
@@ -49,10 +45,12 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 		// category
 		add_action( 'admin_category_add_fields_pq', array( $this, 'addCategorySelector' ) );
 		add_action( 'admin_category_edit_fields_pq', array( $this, 'editCategorySelector' ) );
-		add_action( 'create_category', array( $this, 'saveCategory' ), 10, 2 );
-		add_action( 'edit_category', array( $this, 'saveCategory' ), 10, 2 );
+		
+		add_action( 'create_term', array( $this, 'saveCategory' ), 10, 2 );
+		add_action( 'edit_terms', array( $this, 'saveCategory' ), 10, 2 );
+		
 		add_action( 'admin_init', array( $this, 'saveCategorySibling' ) );
-		add_action(	'delete_category', array( $this, 'deleteCategory' ), 10, 2 );
+		add_action(	'delete_term', array( $this, 'deleteCategory' ), 10, 2 );
 		
 		add_action( 'admin_init_category_edit', array( $this, 'filterCatEditAdminCategories' ) );
 		add_action( 'admin_init_category_list', array( $this, 'filterCatListAdminCategories' ) );
@@ -61,8 +59,6 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 		// post
 		add_action( 'admin_init_post_add', array( $this, 'filterPostAdminCategories' ) );
 		add_action( 'admin_init_post_edit', array( $this, 'filterPostAdminCategories' ) );
-		
-		Geko_Hooks::addFilter( 'admin_page_source', array( $this, 'tweakTitle' ) );
 		
 		
 		return $this;
@@ -87,30 +83,6 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 	
 	//// category hook methods
 	
-	//
-	public function tweakTitle( $sContent ) {
-		
-		$oUrl = new Geko_Uri;
-		$sUrlPath = $oUrl->getPath();
-		
-		if (
-			( FALSE !== strpos( $sUrlPath, '/wp-admin/categories.php' ) ) || 
-			(
-				( FALSE !== strpos( $sUrlPath, '/wp-admin/edit-tags.php' ) ) && 
-				( 'category' == $oUrl->getVar( 'taxonomy' ) )
-			)
-		) {
-			if ( ( 'edit' == $_GET[ 'action' ] ) && $_GET[ 'cat_lgroup_id' ] && $_GET[ 'cat_lang_id' ] ) {
-				$sContent = str_replace(
-					array( '<h2>Edit Category</h2>', '<input type="submit" class="button-primary" name="submit" value="Update">' ),
-					array( '<h2>Add Category</h2>', '<input type="submit" class="button-primary" name="submit" value="Add">' ),
-					$sContent
-				);
-			}
-		}
-		
-		return $sContent;
-	}
 	
 	//
 	public function addCategorySelectorJs() {
@@ -147,12 +119,15 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 			$aVals[ 'geko_lang_id' ] = $iLangId;
 		}
 		
-		$oPq->find( 'form' )->prepend( sprintf( '
-			<div class="form-field">
+		$oPq->find( 'form' )->prepend( sprintf(
+			'<div class="form-field">
 				<label for="geko_lang_id">Language</label>
 				%s
-			</div>
-		', Geko_Html::populateForm( $this->getLanguageSelect(), $aVals ) ) );
+				<input type="hidden" name="geko_lgroup_id" value="%d" />
+			</div>',
+			Geko_Html::populateForm( $this->getLanguageSelect(), $aVals ),
+			intval( $_REQUEST[ 'cat_lgroup_id' ] )
+		 ) );
 		
 		return $oPq;
 	}
@@ -188,24 +163,13 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 		// manipulate $oPq
 		$oPq->prepend( $this->getNotificationHtml() );
 		
-		$sCatId = ( $_GET[ 'cat_ID' ] ) ? 'editcat' : 'edittag' ;
-		
-		$oPq->find( sprintf( 'form#%s > table', $sCatId ) )->prepend( sprintf( '
+		$oPq->find( 'form#edittag > table' )->prepend( sprintf( '
 			<tr class="form-field">
 				<th valign="top" scope="row"><label for="geko_lang_id">Language</label></th>
 				<td>%s</td>
 			</tr>
 		', $sField ) );
-		
-		// HACK!!!
-		if ( FALSE == $this->bHasTagId ) {
-			$oPq->find( 'input[name=tag_ID]' )->attr( 'value', '' );
-			$oPq->find( 'input[name=action]' )->attr( 'value', 'add-tag' );
-			$oPq->find( '#_wpnonce' )->attr( 'value', wp_create_nonce( 'add-tag' ) );
-			$oPq->find( '#name' )->attr( 'value', '' );
-			$oPq->find( '#slug' )->attr( 'value', '' );
-		}
-		
+				
 		if ( ( 'edit' == $_GET[ 'action' ] ) && ( $this->_getCatId() ) ) {
 			$oUrl = new Geko_Uri();
 			$oPq->find( 'input[name="_wp_original_http_referer"]' )->val( strval( $oUrl ) );
@@ -217,25 +181,29 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 	//
 	public function getSelExistLink( $aParams ) {
 		
-		if ( $_GET[ 'cat_ID' ] ) {
-			$sLink = '<a href="%s/wp-admin/categories.php?action=edit&cat_ID=%d">%s</a>';
-		} else {
-			$sLink = '<a href="%s/wp-admin/edit-tags.php?action=edit&taxonomy=category&post_type=post&tag_ID=%d">%s</a>';		
-		}
+		$sLink = '<a href="%s/wp-admin/edit-tags.php?action=edit&taxonomy=%s&post_type=%s&tag_ID=%d">%s</a>';		
 		
-		return sprintf( $sLink, Geko_Wp::getUrl(), $aParams[ 'obj_id' ], $aParams[ 'title' ] );
+		$sTaxonomy = trim( $_GET[ 'taxonomy' ] );
+		if ( !$sTaxonomy ) $sTaxonomy = 'category';
+		
+		$sPostType = trim( $_GET[ 'post_type' ] );
+		if ( !$sPostType ) $sPostType = 'post';
+				
+		return sprintf( $sLink, Geko_Wp::getUrl(), $sTaxonomy, $sPostType, $aParams[ 'obj_id' ], $aParams[ 'title' ] );
 	}
 	
 	//
 	public function getSelNonExistLink( $aParams ) {
 
-		if ( $_GET[ 'cat_ID' ] ) {
-			$sLink = '<a href="%s/wp-admin/categories.php?action=edit&cat_lgroup_id=%d&cat_lang_id=%d">%s</a>';
-		} else {
-			$sLink = '<a href="%s/wp-admin/edit-tags.php?action=edit&taxonomy=category&post_type=post&cat_lgroup_id=%d&cat_lang_id=%d">%s</a>';		
-		}
+		$sLink = '<a href="%s/wp-admin/edit-tags.php?taxonomy=%s&post_type=%s&cat_lgroup_id=%d&cat_lang_id=%d">%s</a>';		
+
+		$sTaxonomy = trim( $_GET[ 'taxonomy' ] );
+		if ( !$sTaxonomy ) $sTaxonomy = 'category';
 		
-		return sprintf( $sLink, Geko_Wp::getUrl(), $aParams[ 'lgroup_id' ], $aParams[ 'lang_id' ], $aParams[ 'title' ] );
+		$sPostType = trim( $_GET[ 'post_type' ] );
+		if ( !$sPostType ) $sPostType = 'post';
+		
+		return sprintf( $sLink, Geko_Wp::getUrl(), $sTaxonomy, $sPostType, $aParams[ 'lgroup_id' ], $aParams[ 'lang_id' ], $aParams[ 'title' ] );
 	}
 	
 	//
@@ -243,10 +211,14 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 		
 		$oDb = Geko_Wp::get( 'db' );
 		
-		if ( $iLangId = intval( $_POST[ 'geko_lang_id' ] ) ) {
+		$iLangId = Geko_String::coalesce( intval( $_REQUEST[ 'cat_lang_id' ] ), intval( $_REQUEST[ 'geko_lang_id' ] ) );
+		
+		if ( $iLangId ) {
+
+			$iLangGroupId = Geko_String::coalesce( intval( $_REQUEST[ 'cat_lgroup_id' ] ), intval( $_REQUEST[ 'geko_lgroup_id' ] ) );
 			
-			if ( !$iLangGroupId = intval( $_POST[ 'geko_lgroup_id' ] ) )
-			{
+			if ( !$iLangGroupId ) {
+				
 				// create a lang group
 				$oDb->insert( '##pfx##geko_lang_groups', array(
 					'type_id' => Geko_Wp_Options_MetaKey::getId( 'category' )
@@ -275,10 +247,7 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 			( $oUrl = new Geko_Uri( sprintf( 'http://%s%s', $_SERVER[ 'SERVER_NAME' ], $sReferer ) ) ) && 
 			(
 				( FALSE !== strpos( $sReferer, '/wp-admin/categories.php' ) ) || 
-				(
-					( FALSE !== strpos( $sReferer, '/wp-admin/edit-tags.php' ) ) && 
-					( 'category' == $oUrl->getVar( 'taxonomy' ) )
-				)
+				( FALSE !== strpos( $sReferer, '/wp-admin/edit-tags.php' ) )
 			)
 		) {
 			if (
@@ -295,8 +264,7 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 					->unsetVar( 'cat_lang_id' )
 				;
 				
-				$sCatIdVar = ( FALSE !== strpos( $sReferer, '/wp-admin/categories.php' ) ) ? 'cat_ID' : 'tag_ID';
-				$oUrl->setVar( $sCatIdVar, $mCatId );
+				$oUrl->setVar( 'tag_ID', $mCatId );
 				
 				$this->triggerNotifyMsg( 'm101' );
 				
@@ -334,7 +302,7 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 			$sLangCode = $this->getLanguage( $iLangId )->getSlug();
 		}
 		
-		if ( $sLangCode ) $this->sFilterLangCode = $sLangCode;
+		if ( $sLangCode ) $this->_sFilterLangCode = $sLangCode;
 		
 		add_filter( 'get_terms', array( $this, 'categoryFilterQuery' ), 10, 3 );
 	}
@@ -352,7 +320,7 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 			$sLangCode = self::$oDefaultLang->getSlug();
 		}
 		
-		if ( $sLangCode ) $this->sFilterLangCode = $sLangCode;
+		if ( $sLangCode ) $this->_sFilterLangCode = $sLangCode;
 		
 		add_filter( 'get_terms', array( $this, 'categoryFilterQuery' ), 10, 3 );
 	}
@@ -369,7 +337,7 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 			$sLangCode = $this->getLanguage( $iLangId )->getSlug();
 		}
 		
-		if ( $sLangCode ) $this->sFilterLangCode = $sLangCode;
+		if ( $sLangCode ) $this->_sFilterLangCode = $sLangCode;
 		
 		add_filter( 'get_terms', array( $this, 'categoryFilterQuery' ), 10, 3 );
 	}
@@ -379,10 +347,12 @@ class Geko_Wp_Language_Manage_Category extends Geko_Wp_Language_Manage
 		
 		$this->getLanguages();		// initialize lang array
 		
-		if ( $this->sFilterLangCode ) $aArgs[ 'lang' ] = $this->sFilterLangCode;
+		if ( $this->_sFilterLangCode ) $aArgs[ 'lang' ] = $this->_sFilterLangCode;
 		
+		
+		// $sTaxonomy ??? use this for something ???
 		if (
-			( 'category' == $aTx[ 0 ] ) && 
+			( $sTaxonomy = $aTx[ 0 ] ) && 
 			( $sLangCode = $aArgs[ 'lang' ] )
 		) {
 			

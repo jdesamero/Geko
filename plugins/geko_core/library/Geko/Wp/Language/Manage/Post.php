@@ -1,11 +1,22 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/Language/Manage/Post.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
 
 //
 class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 {
 	protected $_aSubOptions = array();
 	
-	protected $sFilterLangCode = '';
+	protected $_sFilterLangCode = '';
+	protected $_sPostQueryClass = '';
+	
+	protected $_aPostCache = array();
+	
 	
 	
 	
@@ -16,32 +27,29 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 		
 		Geko_Wp_Language_Manage_Post_QueryHooks::register();		
 		
-		/* /
 		$aPrefixes = array( 'Gloc_', 'Geko_Wp_' );
 		
-		$sPostQueryClass = Geko_Class::getBestMatch( $aPrefixes, array( 'Post_Query' ) );		
+		$sPostQueryClass = Geko_Class::getBestMatch( $aPrefixes, array( 'Post_Query' ) );
 		add_action( sprintf( '%s::init', $sPostQueryClass ), array( $this, 'initQuery' ) );
-		/* */
+		
+		$this->_sPostClass = Geko_Class::getBestMatch( $aPrefixes, array( 'Post' ) );
+		
 		
 		return $this;
 	}
 	
-	/* /
 	//
 	public function initQuery( $oQuery ) {
 		$oQuery->addPlugin( 'Geko_Wp_Language_Manage_Post_QueryPlugin' );
 	}
-	/* */
-
+	
+	
 	
 	//
 	public function addAdmin() {
 		
 		parent::addAdmin();
 		
-		// post		
-		// add_action( 'submitpost_box', array( $this, 'addPostSelector' ) );
-		// add_action( 'submitpage_box', array( $this, 'addPostSelector' ) );
 		add_action( 'delete_post', array( $this, 'deletePost' ) );		
 		add_action( 'save_post', array( $this, 'savePost' ) );
 		add_action( 'admin_init', array( $this, 'addPostMetabox' ) );
@@ -72,6 +80,26 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 	public function attachPage() { }
 	
 	
+	
+	////// accessors
+	
+	//
+	public function getPost( $iPostId ) {
+		
+		if ( !$this->_aPostCache[ $iPostId ] ) {
+			
+			$this->_aPostCache[ $iPostId ] = call_user_func(
+				array( $this->_sPostClass, 'getOne' ),
+				array( 'p' => $iPostId )
+			);
+		}
+		
+		return $this->_aPostCache[ $iPostId ];
+	}
+	
+	
+	
+	
 	////// actions and filters
 	
 	
@@ -80,13 +108,27 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 	//
 	public function addPostMetabox() {
 		
-		if ( function_exists( 'add_meta_box' ) ) {
-			add_meta_box( 'geko-language', __( 'Language', 'geko-expiry_textdomain' ), array( $this, 'addPostSelector' ), 'post', 'side' );
-			add_meta_box( 'geko-language', __( 'Language', 'geko-expiry_textdomain' ), array( $this, 'addPostSelector' ), 'page', 'side' );
-		} else {
-			add_action( 'dbx_post_advanced', array( $this, 'addPostSelector' ) );
-			add_action( 'dbx_page_advanced', array( $this, 'addPostSelector' ) );		
-		}	
+		$oUrl = Geko_Uri::getGlobal();
+		$sUrl = strval( $oUrl );
+		
+		$sPostType = '';
+		
+		if ( FALSE !== strpos( $sUrl, 'wp-admin/post-new.php' ) ) {
+			
+			$sPostType = trim( $_GET[ 'post_type' ] );
+			if ( !$sPostType ) $sPostType = 'post';
+			
+		} elseif ( FALSE !== strpos( $sUrl, 'wp-admin/post.php' ) ) {
+			
+			if ( $iPostId = intval( $_GET[ 'post' ] ) ) {
+				$sPostType = get_post_type( $iPostId );
+			}
+			
+		}
+		
+		if ( $sPostType ) {
+			add_meta_box( 'geko-language', __( 'Language', 'geko-expiry_textdomain' ), array( $this, 'addPostSelector' ), $sPostType, 'side' );	
+		}
 	}
 	
 	//
@@ -94,16 +136,11 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 		
 		global $post;
 		
-		$aVer = Geko_Wp::version();
-
 		$iLangId = intval( $_GET[ 'post_lang_id' ] );
 		$iLangGroupId = intval( $_GET[ 'post_lgroup_id' ] );
 		$iPostId = intval( $_GET[ 'post' ] );
-		$bNewSibling = ( !$iLangGroupId || !$iLangId ) ? FALSE : TRUE;
-		$sType = ( intval( $aVer[0] ) >= 3 ) ?
-			'post' :
-			( ( 'page' == $post->post_type ) ? 'page' : 'post' )
-		;
+		$bNewSibling = ( !$iLangGroupId || !$iLangId ) ? FALSE : TRUE ;
+		$sType = $post->post_type;
 		
 		$aLinks = $this->getSelectorLinks(
 			$iLangGroupId,
@@ -131,9 +168,8 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 	//
 	public function getSelExistLink( $aParams ) {
 		return sprintf(
-			'<a href="%s/wp-admin/%s.php?action=edit&post=%d">%s</a>',
+			'<a href="%s/wp-admin/post.php?action=edit&post=%d">%s</a>',
 			Geko_Wp::getUrl(),
-			$aParams[ 'type' ],
 			$aParams[ 'obj_id' ],
 			$aParams[ 'title' ]
 		);
@@ -144,15 +180,12 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 		
 		global $post;
 		
-		$aVer = Geko_Wp::version();
-		
 		return sprintf(
-			'<a href="%s/wp-admin/%s-new.php?post_lgroup_id=%d&post_lang_id=%d%s">%s</a>',
+			'<a href="%s/wp-admin/post-new.php?post_lgroup_id=%d&post_lang_id=%d%s">%s</a>',
 			Geko_Wp::getUrl(),
-			$aParams[ 'type' ],
 			$aParams[ 'lgroup_id' ],
 			$aParams[ 'lang_id' ],
-			( ( intval( $aVer[0] ) >= 3 ) && ( 'page' == $post->post_type ) ) ? '&post_type=page' : '',
+			( 'post' != $aParams[ 'type' ] ) ? sprintf( '&post_type=%s', $aParams[ 'type' ] ) : '' ,
 			$aParams[ 'title' ]
 		);
 	}
@@ -187,12 +220,14 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 			global $post;
 			static $oUrl = NULL;
 			
-			if ( $post->lang_code ):
+			$oPost = $this->getPost( $post->ID );
+			
+			if ( $sLangCode = $oPost->getLangCode() ):
 			
 				if ( NULL === $oUrl ) $oUrl = new Geko_Uri();
-				$oUrl->setVar( 'lang', $post->lang_code );
+				$oUrl->setVar( 'lang', $sLangCode );
 				
-				?><a href="<?php echo strval( $oUrl ); ?>"><?php echo $post->lang_title; ?></a><?php
+				?><a href="<?php echo strval( $oUrl ); ?>"><?php $oPost->echoLangTitle(); ?></a><?php
 			else:
 				?>No Language<?php
 			endif;
@@ -301,7 +336,7 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 			$sLangCode = $this->getLanguage( $iLangId )->getSlug();
 		}
 		
-		if ( $sLangCode ) $this->sFilterLangCode = $sLangCode;
+		if ( $sLangCode ) $this->_sFilterLangCode = $sLangCode;
 		
 		add_filter( 'get_pages', array( $this, 'pageFilterQuery' ), 10, 2 );
 	}
@@ -311,7 +346,7 @@ class Geko_Wp_Language_Manage_Post extends Geko_Wp_Language_Manage
 		
 		$this->getLanguages();		// initialize lang array
 		
-		if ( $this->sFilterLangCode ) $aArgs[ 'lang' ] = $this->sFilterLangCode;
+		if ( $this->_sFilterLangCode ) $aArgs[ 'lang' ] = $this->_sFilterLangCode;
 		
 		if ( $sLangCode = $aArgs[ 'lang' ] ) {
 			
