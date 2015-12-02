@@ -32,7 +32,7 @@ class Geko_Salesforce
 	
 	
 	//
-	public function __construct( $sUsername, $sPassword, $sToken, $sSoapClientPath = '' ) {
+	public function __construct( $sUsername, $sPassword, $sToken, $sSoapClientPath = '', $sEndPoint = NULL ) {
 		
 		try {
 			
@@ -67,6 +67,10 @@ class Geko_Salesforce
 			} else {
 				
 				$sPwdTok = sprintf( '%s%s', $sPassword, $sToken );
+				
+				if ( $sEndPoint ) {
+					$oSfConn->setEndpoint( $sEndPoint );
+				}
 				
 				$oSfConn->login( $sUsername, $sPwdTok );
 				
@@ -232,18 +236,18 @@ class Geko_Salesforce
 	}
 	
 	//
-	public function formatWhoId( $mWhoId ) {
+	public function formatSfId( $mSfId ) {
 
-		if ( is_object( $mWhoId ) ) {
-			$sWhoId = $mWhoId->Id;
+		if ( is_object( $mSfId ) ) {
+			$sSfId = $mSfId->Id;
 		} else {
-			$sWhoId = $mWhoId;
+			$sSfId = $mSfId;
 		}
 		
-		return $sWhoId;
+		return $sSfId;
 	}
 	
-
+	
 	// - - - - - - object specific methods - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	
@@ -438,34 +442,6 @@ class Geko_Salesforce
 	}
 	
 	
-	
-	
-	
-	//
-	public function addTask( $mWhoId, $Subject, $sDescription = '', $mTime = NULL, $sStatus = 'Completed' ) {
-		
-		if ( $oSfConn = $this->_oSfConn ) {
-						
-			$aFields = array(
-				'Subject' => $Subject,
-				'Description' => $sDescription,
-				'WhoId' => $this->formatWhoId( $mWhoId ),
-				'ActivityDate' => date( 'c', $this->formatToTs( $mTime ) ),
-				'Status' => $sStatus
-			);
-			
-			$oTask = $this->newObject( 'Task', $aFields );
-
-			$aResult = $oSfConn->create( array( $oTask ) );
-			
-			return $this->createSingleResAssign( $oTask, $aResult );
-		}
-		
-		return NULL;
-	}
-	
-	
-	
 	//
 	public function addLeadToCampaign( $oLead, $sCampaignId, $sStatus = NULL ) {
 		
@@ -500,6 +476,155 @@ class Geko_Salesforce
 		
 		return NULL;		
 	}
+	
+	
+	
+	
+	
+	//// contacts
+	
+	//
+	public function getContactByEmail( $mEmail, $aFields = NULL ) {
+		
+		$bWrapped = FALSE;
+		
+		if ( is_array( $mEmail ) ) {
+			$aEmails = $mEmail;		
+		} else {
+			$bWrapped = TRUE;
+			$aEmails = array( $mEmail );
+		}
+		
+		
+		// protect against injections
+		$aEmails = array_map( 'addslashes', $aEmails );
+		
+		// default fields
+		if ( NULL === $aFields ) {
+			$aFields = array( 'FirstName', 'LastName', 'Phone', 'Email' );
+		}
+		
+		$aFields[] = 'Id';		// required
+		
+		$sQuery = sprintf( "
+			
+			SELECT			%s
+			
+			FROM			Contact
+			
+			WHERE			Email IN ( '%s' )
+			
+			",
+			implode( ', ', $aFields ),
+			implode( "', '", $aEmails )
+		);
+		
+		if ( $aRes = $this->getRecords( $sQuery, 'Contact' ) ) {
+			return $bWrapped ? $aRes[ 0 ] : $aRes ;
+		}
+		
+		return NULL;
+	}
+	
+	
+	
+	/* Overloading:
+	 * addLead( $sEmail, $sFirstName, $sLastName, $sCompany, $aOther = array() )
+	 * addLead( $aFields )
+	 */
+	public function addContact() {
+		
+		if ( $oSfConn = $this->_oSfConn ) {
+			
+			$aArgs = func_get_args();
+			
+			if (
+				( 1 == count( $aArgs ) ) && 
+				( is_array( $aArgs[ 0 ] ) )
+			) {
+				
+				$aFields = $aArgs[ 0 ];
+			
+			} else {
+
+				$aFields = array(
+					'Email' => $aArgs[ 0 ],
+					'FirstName' => $aArgs[ 1 ],
+					'LastName' => $aArgs[ 2 ],
+					'Description' => $aArgs[ 3 ]
+				);
+				
+				if ( is_array( $aArgs[ 4 ] ) ) {
+					$aFields = array_merge( $aFields, $aArgs[ 4 ] );
+				}
+				
+			}
+			
+			
+			$oLead = $this->newObject( 'Contact', $aFields );
+
+			$aResult = $oSfConn->create( array( $oLead ) );
+			
+			return $this->createSingleResAssign( $oLead, $aResult );
+		}
+		
+		return NULL;
+	}
+	
+	
+	
+	//// tasks
+	
+	//
+	public function addTask( $mWhoId, $Subject, $sDescription = '', $mTime = NULL, $sStatus = 'Completed' ) {
+		
+		if ( $oSfConn = $this->_oSfConn ) {
+						
+			$aFields = array(
+				'Subject' => $Subject,
+				'Description' => $sDescription,
+				'WhoId' => $this->formatSfId( $mWhoId ),
+				'ActivityDate' => date( 'c', $this->formatToTs( $mTime ) ),
+				'Status' => $sStatus
+			);
+			
+			$oTask = $this->newObject( 'Task', $aFields );
+
+			$aResult = $oSfConn->create( array( $oTask ) );
+			
+			return $this->createSingleResAssign( $oTask, $aResult );
+		}
+		
+		return NULL;
+	}
+	
+	
+	
+	
+	//// cases
+	
+	//
+	public function addCase( $mSfId, $Subject, $sDescription = '', $sStatus = 'New' ) {
+		
+		if ( $oSfConn = $this->_oSfConn ) {
+						
+			$aFields = array(
+				'Subject' => $Subject,
+				'Description' => $sDescription,
+				'ContactId' => $this->formatSfId( $mSfId ),
+				'Status' => $sStatus
+			);
+			
+			$oCase = $this->newObject( 'Case', $aFields );
+
+			$aResult = $oSfConn->create( array( $oCase ) );
+			
+			return $this->createSingleResAssign( $oCase, $aResult );
+		}
+		
+		return NULL;
+	}
+	
 	
 	
 	// - - - - - - assignment rules - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
