@@ -195,6 +195,14 @@ class Geko_Wp extends Geko
 					}
 				}
 				
+			} elseif ( 'body_class' == $sCond ) {
+				
+				$aClasses = Geko_Array::explodeTrim( ' ', self::getBodyClass() );
+				
+				if ( in_array( $mParam2, $aClasses ) ) {
+					return TRUE;
+				}
+				
 			} else {
 				
 				$fTest = sprintf( 'is_%s', $sCond );
