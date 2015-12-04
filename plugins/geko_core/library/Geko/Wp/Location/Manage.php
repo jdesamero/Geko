@@ -130,20 +130,6 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	}
 	
 	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		Geko_Wp_Options_MetaKey::install();
-		
-		$this->createTableOnce();
-		$this->createTableOnce( '##pfx##geko_location_geocache' );
-		
-		
-		return $this;		
-	}
-	
 	
 	
 	

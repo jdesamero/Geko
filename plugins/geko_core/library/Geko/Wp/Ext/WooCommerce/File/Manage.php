@@ -36,16 +36,6 @@ class Geko_Wp_Ext_WooCommerce_File_Manage extends Geko_Wp_Options_Manage
 	}
 	
 	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		$this->createTableOnce();
-		
-		return $this;
-	}
-	
 	
 	
 }

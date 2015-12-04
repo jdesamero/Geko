@@ -50,31 +50,22 @@ class Geko_Wp_Category_Meta extends Geko_Wp_Options_Meta
 		$this->addTable( $oSqlTable2, FALSE );
 		
 		
+		// first-time setup, call only once
+		if ( !$this->regWasInitialized() ) {
+
+			// create hierarchy functions
+			if ( self::$bUseTermTaxonomy ) {
+				Geko_Wp_TermTaxonomy::install();
+			}
+			
+			$this->regSetInitialized();
+		}		
 		
-		// register hierarchy functions
-		Geko_Wp_TermTaxonomy::init();
 		
 		return $this;
 	}
 	
-	// create table
-	public function install() {
-
-		parent::install();
-		
-		Geko_Wp_Options_MetaKey::install();
-		
-		$this->createTableOnce();
-		$this->createTableOnce( '##pfx##geko_term_meta_members' );
-		
-		// create hierarchy functions
-		if ( self::$bUseTermTaxonomy ) {
-			Geko_Wp_TermTaxonomy::install();
-		}
-		
-		return $this;
-		
-	}
+	
 	
 	//
 	public function addAdmin() {

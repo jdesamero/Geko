@@ -49,18 +49,6 @@ class GekoX_Test_Wp_Full_Manage extends Geko_Wp_Options_Manage
 		
 	}
 	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		$this->createTableOnce();
-		
-		return $this;
-	}
-	
-	
-	
 	
 	
 	//// front-end display methods

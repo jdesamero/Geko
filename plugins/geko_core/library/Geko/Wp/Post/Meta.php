@@ -36,16 +36,6 @@ class Geko_Wp_Post_Meta extends Geko_Wp_Options_Meta
 		return $this;
 	}
 	
-	//
-	public function install() {
-		
-		parent::install();
-		
-		$this->createTableOnce();
-		
-		return $this;
-	}
-	
 	
 	
 	//

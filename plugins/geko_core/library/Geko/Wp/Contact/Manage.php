@@ -101,17 +101,6 @@ class Geko_Wp_Contact_Manage extends Geko_Wp_Options_Manage
 		return $this;
 	}
 	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		Geko_Wp_Options_MetaKey::install();
-		
-		$this->createTableOnce();
-		
-		return $this;		
-	}
 	
 	
 	//

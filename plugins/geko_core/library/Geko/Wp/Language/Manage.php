@@ -84,24 +84,6 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 	
 	
 	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		Geko_Wp_Options_MetaKey::install();
-		
-		$this->createTableOnce();
-		$this->createTableOnce( '##pfx##geko_lang_groups' );
-		$this->createTableOnce( '##pfx##geko_lang_group_members' );
-		
-		
-		return $this;
-	}
-	
-	
-	
-	
 	
 	//// plugin management
 	

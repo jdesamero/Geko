@@ -42,21 +42,6 @@ class Geko_Wp_Generic_Manage extends Geko_Wp_Options_Manage
 	}
 	
 	
-	//
-	public function install() {
-		
-		parent::install();
-		
-		Geko_Wp_Options_MetaKey::install();
-		
-		$this->createTableOnce();
-		
-		return $this;
-	}
-	
-	
-	
-	
 	
 	
 	

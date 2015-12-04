@@ -30,16 +30,6 @@ class Geko_Wp_Form_Response_Meta extends Geko_Wp_Options_Meta
 	}
 	
 	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		$this->createTableOnce();
-		
-		return $this;
-	}
-	
 	
 	// save the data
 	public function save() {

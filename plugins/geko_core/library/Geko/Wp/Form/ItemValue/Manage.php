@@ -47,16 +47,6 @@ class Geko_Wp_Form_ItemValue_Manage extends Geko_Wp_Options_Manage
 		
 	}
 	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		$this->createTableOnce();
-		
-		return $this;
-	}
-	
 	
 	//
 	public function getStoredSubOptionParams( $oMainMng, $oMainEnt ) {

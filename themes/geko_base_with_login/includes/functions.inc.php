@@ -29,16 +29,19 @@ $oBoot = Gloc_Bootstrap::getInstance();
 $oBoot->config( array(
 	
 	// 'error' => FALSE,
+	// 'logger' => TRUE,
+	
 	'debug' => $aDebug,
 	
 	'role.mng' => TRUE,
 	
 	'emsg.mng' => TRUE,
 	
-	'user' => TRUE,
+	'user' => TRUE
+	
 	// 'user.mng' => TRUE,
-	'user.rewrite' => TRUE,
-	'user.photo' => TRUE,
+	// 'user.rewrite' => TRUE,
+	//'user.photo' => TRUE,
 	// 'user.security' => TRUE,
 	
 	// 'cat.alias' => TRUE,

@@ -12,14 +12,8 @@
 //
 class Geko_Wp_TermTaxonomy
 {	
-	private static $bCalledInit = FALSE;
 	private static $bCalledInstall = FALSE;
 	
-	
-	//
-	public static function init() {
-		// do nothing
-	}
 	
 	//
 	public static function install( $sTaxonomy = 'category' ) {

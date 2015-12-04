@@ -441,27 +441,6 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 		return FALSE;
 	}
 	
-	//
-	public function createTableOnce( $mSqlTable = NULL ) {
-		
-		if ( !$mSqlTable ) {
-			$mSqlTable = $this->getPrimaryTable();
-		}
-		
-		$oSqlTable = NULL;
-		
-		if ( $mSqlTable instanceof Geko_Sql_Table ) {
-			$oSqlTable = $mSqlTable;
-		} else {
-			$oSqlTable = $this->resolveTable( $mSqlTable );
-		}
-		
-		if ( $oSqlTable ) {
-			return Geko_Once::run( $oSqlTable->getTableName(), array( $this, 'createTable' ), array( $oSqlTable ) );
-		}
-		
-		return FALSE;
-	}
 	
 	
 	// register an <sql table object> into _aTables property
@@ -480,6 +459,12 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 			if ( !$this->_sEntityIdVarName && ( $oPkf = $oSqlTable->getPrimaryKeyField() ) ) {
 				$this->_sEntityIdVarName = $oPkf->getFieldName();
 			}
+		}
+		
+		// create table if it doesn't exist
+		$oDb = Geko_Wp::get( 'db' );
+		if ( !$oDb->tableExists( $sTableName ) ) {
+			$this->createTable( $oSqlTable );
 		}
 		
  		return $this;
@@ -608,6 +593,36 @@ class Geko_Wp_Options extends Geko_Wp_Initialize
 	
 	
 	
+	
+	
+	//// registry
+	
+	
+	//
+	protected function regWasInitialized( $sKey = NULL ) {
+		
+		if ( NULL === $sKey ) {
+			$sKey = $this->_sInstanceClass;
+		}
+		
+		$oOptsReg = Geko_Wp::get( 'opts.reg' );
+		
+		return $oOptsReg->wasInitialized( $sKey );
+	}
+	
+	//
+	protected function regSetInitialized( $sKey = NULL ) {
+
+		if ( NULL === $sKey ) {
+			$sKey = $this->_sInstanceClass;
+		}
+		
+		$oOptsReg = Geko_Wp::get( 'opts.reg' );
+		
+		$oOptsReg->setInitialized( $sKey );
+		
+		return $this;
+	}
 	
 	
 	

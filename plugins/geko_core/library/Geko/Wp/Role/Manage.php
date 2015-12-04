@@ -41,8 +41,22 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 		$this->addTable( $oSqlTable );
 		
 		
+		// first-time setup, call only once
+		if ( !$this->regWasInitialized() ) {
+
+			// initial database sync with roles array
+			global $wp_roles;
+			
+			$aRoleNames = $wp_roles->get_names();
+			$this->insertRolesIntoDb( $aRoleNames );
+			
+			$this->regSetInitialized();
+		}
+		
+		
 		return $this;
 	}
+	
 	
 	//
 	public function addAdmin() {
@@ -69,22 +83,6 @@ class Geko_Wp_Role_Manage extends Geko_Wp_Options_Manage
 	}
 	
 	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		if ( $this->createTableOnce() ) {
-			
-			// initial database sync with roles array
-			global $wp_roles;
-			
-			$aRoleNames = $wp_roles->get_names();
-			$this->insertRolesIntoDb( $aRoleNames );
-		}
-		
-		return $this;
-	}
 	
 	//
 	public function attachPage() {

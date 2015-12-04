@@ -37,89 +37,77 @@ class Geko_Wp_Form_ItemType_Manage extends Geko_Wp_Options_Manage
 		$this->addTable( $oSqlTable );
 		
 		
-		return $this;
-		
-	}
-	
-	
-	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		$this->createTableOnce();
-		
-		// populate with default values if table is empty
-		
-		$sTable = '##pfx##geko_form_item_type';
-		
-		Geko_Once::run( sprintf( '%s::populate', $this->_sInstanceClass ), array( $this, 'populateTable' ), array( $sTable ) );
-		
-		return $this;
-	}
-	
-	
-	//
-	public function populateTable( $sTable ) {
-		
-		$oDb = Geko_Wp::get( 'db' );
-		
-		if ( 0 === $oDb->getTableNumRows( $sTable ) ) {
+		// first-time setup, call only once
+		if ( !$this->regWasInitialized() ) {
 			
-			$oDb->insertMulti( $sTable, array(
-				array(
-					'slug' => 'text',
-					'name' => 'Text',
-					'has_multiple_values' => 0,
-					'has_multiple_response' => 0,
-					'has_choice_subs' => 0
-				),
-				array(
-					'slug' => 'textarea',
-					'name' => 'Textarea',
-					'has_multiple_values' => 0,
-					'has_multiple_response' => 0,
-					'has_choice_subs' => 0
-				),
-				array(
-					'slug' => 'radio',
-					'name' => 'Radio Buttons',
-					'has_multiple_values' => 1,
-					'has_multiple_response' => 0,
-					'has_choice_subs' => 1
-				),
-				array(
-					'slug' => 'checkbox',
-					'name' => 'Checkbox',
-					'has_multiple_values' => 0,
-					'has_multiple_response' => 0,
-					'has_choice_subs' => 0
-				),
-				array(
-					'slug' => 'checkbox_multi',
-					'name' => 'Checkbox (Multiple)',
-					'has_multiple_values' => 1,
-					'has_multiple_response' => 1,
-					'has_choice_subs' => 0
-				),
-				array(
-					'slug' => 'select',
-					'name' => 'Select',
-					'has_multiple_values' => 1,
-					'has_multiple_response' => 0,
-					'has_choice_subs' => 1
-				),
-				array(
-					'slug' => 'select_multi',
-					'name' => 'Select (Multiple)',
-					'has_multiple_values' => 1,
-					'has_multiple_response' => 1,
-					'has_choice_subs' => 0
-				)
-			) );
+			$sTableName = $oSqlTable->getTableName();
+			
+			
+			$oDb = Geko_Wp::get( 'db' );
+			
+			if ( 0 === $oDb->getTableNumRows( $sTableName ) ) {
+				
+				$oDb->insertMulti( $sTableName, array(
+					array(
+						'slug' => 'text',
+						'name' => 'Text',
+						'has_multiple_values' => 0,
+						'has_multiple_response' => 0,
+						'has_choice_subs' => 0
+					),
+					array(
+						'slug' => 'textarea',
+						'name' => 'Textarea',
+						'has_multiple_values' => 0,
+						'has_multiple_response' => 0,
+						'has_choice_subs' => 0
+					),
+					array(
+						'slug' => 'radio',
+						'name' => 'Radio Buttons',
+						'has_multiple_values' => 1,
+						'has_multiple_response' => 0,
+						'has_choice_subs' => 1
+					),
+					array(
+						'slug' => 'checkbox',
+						'name' => 'Checkbox',
+						'has_multiple_values' => 0,
+						'has_multiple_response' => 0,
+						'has_choice_subs' => 0
+					),
+					array(
+						'slug' => 'checkbox_multi',
+						'name' => 'Checkbox (Multiple)',
+						'has_multiple_values' => 1,
+						'has_multiple_response' => 1,
+						'has_choice_subs' => 0
+					),
+					array(
+						'slug' => 'select',
+						'name' => 'Select',
+						'has_multiple_values' => 1,
+						'has_multiple_response' => 0,
+						'has_choice_subs' => 1
+					),
+					array(
+						'slug' => 'select_multi',
+						'name' => 'Select (Multiple)',
+						'has_multiple_values' => 1,
+						'has_multiple_response' => 1,
+						'has_choice_subs' => 0
+					)
+				) );
+			}
+			
+			$this->regSetInitialized();
 		}
+		
+		
+		return $this;
+		
 	}
+	
 	
 	
 	

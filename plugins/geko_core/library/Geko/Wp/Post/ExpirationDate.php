@@ -43,15 +43,6 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 		return $this;
 	}
 	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		$this->createTableOnce();
-		
-		return $this;
-	}
 	
 	
 	//

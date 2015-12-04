@@ -43,18 +43,6 @@ class Geko_Wp_Location_Meta extends Geko_Wp_Options_Meta
 		return $this;
 	}
 	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		$this->createTableOnce();
-		$this->createTableOnce( '##pfx##geko_location_meta_members' );
-		
-		return $this;
-	}
-	
-	
 	
 	
 }

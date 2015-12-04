@@ -54,19 +54,6 @@ class Geko_Wp_Generic_Meta extends Geko_Wp_Options_Meta
 	
 	
 	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		Geko_Wp_Options_MetaKey::install();
-		
-		$this->createTableOnce();
-		$this->createTableOnce( '##pfx##geko_generic_meta_members' );
-		
-		return $this;
-	}
-	
 	
 	//
 	public function getPrimaryTable() {

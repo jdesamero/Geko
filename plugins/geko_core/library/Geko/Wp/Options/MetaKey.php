@@ -4,7 +4,6 @@
 class Geko_Wp_Options_MetaKey
 {
 	private static $bCalledInit = FALSE;
-	private static $bCalledInstall = FALSE;
 	
 	private static $aMetaKeyCache = NULL;
 	private static $aMetaKeyHash = NULL;
@@ -23,24 +22,24 @@ class Geko_Wp_Options_MetaKey
 				->fieldMediumInt( 'mkey_id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 				->fieldVarChar( 'meta_key', array( 'size' => 255, 'unq' ) )
 			;			
+
+			$sTableName = $oSqlTable->getTableName();
+			
+			
+			// create table if it doesn't exist
+			$oDb = Geko_Wp::get( 'db' );
+			if ( !$oDb->tableExists( $sTableName ) ) {
+				$oDb->tableCreateIfNotExists( $oSqlTable );
+			}
+			
 			
 			self::$oSqlTable = $oSqlTable;
 			
 			self::$bCalledInit = TRUE;
-		}	
+		}
+		
 	}
 	
-	// create table
-	public static function install() {
-		
-		if ( !self::$bCalledInstall && is_admin() ) {
-			
-			$oDb = Geko_Wp::get( 'db' );
-			$oDb->tableCreateIfNotExists( self::$oSqlTable );
-			
-			self::$bCalledInstall = TRUE;
-		}
-	}
 	
 	
 	//

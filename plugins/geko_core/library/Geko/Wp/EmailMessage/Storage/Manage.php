@@ -72,38 +72,27 @@ class Geko_Wp_EmailMessage_Storage_Manage extends Geko_Wp_Options_Manage
 		$this->addTable( $oSqlTable );
 		
 		
+		// first-time setup, call only once
+		if ( !$this->regWasInitialized() ) {
+
+			Geko_Wp_Enumeration_Manage::populate( array(
+				array( 'title' => 'Email Message Storage Type', 'slug' => 'geko-emsg-strg-type', 'description' => 'List of email storage types.' ),
+				array(
+					array( 'title' => 'Mbox', 'slug' => 'geko-emsg-strg-type-mbox', 'value' => 1, 'rank' => 0, 'description' => 'Open local Mbox storage file.' ),
+					array( 'title' => 'Maildir', 'slug' => 'geko-emsg-strg-type-maildir', 'value' => 2, 'rank' => 1, 'description' => 'Open local Maildir location.' ),
+					array( 'title' => 'POP3', 'slug' => 'geko-emsg-strg-type-pop3', 'value' => 3, 'rank' => 2, 'description' => 'Connect to POP3 server.' ),
+					array( 'title' => 'IMAP', 'slug' => 'geko-emsg-strg-type-imap', 'value' => 4, 'rank' => 3, 'description' => 'Connect to IMAP server.' )
+				)
+			) );
+			
+			$this->regSetInitialized();
+		}
+
+		
 		return $this;
 	}
 	
 	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		Geko_Once::run( sprintf( '%s::enumeration', __CLASS__ ), array( $this, 'installEnumeration' ) );
-		
-		$this->createTableOnce();
-		
-		return $this;
-	}
-	
-	
-	//
-	public function installEnumeration() {
-		
-		Geko_Wp_Enumeration_Manage::getInstance()->install();
-		Geko_Wp_Enumeration_Manage::populate( array(
-			array( 'title' => 'Email Message Storage Type', 'slug' => 'geko-emsg-strg-type', 'description' => 'List of email storage types.' ),
-			array(
-				array( 'title' => 'Mbox', 'slug' => 'geko-emsg-strg-type-mbox', 'value' => 1, 'rank' => 0, 'description' => 'Open local Mbox storage file.' ),
-				array( 'title' => 'Maildir', 'slug' => 'geko-emsg-strg-type-maildir', 'value' => 2, 'rank' => 1, 'description' => 'Open local Maildir location.' ),
-				array( 'title' => 'POP3', 'slug' => 'geko-emsg-strg-type-pop3', 'value' => 3, 'rank' => 2, 'description' => 'Connect to POP3 server.' ),
-				array( 'title' => 'IMAP', 'slug' => 'geko-emsg-strg-type-imap', 'value' => 4, 'rank' => 3, 'description' => 'Connect to IMAP server.' )
-			)
-		) );
-		
-	}
 	
 	
 	//// front-end display methods

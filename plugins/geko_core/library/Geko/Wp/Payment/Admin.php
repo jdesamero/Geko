@@ -49,22 +49,6 @@ class Geko_Wp_Payment_Admin extends Geko_Wp_Options_Admin
 	}
 	
 	
-	// NOTE: Not required anymore???
-	
-	/* /
-	
-	//
-	public function addAdmin() {
-		
-		parent::addAdmin();
-		
-		$this->coft_install();
-		
-		return $this;
-	}
-
-	/* */
-	
 	//
 	public function attachPage() {
 		add_options_page(
@@ -89,17 +73,6 @@ class Geko_Wp_Payment_Admin extends Geko_Wp_Options_Admin
 		
 		$this->addTable( $oSqlTable );
 				
-		return $this;
-	}
-	
-	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		$this->createTableOnce();
-		
 		return $this;
 	}
 	

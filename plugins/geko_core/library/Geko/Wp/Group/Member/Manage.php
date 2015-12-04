@@ -31,6 +31,8 @@ class Geko_Wp_Group_Member_Manage extends Geko_Wp_Options_Manage
 		parent::add();
 		
 		
+		Geko_Wp_Options_MetaKey::init();
+
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
 			->create( '##pfx##geko_group_members', 'gm' )
@@ -47,20 +49,6 @@ class Geko_Wp_Group_Member_Manage extends Geko_Wp_Options_Manage
 		
 		return $this;
 	}
-	
-	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		Geko_Wp_Options_MetaKey::install();
-		
-		$this->createTableOnce();
-		
-		return $this;
-	}
-	
 	
 	
 	

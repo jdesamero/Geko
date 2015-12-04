@@ -49,17 +49,6 @@ class Geko_Wp_Payment_Cash_Admin extends Geko_Wp_Payment_Admin
 	
 	
 	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		$this->createTableOnce();
-		
-		return $this;
-	}
-	
-	
 	
 	//// front-end display methods
 	

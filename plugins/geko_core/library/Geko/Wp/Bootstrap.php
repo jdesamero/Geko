@@ -51,7 +51,8 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 				'consts' => TRUE,
 				'setup' => TRUE,
 				'hooks' => TRUE,
-				'gf' => TRUE
+				'gf' => TRUE,
+				'opts.reg' => TRUE
 				
 			) )
 			
@@ -70,8 +71,10 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 				'mng' => 'Manage',
 				'navmng' => 'NavigationManagement',
 				'op' => 'Operation',
+				'opts' => 'Options',
 				'pnt' => 'Point',
 				'posttmpl' => 'PostTemplate',
+				'reg' => 'Registry',
 				'rslv' => 'Resolver',
 				'tmpl' => 'Template',
 				'wc' => 'WooCommerce'
@@ -313,7 +316,6 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 		//// init meta key system
 		
 		Geko_Wp_Options_MetaKey::init();
-		Geko_Wp_Options_MetaKey::install();
 		
 		
 		

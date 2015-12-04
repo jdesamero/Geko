@@ -92,43 +92,30 @@ class Geko_Wp_EmailMessage_Manage extends Geko_Wp_Options_Manage
 		
 		$this->addTable( $oSqlTable );
 		
-		return $this;
 		
-	}
-	
-	
-	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		Geko_Once::run( sprintf( '%s::enumeration', __CLASS__ ), array( $this, 'installEnumeration' ) );
-		
-		$this->createTableOnce();
-		
-		return $this;
-	}
-	
-	
-	//
-	public function installEnumeration() {
-		
-		Geko_Wp_Enumeration_Manage::getInstance()->install();
-		Geko_Wp_Enumeration_Manage::populate( array(
-			array( 'title' => 'Email Message Type', 'slug' => 'geko-emsg-type', 'description' => 'List of email formatting options.' ),
-			array(
-				array( 'title' => 'Plain Text', 'slug' => 'geko-emsg-type-text', 'value' => 1, 'rank' => 0, 'description' => 'Send email as plain text, with MIME type "text/plain".' ),
-				array( 'title' => 'HTML', 'slug' => 'geko-emsg-type-html', 'value' => 2, 'rank' => 1, 'description' => 'Send email as HTML, with MIME type "text/html".' ),
-				array( 'title' => 'Both', 'slug' => 'geko-emsg-type-both', 'value' => 3, 'rank' => 2, 'description' => 'Send email as both text and HTML, with MIME type "multipart/alternative".' )
-			)
-		) );
-		
-	}
+		// first-time setup, call only once
+		if ( !$this->regWasInitialized() ) {
 
-	
-	
+			Geko_Wp_Enumeration_Manage::populate( array(
+				array( 'title' => 'Email Message Type', 'slug' => 'geko-emsg-type', 'description' => 'List of email formatting options.' ),
+				array(
+					array( 'title' => 'Plain Text', 'slug' => 'geko-emsg-type-text', 'value' => 1, 'rank' => 0, 'description' => 'Send email as plain text, with MIME type "text/plain".' ),
+					array( 'title' => 'HTML', 'slug' => 'geko-emsg-type-html', 'value' => 2, 'rank' => 1, 'description' => 'Send email as HTML, with MIME type "text/html".' ),
+					array( 'title' => 'Both', 'slug' => 'geko-emsg-type-both', 'value' => 3, 'rank' => 2, 'description' => 'Send email as both text and HTML, with MIME type "multipart/alternative".' )
+				)
+			) );
+			
+			$this->regSetInitialized();
+		}
 		
+		
+		return $this;
+		
+	}
+	
+	
+	
+	
 	//
 	public function enqueueAdmin() {
 		

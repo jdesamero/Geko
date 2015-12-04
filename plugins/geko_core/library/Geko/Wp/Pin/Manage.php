@@ -27,8 +27,6 @@ class Geko_Wp_Pin_Manage extends Geko_Wp_Options_Manage
 		parent::add();
 		
 		
-		// Geko_Wp_Enumeration_Manage::getInstance()->add();
-		
 		$oSqlTable = new Geko_Sql_Table();
 		$oSqlTable
 			->create( '##pfx##geko_pin', 'p' )
@@ -50,17 +48,6 @@ class Geko_Wp_Pin_Manage extends Geko_Wp_Options_Manage
 		
 	}
 	
-	
-	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		$this->createTableOnce();
-		
-		return $this;
-	}
 	
 	
 	

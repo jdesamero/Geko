@@ -69,35 +69,22 @@ class Geko_Wp_EmailMessage_Transport_Manage extends Geko_Wp_Options_Manage
 		$this->addTable( $oSqlTable );
 		
 		
+		// first-time setup, call only once
+		if ( !$this->regWasInitialized() ) {
+
+			Geko_Wp_Enumeration_Manage::populate( array(
+				array( 'title' => 'Email Message Transport Type', 'slug' => 'geko-emsg-trpt-type', 'description' => 'List of email transport types.' ),
+				array(
+					array( 'title' => 'Sendmail', 'slug' => 'geko-emsg-trpt-type-sendmail', 'value' => 1, 'rank' => 0, 'description' => 'Send email via "sendmail".' ),
+					array( 'title' => 'SMTP', 'slug' => 'geko-emsg-trpt-type-smtp', 'value' => 2, 'rank' => 1, 'description' => 'Send email via SMTP.' )
+				)
+			) );
+			
+			$this->regSetInitialized();
+		}
+
+		
 		return $this;
-	}
-	
-	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		Geko_Once::run( sprintf( '%s::enumeration', __CLASS__ ), array( $this, 'installEnumeration' ) );
-		
-		$this->createTableOnce();
-		
-		return $this;
-	}
-	
-	
-	//
-	public function installEnumeration() {
-		
-		Geko_Wp_Enumeration_Manage::getInstance()->install();
-		Geko_Wp_Enumeration_Manage::populate( array(
-			array( 'title' => 'Email Message Transport Type', 'slug' => 'geko-emsg-trpt-type', 'description' => 'List of email transport types.' ),
-			array(
-				array( 'title' => 'Sendmail', 'slug' => 'geko-emsg-trpt-type-sendmail', 'value' => 1, 'rank' => 0, 'description' => 'Send email via "sendmail".' ),
-				array( 'title' => 'SMTP', 'slug' => 'geko-emsg-trpt-type-smtp', 'value' => 2, 'rank' => 1, 'description' => 'Send email via SMTP.' )
-			)
-		) );
-		
 	}
 	
 	

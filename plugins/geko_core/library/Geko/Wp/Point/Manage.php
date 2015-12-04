@@ -67,55 +67,43 @@ class Geko_Wp_Point_Manage extends Geko_Wp_Options_Manage
 		$this->addTable( $oSqlTable );
 		
 		
-		return $this;
-		
-	}
-	
-	
-	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		Geko_Once::run( sprintf( '%s::enumeration', __CLASS__ ), array( $this, 'installEnumeration' ) );
-		
-		$this->createTableOnce();
-		
-		return $this;
-	}
-	
-	
-	//
-	public function installEnumeration() {
-		
-		Geko_Wp_Enumeration_Manage::getInstance()->install();
-		Geko_Wp_Enumeration_Manage::populate( array(
-			array( 'title' => 'Point Status', 'slug' => 'geko-point-status', 'description' => 'List of point statuses.' ),
-			array(
-				array( 'title' => 'Not Reviewed', 'slug' => 'geko-point-status-not-reviewed', 'value' => 0, 'rank' => 0, 'description' => 'The user point has not been reviewed.' ),
-				array( 'title' => 'Approved', 'slug' => 'geko-point-status-approved', 'value' => 1, 'rank' => 1, 'description' => 'The user point has been approved.' ),
-				array( 'title' => 'Denied', 'slug' => 'geko-point-status-denied', 'value' => 2, 'rank' => 2, 'description' => 'The user point has been denied.' )
-			)
-		) );
-		
-		Geko_Wp_Enumeration_Manage::populate( array(
-			array( 'title' => 'Point Award Error', 'slug' => 'geko-point-award-error', 'description' => 'List of point award errors.' ),
-			array(
-				array( 'title' => 'Invalid user', 'slug' => 'geko-point-awerr-invalid-user', 'value' => -1, 'rank' => 0, 'description' => 'Invalid user was specified.' ),
-				array( 'title' => 'Invalid event slug', 'slug' => 'geko-point-awerr-invalid-slug', 'value' => -2, 'rank' => 1, 'description' => 'Invalid point event slug was specfied.' ),
-				array( 'title' => 'Point is one-time only', 'slug' => 'geko-point-awerr-one-time-only', 'value' => -3, 'rank' => 2, 'description' => 'Trying to award a one-time point again.' ),
-				array( 'title' => 'Time limit still in effect', 'slug' => 'geko-point-awerr-time-limit-in-effect', 'value' => -4, 'rank' => 3, 'description' => 'Time limit in effect, must pass before point can be awarded again.' ),
-				array( 'title' => 'Max point events exceeded', 'slug' => 'geko-point-awerr-max-events-exceeded', 'value' => -5, 'rank' => 4, 'description' => 'The number of allowable point events have been exceeded.' ),
-				array( 'title' => 'Duplicate point already awarded', 'slug' => 'geko-point-awerr-duplicate', 'value' => -6, 'rank' => 5, 'description' => 'Trying to a award a duplicate point.' ),
-				array( 'title' => 'Zero (0) points awarded', 'slug' => 'geko-point-awerr-zero-points', 'value' => -7, 'rank' => 6, 'description' => 'Trying to award zero (0) points.' ),
-				array( 'title' => 'Daily IP Limit Reached', 'slug' => 'geko-point-awerr-ip-limit', 'value' => -8, 'rank' => 7, 'description' => 'Daily sending limit from same IP address has been reached.' ),
-				array( 'title' => 'Unknown error', 'slug' => 'geko-point-awerr-unknown-error', 'value' => -999, 'rank' => 8, 'description' => 'An unknown error occured.' )
-			)
-		) );
-		
-	}
+		// first-time setup, call only once
+		if ( !$this->regWasInitialized() ) {
+			
+			Geko_Wp_Enumeration_Manage::populate( array(
+				array( 'title' => 'Point Status', 'slug' => 'geko-point-status', 'description' => 'List of point statuses.' ),
+				array(
+					array( 'title' => 'Not Reviewed', 'slug' => 'geko-point-status-not-reviewed', 'value' => 0, 'rank' => 0, 'description' => 'The user point has not been reviewed.' ),
+					array( 'title' => 'Approved', 'slug' => 'geko-point-status-approved', 'value' => 1, 'rank' => 1, 'description' => 'The user point has been approved.' ),
+					array( 'title' => 'Denied', 'slug' => 'geko-point-status-denied', 'value' => 2, 'rank' => 2, 'description' => 'The user point has been denied.' )
+				)
+			) );
+			
+			Geko_Wp_Enumeration_Manage::populate( array(
+				array( 'title' => 'Point Award Error', 'slug' => 'geko-point-award-error', 'description' => 'List of point award errors.' ),
+				array(
+					array( 'title' => 'Invalid user', 'slug' => 'geko-point-awerr-invalid-user', 'value' => -1, 'rank' => 0, 'description' => 'Invalid user was specified.' ),
+					array( 'title' => 'Invalid event slug', 'slug' => 'geko-point-awerr-invalid-slug', 'value' => -2, 'rank' => 1, 'description' => 'Invalid point event slug was specfied.' ),
+					array( 'title' => 'Point is one-time only', 'slug' => 'geko-point-awerr-one-time-only', 'value' => -3, 'rank' => 2, 'description' => 'Trying to award a one-time point again.' ),
+					array( 'title' => 'Time limit still in effect', 'slug' => 'geko-point-awerr-time-limit-in-effect', 'value' => -4, 'rank' => 3, 'description' => 'Time limit in effect, must pass before point can be awarded again.' ),
+					array( 'title' => 'Max point events exceeded', 'slug' => 'geko-point-awerr-max-events-exceeded', 'value' => -5, 'rank' => 4, 'description' => 'The number of allowable point events have been exceeded.' ),
+					array( 'title' => 'Duplicate point already awarded', 'slug' => 'geko-point-awerr-duplicate', 'value' => -6, 'rank' => 5, 'description' => 'Trying to a award a duplicate point.' ),
+					array( 'title' => 'Zero (0) points awarded', 'slug' => 'geko-point-awerr-zero-points', 'value' => -7, 'rank' => 6, 'description' => 'Trying to award zero (0) points.' ),
+					array( 'title' => 'Daily IP Limit Reached', 'slug' => 'geko-point-awerr-ip-limit', 'value' => -8, 'rank' => 7, 'description' => 'Daily sending limit from same IP address has been reached.' ),
+					array( 'title' => 'Unknown error', 'slug' => 'geko-point-awerr-unknown-error', 'value' => -999, 'rank' => 8, 'description' => 'An unknown error occured.' )
+				)
+			) );
+			
+			$this->regSetInitialized();
+		}
 
+		
+		return $this;
+		
+	}
+	
+	
+	
 	
 	
 	//// accessors

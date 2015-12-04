@@ -55,26 +55,14 @@ class Geko_Wp_User_Meta extends Geko_Wp_Options_Meta
 		
 	}
 	
-	
-	//
-	public function install() {
 		
-		parent::install();
-		
-		$this->createTableOnce();
-		
-		return $this;
-	}
-	
-		
-	
 	
 	//
 	public function addAdmin() {
 		
 		parent::addAdmin();
 		
-		add_action( 'admin_init_user', array( $this, 'install' )  );		
+		// add_action( 'admin_init_user', array( $this, 'install' )  );		
 		add_action( 'admin_head_user', array( $this, 'addAdminHead' )  );
 				
 		////

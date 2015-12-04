@@ -43,36 +43,26 @@ class Geko_Wp_Form_MetaData_Manage extends Geko_Wp_Options_Manage
 		$this->addTable( $oSqlTable );
 		
 		
+		// first-time setup, call only once
+		if ( !$this->regWasInitialized() ) {
+			
+			Geko_Wp_Enumeration_Manage::populate( array(
+				array( 'title' => 'Form Context', 'slug' => 'geko-form-context', 'description' => 'List of areas where meta data is applicable.' ),
+				array(
+					array( 'title' => 'Question', 'slug' => 'geko-form-context-question', 'value' => 0, 'rank' => 0, 'description' => 'Meta data for form questions.' ),
+					array( 'title' => 'Choice', 'slug' => 'geko-form-context-choice', 'value' => 1, 'rank' => 1, 'description' => 'Meta data for form choices.' ),
+					array( 'title' => 'Section', 'slug' => 'geko-form-context-section', 'value' => 2, 'rank' => 2, 'description' => 'Meta data for form sections.' )
+				)
+			) );
+			
+			$this->regSetInitialized();
+		}
+		
+		
 		return $this;
 		
 	}
 	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		Geko_Once::run( sprintf( '%s::enumeration', __CLASS__ ), array( $this, 'installEnumeration' ) );
-				
-		$this->createTableOnce();
-		
-		return $this;
-	}
-	
-	//
-	public function installEnumeration() {
-		
-		Geko_Wp_Enumeration_Manage::getInstance()->install();
-		Geko_Wp_Enumeration_Manage::populate( array(
-			array( 'title' => 'Form Context', 'slug' => 'geko-form-context', 'description' => 'List of areas where meta data is applicable.' ),
-			array(
-				array( 'title' => 'Question', 'slug' => 'geko-form-context-question', 'value' => 0, 'rank' => 0, 'description' => 'Meta data for form questions.' ),
-				array( 'title' => 'Choice', 'slug' => 'geko-form-context-choice', 'value' => 1, 'rank' => 1, 'description' => 'Meta data for form choices.' ),
-				array( 'title' => 'Section', 'slug' => 'geko-form-context-section', 'value' => 2, 'rank' => 2, 'description' => 'Meta data for form sections.' )
-			)
-		) );
-		
-	}
 	
 	
 	

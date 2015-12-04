@@ -35,16 +35,6 @@ class Geko_Wp_Ext_WooCommerce_File_DownloadHistory_Manage extends Geko_Wp_Option
 	}
 	
 	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		$this->createTableOnce();
-		
-		return $this;
-	}
-	
 	
 	
 }

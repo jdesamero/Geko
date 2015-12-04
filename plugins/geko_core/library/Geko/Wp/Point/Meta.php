@@ -35,18 +35,6 @@ class Geko_Wp_Point_Meta extends Geko_Wp_Options_Meta
 		
 	
 	
-	// create table
-	public function install() {
-		
-		parent::install();
-		
-		Geko_Wp_Options_MetaKey::install();
-		
-		$this->createTableOnce();
-		
-		return $this;
-	}
-	
 	
 	// save the data
 	public function save() {
