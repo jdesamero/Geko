@@ -78,6 +78,34 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 		
 		
 		
+		// first-time setup, call only once
+		if ( !$this->regWasInitialized() ) {
+			
+			$sTableName = $oSqlTable->getTableName();
+			
+			
+			$oDb = Geko_Wp::get( 'db' );
+			
+			if ( 0 === $oDb->getTableNumRows( $sTableName ) ) {
+				
+				$sTimestamp = $oDb->getTimestamp();
+				
+				$oDb->insertMulti( $sTableName, array(
+					array(
+						'code' => 'en',
+						'title' => 'English',
+						'is_default' => 1,
+						'date_created' => $sTimestamp,
+						'date_modified' => $sTimestamp
+					)
+				) );
+			}
+			
+			$this->regSetInitialized();
+		}
+		
+		
+		
 		return $this;
 	}
 	

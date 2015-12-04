@@ -1,6 +1,15 @@
 <?php
+/*
+ * "geko_navigation_management/includes/library/Geko/Wp/NavigationManagement/Language.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * also implements pluginHookActivate() and pluginHookDeactivate()
+ */
 
-// also implements pluginHookActivate() and pluginHookDeactivate()
+//
 class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 {
 	protected $sLangQueryVar = 'nav_lang_id';
@@ -321,6 +330,7 @@ class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 	public function getSiblings( $aParams ) {
 		
 		$sDefLangCode = $this->getLangCode( 0 );
+		
 		
 		$aFlat = $this->flattenParams( $aParams );
 		$aSibParams = array( 'add_siblings_field' => TRUE );

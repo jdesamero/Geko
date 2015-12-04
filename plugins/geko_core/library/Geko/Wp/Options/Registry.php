@@ -6,7 +6,7 @@
  * Copyright (c) 2013 Joel Desamero.
  * Licensed under the MIT license.
  *
- * A singleton class responsible checking the state of option/management classes (eg: table exists)
+ * A singleton class responsible checking the state of option/management classes (eg: initialized)
  */
 
 //
@@ -82,13 +82,35 @@ class Geko_Wp_Options_Registry extends Geko_Singleton_Abstract
 	
 	//
 	public function shutdown() {
+
+		// remove non-initalized plugins
+		$aInitialized = $this->_aParams[ 'initialized' ];
+		$aInitClean = array();
 		
+		foreach ( $aInitialized as $sMaybeSingleton ) {
+			
+			if ( is_a( $sMaybeSingleton, 'Geko_Singleton_Abstract', TRUE ) ) {
+				
+				$oSingleton = Geko_Singleton_Abstract::getInstance( $sMaybeSingleton );
+				
+				if ( !$oSingleton->getCalledInit() ) {
+					$aInitClean[] = $sMaybeSingleton;
+				}
+			}
+		}
+		
+		if ( count( $aInitClean ) > 0 ) {
+			$this->_aParams[ 'initialized' ] = array_diff( $aInitialized, $aInitClean );
+			$this->setParamsUpdated();
+		}
+		
+		
+		// update
 		if ( $this->_bParamsUpdated ) {
 			
 			update_option( self::REG_OPT_KEY, Geko_Json::encode(
 				$this->_aParams
 			) );
-			
 		}
 		
 	}
