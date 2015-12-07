@@ -110,6 +110,9 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 		if ( !$this->_bReportOnly ) {
 			
 			
+			$oDb = Geko_Wp::get( 'db' );
+			
+			
 			//// main log table
 			
 			$oSqlTable = new Geko_Sql_Table();
@@ -129,7 +132,11 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 			}
 			
 			$this->_oPrimaryTable = $this->modifyPrimaryTable( $oSqlTable );
+			$sPrimaryTableName = $this->_oPrimaryTable->getTableName();
 			
+			if ( !$oDb->tableExists( $sPrimaryTableName ) ) {
+				$this->createTable( $this->_oPrimaryTable );
+			}
 			
 			
 			//// meta data table
@@ -150,10 +157,15 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 				}
 				
 				$this->_oMetaTable = $this->modifyMetaTable( $oSqlTable1 );
+				$sMetaTableName = $this->_oMetaTable->getTableName();
 				
+				if ( !$oDb->tableExists( $sMetaTableName ) ) {
+					$this->createTable( $this->_oMetaTable );
+				}
 			}
-		
+			
 		}
+		
 		
 		if ( !$this->_sExportCapability ) {
 			$this->_sExportCapability = sprintf( 'export_%s_logs', $this->_sTableSuffix );
@@ -210,7 +222,6 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 		
 		parent::addAdmin();
 		
-		$this->install();
 		
 		////
 		
@@ -273,26 +284,7 @@ class Geko_Wp_Log_Manage extends Geko_Wp_Initialize
 	
 	
 	
-	
-	// create table
-	public function install() {
 		
-		if ( $this->_sTableName && !$this->_bReportOnly ) {
-			
-			$oDb = Geko_Wp::get( 'db' );
-			
-			Geko_Wp_Options_MetaKey::install();
-			$oDb->tableCreateIfNotExists( $this->_oPrimaryTable );
-			
-			if ( $this->_bUseMetaTable && $this->_oMetaTable ) {
-				$oDb->tableCreateIfNotExists( $this->_oMetaTable );
-			}
-		}
-		
-		return $this;
-	}
-	
-	
 	//
 	public function attachPage() {
 		add_submenu_page( 'tools.php', self::$sManagementPageTitle, self::$sManagementMenuTitle, self::$sManagementCapability, __CLASS__, array( $this, 'displayPage' ) );

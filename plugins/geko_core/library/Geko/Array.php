@@ -86,13 +86,13 @@ class Geko_Array
 		return FALSE;
 	}
 	
-	// return TRUE if any of the subjects is contained in the value
-	public static function contains( $aSubject, $sValue ) {
+	// return TRUE if the subject contains any of the given values
+	public static function contains( $sSubject, $aValues ) {
 		
-		if ( !is_array( $aSubject ) ) return FALSE;
+		if ( !is_array( $aValues ) ) return FALSE;
 		
-		foreach ( $aSubject as $sSubject ) {
-			if ( FALSE !== strpos( $sValue, $sSubject ) ) {
+		foreach ( $aValues as $sValue ) {
+			if ( FALSE !== strpos( $sSubject, $sValue ) ) {
 				return TRUE;
 			}
 		}
