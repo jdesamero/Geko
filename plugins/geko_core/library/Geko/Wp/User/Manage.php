@@ -1,4 +1,11 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/User/Manage.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
 
 //
 class Geko_Wp_User_Manage extends Geko_Wp_Options_Manage

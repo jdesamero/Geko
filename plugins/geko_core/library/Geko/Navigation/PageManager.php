@@ -1,4 +1,11 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/Navigation/PageManager.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
 
 //
 class Geko_Navigation_PageManager
@@ -31,7 +38,7 @@ class Geko_Navigation_PageManager
 			'legend'
 		);
 		
-		$iMaxWidth = 500;
+		$iMaxWidth = 700;
 		$iInnerWidthOffset = 150;
 		$iInnerSpanWidth = $iMaxWidth - $iInnerWidthOffset;
 		
@@ -175,7 +182,7 @@ class Geko_Navigation_PageManager
 		foreach ( $aParams as $sKey => $mValue ) {
 			if ( in_array( $sKey, $this->_aPrefixedVars ) ) {
 				// add prefix
-				$aPrefixed[ $sKey ] = $this->_aInjectParams[ 'nav_prefix' ] . $mValue;
+				$aPrefixed[ $sKey ] = sprintf( '%s%s', $this->_aInjectParams[ 'nav_prefix' ], $mValue );
 			} else {
 				// no change
 				$aPrefixed[ $sKey ] = $mValue;
@@ -297,7 +304,7 @@ class Geko_Navigation_PageManager
 			$sPageClass = $aPageType[ 'type' ];
 			
 			$this->_aPageTypeHash[ $sPageClass ] = $iType;
-			$sTypeCssClasses .= 'type-' . $iType . ' ';
+			$sTypeCssClasses .= sprintf( 'type-%d ', $iType );
 			
 			
 			//// determine a page manager class, if it exists
@@ -345,10 +352,11 @@ class Geko_Navigation_PageManager
 	
 	// static helper that resolves the corresponding page manager class
 	public static function resolvePageManagerClass( $sPageClass, $sPageManagerClass = '' ) {
+		
 		return Geko_Class::existsCoalesce(
-			( $sPageManagerClass ) ? $sPageManagerClass : '',
+			( $sPageManagerClass ) ? $sPageManagerClass : '' ,
 			str_replace( '_Page_', '_PageManager_', $sPageClass ),
-			$sPageClass . 'Manager'
+			sprintf( '%sManager', $sPageClass )
 		);
 	}
 	
@@ -361,10 +369,12 @@ class Geko_Navigation_PageManager
 	
 	//
 	protected function outputPluginJs( $sCallback ) {
-		$sCallback = 'get' . ucfirst( $sCallback );
+		
+		$sCallback = sprintf( 'get%s', ucfirst( $sCallback ) );
+		
 		foreach ($this->_aPlugins as $iType => $oPlugin) {
 			if ( $sOutput = $oPlugin->$sCallback() ) {
-				echo $this->outputInjectType( $iType, $sOutput ) . "\n";
+				printf( "%s\n", $this->outputInjectType( $iType, $sOutput ) );
 			}
 		}
 	}
@@ -372,9 +382,10 @@ class Geko_Navigation_PageManager
 	
 	//
 	protected function outputInjectType( $iType, $sOutput ) {
+		
 		return str_replace(
 			array( '##type##', '##nvpfx_type##' ),
-			array( $iType, $this->_aInjectParams[ 'nav_prefix' ] . $iType . '_' ),
+			array( $iType, sprintf( '%s%d_', $this->_aInjectParams[ 'nav_prefix' ], $iType ) ),
 			$sOutput
 		);
 	}
@@ -392,10 +403,9 @@ class Geko_Navigation_PageManager
 		// do injections
 		echo str_replace(
 			array_map(
-				create_function(
-					'$sValue',
-					'return "##" . $sValue . "##";'
-				),
+				function( $sValue ) {
+					return sprintf( '##%s##', $sValue );
+				},
 				array_keys( $aParams )
 			),
 			array_values( $aParams ),
@@ -497,7 +507,7 @@ class Geko_Navigation_PageManager
 				array(
 					'default_params' => $oPlugin->getDefaultParams(),
 					'type' => $iType,
-					'pfx_type' => $this->_aInjectParams[ 'nav_prefix' ] . $iType . '_',
+					'pfx_type' => sprintf( '%s%d_', $this->_aInjectParams[ 'nav_prefix' ], $iType ),
 					'disable_params' => FALSE
 				),
 				$oPlugin->getManagementData()
@@ -667,7 +677,7 @@ class Geko_Navigation_PageManager
 			// delegate
 			return $this->_outputInject( $sOutputInjectMethod );
 		} else {
-			throw new Exception( 'Invalid method ' . __CLASS__ . '::' . $sMethod . '() called.' );
+			throw new Exception( sprintf( 'Invalid method %s::%s() called.', __CLASS__, $sMethod ) );
 		}
 		
 	}

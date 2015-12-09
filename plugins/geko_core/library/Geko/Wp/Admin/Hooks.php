@@ -3,6 +3,7 @@
 //
 class Geko_Wp_Admin_Hooks
 {
+	
 	//
 	protected static $bCalledInit = FALSE;
 	protected static $sCurrentFilter;
@@ -10,6 +11,8 @@ class Geko_Wp_Admin_Hooks
 	protected static $aStates = FALSE;
 	protected static $oCurrentPlugin;
 	protected static $sDisplayMode = FALSE;
+	
+	
 	
 	//
 	public static function init( $aPlugins = array() ) {
@@ -20,12 +23,11 @@ class Geko_Wp_Admin_Hooks
 				
 				// generate list of default plugin classes
 				$aDefaultPlugins = array_map(
-					create_function(
-						'$sVal',
-						'return "' . __CLASS__ . '_" . str_replace( ".php", "", $sVal );'
-					),
+					function( $sVal ) {
+						return sprintf( '%s_%s', __CLASS__, str_replace( '.php', '', $sVal ) );
+					},
 					array_diff(
-						scandir( dirname( __FILE__ ) . '/Hooks' ),
+						scandir( sprintf( '%s/Hooks', dirname( __FILE__ ) ) ),
 						array( '.', '..', 'PluginAbstract.php' )
 					)	
 				);
@@ -53,7 +55,7 @@ class Geko_Wp_Admin_Hooks
 					
 					// Hacky!!!
 					if ( self::$aStates && ( count( self::$aStates ) == 2 ) ) {
-						self::$sDisplayMode = str_replace( self::$aStates[ 0 ] . '_', '', self::$aStates[ 1 ] );
+						self::$sDisplayMode = str_replace( sprintf( '%s_', self::$aStates[ 0 ] ), '', self::$aStates[ 1 ] );
 					}
 				}
 				
@@ -79,7 +81,7 @@ class Geko_Wp_Admin_Hooks
 	public static function adminHook( $sType ) {
 		if ( self::$aStates ) {
 			foreach ( self::$aStates as $sState ) {
-				$sAction = 'admin_' . $sType . '_' . $sState;
+				$sAction = sprintf( 'admin_%s_%s', $sType, $sState );
 				do_action( $sAction );
 			}
 		}
@@ -91,8 +93,9 @@ class Geko_Wp_Admin_Hooks
 		
 		if ( self::$aStates ) {
 			foreach ( self::$aStates as $sState ) {
-				add_filter( 'admin_page_source_' . $sState, array( self::$oCurrentPlugin, 'applyFilters' ), 10, 2 );
-				$sContent = apply_filters( 'admin_page_source_' . $sState, $sContent, $sState );
+				$sFilter = sprintf( 'admin_page_source_%s', $sState );
+				add_filter( $sFilter, array( self::$oCurrentPlugin, 'applyFilters' ), 10, 2 );
+				$sContent = apply_filters( $sFilter, $sContent, $sState );
 			}
 		}
 		

@@ -11,8 +11,6 @@
 class Geko_Wp_Admin_Hooks_Post extends Geko_Wp_Admin_Hooks_PluginAbstract
 {
 	
-	protected $_sPostType = '';
-	
 	
 	//
 	public function getStates() {
@@ -53,7 +51,8 @@ class Geko_Wp_Admin_Hooks_Post extends Geko_Wp_Admin_Hooks_PluginAbstract
 			
 		}
 		
-		$this->_sPostType = $sPostType;
+		
+		$this->setValue( 'post_type', $sPostType );
 		
 		return $aRes;
 	}
@@ -61,7 +60,7 @@ class Geko_Wp_Admin_Hooks_Post extends Geko_Wp_Admin_Hooks_PluginAbstract
 	//
 	public function applyFilters( $sContent, $sState ) {
 		
-		$sPostType = $this->_sPostType;
+		$sPostType = $this->getValue( 'post_type' );
 		
 		if ( ( 'post_edit' == $sState ) || ( 'post_add' == $sState ) ) {
 			

@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ * "geko_core/conf/register.xml"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+-->
 <data version-flags="jquery-ui" default-jquery-ui-version="1.9.2">
-	
-	
+		
 	<!-- JavaScript -->
 	<scripts>
 		
@@ -297,7 +303,7 @@
 		
 		<file id="geko" src="##geko_core_uri##/js/Geko.js" dependencies="jquery" />
 		
-		<file id="geko_navigation_pagemanager" src="##geko_core_uri##/js/Geko/Navigation/PageManager.js" dependencies="geko-jquery-geko_util" />
+		<file id="geko_navigation_pagemanager" src="##geko_core_uri##/js/Geko/Navigation/PageManager.js" dependencies="geko-string_format geko-jquery-geko_util" />
 		<file id="geko_navigation_pagemanager_custom" src="##geko_core_uri##/js/Geko/Navigation/PageManager/Custom.js" dependencies="geko_navigation_pagemanager" />
 		<file id="geko_navigation_pagemanager_uri" src="##geko_core_uri##/js/Geko/Navigation/PageManager/Uri.js" dependencies="geko_navigation_pagemanager" />
 		<file id="geko_navigation_pagemanager_implicitlabelabstract" src="##geko_core_uri##/js/Geko/Navigation/PageManager/ImplicitLabelAbstract.js" dependencies="geko_navigation_pagemanager" />
@@ -350,6 +356,7 @@
 		<file id="geko_wp_navigationmanagement_pagemanager_role" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/Role.js" dependencies="geko_navigation_pagemanager_implicitlabelabstract" />
 		<file id="geko_wp_navigationmanagement_pagemanager_roleitem" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/RoleItem.js" dependencies="geko_navigation_pagemanager_implicitlabelabstract" />
 		<file id="geko_wp_navigationmanagement_pagemanager_search" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/Search.js" dependencies="geko_navigation_pagemanager_implicitlabelabstract" />
+		
 		<file id="geko_wp_options_manage" src="##geko_core_uri##/js/Geko/Wp/Options/Manage.js" dependencies="geko-jquery-ui-dialog" />
 		
 		

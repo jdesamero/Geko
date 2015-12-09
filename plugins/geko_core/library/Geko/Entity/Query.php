@@ -1,5 +1,13 @@
 <?php
+/*
+ * "geko_core/library/Geko/Entity/Query.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
 
+//
 abstract class Geko_Entity_Query
 	implements Iterator, ArrayAccess, Countable, Geko_Json_Encodable
 {

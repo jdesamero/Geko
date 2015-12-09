@@ -1,4 +1,11 @@
 <?php
+/*
+ * "geko_navigation_management/includes/library/Geko/Wp/NavigationManagement.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
 
 //
 class Geko_Wp_NavigationManagement
@@ -9,12 +16,14 @@ class Geko_Wp_NavigationManagement
 	protected $_sPrefix = 'geko_nav';
 	
 	
-	protected $aNavContainers = array();
+	protected $_aNavContainers = array();
 	
-	protected $aGroups = NULL;
-	protected $aCodeHash = array();
+	protected $_aGroups = NULL;
+	protected $_aCodeHash = array();
 	
-	protected $aActivePlugins = array();
+	protected $_aActivePlugins = array();
+	
+	
 	
 	
 	//// initialize
@@ -26,13 +35,14 @@ class Geko_Wp_NavigationManagement
 		
 		//
 		if ( !is_array(
-			$aRegisteredPlugins = Zend_Json::decode( $this->getOption( 'plugins' ) )
+			$aRegisteredPlugins = Geko_Json::decode( $this->getOption( 'plugins' ) )
 		) ) {
 			$aRegisteredPlugins = array();
 		}
 		
-		foreach ( $this->aActivePlugins as $sClass => $b ) {
+		foreach ( $this->_aActivePlugins as $sClass => $b ) {
 			if ( !$aRegisteredPlugins[ $sClass ] ) {
+				
 				if (
 					is_subclass_of( $sClass, 'Geko_Singleton_Abstract' ) && 
 					method_exists( $sClass, 'pluginHookActivate' )
@@ -40,12 +50,14 @@ class Geko_Wp_NavigationManagement
 					$oPlugin = Geko_Singleton_Abstract::getInstance( $sClass );
 					$oPlugin->pluginHookActivate();
 				}
+				
 				$aRegisteredPlugins[ $sClass ] = TRUE;
 			}
 		}
 		
 		foreach ( $aRegisteredPlugins as $sClass => $b ) {
-			if ( !$this->aActivePlugins[ $sClass ] ) {
+			if ( !$this->_aActivePlugins[ $sClass ] ) {
+				
 				if (
 					is_subclass_of( $sClass, 'Geko_Singleton_Abstract' ) && 
 					method_exists( $sClass, 'pluginHookDeactivate' )
@@ -53,11 +65,12 @@ class Geko_Wp_NavigationManagement
 					$oPlugin = Geko_Singleton_Abstract::getInstance( $sClass );
 					$oPlugin->pluginHookDeactivate();
 				}
+				
 				unset( $aRegisteredPlugins[ $sClass ] );
 			}
 		}
 		
-		$this->updateOption( 'plugins', Zend_Json::encode( $aRegisteredPlugins ) );
+		$this->updateOption( 'plugins', Geko_Json::encode( $aRegisteredPlugins ) );
 			
 					
 		return $this;
@@ -70,10 +83,10 @@ class Geko_Wp_NavigationManagement
 		
 		if ( !$bCalled ) {
 			
-			$this->aGroups = Zend_Json::decode( $this->getOption( 'groups' ) );
+			$this->_aGroups = Geko_Json::decode( $this->getOption( 'groups' ) );
 			
-			foreach ( $this->aGroups as $i => $aGroup ) {
-				$this->aCodeHash[ $aGroup[ 'code' ] ] = sprintf( 'gp_%d', $i );
+			foreach ( $this->_aGroups as $i => $aGroup ) {
+				$this->_aCodeHash[ $aGroup[ 'code' ] ] = sprintf( 'gp_%d', $i );
 			}
 			
 			$bCalled = TRUE;
@@ -82,7 +95,7 @@ class Geko_Wp_NavigationManagement
 	
 	//
 	public function activatePlugin( $sClass ) {
-		$this->aActivePlugins[ $sClass ] = TRUE;
+		$this->_aActivePlugins[ $sClass ] = TRUE;
 	}
 	
 	
@@ -95,13 +108,13 @@ class Geko_Wp_NavigationManagement
 	//
 	public function getGroups() {
 		$this->initGroups();
-		return $this->aGroups;
+		return $this->_aGroups;
 	}
 	
 	//
 	public function getCodeHash() {
 		$this->initGroups();
-		return $this->aCodeHash;
+		return $this->_aCodeHash;
 	}	
 	
 	
@@ -111,7 +124,7 @@ class Geko_Wp_NavigationManagement
 	//
 	public function loadNavParams( $sKey ) {
 		
-		if ( is_array( $aNavParams = Zend_Json::decode( $this->getOption( $sKey ) ) ) ) {
+		if ( is_array( $aNavParams = Geko_Json::decode( $this->getOption( $sKey ) ) ) ) {
 		
 			$aNavParams = apply_filters(
 				'admin_geko_wp_nav_load_group',
@@ -130,10 +143,10 @@ class Geko_Wp_NavigationManagement
 		
 		$this->initGroups();
 		
-		if ( is_array( $this->aGroups ) ) {
+		if ( is_array( $this->_aGroups ) ) {
 
-			if ( isset( $this->aCodeHash[ $sKey ] ) ) {
-				$sKey = $this->aCodeHash[ $sKey ];
+			if ( isset( $this->_aCodeHash[ $sKey ] ) ) {
+				$sKey = $this->_aCodeHash[ $sKey ];
 			}
 			
 			if ( is_array( $aNavParams = $this->loadNavParams( $sKey ) ) ) {
@@ -152,15 +165,15 @@ class Geko_Wp_NavigationManagement
 		
 		$this->initGroups();
 		
-		if ( is_array( $this->aGroups ) ) {
+		if ( is_array( $this->_aGroups ) ) {
 			
 			// check if key is in the code hash and re-assign
-			if ( isset( $this->aCodeHash[ $sKey ] ) ) {
-				$sKey = $this->aCodeHash[ $sKey ];
+			if ( isset( $this->_aCodeHash[ $sKey ] ) ) {
+				$sKey = $this->_aCodeHash[ $sKey ];
 			}
 			
 			// serialize nav data
-			if ( !isset( $this->aNavContainers[ $sKey ] ) ) {
+			if ( !isset( $this->_aNavContainers[ $sKey ] ) ) {
 				
 				if ( is_array( $aNavParams = $this->loadNavParams( $sKey ) ) ) {
 					$oContainer = new Zend_Navigation(
@@ -169,16 +182,18 @@ class Geko_Wp_NavigationManagement
 				} else {
 					$oContainer = NULL;
 				}
-				$this->aNavContainers[ $sKey ] = $oContainer;
+				$this->_aNavContainers[ $sKey ] = $oContainer;
 			}
 			
 		}
 		
-		return $this->aNavContainers[ $sKey ];
+		return $this->_aNavContainers[ $sKey ];
 	}
+	
 	
 	//
 	public function render( $sKey, $aParams = array() ) {
+		
 		if ( $oNavContainer = $this->getNavContainer( $sKey ) ) {			
 			echo Geko_Navigation_Renderer::menu( $oNavContainer, $aParams );
 		}
@@ -186,11 +201,13 @@ class Geko_Wp_NavigationManagement
 
 	// alias of $this->render()
 	public function renderMenu( $sKey, $aParams = array() ) {
+		
 		$this->render( $sKey, $aParams );
 	}
 	
 	//
 	public function renderBreadcrumb( $sKey, $aParams = array() ) {
+		
 		if ( $oNavContainer = $this->getNavContainer( $sKey ) ) {			
 			echo Geko_Navigation_Renderer::breadcrumbs( $oNavContainer, $aParams );
 		}
@@ -198,6 +215,7 @@ class Geko_Wp_NavigationManagement
 	
 	//
 	public function renderClassChain( $sKey, $aParams = array() ) {
+		
 		if ( $oNavContainer = $this->getNavContainer( $sKey ) ) {			
 			echo Geko_Navigation_Renderer::classChain( $oNavContainer, $aParams );
 		}
@@ -205,17 +223,21 @@ class Geko_Wp_NavigationManagement
 	
 	//
 	public function findActiveDepth( $sKey, $aParams = array() ) {
+		
 		if ( $oNavContainer = $this->getNavContainer( $sKey ) ) {			
 			return Geko_Navigation_Renderer::getActiveDepth( $oNavContainer, $aParams );
 		}
+		
 		return NULL;
 	}
 	
 	//
 	public function findActiveParent( $sKey, $aParams = array() ) {
+		
 		if ( $oNavContainer = $this->getNavContainer( $sKey ) ) {			
 			return Geko_Navigation_Renderer::getActiveParent( $oNavContainer, $aParams );
 		}
+		
 		return NULL;
 	}	
 	

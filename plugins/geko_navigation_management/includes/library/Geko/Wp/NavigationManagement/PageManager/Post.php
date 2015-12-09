@@ -1,4 +1,11 @@
 <?php
+/*
+ * "geko_navigation_management/includes/library/Geko/Wp/NavigationManagement/PageManager/Post.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
 
 //
 class Geko_Wp_NavigationManagement_PageManager_Post
@@ -9,38 +16,34 @@ class Geko_Wp_NavigationManagement_PageManager_Post
 	
 	
 	//
-	protected $aPostTypesNorm = array();
-	protected $aCatsNorm = array();
-	protected $aAuthorsNorm = array();
+	protected $_aPostTypeParams = array();
+	protected $_aCatParams = array();
+	protected $_aAuthorParams = array();
 	
 	
 	//
 	public function init() {
 		
+		
+		$oNavMgmtAdmin = Geko_Wp_NavigationManagement_PluginAdmin::getInstance();
+		$oPageManager = $oNavMgmtAdmin->getPageManager();
+		
 		//// post types, normalized
 		
-		$this->setPostTypesNorm( array(
+		$this->setPostTypeParams( array(
 			self::TYPE_CAT => array( 'slug' => 'category', 'title' => 'Category' ),
 			self::TYPE_AUTH => array( 'slug' => 'author', 'title' => 'Author' )
 		) );
 		
+		
+		
 		//// categories normalized
 		
-		$aCatsNorm = array();
+		$oCatPlugin = $oPageManager->getPlugin( 'Geko_Wp_NavigationManagement_Page_Category' );
 		
-		$aParams = array( 'hide_empty' => FALSE );
-		$aParams = apply_filters( 'admin_geko_wp_nav_post_query_params', $aParams, 'category' );
+		$this->setCatParams( $oCatPlugin->getCatParams() );
 		
-		$aCats = new Geko_Wp_Category_Query( $aParams, FALSE );
 		
-		foreach ( $aCats as $oCat ) {
-			$aCatsNorm[ $oCat->getId() ] = array(
-				'title' => $oCat->getTheTitle(),
-				'link' => $oCat->getUrl()
-			);
-		}
-		
-		$this->setCatsNorm( $aCatsNorm );
 		
 		//// authors normalized
 		
@@ -58,25 +61,25 @@ class Geko_Wp_NavigationManagement_PageManager_Post
 			);
 		}
 		
-		$this->setAuthorsNorm( $aAuthorsNorm );
+		$this->setAuthorParams( $aAuthorsNorm );
 		
 	}
 
 	//
-	public function setPostTypesNorm( $aPostTypesNorm ) {
-		$this->aPostTypesNorm = $aPostTypesNorm;
+	public function setPostTypeParams( $aPostTypeParams ) {
+		$this->_aPostTypeParams = $aPostTypeParams;
 		return $this;
 	}
 	
 	//
-	public function setCatsNorm( $aCatsNorm ) {
-		$this->aCatsNorm = $aCatsNorm;
+	public function setCatParams( $aCatParams ) {
+		$this->_aCatParams = $aCatParams;
 		return $this;
 	}
 	
 	//
-	public function setAuthorsNorm( $aAuthorsNorm ) {
-		$this->aAuthorsNorm = $aAuthorsNorm;
+	public function setAuthorParams( $aAuthorParams ) {
+		$this->_aAuthorParams = $aAuthorParams;
 		return $this;
 	}
 	
@@ -86,10 +89,10 @@ class Geko_Wp_NavigationManagement_PageManager_Post
 	public function getDefaultParams() {
 		
 		$aParams = parent::getDefaultParams();
-		$aParams['post_type_id'] = key( $this->aPostTypesNorm );
-		$aParams['cat_id'] = key( $this->aCatsNorm );
-		$aParams['author_id'] = key( $this->aAuthorsNorm );
-		$aParams['hide'] = TRUE;
+		$aParams[ 'post_type_id' ] = key( $this->_aPostTypeParams );
+		$aParams[ 'cat_id' ] = key( $this->_aCatParams );
+		$aParams[ 'author_id' ] = key( $this->_aAuthorParams );
+		$aParams[ 'hide' ] = TRUE;
 		
 		return $aParams;
 	}
@@ -97,12 +100,12 @@ class Geko_Wp_NavigationManagement_PageManager_Post
 	
 	
 	//
-	public function getManagementData()
-	{	
+	public function getManagementData() {
+		
 		$aData = parent::getManagementData();
-		$aData['post_types'] = $this->aPostTypesNorm;
-		$aData['cat_params'] = $this->aCatsNorm;
-		$aData['author_params'] = $this->aAuthorsNorm;
+		$aData[ 'post_types' ] = $this->_aPostTypeParams;
+		$aData[ 'cat_params' ] = $this->_aCatParams;
+		$aData[ 'author_params' ] = $this->_aAuthorParams;
 		
 		return $aData;
 	}
@@ -121,8 +124,8 @@ class Geko_Wp_NavigationManagement_PageManager_Post
 	
 	
 	//
-	public function outputHtml()
-	{
+	public function outputHtml() {
+		
 		?>
 		<label for="##nvpfx_type##post_type_id">Post Attribute to Match</label>
 		<select name="##nvpfx_type##post_type_id" id="##nvpfx_type##post_type_id" class="text ui-widget-content ui-corner-all"></select>		

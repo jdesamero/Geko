@@ -1,6 +1,15 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/User/Query.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * User listing
+ */
 
-// listing
+//
 class Geko_Wp_User_Query extends Geko_Wp_Entity_Query
 {
 	

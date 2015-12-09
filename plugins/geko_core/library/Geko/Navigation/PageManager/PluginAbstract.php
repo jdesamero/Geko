@@ -1,4 +1,11 @@
 <?php
+/*
+ * "geko_navigation_management/includes/library/Geko/Navigation/PageManager/PluginAbstract.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
 
 //
 abstract class Geko_Navigation_PageManager_PluginAbstract
@@ -8,16 +15,16 @@ abstract class Geko_Navigation_PageManager_PluginAbstract
 	
 	
 	//
-	public function __construct( $iIndex = 0 )
-	{
+	public function __construct( $iIndex = 0 ) {
+		
 		$this->setIndex( $iIndex );
 		$this->init();
 	}
 	
 	
 	//
-	public function setJsOption( $sKey, $sValue = NULL )
-	{
+	public function setJsOption( $sKey, $sValue = NULL ) {
+		
 		if ( is_array( $aParams = $sKey ) ) {
 			$this->_aJsOptions = array_merge( $this->_aJsOptions, $aParams );
 		} else {
@@ -29,15 +36,15 @@ abstract class Geko_Navigation_PageManager_PluginAbstract
 	
 	
 	//
-	public function getIndex()
-	{
+	public function getIndex() {
 		return $this->_iIndex;
 	}
 
 	//
-	public function setIndex($iIndex)
-	{
+	public function setIndex( $iIndex ) {
+		
 		$this->_iIndex = $iIndex;
+		
 		return $this;
 	}
 	
@@ -75,14 +82,15 @@ abstract class Geko_Navigation_PageManager_PluginAbstract
 	
 	
 	//
-	public function __call( $sMethod, $aArgs )
-	{
+	public function __call( $sMethod, $aArgs ) {
+		
 		if ( 0 === strpos( strtolower( $sMethod ), 'get' ) ) {
 			
 			// attempt to call echo*() method if it exists
 			$sCall = substr_replace( $sMethod, 'output', 0, 3 );
 			
 			if ( method_exists( $this, $sCall ) ) {
+				
 				ob_start();
 				$this->$sCall();
 				$sOutput = ob_get_contents();
@@ -92,7 +100,7 @@ abstract class Geko_Navigation_PageManager_PluginAbstract
 			}
 		}
 		
-		throw new Exception( 'Invalid method ' . __CLASS__ . '::' . $sMethod . '() called.' );
+		throw new Exception( sprintf( 'Invalid method %s::%s() called.', __CLASS__, $sMethod ) );
 	}
 	
 }

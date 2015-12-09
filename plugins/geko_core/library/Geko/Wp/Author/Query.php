@@ -1,8 +1,19 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/Author/Query.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
 
 //
 class Geko_Wp_Author_Query extends Geko_Wp_User_Query
 {
+	
+	protected $_sManageClass = 'Geko_Wp_User_Manage';
+	
+	
 	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
@@ -18,5 +29,7 @@ class Geko_Wp_Author_Query extends Geko_Wp_User_Query
 		
 		return $oQuery;
 	}
+	
 }
+
 

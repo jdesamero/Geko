@@ -1,3 +1,11 @@
+/*
+ * "geko_core/js/Geko/Wp/NavigationManagement/PageManager/Post.js"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
+
 ;( function ( $ ) {
 	
 	$.gekoNavigationPageManager.registerPlugin( {
@@ -6,66 +14,94 @@
 		
 		depends: 'Geko_Navigation_PageManager_ImplicitLabelAbstract',
 		
-		setup_li: function( li ) {
+		setup_li: function( eNavLi ) {
 			
 			//
-			var mgmt = this;
-			var navDlg = this.__elems.navDlg;
+			var _this = this;
 			
-			var post_type_id = '#' + this.pfx_type + 'post_type_id';
-			var cat_id = '#' + this.pfx_type + 'cat_id';
-			var author_id = '#' + this.pfx_type + 'author_id';
+			var oPostTypes = this.post_types;
+			
+			var oCatParams = this.cat_params;
+			var oCatTypes = oCatParams.cat_types;
+			var oCatsNorm = oCatParams.cats_norm;
+			
+			var oAuthorParams = this.author_params;
+			
+			
+			var eNavDlg = this.__elems.navDlg;
+			var sNavType = this.type;
+			var sTypePfx = this.pfx_type;
+			
+			var sPostTypeDrpdwnSel = '#%spost_type_id'.printf( sTypePfx );
+			var sCatDrpdwnSel = '#%scat_id'.printf( sTypePfx );
+			var sAuthorDrpdwnSel = '#%sauthor_id'.printf( sTypePfx );
+			
+			
+			// This should always be disabled since there is nothing to link to
+			eNavLi.find( 'a.link' ).on( 'click', function() {
+				return false;
+			} );
 			
 			
 			//
-			li.bind( 'pre_update', function( evt ) {
+			eNavLi.on( 'pre_update', function( evt ) {
 				
-				var nav_params = $( this ).data( 'nav_params' );
+				var eLi = $( this );
 				
-				if ( mgmt.type == nav_params.type ) {
+				var oNavParams = eLi.data( 'nav_params' );
+				var sCurNavType = oNavParams.type;
+				
+				if ( sNavType == sCurNavType ) {
 					
-					nav_params.post_type_id = navDlg.find( post_type_id ).val();
-					nav_params.cat_id = navDlg.find( cat_id ).val();
-					nav_params.author_id = navDlg.find( author_id ).val();
+					oNavParams[ 'post_type_id' ] = eNavDlg.find( sPostTypeDrpdwnSel ).val();
+					oNavParams[ 'cat_id' ] = eNavDlg.find( sCatDrpdwnSel ).val();
+					oNavParams[ 'author_id' ] = eNavDlg.find( sAuthorDrpdwnSel ).val();
 					
-					nav_params.hide = true;
+					oNavParams[ 'hide' ] = true;
 				}
 				
 			} );
 			
 			//
-			li.bind( 'update', function( evt ) {
+			eNavLi.on( 'update', function( evt ) {
 				
-				var nav_params = $( this ).data( 'nav_params' );
+				var eLi = $( this );
 				
-				if ( mgmt.type == nav_params.type ) {
+				var oNavParams = eLi.data( 'nav_params' );
+				var sCurNavType = oNavParams.type;
+				
+				if ( sNavType == sCurNavType ) {
 					
-					var post_type = mgmt.post_types[ nav_params.post_type_id ].slug;
+					var iCurPostTypeId = oNavParams.post_type_id;
+					var sPostType = oPostTypes[ iCurPostTypeId ].slug;
 					
-					if ( 'category' == post_type ) {
+					var sFullItemTitle = '';
+					var sItemTitle = '';
+					
+					if ( 'category' == sPostType ) {
 						
-						if ( mgmt.cat_params[ nav_params.cat_id ] ) {
-							$( this ).find( 'span.item_title a' ).html(
-								nav_params.label.htmlEntities() || 
-								mgmt.cat_params[ nav_params.cat_id ].title.htmlEntities()
-							);
+						var iCurCatId = oNavParams.cat_id;
+						var oCurCat = oCatsNorm[ iCurCatId ];
+						
+						if ( oCurCat ) {
+							sItemTitle = oNavParams.label.htmlEntities() || oCurCat.title.htmlEntities() ;
+							sFullItemTitle = '%s (Category: %s)'.printf( sItemTitle, oCatTypes[ oCurCat.type ] );
 						}
 						
-					} else if ( 'author' == post_type ) {
+					} else if ( 'author' == sPostType ) {
 						
-						if ( mgmt.author_params[ nav_params.author_id ] ) {
-							$( this ).find( 'span.item_title a' ).html(
-								nav_params.label || 
-								mgmt.author_params[ nav_params.author_id ].title
-							);
+						var iCurAuthorId = oNavParams.author_id;
+						var oCurAuthor = oAuthorParams[ iCurAuthorId ];
+						
+						if ( oCurAuthor ) {
+							sItemTitle = oNavParams.label.htmlEntities() || oCurAuthor.title.htmlEntities() ;
+							sFullItemTitle = '%s (Author)'.printf( sItemTitle );
 						}
 						
 					}
 					
-					// TO DO: this should always be disabled since there is
-					// nothing to link to
-					// $( this ).find( 'a.link' ).attr( ... );
-					
+					eLi.find( 'span.item_title a' ).html( sFullItemTitle );
+										
 				}
 				
 			} );
@@ -73,25 +109,31 @@
 		},
 		
 		init: function() {
-
-			var mgmt = this;
-			var navDlg = this.__elems.navDlg;
 			
-			var post_type_id = '#' + this.pfx_type + 'post_type_id';
-			var cat_id = '#' + this.pfx_type + 'cat_id';
-			var author_id = '#' + this.pfx_type + 'author_id';
-			
+			var eNavDlg = this.__elems.navDlg;
+			var sTypePfx = this.pfx_type;
+						
 			//
 			if ( this.disable_params ) {
 				
-				navDlg.find( post_type_id ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
-				navDlg.find( 'label[for=' + this.pfx_type + 'post_type_id]' ).css( 'color', 'gray' );
+				var sPostTypeDrpdwnSel = '#%spost_type_id'.printf( sTypePfx );
+				var sPostTypeLabelSel = 'label[for=%spost_type_id]' .printf( sTypePfx );
 				
-				navDlg.find( cat_id ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
-				navDlg.find( 'label[for=' + this.pfx_type + 'cat_id]' ).css( 'color', 'gray' );
+				var sCatDrpdwnSel = '#%scat_id'.printf( sTypePfx );
+				var sCatLabelSel = 'label[for=%scat_id]'.printf( sTypePfx );
 				
-				navDlg.find( author_id ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
-				navDlg.find( 'label[for=' + this.pfx_type + 'author_id]' ).css( 'color', 'gray' );
+				var sAuthorDrpdwnSel = '#%sauthor_id'.printf( sTypePfx );
+				var sAuthorLabelSel = 'label[for=%sauthor_id]'.printf( sTypePfx );
+				
+				
+				eNavDlg.find( sPostTypeDrpdwnSel ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
+				eNavDlg.find( sPostTypeLabelSel ).css( 'color', 'gray' );
+				
+				eNavDlg.find( sCatDrpdwnSel ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
+				eNavDlg.find( sCatLabelSel ).css( 'color', 'gray' );
+				
+				eNavDlg.find( sAuthorDrpdwnSel ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
+				eNavDlg.find( sAuthorLabelSel ).css( 'color', 'gray' );
 				
 			}
 			
@@ -99,97 +141,132 @@
 		
 		setup: function() {
 			
-			var mgmt = this;
-			var navDlg = this.__elems.navDlg;
+			var _this = this;
 			
-			var post_type_id = '#' + this.pfx_type + 'post_type_id';
-			var cat_id = '#' + this.pfx_type + 'cat_id';
-			var author_id = '#' + this.pfx_type + 'author_id';
+			var oCatParams = this.cat_params;
+			var oCatTypes = oCatParams.cat_types;
+			var oCatsNorm = oCatParams.cats_norm;
 			
+			
+			var eNavDlg = this.__elems.navDlg;
+			var sNavType = this.type;
+			var sTypePfx = this.pfx_type;
+			
+			var sPostTypeDrpdwnSel = '#%spost_type_id'.printf( sTypePfx );
+			var sCatDrpdwnSel = '#%scat_id'.printf( sTypePfx );
+			var sAuthorDrpdwnSel = '#%sauthor_id'.printf( sTypePfx );
+			
+			
+			var ePostTypeDrpdwn = eNavDlg.find( sPostTypeDrpdwnSel );
+			var eCatDrpdwn = eNavDlg.find( sCatDrpdwnSel );
+			var eAuthorDrpdwn = eNavDlg.find( sAuthorDrpdwnSel );
+			
+
 			
 			//// populate fields
 			
 			//
-			$.each( this.post_types, function(i, val) {
-				navDlg.find( post_type_id ).append(
-					'<option value="' + i + '">' + val.title + '</option>'
+			$.each( this.post_types, function( i, val ) {
+				ePostTypeDrpdwn.append(
+					'<option value="%d">%s</option>'.printf( i, val.title )
 				);
 			} );
 			
 			//
-			$.each( this.cat_params, function(i, val) {
-				navDlg.find( cat_id ).append(
-					'<option value="' + i + '">' + val.title + ' (' + i + ')</option>'
+			$.each( oCatsNorm, function( i, val ) {
+				eCatDrpdwn.append(
+					'<option value="%d">%s (%d)</option>'.printf( i, val.title, i )
 				);
 			} );
 			
 			//
-			$.each( this.author_params, function(i, val) {
-				navDlg.find( author_id ).append(
-					'<option value="' + i + '">' + val.title + ' (' + i + ')</option>'
+			$.each( this.author_params, function( i, val ) {
+				eAuthorDrpdwn.append(
+					'<option value="%d">%s (%d)</option>'.printf( i, val.title, i )
 				);
 			} );
 			
+			
 			//
-			$( post_type_id ).change( function() {
+			ePostTypeDrpdwn.on( 'change', function() {
 				
-				var nav_params = navDlg.data( 'selected_li' ).data( 'nav_params' );
+				var eDrpdwn = $( this );
 				
-				nav_params.post_type_id = $( this ).val();
+				var oNavParams = eNavDlg.data( 'selected_li' ).data( 'nav_params' );
+				
+				oNavParams[ 'post_type_id' ] = eDrpdwn.val();
 				
 				// trigger open event on the dialog
-				navDlg.trigger( 'open' );
+				eNavDlg.trigger( 'open' );
 				
 			} );
 			
 			
 			
-			//// add functionality
+			//// add dialog triggers
 			
 			//
-			navDlg.bind( 'open', function( evt ) {
+			eNavDlg.on( 'open', function( evt ) {
 				
-				var nav_params = $( this ).data( 'selected_li' ).data( 'nav_params' );
+				var eDlg = $( this );
 				
-				if ( mgmt.type == nav_params.type ) {
+				var oNavParams = eDlg.data( 'selected_li' ).data( 'nav_params' );
+				var sCurNavType = oNavParams.type;
+				
+				if ( sNavType == sCurNavType ) {
 					
-					$( this ).find( '.opt-common' ).hide();
+					eDlg.find( '.opt-common' ).hide();
 					
 					// show the appropriate options
-					var post_type = mgmt.post_types[ nav_params.post_type_id ].slug;
+					var iCurPostTypeId = oNavParams.post_type_id;
 					
-					$( this ).find( '.opt-' + mgmt.type + ' label[for=' + mgmt.pfx_type + 'cat_id]' ).css( 'display', ( ( 'category' == post_type ) ? '' : 'none' ) );
-					$( this ).find( cat_id ).css( 'display', ( ( 'category' == post_type ) ? '' : 'none' ) );
+					var oPostTypes = _this.post_types;
+					var sPostType = oPostTypes[ iCurPostTypeId ].slug;
 					
-					$( this ).find( '.opt-' + mgmt.type + ' label[for=' + mgmt.pfx_type + 'author_id]' ).css( 'display', ( ( 'author' == post_type ) ? '' : 'none' ) );
-					$( this ).find( author_id ).css( 'display', ( ( 'author' == post_type ) ? '' : 'none' ) );
+					
+					var sCatLabelSel = '.opt-%s label[for=%scat_id]'.printf( sNavType, sTypePfx );
+					var sCatDisplayCss = ( 'category' == sPostType ) ? '' : 'none' ;
+
+					var sAuthorLabelSel = '.opt-%s label[for=%sauthor_id]'.printf( sNavType, sTypePfx );
+					var sAuthorDisplayCss = ( 'author' == sPostType ) ? '' : 'none' ;
+					
+					eDlg.find( sCatLabelSel ).css( 'display', sCatDisplayCss );
+					eDlg.find( sCatDrpdwnSel ).css( 'display', sCatDisplayCss );
+					
+					eDlg.find( sAuthorLabelSel ).css( 'display', sAuthorDisplayCss );
+					eDlg.find( sAuthorDrpdwnSel ).css( 'display', sAuthorDisplayCss );
 					
 				}
-								
+				
 			} );
 			
 			//
-			navDlg.bind( 'reset', function( evt ) {
+			eNavDlg.on( 'reset', function( evt ) {
 				
-				var nav_params = $( this ).data( 'selected_li' ).data( 'nav_params' );
+				var eDlg = $( this );
 				
-				$( this ).find( post_type_id ).selValue( nav_params.post_type_id );
-				$( this ).find( cat_id ).selValue( nav_params.cat_id );
-				$( this ).find( author_id ).selValue( nav_params.author_id );
+				var oNavParams = eDlg.data( 'selected_li' ).data( 'nav_params' );
 				
-				$( this ).find( '.opt-common' ).show();
+				ePostTypeDrpdwn.selValue( oNavParams.post_type_id );
+				eCatDrpdwn.selValue( oNavParams.cat_id );
+				eAuthorDrpdwn.selValue( oNavParams.author_id );
+				
+				eDlg.find( '.opt-common' ).show();
 				
 			} );
 						
 			//
-			navDlg.bind( 'type_change', function( evt ) {
+			eNavDlg.on( 'type_change', function( evt ) {
 				
-				var nav_params = $( this ).data( 'selected_li' ).data( 'nav_params' );
+				var eDlg = $( this );
 				
-				if ( mgmt.type == nav_params.type ) {
-					$( this ).find( '.opt-common' ).hide();
+				var oNavParams = eDlg.data( 'selected_li' ).data( 'nav_params' );
+				var sCurNavType = oNavParams.type;
+				
+				if ( sNavType == sCurNavType ) {
+					eDlg.find( '.opt-common' ).hide();
 				} else {
-					$( this ).find( '.opt-common' ).show();				
+					eDlg.find( '.opt-common' ).show();				
 				}
 				
 			} );

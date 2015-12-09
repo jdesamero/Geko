@@ -58,8 +58,17 @@ class Geko_Wp_Post_Meta extends Geko_Wp_Options_Meta
 	
 	//
 	public function attachPage() {
+		
 		if ( TRUE == function_exists( 'add_meta_box' ) ) {
-			add_meta_box( sanitize_title( $this->_sInstanceClass ), sprintf( '%s Custom Settings', $this->aThemeData[ 'Name' ] ), array( $this, 'outputForm' ), 'post', 'normal' );
+			
+			$oHookPlugin = Geko_Wp_Admin_Hooks::getCurrentPlugin();
+			
+			if (
+				( $oHookPlugin instanceof Geko_Wp_Admin_Hooks_Post ) &&
+				( $sPostType = $oHookPlugin->getValue( 'post_type' ) )
+			)
+			
+			add_meta_box( sanitize_title( $this->_sInstanceClass ), sprintf( '%s Custom Settings', $this->aThemeData[ 'Name' ] ), array( $this, 'outputForm' ), $sPostType, 'normal' );
 		}
 	}	
 	

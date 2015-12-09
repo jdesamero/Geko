@@ -191,31 +191,7 @@ class Geko_Wp_Post extends Geko_Wp_Entity
 	
 	protected $_aPages = NULL;
 	
-	//
-	public function __construct( $mEntity = NULL, $oQuery = NULL, $aData = array(), $aQueryParams = NULL ) {
-		
-		parent::__construct( $mEntity, $oQuery, $aData, $aQueryParams );
-		
-		$this->_sCategoryQueryClass = Geko_Class::resolveRelatedClass(
-			$this->_sCategoryEntityClass, '', '_Query', $this->_sCategoryQueryClass
-		);
-		
-		$this->_sTagQueryClass = Geko_Class::resolveRelatedClass(
-			$this->_sTagEntityClass, '', '_Query', $this->_sTagQueryClass
-		);
-		
-		$this->_sMediaQueryClass = Geko_Class::resolveRelatedClass(
-			$this->_sMediaEntityClass, '', '_Query', $this->_sMediaQueryClass
-		);
-		
-		$this->_sCommentQueryClass = Geko_Class::resolveRelatedClass(
-			$this->_sCommentEntityClass, '', '_Query', $this->_sCommentQueryClass
-		);
-		
-		$this->_sAuthorQueryClass = Geko_Class::resolveRelatedClass(
-			$this->_sAuthorEntityClass, '', '_Query', $this->_sAuthorQueryClass
-		);
-	}
+	
 	
 	//
 	public function getEntityFromId( $iEntityId ) {
@@ -238,6 +214,32 @@ class Geko_Wp_Post extends Geko_Wp_Entity
 	public function init() {
 		
 		parent::init();
+		
+		
+		// resolve related classes
+		
+		$this->_sCategoryQueryClass = Geko_Class::resolveRelatedClass(
+			$this->_sCategoryEntityClass, '', '_Query', $this->_sCategoryQueryClass
+		);
+		
+		$this->_sTagQueryClass = Geko_Class::resolveRelatedClass(
+			$this->_sTagEntityClass, '', '_Query', $this->_sTagQueryClass
+		);
+		
+		$this->_sMediaQueryClass = Geko_Class::resolveRelatedClass(
+			$this->_sMediaEntityClass, '', '_Query', $this->_sMediaQueryClass
+		);
+		
+		$this->_sCommentQueryClass = Geko_Class::resolveRelatedClass(
+			$this->_sCommentEntityClass, '', '_Query', $this->_sCommentQueryClass
+		);
+		
+		$this->_sAuthorQueryClass = Geko_Class::resolveRelatedClass(
+			$this->_sAuthorEntityClass, '', '_Query', $this->_sAuthorQueryClass
+		);
+		
+		
+		// field mappings
 		
 		$this
 			->setEntityMapping( 'id', 'ID' )

@@ -1,5 +1,13 @@
 <?php
+/*
+ * "geko_core/library/Geko/Wp/Category/Query.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
 
+//
 class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 {
 	
@@ -63,8 +71,11 @@ class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 		// apply super-class manipulations
 		$oQuery = parent::modifyQuery( $oQuery, $aParams );
 		
+		$sTaxonomy = NULL;
 		
-		$sTaxonomy = ( $aParams[ 'taxonomy' ] ) ? $aParams[ 'taxonomy' ] : 'category' ;
+		if ( !$aParams[ 'any' ] ) {
+			$sTaxonomy = ( $aParams[ 'taxonomy' ] ) ? $aParams[ 'taxonomy' ] : 'category' ;
+		}
 		
 		
 		$oQuery
@@ -84,9 +95,11 @@ class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 			->joinLeft( '##pfx##term_taxonomy', 'tx' )
 				->on( 'tx.term_id = t.term_id' )
 			
-			->where( 'tx.taxonomy = ?', $sTaxonomy )
-			
 		;
+		
+		if ( $sTaxonomy ) {
+			$oQuery->where( 'tx.taxonomy = ?', $sTaxonomy );
+		}
 		
 		
 		////
@@ -154,12 +167,18 @@ class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 					
 				
 				->where( 'wp2tx.term_id = ?', $iCatWithPosts )
-				
-				->where( 'wptx.taxonomy = ?', $sTaxonomy )
-				->where( 'wp2tx.taxonomy = ?', $sTaxonomy )
-				
+								
 				->group( 'wptx.term_id' )
 			;
+			
+			
+			if ( $sTaxonomy ) {
+				$oHasPostsQuery
+					->where( 'wptx.taxonomy = ?', $sTaxonomy )
+					->where( 'wp2tx.taxonomy = ?', $sTaxonomy )				
+				;
+			}
+			
 			
 			$oQuery
 				
