@@ -322,6 +322,20 @@ class Geko_Wp_Post extends Geko_Wp_Entity
 	}
 	
 	
+	//
+	public function modifyMetaParams( $aMetaParams, $sEntityClass ) {
+		
+		// TO DO: make this conditional according to class
+		
+		// add "post" as "object_type" param so that location classes are binded properly
+		$aMetaParams[ 'object_type' ] = 'post';
+		
+		return $aMetaParams;
+	}
+	
+	
+	
+	
 	
 	//// accessors for related entities
 	

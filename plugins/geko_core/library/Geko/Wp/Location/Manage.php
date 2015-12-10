@@ -445,14 +445,17 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 	}
 	
 	//
-	public function getCountryPair() {
-	
+	public function getCountryPair( $bUseAbbr = FALSE ) {
+		
 		if ( !isset( self::$aCache[ 'country_pair' ] ) ) {
 			
 			self::$aCache[ 'country_pair' ] = array();
 			$aCountries = $this->getCountries();
 			
 			foreach ( $aCountries as $oCountry ) {
+				
+				$mKey = ( $bUseAbbr ) ? $oCountry->country_abbr : $oCountry->country_id ;
+				
 				self::$aCache[ 'country_pair' ][ $oCountry->country_id ] = $oCountry->country_name;
 			}
 		}

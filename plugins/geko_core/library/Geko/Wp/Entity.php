@@ -170,24 +170,53 @@ abstract class Geko_Wp_Entity extends Geko_Entity
 			// use getEntityPropertyValue() instead of getId() as it will cause a nasty infinite loop
 			
 			if ( is_array( $oMeta ) ) {
-				$oMeta[ 1 ][ 'object_id' ] = $iEntityId;			// hackish
-				$oMeta = call_user_func( array( $oMeta[ 0 ], 'getOne' ), $oMeta[ 1 ] );
-				$this->_aMetaHandlers[ $i ] = $oMeta;
+				
+				$sEntityClass = $oMeta[ 0 ];
+				
+				if ( method_exists( $sEntityClass, 'getOne' ) ) {
+
+					if ( !$aMetaParams = $oMeta[ 1 ] ) {
+						$aMetaParams = array();
+					} else {
+						$aMetaParams = Geko_Array::wrap( $aMetaParams );
+					}
+					
+					$aMetaParams[ 'object_id' ] = $iEntityId;			// hackish
+					
+					$aMetaParams = $this->modifyMetaParams( $aMetaParams, $sEntityClass );
+					
+					$oMeta = call_user_func( array( $sEntityClass, 'getOne' ), $aMetaParams );
+					
+					$this->_aMetaHandlers[ $i ] = $oMeta;
+				}
 			}
 			
 			if ( $oMeta instanceof Geko_Wp_Options_Meta ) {
+				
 				if ( $mMeta = $oMeta->getMeta( $iEntityId, $sMetaKey, TRUE ) ) {
 					return $mMeta;
 				}
+			
 			} elseif ( is_object( $oMeta ) ) {
+				
 				if ( $mMeta = $oMeta->getValue( $sMetaKey ) ) {
 					return $mMeta;
 				}			
 			}
+			
 		}
 		
 		return parent::getMeta( $sMetaKey );
 	}
+	
+	
+	// hook method
+	public function modifyMetaParams( $aMetaParams, $sEntityClass ) {
+		
+		return $aMetaParams;
+	}
+	
+	
 	
 	//
 	public function getMetaMemberData( $sMetaKey, $sFldKey ) {
