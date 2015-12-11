@@ -168,8 +168,17 @@ class Geko_Salesforce
 			$oSfObj->Id = $sId;
 			unset( $aFields[ 'Id' ] );
 		}
-
+		
+		
+		// sanitize html entities
+		foreach ( $aFields as $sKey => $mValue ) {
+			if ( is_string( $mValue ) ) {
+				$aFields[ $sKey ] = htmlentities( $mValue );
+			}
+		}
+		
 		$oSfObj->fields = $aFields;
+		
 		
 		return $oSfObj;
 	}
