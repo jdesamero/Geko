@@ -1,6 +1,14 @@
 <?php 
+/*
+ * "geko_core/library/Geko/App/Auth/Storage.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ *
+ * http://framework.zend.com/manual/1.12/en/zend.auth.introduction.html
+ */
 
-// http://framework.zend.com/manual/1.12/en/zend.auth.introduction.html
 class Geko_App_Auth_Storage implements Zend_Auth_Storage_Interface
 {
 	
