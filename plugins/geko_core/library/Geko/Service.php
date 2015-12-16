@@ -382,7 +382,16 @@ class Geko_Service extends Geko_Singleton_Abstract
 					header( $sHeaderFull );
 				}
 				
+				// clear up errant output before reading file
+				// http://stackoverflow.com/questions/13311790/php-readfile-causing-corrupt-file-downloads
+				while ( ob_get_level() ) {
+					ob_end_clean();
+				}
+				
 				readfile( $sSource );
+				
+				// anything after will cause things to crap out, so force end of script
+				die();
 				
 			} else {
 				echo 'File does not exist!';
