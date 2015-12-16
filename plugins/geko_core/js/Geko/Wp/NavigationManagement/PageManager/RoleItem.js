@@ -1,3 +1,11 @@
+/*
+ * "geko_core/js/Geko/Wp/NavigationManagement/PageManager/RoleItem.js"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
+
 ;( function ( $ ) {
 	
 	$.gekoNavigationPageManager.registerPlugin( {
@@ -6,42 +14,51 @@
 		
 		depends: 'Geko_Navigation_PageManager_ImplicitLabelAbstract',
 		
-		setup_li: function( li ) {
+		setup_li: function( eNavLi ) {
 			
 			//
-			var mgmt = this;
-			var navDlg = this.__elems.navDlg;
-			var role_id = '#' + this.pfx_type + 'role_id';
+			var _this = this;
+			
+			var oRoleParams = this.role_params;
+			
+			var eNavDlg = this.__elems.navDlg;
+			var sNavType = this.type;
+			var sTypePfx = this.pfx_type;
+			var sRoleDrpdwnSel = '#%srole_id'.printf( sTypePfx );
 			
 			//
-			li.bind( 'pre_update', function( evt ) {
+			eNavLi.on( 'pre_update', function( evt ) {
 				
-				var nav_params = $( this ).data( 'nav_params' );
+				var eLi = $( this );
 				
-				if ( mgmt.type == nav_params.type ) {
-					nav_params.role_id = navDlg.find( role_id ).val();
-					nav_params.hide = true;
+				var oNavParams = eLi.data( 'nav_params' );
+				
+				if ( sNavType == oNavParams.type ) {
+					oNavParams[ 'role_id' ] = eNavDlg.find( sRoleDrpdwnSel ).val();
+					oNavParams[ 'hide' ] = true;
 				}
 				
 			} );
 			
 			//
-			li.bind( 'update', function( evt ) {
+			eNavLi.on( 'update', function( evt ) {
 				
-				var nav_params = $( this ).data( 'nav_params' );
+				var eLi = $( this );
 				
-				if ( mgmt.type == nav_params.type ) {
-					if ( mgmt.role_params[ nav_params.role_id ] ) {
+				var oNavParams = eLi.data( 'nav_params' );
+				
+				if ( sNavType == oNavParams.type ) {
+					
+					var iCurRoleId = oNavParams.role_id;
+					var oCurRole = oRoleParams[ iCurRoleId ];
+					
+					if ( oCurRole ) {
 						
-						$( this ).find( 'span.item_title a' ).html(
-							nav_params.label.htmlEntities() || 
-							mgmt.role_params[ nav_params.role_id ].title.htmlEntities()
-						);
+						var sRoleItem = oNavParams.label.htmlEntities() || oCurRole.title.htmlEntities();
 						
-						$( this ).find( 'a.link' ).attr(
-							'href',
-							mgmt.role_params[ nav_params.role_id ].link
-						);
+						eLi.find( 'span.item_title a' ).html( sRoleItem );
+						
+						eLi.find( 'a.link' ).attr( 'href', oCurRole.link );
 					}
 				}
 				
@@ -51,61 +68,76 @@
 		
 		setup: function() {
 			
-			var mgmt = this;
-			var navDlg = this.__elems.navDlg;
-			var role_id = '#' + this.pfx_type + 'role_id';
-			var role_params = this.role_params;
+			var _this = this;
+			
+			var oRoleParams = this.role_params;
+			var oRoleGroups = this.role_groups;
+			
+			var eNavDlg = this.__elems.navDlg;
+			var sNavType = this.type;
+			var sTypePfx = this.pfx_type;
+			var sRoleDrpdwnSel = '#%srole_id'.printf( sTypePfx );
+			
 			
 			//
-			$.each( this.role_groups, function( grp, items ) {
-				var opts = '';
+			$.each( oRoleGroups, function( sGrp, aItems ) {
 				
-				$.each( items, function( i, r_id ) {
-					var id_hint = '';
-					var param = role_params[ r_id ];
+				var sOpts = '';
+				
+				$.each( aItems, function( i, iRoleId ) {
 					
-					if ( !param.skip_id ) id_hint = ' (' + r_id + ')';
+					var sIdHint = '';
+					var oParam = oRoleParams[ iRoleId ];
 					
-					opts += '<option value="' + r_id + '">' + param.title + id_hint + '</option>';
+					if ( !oParam.skip_id ) sIdHint = ' (%s)'.printf( iRoleId );
+					
+					sOpts += '<option value="%s">%s%s</option>'.printf( iRoleId, oParam.title, sIdHint );
 				} );
 				
-				opts = '<optgroup label="' + grp + '">' + opts + '</optgroup>';
+				var sOptGrp = '<optgroup label="%s">%s</optgroup>'.printf( sGrp, sOpts );
 				
-				navDlg.find( role_id ).append( opts );
+				eNavDlg.find( sRoleDrpdwnSel ).append( sOptGrp );
 			} );
 			
 			
 			
 			//
-			navDlg.bind( 'open', function( evt ) {
+			eNavDlg.on( 'open', function( evt ) {
 				
-				var nav_params = $( this ).data( 'selected_li' ).data( 'nav_params' );
+				var eDlg = $( this );
 				
-				if ( mgmt.type == nav_params.type ) {
-					$( this ).find( '.opt-common' ).hide();
+				var oNavParams = eDlg.data( 'selected_li' ).data( 'nav_params' );
+				
+				if ( sNavType == oNavParams.type ) {
+					eDlg.find( '.opt-common' ).hide();
 				}
 				
 			} );
 			
 			//
-			navDlg.bind( 'reset', function( evt ) {
+			eNavDlg.on( 'reset', function( evt ) {
 				
-				var nav_params = $( this ).data( 'selected_li' ).data( 'nav_params' );
+				var eDlg = $( this );
 				
-				$( this ).find( role_id ).selValue( nav_params.role_id );
-				$( this ).find( '.opt-common' ).show();
+				var oNavParams = eDlg.data( 'selected_li' ).data( 'nav_params' );
+				var iCurRoleId = oNavParams.role_id;
+				
+				eDlg.find( sRoleDrpdwnSel ).selValue( iCurRoleId );
+				eDlg.find( '.opt-common' ).show();
 				
 			} );
 			
 			//
-			navDlg.bind( 'type_change', function( evt ) {
+			eNavDlg.on( 'type_change', function( evt ) {
 				
-				var nav_params = $( this ).data( 'selected_li' ).data( 'nav_params' );
+				var eDlg = $( this );
 				
-				if ( mgmt.type == nav_params.type ) {
-					$( this ).find( '.opt-common' ).hide();
+				var oNavParams = eDlg.data( 'selected_li' ).data( 'nav_params' );
+				
+				if ( sNavType == oNavParams.type ) {
+					eDlg.find( '.opt-common' ).hide();
 				} else {
-					$( this ).find( '.opt-common' ).show();				
+					eDlg.find( '.opt-common' ).show();				
 				}
 				
 			} );

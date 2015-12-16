@@ -1,3 +1,11 @@
+/*
+ * "geko_core/js/Geko/Wp/NavigationManagement/PageManager/Admin.js"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
+
 ;( function ( $ ) {
 	
 	$.gekoNavigationPageManager.registerPlugin( {

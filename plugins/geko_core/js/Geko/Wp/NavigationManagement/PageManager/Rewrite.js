@@ -1,3 +1,11 @@
+/*
+ * "geko_core/js/Geko/Wp/NavigationManagement/PageManager/Rewrite.js"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
+
 ;( function ( $ ) {
 		
 	$.gekoNavigationPageManager.registerPlugin( {
@@ -6,39 +14,48 @@
 		
 		depends: 'Geko_Navigation_PageManager_ImplicitLabelAbstract',
 		
-		setup_li: function( li ) {
+		setup_li: function( eNavLi ) {
 			
 			//
-			var mgmt = this;
-			var navDlg = this.__elems.navDlg;
+			var _this = this;
 			
-			var rw_subj = '#' + this.pfx_type + 'rw_subj';
-			var rw_type = '#' + this.pfx_type + 'rw_type';
-			var rw_cmthd = '#' + this.pfx_type + 'rw_cmthd';
+			var eNavDlg = this.__elems.navDlg;
+			var sNavType = this.type;
+			var sTypePfx = this.pfx_type;
+			
+			var sRwSubjTxtSel = '#%srw_subj'.printf( sTypePfx );
+			var sRwTypeDrpdwnSel = '#%srw_type'.printf( sTypePfx );
+			var sRwCmthdTxtSel = '#%srw_cmthd'.printf( sTypePfx );
 			
 			//
-			li.bind( 'pre_update', function( evt ) {
+			eNavLi.on( 'pre_update', function( evt ) {
 				
-				var nav_params = $( this ).data( 'nav_params' );
+				var eLi = $( this );
 				
-				if ( mgmt.type == nav_params.type ) {
-					nav_params.rw_subj = navDlg.find( rw_subj ).val();
-					nav_params.rw_type = navDlg.find( rw_type ).val();
-					nav_params.rw_cmthd = navDlg.find( rw_cmthd ).val();
+				var oNavParams = eLi.data( 'nav_params' );
+				var sCurNavType = oNavParams.type;
+				
+				if ( sNavType == sCurNavType ) {
+					oNavParams[ 'rw_subj' ] = eNavDlg.find( sRwSubjTxtSel ).val();
+					oNavParams[ 'rw_type' ] = eNavDlg.find( sRwTypeDrpdwnSel ).val();
+					oNavParams[ 'rw_cmthd' ] = eNavDlg.find( sRwCmthdTxtSel ).val();
 				}
 				
 			} );
 			
 			//
-			li.bind( 'update', function( evt ) {
+			eNavLi.on( 'update', function( evt ) {
 				
-				var nav_params = $( this ).data( 'nav_params' );
+				var eLi = $( this );
 				
-				if ( mgmt.type == nav_params.type ) {
+				var oNavParams = eLi.data( 'nav_params' );
+				var sCurNavType = oNavParams.type;
+				
+				if ( sNavType == sCurNavType ) {
 					
-					$( this ).find( 'span.item_title a' ).html(
-						nav_params.label.htmlEntities() || 
-						nav_params.rw_subj.htmlEntities()
+					eLi.find( 'span.item_title a' ).html(
+						oNavParams.label.htmlEntities() || 
+						oNavParams.rw_subj.htmlEntities()
 					);
 					
 				}
@@ -49,49 +66,66 @@
 		
 		setup: function() {
 			
-			var mgmt = this;
-			var navDlg = this.__elems.navDlg;
+			var _this = this;
 			
-			var rw_subj = '#' + this.pfx_type + 'rw_subj';
-			var rw_type = '#' + this.pfx_type + 'rw_type';
-			var rw_cmthd = '#' + this.pfx_type + 'rw_cmthd';
+			var eNavDlg = this.__elems.navDlg;
+			var sNavType = this.type;
+			var sTypePfx = this.pfx_type;
+			
+			var sRwSubjTxtSel = '#%srw_subj'.printf( sTypePfx );
+			var sRwTypeDrpdwnSel = '#%srw_type'.printf( sTypePfx );
+			var sRwCmthdTxtSel = '#%srw_cmthd'.printf( sTypePfx );
+			
+			var sCustMthdLabelSel = '.opt-%s label[for=%srw_cmthd]'.printf( sNavType, sTypePfx );
+			
+			
 			
 			//
-			$( '#' + this.pfx_type + 'rw_type' ).change( function() {
+			$( sRwTypeDrpdwnSel ).change( function() {
 				
-				var nav_params = navDlg.data( 'selected_li' ).data( 'nav_params' );
+				var eDrpdwn = $( this );
 				
-				nav_params.rw_type = $( this ).val();
+				var oNavParams = eNavDlg.data( 'selected_li' ).data( 'nav_params' );
+				
+				oNavParams[ 'rw_type' ] = eDrpdwn.val();
 				
 				// trigger open event on the dialog
-				navDlg.trigger( 'open' );
+				eNavDlg.trigger( 'open' );
 				
 			} );
 			
 			//
-			navDlg.bind( 'open', function( evt ) {
+			eNavDlg.on( 'open', function( evt ) {
 				
-				var selectedLi = $( this ).data( 'selected_li' );
-				var nav_params = selectedLi.data( 'nav_params' );
+				var eDlg = $( this );
 				
-				if ( mgmt.type == nav_params.type ) {
+				var eSelectedLi = eDlg.data( 'selected_li' );
+				
+				var oNavParams = eSelectedLi.data( 'nav_params' );
+				var sCurNavType = oNavParams.type;
+				
+				if ( sNavType == sCurNavType ) {
 					
 					// only show rw_cmthd field if rw_type is set to "custom_method"
-					$( this ).find( '.opt-' + mgmt.type + ' label[for=' + mgmt.pfx_type + 'rw_cmthd]' ).css('display', ( ( 'custom_method' == nav_params.rw_type ) ? '' : 'none' ) );
-					$( this ).find( rw_cmthd ).css( 'display', ( ( 'custom_method' == nav_params.rw_type ) ? '' : 'none' ) );
+					var sRwTypeDisplayCss = ( 'custom_method' == oNavParams.rw_type ) ? '' : 'none' ;
+					
+					eDlg.find( sCustMthdLabelSel ).css( 'display', sRwTypeDisplayCss );
+					eDlg.find( sRwCmthdTxtSel ).css( 'display', sRwTypeDisplayCss );
 					
 				}
 				
 			} );
 			
 			//
-			navDlg.bind( 'reset', function( evt ) {
+			eNavDlg.on( 'reset', function( evt ) {
 				
-				var nav_params = $( this ).data( 'selected_li' ).data( 'nav_params' );
+				var eDlg = $( this );
 				
-				$( this ).find( rw_subj ).selValue( nav_params.rw_subj );
-				$( this ).find( rw_type ).selValue( nav_params.rw_type );
-				$( this ).find( rw_cmthd ).selValue( nav_params.rw_cmthd );
+				var oNavParams = eDlg.data( 'selected_li' ).data( 'nav_params' );
+				
+				eDlg.find( sRwSubjTxtSel ).selValue( oNavParams.rw_subj );
+				eDlg.find( sRwTypeDrpdwnSel ).selValue( oNavParams.rw_type );
+				eDlg.find( sRwCmthdTxtSel ).selValue( oNavParams.rw_cmthd );
 				
 			} );
 						

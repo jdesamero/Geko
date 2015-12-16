@@ -1,3 +1,11 @@
+/*
+ * "geko_core/js/Geko/Wp/NavigationManagement/PageManager/Author.js"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
+
 ;( function ( $ ) {
 	
 	$.gekoNavigationPageManager.registerPlugin( {
@@ -6,40 +14,46 @@
 		
 		depends: 'Geko_Navigation_PageManager_ImplicitLabelAbstract',
 		
-		setup_li: function( li ) {
+		setup_li: function( eNavLi ) {
 			
 			//
-			var mgmt = this;
-			var navDlg = this.__elems.navDlg;
-			var author_id = '#' + this.pfx_type + 'author_id';
+			var _this = this;
+			
+			var eNavDlg = this.__elems.navDlg;
+			var sTypePfx = this.pfx_type;
+			var author_id = '#%sauthor_id'.printf( sTypePfx );
 			
 			//
-			li.bind( 'pre_update', function( evt ) {
+			eNavLi.on( 'pre_update', function( evt ) {
 				
-				var nav_params = $( this ).data( 'nav_params' );
+				var eLi = $( this );
 				
-				if ( mgmt.type == nav_params.type ) {
-					nav_params.author_id = navDlg.find( author_id ).val();
+				var oNavParams = eLi.data( 'nav_params' );
+				
+				if ( _this.type == oNavParams.type ) {
+					oNavParams.author_id = eNavDlg.find( author_id ).val();
 				}
 				
 			} );
 			
 			//
-			li.bind( 'update', function( evt ) {
+			eNavLi.on( 'update', function( evt ) {
 				
-				var nav_params = $( this ).data( 'nav_params' );
+				var eLi = $( this );
 				
-				if ( mgmt.type == nav_params.type ) {
-					if ( mgmt.author_params[ nav_params.author_id ] ) {
+				var oNavParams = eLi.data( 'nav_params' );
+				
+				if ( _this.type == oNavParams.type ) {
+					if ( _this.author_params[ oNavParams.author_id ] ) {
 						
-						$( this ).find( 'span.item_title a' ).html(
-							nav_params.label.htmlEntities() || 
-							mgmt.author_params[ nav_params.author_id ].title.htmlEntities()
+						eLi.find( 'span.item_title a' ).html(
+							oNavParams.label.htmlEntities() || 
+							_this.author_params[ oNavParams.author_id ].title.htmlEntities()
 						);
 						
-						$( this ).find( 'a.link' ).attr(
+						eLi.find( 'a.link' ).attr(
 							'href',
-							mgmt.author_params[ nav_params.author_id ].link
+							_this.author_params[ oNavParams.author_id ].link
 						);
 					}
 				}
@@ -50,37 +64,42 @@
 		
 		init: function() {
 
-			var mgmt = this;
-			var navDlg = this.__elems.navDlg;
-			var author_id = '#' + this.pfx_type + 'author_id';
+			var _this = this;
+			var eNavDlg = this.__elems.navDlg;
+			var sTypePfx = this.pfx_type;
+			var author_id = '#%sauthor_id'.printf( sTypePfx );
 			
 			//
 			if ( this.disable_params ) {
-				navDlg.find( author_id ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
-				navDlg.find( 'label[for=' + this.pfx_type + 'author_id]' ).css( 'color', 'gray' );
+				eNavDlg.find( author_id ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
+				eNavDlg.find( 'label[for=%sauthor_id]'.printf( sTypePfx ) ).css( 'color', 'gray' );
 			}
 			
 		},
 		
 		setup: function() {
 			
-			var mgmt = this;
-			var navDlg = this.__elems.navDlg;
-			var author_id = '#' + this.pfx_type + 'author_id';
+			var _this = this;
+			
+			var eNavDlg = this.__elems.navDlg;
+			var sTypePfx = this.pfx_type;
+			var author_id = '#%sauthor_id'.printf( sTypePfx );
 			
 			//
-			$.each( this.author_params, function(i, val) {
-				navDlg.find( author_id ).append(
-					'<option value="' + i + '">' + val.title + ' (' + i + ')</option>'
+			$.each( this.author_params, function( i, val ) {
+				eNavDlg.find( author_id ).append(
+					'<option value="%d">%s (%d)</option>'.printf( i, val.title, i )
 				);
 			} );
 			
 			//
-			navDlg.bind( 'reset', function( evt ) {
+			eNavDlg.on( 'reset', function( evt ) {
 				
-				var nav_params = $( this ).data( 'selected_li' ).data( 'nav_params' );
+				var eDlg = $( this );
 				
-				$( this ).find( author_id ).selValue( nav_params.author_id );
+				var oNavParams = eDlg.data( 'selected_li' ).data( 'nav_params' );
+				
+				eDlg.find( author_id ).selValue( oNavParams.author_id );
 				
 			} );
 						

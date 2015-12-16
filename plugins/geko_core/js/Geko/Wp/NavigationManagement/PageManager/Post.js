@@ -156,6 +156,9 @@
 			var sCatDrpdwnSel = '#%scat_id'.printf( sTypePfx );
 			var sAuthorDrpdwnSel = '#%sauthor_id'.printf( sTypePfx );
 			
+			var sCatLabelSel = '.opt-%s label[for=%scat_id]'.printf( sNavType, sTypePfx );
+			var sAuthorLabelSel = '.opt-%s label[for=%sauthor_id]'.printf( sNavType, sTypePfx );
+			
 			
 			var ePostTypeDrpdwn = eNavDlg.find( sPostTypeDrpdwnSel );
 			var eCatDrpdwn = eNavDlg.find( sCatDrpdwnSel );
@@ -223,11 +226,7 @@
 					var oPostTypes = _this.post_types;
 					var sPostType = oPostTypes[ iCurPostTypeId ].slug;
 					
-					
-					var sCatLabelSel = '.opt-%s label[for=%scat_id]'.printf( sNavType, sTypePfx );
 					var sCatDisplayCss = ( 'category' == sPostType ) ? '' : 'none' ;
-
-					var sAuthorLabelSel = '.opt-%s label[for=%sauthor_id]'.printf( sNavType, sTypePfx );
 					var sAuthorDisplayCss = ( 'author' == sPostType ) ? '' : 'none' ;
 					
 					eDlg.find( sCatLabelSel ).css( 'display', sCatDisplayCss );

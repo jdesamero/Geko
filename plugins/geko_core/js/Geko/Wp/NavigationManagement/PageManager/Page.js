@@ -1,3 +1,11 @@
+/*
+ * "geko_core/js/Geko/Wp/NavigationManagement/PageManager/Page.js"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
+
 ;( function ( $ ) {
 	
 	$.gekoNavigationPageManager.registerPlugin( {
@@ -6,41 +14,52 @@
 		
 		depends: 'Geko_Navigation_PageManager_ImplicitLabelAbstract',
 		
-		setup_li: function( li ) {
+		setup_li: function( eNavLi ) {
 			
 			//
-			var mgmt = this;
-			var navDlg = this.__elems.navDlg;
-			var page_id = '#' + this.pfx_type + 'page_id';
+			var _this = this;
+			
+			var oPageParams = _this.page_params;
+			
+			var eNavDlg = this.__elems.navDlg;
+			var sNavType = this.type;
+			var sTypePfx = this.pfx_type;
+			var sPageDrpdwnSel = '#%spage_id'.printf( sTypePfx );
 			
 			//
-			li.bind( 'pre_update', function( evt ) {
-	
-				var nav_params = $( this ).data( 'nav_params' );
+			eNavLi.on( 'pre_update', function( evt ) {
 				
-				if ( mgmt.type == nav_params.type ) {
-					nav_params.page_id = navDlg.find( page_id ).val();
+				var eLi = $( this );
+				
+				var oNavParams = eLi.data( 'nav_params' );
+				var sCurNavType = oNavParams.type;
+				
+				if ( sNavType == sCurNavType ) {
+					oNavParams[ 'page_id' ] = eNavDlg.find( sPageDrpdwnSel ).val();
 				}
 				
 			} );
 			
 			//
-			li.bind( 'update', function( evt ) {
-	
-				var nav_params = $( this ).data( 'nav_params' );
+			eNavLi.on( 'update', function( evt ) {
 				
-				if ( mgmt.type == nav_params.type ) {
-					if ( mgmt.page_params[ nav_params.page_id ] ) {
+				var eLi = $( this );
+				
+				var oNavParams = eLi.data( 'nav_params' );
+				var sCurNavType = oNavParams.type;
+				
+				if ( sNavType == sCurNavType ) {
+					
+					var iCurPageId = oNavParams.page_id;
+					var oCurPage = oPageParams[ iCurPageId ];
+					
+					if ( oCurPage ) {
 						
-						$( this ).find( 'span.item_title a' ).html(
-							nav_params.label.htmlEntities() || 
-							mgmt.page_params[ nav_params.page_id ].title.htmlEntities()
-						);
+						var sPageTitle = oNavParams.label.htmlEntities() || oCurPage.title.htmlEntities();
 						
-						$( this ).find( 'a.link' ).attr(
-							'href',
-							mgmt.page_params[ nav_params.page_id ].link
-						);
+						eLi.find( 'span.item_title a' ).html( sPageTitle );
+						
+						eLi.find( 'a.link' ).attr( 'href', oCurPage.link );
 					}
 				}
 				
@@ -50,37 +69,47 @@
 		
 		init: function() {
 			
-			var mgmt = this;
-			var navDlg = this.__elems.navDlg;
-			var page_id = '#' + this.pfx_type + 'page_id';
+			var _this = this;
+			
+			var eNavDlg = this.__elems.navDlg;
+			var sTypePfx = this.pfx_type;
 			
 			//
 			if ( this.disable_params ) {
-				navDlg.find( page_id ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
-				navDlg.find( 'label[for=' + this.pfx_type + 'page_id]' ).css( 'color', 'gray' );
+				
+				var sPageDrpdwnSel = '#%spage_id'.printf( sTypePfx );
+				eNavDlg.find( sPageDrpdwnSel ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
+				
+				var sPageLabelSel = 'label[for=%spage_id]'.printf( sTypePfx );
+				eNavDlg.find( sPageLabelSel ).css( 'color', 'gray' );
 			}
 			
 		},
 		
 		setup: function() {
 			
-			var mgmt = this;
-			var navDlg = this.__elems.navDlg;
-			var page_id = '#' + this.pfx_type + 'page_id';
+			var _this = this;
+			
+			var eNavDlg = this.__elems.navDlg;
+			var sTypePfx = this.pfx_type;
+			var sPageDrpdwnSel = '#%spage_id'.printf( sTypePfx );
 			
 			//
-			$.each( this.page_params, function(i, val) {
-				navDlg.find( page_id ).append(
-					'<option value="' + i + '">' + val.title + ' (' + i + ')</option>'
+			$.each( this.page_params, function( i, val ) {
+				eNavDlg.find( sPageDrpdwnSel ).append(
+					'<option value="%d">%s (%d)</option>'.printf( i, val.title, i )
 				);
 			} );
 			
 			//
-			navDlg.bind( 'reset', function( evt ) {
-	
-				var nav_params = $( this ).data( 'selected_li' ).data( 'nav_params' );
+			eNavDlg.on( 'reset', function( evt ) {
 				
-				$( this ).find( page_id ).selValue( nav_params.page_id );
+				var eDlg = $( this );
+				
+				var oNavParams = eDlg.data( 'selected_li' ).data( 'nav_params' );
+				var iCurPageId = oNavParams.page_id;
+				
+				eDlg.find( sPageDrpdwnSel ).selValue( iCurPageId );
 				
 			} );
 						
