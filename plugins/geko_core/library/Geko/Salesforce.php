@@ -173,7 +173,7 @@ class Geko_Salesforce
 		// sanitize html entities
 		foreach ( $aFields as $sKey => $mValue ) {
 			if ( is_string( $mValue ) ) {
-				$aFields[ $sKey ] = htmlentities( $mValue );
+				$aFields[ $sKey ] = htmlspecialchars( $mValue );
 			}
 		}
 		
