@@ -325,6 +325,7 @@ class Geko_Layout extends Geko_Singleton_Abstract
 				$sMergeBodyClass = str_replace( '##template_grouping##', implode( ' ', $this->getTemplateGrouping() ), $sMergeBodyClass );
 			}
 			
+			$sMergeBodyClass = $this->modifyMergeBodyClass( $sMergeBodyClass );
 			
 			$sBodyClass = trim( sprintf( '%s %s', trim( $sBodyClass ), trim( $sMergeBodyClass ) ) );
 		
@@ -332,6 +333,12 @@ class Geko_Layout extends Geko_Singleton_Abstract
 		
 		return $sBodyClass;
 	}
+	
+	// hook method
+	public function modifyMergeBodyClass( $sMergeBodyClass ) {
+		return $sMergeBodyClass;
+	}
+	
 	
 	// to be implemented by sub-class
 	public function getBodyClassCb() {

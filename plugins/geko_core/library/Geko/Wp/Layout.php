@@ -146,6 +146,19 @@ class Geko_Wp_Layout extends Geko_Layout
 		return call_user_func_array( array( 'Geko_Wp', 'getBodyClass' ), $aArgs );
 	}
 	
+	// implement hook method
+	public function modifyMergeBodyClass( $sMergeBodyClass ) {
+
+		if ( FALSE !== strpos( $sMergeBodyClass, '##language##' ) ) {
+			
+			$oResolve = Geko_Wp_Language_Resolver::getInstance();
+			$sLangClass = sprintf( 'lang-%s', $oResolve->getCurLang( FALSE ) );
+			
+			$sMergeBodyClass = str_replace( '##language##', $sLangClass, $sMergeBodyClass );
+		}
+		
+		return $sMergeBodyClass;
+	}
 	
 	
 	
