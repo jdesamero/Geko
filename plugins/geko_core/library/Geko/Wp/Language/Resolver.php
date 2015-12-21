@@ -111,8 +111,7 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 							SELECT		id
 							FROM		##pfx##posts p
 							WHERE		( p.post_name = '%s' ) AND 
-										( p.post_status = 'publish' ) AND 
-										( p.post_type = 'post' )
+										( p.post_status = 'publish' )
 						", sanitize_title_for_query( $aQuery->query_vars[ 'name' ] ) ) );
 					}
 					
