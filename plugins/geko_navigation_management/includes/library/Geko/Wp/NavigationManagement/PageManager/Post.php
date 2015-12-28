@@ -13,6 +13,8 @@ class Geko_Wp_NavigationManagement_PageManager_Post
 {
 	const TYPE_CAT = 1;
 	const TYPE_AUTH = 2;
+	const TYPE_POST_TYPE = 3;
+	
 	
 	
 	//
@@ -32,7 +34,8 @@ class Geko_Wp_NavigationManagement_PageManager_Post
 		
 		$this->setPostTypeParams( array(
 			self::TYPE_CAT => array( 'slug' => 'category', 'title' => 'Category' ),
-			self::TYPE_AUTH => array( 'slug' => 'author', 'title' => 'Author' )
+			self::TYPE_AUTH => array( 'slug' => 'author', 'title' => 'Author' ),
+			self::TYPE_POST_TYPE => array( 'slug' => 'post_type', 'title' => 'Post Type' )			
 		) );
 		
 		
@@ -130,7 +133,10 @@ class Geko_Wp_NavigationManagement_PageManager_Post
 		<label for="##nvpfx_type##post_type_id">Post Attribute to Match</label>
 		<select name="##nvpfx_type##post_type_id" id="##nvpfx_type##post_type_id" class="text ui-widget-content ui-corner-all"></select>		
 		
-		<label for="##nvpfx_type##cat_id">Active on Matching Category</label>
+		<label for="##nvpfx_type##cat_type">Active on Matching Category Type</label>
+		<select name="##nvpfx_type##cat_type" id="##nvpfx_type##cat_type" class="text ui-widget-content ui-corner-all"></select>		
+		
+		<label for="##nvpfx_type##cat_id">Category Title</label>
 		<select name="##nvpfx_type##cat_id" id="##nvpfx_type##cat_id" class="text ui-widget-content ui-corner-all"></select>		
 		
 		<label for="##nvpfx_type##author_id">Active on Matching Author</label>

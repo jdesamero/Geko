@@ -117,7 +117,7 @@ class Geko_Wp_NavigationManagement_PageManager_Category
 	//
 	public function outputHtml() {
 		?>
-		<label for="##nvpfx_type##cat_id">Category Type</label>
+		<label for="##nvpfx_type##cat_type">Category Type</label>
 		<select name="##nvpfx_type##cat_type" id="##nvpfx_type##cat_type" class="text ui-widget-content ui-corner-all"></select>		
 		
 		<label for="##nvpfx_type##cat_id">Category Title</label>

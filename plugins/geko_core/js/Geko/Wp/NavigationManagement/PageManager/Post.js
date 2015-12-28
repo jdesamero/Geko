@@ -33,7 +33,8 @@
 			var sTypePfx = this.pfx_type;
 			
 			var sPostTypeDrpdwnSel = '#%spost_type_id'.printf( sTypePfx );
-			var sCatDrpdwnSel = '#%scat_id'.printf( sTypePfx );
+			var sCatTypesDrpdwnSel = '#%scat_type'.printf( sTypePfx );
+			var sCatsDrpdwnSel = '#%scat_id'.printf( sTypePfx );
 			var sAuthorDrpdwnSel = '#%sauthor_id'.printf( sTypePfx );
 			
 			
@@ -54,7 +55,8 @@
 				if ( sNavType == sCurNavType ) {
 					
 					oNavParams[ 'post_type_id' ] = eNavDlg.find( sPostTypeDrpdwnSel ).val();
-					oNavParams[ 'cat_id' ] = eNavDlg.find( sCatDrpdwnSel ).val();
+					oNavParams[ 'cat_type' ] = eNavDlg.find( sCatTypesDrpdwnSel ).val();
+					oNavParams[ 'cat_id' ] = eNavDlg.find( sCatsDrpdwnSel ).val();
 					oNavParams[ 'author_id' ] = eNavDlg.find( sAuthorDrpdwnSel ).val();
 					
 					oNavParams[ 'hide' ] = true;
@@ -86,6 +88,9 @@
 						if ( oCurCat ) {
 							sItemTitle = oNavParams.label.htmlEntities() || oCurCat.title.htmlEntities() ;
 							sFullItemTitle = '%s (Category: %s)'.printf( sItemTitle, oCatTypes[ oCurCat.type ] );
+						} else {
+							var sCurCatType = oNavParams.cat_type;
+							sFullItemTitle = 'Any (Category: %s)'.printf( oCatTypes[ sCurCatType ] );
 						}
 						
 					} else if ( 'author' == sPostType ) {
@@ -119,8 +124,8 @@
 				var sPostTypeDrpdwnSel = '#%spost_type_id'.printf( sTypePfx );
 				var sPostTypeLabelSel = 'label[for=%spost_type_id]' .printf( sTypePfx );
 				
-				var sCatDrpdwnSel = '#%scat_id'.printf( sTypePfx );
-				var sCatLabelSel = 'label[for=%scat_id]'.printf( sTypePfx );
+				var sCatsDrpdwnSel = '#%scat_id'.printf( sTypePfx );
+				var sCatsLabelSel = 'label[for=%scat_id]'.printf( sTypePfx );
 				
 				var sAuthorDrpdwnSel = '#%sauthor_id'.printf( sTypePfx );
 				var sAuthorLabelSel = 'label[for=%sauthor_id]'.printf( sTypePfx );
@@ -129,8 +134,8 @@
 				eNavDlg.find( sPostTypeDrpdwnSel ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
 				eNavDlg.find( sPostTypeLabelSel ).css( 'color', 'gray' );
 				
-				eNavDlg.find( sCatDrpdwnSel ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
-				eNavDlg.find( sCatLabelSel ).css( 'color', 'gray' );
+				eNavDlg.find( sCatsDrpdwnSel ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
+				eNavDlg.find( sCatsLabelSel ).css( 'color', 'gray' );
 				
 				eNavDlg.find( sAuthorDrpdwnSel ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
 				eNavDlg.find( sAuthorLabelSel ).css( 'color', 'gray' );
@@ -153,15 +158,18 @@
 			var sTypePfx = this.pfx_type;
 			
 			var sPostTypeDrpdwnSel = '#%spost_type_id'.printf( sTypePfx );
-			var sCatDrpdwnSel = '#%scat_id'.printf( sTypePfx );
+			var sCatTypesDrpdwnSel = '#%scat_type'.printf( sTypePfx );
+			var sCatsDrpdwnSel = '#%scat_id'.printf( sTypePfx );
 			var sAuthorDrpdwnSel = '#%sauthor_id'.printf( sTypePfx );
 			
-			var sCatLabelSel = '.opt-%s label[for=%scat_id]'.printf( sNavType, sTypePfx );
+			var sCatTypeLabelSel = '.opt-%s label[for=%scat_type]'.printf( sNavType, sTypePfx );
+			var sCatsLabelSel = '.opt-%s label[for=%scat_id]'.printf( sNavType, sTypePfx );
 			var sAuthorLabelSel = '.opt-%s label[for=%sauthor_id]'.printf( sNavType, sTypePfx );
 			
 			
 			var ePostTypeDrpdwn = eNavDlg.find( sPostTypeDrpdwnSel );
-			var eCatDrpdwn = eNavDlg.find( sCatDrpdwnSel );
+			var eCatTypesDrpdwn = eNavDlg.find( sCatTypesDrpdwnSel );
+			var eCatsDrpdwn = eNavDlg.find( sCatsDrpdwnSel );
 			var eAuthorDrpdwn = eNavDlg.find( sAuthorDrpdwnSel );
 			
 
@@ -175,10 +183,17 @@
 				);
 			} );
 			
+			$.each( oCatTypes, function( k, v ) {
+				eCatTypesDrpdwn.append(
+					'<option value="%s">%s</option>'.printf( k, v )
+				);
+			} );
+			
 			//
+			eCatsDrpdwn.append( '<option value="" class="type-default">Any</option>' );
 			$.each( oCatsNorm, function( i, val ) {
-				eCatDrpdwn.append(
-					'<option value="%d">%s (%d)</option>'.printf( i, val.title, i )
+				eCatsDrpdwn.append(
+					'<option value="%d" class="type-%s">%s (%d)</option>'.printf( i, val.type, val.title, i )
 				);
 			} );
 			
@@ -205,11 +220,20 @@
 			} );
 			
 			
+			eCatTypesDrpdwn.on( 'change', function() {
+				
+				// trigger open event on the dialog
+				eNavDlg.trigger( 'open', [ true ] );
+				
+			} );
+
+			
+			
 			
 			//// add dialog triggers
 			
 			//
-			eNavDlg.on( 'open', function( evt ) {
+			eNavDlg.on( 'open', function( evt, bChangeType ) {
 				
 				var eDlg = $( this );
 				
@@ -229,11 +253,29 @@
 					var sCatDisplayCss = ( 'category' == sPostType ) ? '' : 'none' ;
 					var sAuthorDisplayCss = ( 'author' == sPostType ) ? '' : 'none' ;
 					
-					eDlg.find( sCatLabelSel ).css( 'display', sCatDisplayCss );
-					eDlg.find( sCatDrpdwnSel ).css( 'display', sCatDisplayCss );
+					eDlg.find( sCatTypeLabelSel ).css( 'display', sCatDisplayCss );
+					eDlg.find( sCatTypesDrpdwnSel ).css( 'display', sCatDisplayCss );
+					
+					eDlg.find( sCatsLabelSel ).css( 'display', sCatDisplayCss );
+					eDlg.find( sCatsDrpdwnSel ).css( 'display', sCatDisplayCss );
 					
 					eDlg.find( sAuthorLabelSel ).css( 'display', sAuthorDisplayCss );
 					eDlg.find( sAuthorDrpdwnSel ).css( 'display', sAuthorDisplayCss );
+					
+					if ( 'category' == sPostType ) {
+						
+						var sCurCatType = eCatTypesDrpdwn.val();
+						if ( sCurCatType ) {
+							
+							eCatsDrpdwn.showSelOpts( '.type-%s, .type-default'.printf( sCurCatType ) );
+							
+							// select default sub-option if type was changed
+							if ( bChangeType ) {
+								eCatsDrpdwn.find( 'option:first-child' ).attr( 'selected', 'selected' );
+							}
+						}
+						
+					}
 					
 				}
 				
@@ -246,9 +288,10 @@
 				
 				var oNavParams = eDlg.data( 'selected_li' ).data( 'nav_params' );
 				
-				ePostTypeDrpdwn.selValue( oNavParams.post_type_id );
-				eCatDrpdwn.selValue( oNavParams.cat_id );
-				eAuthorDrpdwn.selValue( oNavParams.author_id );
+				ePostTypeDrpdwn.val( oNavParams.post_type_id );
+				eCatTypesDrpdwn.val( oNavParams.cat_type );
+				eCatsDrpdwn.val( oNavParams.cat_id );
+				eAuthorDrpdwn.val( oNavParams.author_id );
 				
 				eDlg.find( '.opt-common' ).show();
 				
