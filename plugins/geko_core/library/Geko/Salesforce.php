@@ -400,6 +400,16 @@ class Geko_Salesforce
 			}
 			
 			
+			//// process ##doie## fields (don't override if exists) fields
+			$aDoieFields = array();
+			foreach ( $aFields as $sKey => $sValue ) {
+				if ( 0 === strpos( $sValue, '##doie##' ) ) {
+					$aFields[ $sKey ] = substr( $sValue, 8 );
+					$aDoieFields[] = $sKey;
+				}
+			}
+			
+			
 			
 			$aChanged = NULL;		// use this to track changes
 			
@@ -421,6 +431,15 @@ class Geko_Salesforce
 						$aChanged[ $sKey ] = $sOldValue;
 					}
 				}
+				
+				
+				// keep the original values if they exist
+				foreach ( $aDoieFields as $sDoeiKey ) {
+					if ( $sKeepValue = $aOldFields[ $sDoeiKey ] ) {
+						$aFields[ $sDoeiKey ] = $sKeepValue;
+					}
+				}
+				
 				
 				// don't set the LeadSource field if updating an existing lead
 				if ( $aFields[ 'LeadSource' ] ) {
