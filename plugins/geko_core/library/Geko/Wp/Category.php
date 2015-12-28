@@ -174,11 +174,14 @@ class Geko_Wp_Category extends Geko_Wp_Entity
 	
 	//
 	public function getEntityFromId( $iEntityId ) {
-		return get_category( $iEntityId );
+		return get_term( $iEntityId );
 	}
 	
 	//
 	public function getEntityFromSlug( $sEntitySlug ) {
+		
+		// TO DO: ??????
+		
 		if ( FALSE !== strpos( $sEntitySlug, '/' ) ) {
 			return get_category_by_path( $sEntitySlug );
 		} else {
@@ -204,7 +207,7 @@ class Geko_Wp_Category extends Geko_Wp_Entity
 	
 	//
 	public function getPermalink() {
-		return get_category_link( $this->getId() );
+		return get_term_link( $this->_oEntity );
 	}
 	
 	
@@ -212,6 +215,9 @@ class Geko_Wp_Category extends Geko_Wp_Entity
 	public function getDefaultEntityValue() {
 		
 		global $wp_query;
+		
+		$aQv = $wp_query->query_vars;
+		
 		
 		if ( is_category() ) {
 			
@@ -221,7 +227,11 @@ class Geko_Wp_Category extends Geko_Wp_Entity
 				return $oCatAlias->getApparentCat()->getRawEntity();
 			}
 			
-			return self::get_ID( $wp_query->query_vars[ 'category_name' ] );
+			return self::get_ID( $aQv[ 'category_name' ] );
+		
+		} elseif ( $sTaxonomy = $aQv[ 'taxonomy' ] ) {
+			
+			return get_term_by( 'slug', $aQv[ 'term' ], $sTaxonomy );
 		}
 		
 		return NULL;

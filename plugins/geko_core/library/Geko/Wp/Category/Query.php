@@ -24,21 +24,35 @@ class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 		// sanitize passed parameters
 		
 		$aGetCatParamKeys = array(
-			'type', 'child_of', 'parent', 'orderby', 'order', 'hide_empty', 'hierarchical', 
-			'exclude', 'include', 'number', 'taxonomy', 'pad_counts'
+			'orderby', 'order', 'hide_empty', 'include', 'exclude', 'exclude_tree', 'number', 'offset',
+			'fields', 'name', 'slug', 'hierarchical', 'search', 'name__like', 'description__like',
+			'pad_counts', 'get', 'child_of', 'parent', 'childless', 'cache_domain', 'update_term_meta_cache',
+			'meta_query', 'taxonomy', 'lang'
 		);
 		
+		// "taxonomy" included above to maintain compatibility with get_categories()
+		
+		
 		$aSanitizedParams = array();
+		$mTaxonomy = 'category';				// default
+		
 		foreach ( $aGetCatParamKeys as $sKey ) {
+			
 			if ( isset( $this->_aParams[ $sKey ] ) ) {
-				$aSanitizedParams[ $sKey ] = $this->_aParams[ $sKey ];
+				
+				if ( 'taxonomy' == $sKey ) {
+					$mTaxonomy = $this->_aParams[ $sKey ];
+				} else {
+					$aSanitizedParams[ $sKey ] = $this->_aParams[ $sKey ];
+				}
+				
 			}
 		}
 		
 		
 		$this->_aEntities = ( 0 === $this->_aParams[ 'number' ] ) ?
 			array() : 
-			array_values( get_categories( $aSanitizedParams ) )
+			array_values( get_terms( $mTaxonomy, $aSanitizedParams ) )
 		;
 		
 		$this->_iTotalRows = count( $this->_aEntities );
@@ -51,6 +65,10 @@ class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 		
 		// hacky!!!
 		$aDefaultParams = parent::getDefaultParams();
+		
+		if ( is_single() ) {
+			unset( $aDefaultParams[ 'name' ] );
+		}
 		
 		if ( $aDefaultParams[ 'category_name' ] ) {
 			
@@ -75,6 +93,27 @@ class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 		
 		if ( !$aParams[ 'any' ] ) {
 			$sTaxonomy = ( $aParams[ 'taxonomy' ] ) ? $aParams[ 'taxonomy' ] : 'category' ;
+		}
+		
+		
+		// deal with object counts
+		
+		$oCountQuery = new Geko_Sql_Select();
+		$oCountQuery
+			
+			->field( 'wptx.term_id' )
+			->field( 'COUNT( wptr.object_id )', 'count' )
+			
+			->from( '##pfx##term_relationships', 'wptr' )
+			
+			->joinLeft( '##pfx##term_taxonomy', 'wptx' )
+				->on( 'wptx.term_taxonomy_id = wptr.term_taxonomy_id' )
+			
+			->group( 'wptx.term_id' )
+		;
+		
+		if ( $sTaxonomy ) {
+			$oCountQuery->where( 'wptx.taxonomy = ?', $sTaxonomy );
 		}
 		
 		
@@ -144,6 +183,18 @@ class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 		}
 		
 		
+		// default
+		if ( !isset( $aParams[ 'hide_empty' ] ) ) {
+			$aParams[ 'hide_empty' ] = TRUE;
+		}
+		
+		//
+		if ( $aParams[ 'hide_empty' ] ) {
+			$oQuery->where( 'wpthe.count > 0' );
+		}
+		
+		
+		
 		// "wp" stands for "with posts"
 		if ( $iCatWithPosts = $aParams[ 'has_posts_in_cat' ] ) {
 			
@@ -211,6 +262,7 @@ class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 	public function getAsFlatNested() {
 		
 		$aCatGroup = array();
+		
 		foreach ( $this as $oCat ) {
 			$aCatGroup[ $oCat->getParent() ][] = $oCat;
 		}
@@ -218,21 +270,29 @@ class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 		return $this->sortAsFlatNested( $aCatGroup );
 	}
 	
+	
 	// helper for $this->getAsFlatNested()
 	public function sortAsFlatNested( $aCatGroup, $iParent = 0, $iLevel = 0 ) {
+		
 		$aRet = array();
 		$aList = $aCatGroup[ $iParent ];
+		
 		if ( count( $aList ) > 0 ) {
+			
 			foreach ( $aList as $oCat ) {
+				
 				$aRet[] = $oCat->setData( 'level', $iLevel );
 				$iCatId = $oCat->getId();
+				
 				if ( is_array( $aCatGroup[ $iCatId ] ) ) {
 					$aRet = array_merge( $aRet, $this->sortAsFlatNested( $aCatGroup, $iCatId, $iLevel + 1 ) );
 				}
 			}
 		}
+		
 		return $aRet;	
 	}
+	
 	
 }
 
