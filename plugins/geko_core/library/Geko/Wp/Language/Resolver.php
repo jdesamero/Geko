@@ -21,7 +21,7 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 			parent::init();
 			
 			add_action( 'admin_init', array( $this, 'resolveAdmin' ) );
-			add_filter( 'pre_get_posts', array( $this, 'resolveTheme' ) );
+			add_action( 'pre_get_posts', array( $this, 'resolveTheme' ) );
 			add_filter( 'pre_option_page_on_front', array( $this, 'getPageOnFront' ) );
 						
 			add_filter( 'Geko_Wp::getHomepageId', array( $this, 'getHomepageId' ), 10, 2 );
