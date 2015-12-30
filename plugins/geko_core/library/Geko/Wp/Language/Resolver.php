@@ -66,192 +66,177 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 	}
 	
 	//
-	public function resolveTheme( $aQuery ) {
+	public function resolveTheme( $oWpQuery ) {
 		
-		static $bDefaultQuery = FALSE;
-		
-		if ( !$bDefaultQuery ) {
+		if ( $oWpQuery->is_main_query() ) {
+						
+			////// determine the current language
 			
-			// use backtrace to determine if this is the default query
+			$sInherentLang = '';
 			
-			$aBt = debug_backtrace( FALSE );
-			if (
-				( 'WP_Query' == $aBt[ 4 ][ 'class' ] ) && 
-				( 'query' == $aBt[ 4 ][ 'function' ] )
-			) {
+			$aParams = array();
+			
+			// prepare parameters to figure out inherent language, if any
+			if ( is_page() ) {
 				
-				////// determine the current language
-				
-				$sInherentLang = '';
-				
-				$aParams = array();
-				
-				// prepare parameters to figure out inherent language, if any
-				if ( is_page() ) {
-					
-					$iPageId = $aQuery->query_vars[ 'page_id' ];
-					if ( !$iPageId ) {
-						$oPg = get_page_by_path( $aQuery->query_vars[ 'pagename' ] );
-						$iPageId = $oPg->ID;
-					}
-					
-					$aParams = array(
-						'type' => 'post',
-						'obj_id' => $iPageId
-					);
-										
-				} elseif ( is_single() ) {
-					
-					$iPostId = $aQuery->query_vars[ 'p' ];
-					if ( !$iPostId ) {
-						
-						$oDb = Geko_Wp::get( 'db' );
-						
-						$iPostId = $oDb->fetchOne( sprintf( "
-							SELECT		id
-							FROM		##pfx##posts p
-							WHERE		( p.post_name = '%s' ) AND 
-										( p.post_status = 'publish' )
-						", sanitize_title_for_query( $aQuery->query_vars[ 'name' ] ) ) );
-					}
-					
-					$aParams = array(
-						'type' => 'post',
-						'obj_id' => $iPostId
-					);
-					
-				} elseif ( is_category() ) {
-					
-					$iCatId = $aQuery->query_vars[ 'cat' ];
-					if ( !$iCatId ) {
-						$iCatId = Geko_Wp_Category::get_ID( $aQuery->query_vars[ 'category_name' ] );
-					}
-					
-					$aParams = array(
-						'type' => 'category',
-						'obj_id' => $iCatId
-					);
-					
-				} elseif ( is_tax() ) {
-					
-					$aTaxonomies = get_taxonomies( array(), 'names' );
-					
-					foreach ( $aTaxonomies as $sTx ) {
-						if ( $sTerm = $aQuery->query[ $sTx ] ) {
-							break;
-						}
-					}
-					
-					$oTx = get_term_by( 'slug', $sTerm, $sTx );
-					$iCatId = $oTx->term_id;
-					
-					$aParams = array(
-						'type' => 'category',
-						'obj_id' => $iCatId
-					);
-					
+				$iPageId = $oWpQuery->query_vars[ 'page_id' ];
+				if ( !$iPageId ) {
+					$oPg = get_page_by_path( $oWpQuery->query_vars[ 'pagename' ] );
+					$iPageId = $oPg->ID;
 				}
 				
+				$aParams = array(
+					'type' => 'post',
+					'obj_id' => $iPageId
+				);
+									
+			} elseif ( is_single() ) {
 				
-				
-				// check for inherent lang
-				if (
-					( count( $aParams ) > 0 ) && 
-					( $oMember = Geko_Wp_Language_Member::getOne( $aParams ) ) && 
-					( $oMember->isValid() ) && 
-					( !$oMember->getLangIsDefault() )
-				) {
-					$this->sCurLang = $sInherentLang = $oMember->getLangCode();
-				}
-				
-				// check for query var lang
-				if (
-					( $sLangCode = $_REQUEST[ $this->sLangQueryVar ] ) && 
-					( !$sInherentLang )
-				) {
-					$this->sCurLang = $this->oLangMgm->getLanguage( $sLangCode )->getSlug();
-				}
-				
-				// check domain
-				if ( !$this->sCurLang && !$sInherentLang ) {
-					$oUrl = Geko_Uri::getGlobal();
-					$this->sCurLang = $this->oLangMgm->getLangCodeFromDomain( $oUrl->getHost() );
-				}
-				
-				
-				
-				////// resolve entity
-				
-				// if $this->sCurLang is not empty (current language is not default)
-				// then attempt to resolve it by finding it's siblings
-				if ( $this->sCurLang && ( $this->sCurLang != $sInherentLang ) ) {
+				$iPostId = $oWpQuery->query_vars[ 'p' ];
+				if ( !$iPostId ) {
 					
-					$aParams = array( 'lang' => $this->sCurLang );
+					$oDb = Geko_Wp::get( 'db' );
 					
-					if ( $iPageId ) {
-						
-						$aParams[ 'type' ] = 'post';
-						$aParams[ 'sibling_id' ] = $iPageId;
-						
-						if ( $iSiblingId = $this->getSiblingId( $aParams ) ) {
-							
-							$aQuery->queried_object = get_page( $iSiblingId );
-							$aQuery->queried_object_id = $iSiblingId;
-							$aQuery->query_vars[ 'page_id' ] = $iSiblingId;							// re-route to sibling!!!
-							
-							// make sure homepage in other language resolves
-							$iFrontPageId = get_option( 'page_on_front' );
-							
-							if ( $iSiblingId != $iFrontPageId ) {
-								
-								$aSibs = new Geko_Wp_Language_Member_Query( array(
-									'type' => 'post',
-									'sibling_id' => $iSiblingId
-								), FALSE );
-								
-								if ( in_array( $iFrontPageId, $aSibs->gatherObjId() ) ) {
-									$this->iFrontPage = $iSiblingId;
-									$aQuery->is_home = 1;
-								}
-							}
-							
-						}
-						
-					} elseif ( $iPostId ) {
-						
-						$aParams[ 'type' ] = 'post';
-						$aParams[ 'sibling_id' ] = $iPageId;
-						
-						if ( $iSiblingId = $this->getSiblingId( $aParams ) ) {
-							$aQuery->queried_object = get_page( $iSiblingId );
-							$aQuery->queried_object_id = $iSiblingId;
-							$aQuery->query_vars[ 'p' ] = $iSiblingId;								// re-route to sibling!!!
-						}
-						
-					} elseif ( $iCatId ) {
-						
-						$aParams[ 'type' ] = 'category';
-						$aParams[ 'sibling_id' ] = $iCatId;
-						
-						if ( $iSiblingId = $this->getSiblingId( $aParams ) ) {
-							$oCat = Geko_Wp_Category( $iSiblingId );
-							$aQuery->queried_object_id = $iSiblingId;
-							$aQuery->query_vars[ 'cat' ] = $iSiblingId;								// re-route to sibling!!!
-							$aQuery->query_vars[ 'category_name' ] = $oCat->getSlug();
-							$aQuery->parse_tax_query( $aQuery->query_vars );
-						}
-						
+					$iPostId = $oDb->fetchOne( sprintf( "
+						SELECT		id
+						FROM		##pfx##posts p
+						WHERE		( p.post_name = '%s' ) AND 
+									( p.post_status = 'publish' )
+					", sanitize_title_for_query( $oWpQuery->query_vars[ 'name' ] ) ) );
+				}
+				
+				$aParams = array(
+					'type' => 'post',
+					'obj_id' => $iPostId
+				);
+				
+			} elseif ( is_category() ) {
+				
+				$iCatId = $oWpQuery->query_vars[ 'cat' ];
+				if ( !$iCatId ) {
+					$iCatId = Geko_Wp_Category::get_ID( $oWpQuery->query_vars[ 'category_name' ] );
+				}
+				
+				$aParams = array(
+					'type' => 'category',
+					'obj_id' => $iCatId
+				);
+				
+			} elseif ( is_tax() ) {
+				
+				$aTaxonomies = get_taxonomies( array(), 'names' );
+				
+				foreach ( $aTaxonomies as $sTx ) {
+					if ( $sTerm = $oWpQuery->query[ $sTx ] ) {
+						break;
 					}
-					
 				}
 				
-				$bDefaultQuery = TRUE;
+				$oTx = get_term_by( 'slug', $sTerm, $sTx );
+				$iCatId = $oTx->term_id;
+				
+				$aParams = array(
+					'type' => 'category',
+					'obj_id' => $iCatId
+				);
 				
 			}
+			
+			
+			
+			// check for inherent lang
+			if (
+				( count( $aParams ) > 0 ) && 
+				( $oMember = Geko_Wp_Language_Member::getOne( $aParams ) ) && 
+				( $oMember->isValid() ) && 
+				( !$oMember->getLangIsDefault() )
+			) {
+				$this->sCurLang = $sInherentLang = $oMember->getLangCode();
+			}
+			
+			// check for query var lang
+			if (
+				( $sLangCode = $_REQUEST[ $this->sLangQueryVar ] ) && 
+				( !$sInherentLang )
+			) {
+				$this->sCurLang = $this->oLangMgm->getLanguage( $sLangCode )->getSlug();
+			}
+			
+			// check domain
+			if ( !$this->sCurLang && !$sInherentLang ) {
+				$oUrl = Geko_Uri::getGlobal();
+				$this->sCurLang = $this->oLangMgm->getLangCodeFromDomain( $oUrl->getHost() );
+			}
+			
+			
+			
+			////// resolve entity
+			
+			// if $this->sCurLang is not empty (current language is not default)
+			// then attempt to resolve it by finding it's siblings
+			if ( $this->sCurLang && ( $this->sCurLang != $sInherentLang ) ) {
+				
+				$aParams = array( 'lang' => $this->sCurLang );
+				
+				if ( $iPageId ) {
+					
+					$aParams[ 'type' ] = 'post';
+					$aParams[ 'sibling_id' ] = $iPageId;
+					
+					if ( $iSiblingId = $this->getSiblingId( $aParams ) ) {
 						
+						$oWpQuery->queried_object = get_page( $iSiblingId );
+						$oWpQuery->queried_object_id = $iSiblingId;
+						$oWpQuery->query_vars[ 'page_id' ] = $iSiblingId;							// re-route to sibling!!!
+						
+						// make sure homepage in other language resolves
+						$iFrontPageId = get_option( 'page_on_front' );
+						
+						if ( $iSiblingId != $iFrontPageId ) {
+							
+							$aSibs = new Geko_Wp_Language_Member_Query( array(
+								'type' => 'post',
+								'sibling_id' => $iSiblingId
+							), FALSE );
+							
+							if ( in_array( $iFrontPageId, $aSibs->gatherObjId() ) ) {
+								$this->iFrontPage = $iSiblingId;
+								$oWpQuery->is_home = 1;
+							}
+						}
+						
+					}
+					
+				} elseif ( $iPostId ) {
+					
+					$aParams[ 'type' ] = 'post';
+					$aParams[ 'sibling_id' ] = $iPageId;
+					
+					if ( $iSiblingId = $this->getSiblingId( $aParams ) ) {
+						$oWpQuery->queried_object = get_page( $iSiblingId );
+						$oWpQuery->queried_object_id = $iSiblingId;
+						$oWpQuery->query_vars[ 'p' ] = $iSiblingId;								// re-route to sibling!!!
+					}
+					
+				} elseif ( $iCatId ) {
+					
+					$aParams[ 'type' ] = 'category';
+					$aParams[ 'sibling_id' ] = $iCatId;
+					
+					if ( $iSiblingId = $this->getSiblingId( $aParams ) ) {
+						$oCat = Geko_Wp_Category( $iSiblingId );
+						$oWpQuery->queried_object_id = $iSiblingId;
+						$oWpQuery->query_vars[ 'cat' ] = $iSiblingId;								// re-route to sibling!!!
+						$oWpQuery->query_vars[ 'category_name' ] = $oCat->getSlug();
+						$oWpQuery->parse_tax_query( $oWpQuery->query_vars );
+					}
+					
+				}			
+			}									
 		}
 		
 	}
+	
 	
 	//
 	public function resolveUrl( $mUrl, $iLangId ) {
