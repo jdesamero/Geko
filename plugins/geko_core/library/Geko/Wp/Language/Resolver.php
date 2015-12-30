@@ -132,7 +132,27 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 						'obj_id' => $iCatId
 					);
 					
+				} elseif ( is_tax() ) {
+					
+					$aTaxonomies = get_taxonomies( array(), 'names' );
+					
+					foreach ( $aTaxonomies as $sTx ) {
+						if ( $sTerm = $aQuery->query[ $sTx ] ) {
+							break;
+						}
+					}
+					
+					$oTx = get_term_by( 'slug', $sTerm, $sTx );
+					$iCatId = $oTx->term_id;
+					
+					$aParams = array(
+						'type' => 'category',
+						'obj_id' => $iCatId
+					);
+					
 				}
+				
+				
 				
 				// check for inherent lang
 				if (

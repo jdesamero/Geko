@@ -17,6 +17,7 @@ class Geko_Wp_NavigationManagement_Page_Post
 	protected $_sCatType;
 	protected $_iCatId;
 	protected $_iAuthorId;
+	protected $_sCpt;
 	
 	protected $oPost;
 	
@@ -72,6 +73,21 @@ class Geko_Wp_NavigationManagement_Page_Post
 	}
 	
 	
+	//
+	public function setCustomPostType( $sCpt ) {
+		$this->_sCpt = $sCpt;
+		return $this;
+	}
+	
+	//
+	public function getCustomPostType() {
+		return $this->_sCpt;
+	}
+
+	
+	
+	
+	
 	
 	//
 	public function getPost() {
@@ -103,7 +119,8 @@ class Geko_Wp_NavigationManagement_Page_Post
 				'post_type_id' => $this->_iPostTypeId,
 				'cat_type' => $this->_sCatType,
 				'cat_id' => $this->_iCatId,
-				'author_id' => $this->_iAuthorId
+				'author_id' => $this->_iAuthorId,
+				'custom_post_type' => $this->_sCpt
 			)
 		);
 	}
@@ -118,14 +135,28 @@ class Geko_Wp_NavigationManagement_Page_Post
 			
 			if ( Geko_Wp_NavigationManagement_PageManager_Post::TYPE_CAT == $this->_iPostTypeId ) {
 				
-				$bMatch = in_category( $this->_iCatId );
+				$bMatch = FALSE;
+				
+				$aTaxonomies = get_taxonomies( array(), 'names' );
+				
+				foreach ( $aTaxonomies as $sTx ) {
+					if ( $bMatch = has_term( $this->_iCatId, $sTx ) ) {
+						break;
+					}
+				}
+				
 				$iMatchId = $this->_iCatId;
 			
 			} elseif ( Geko_Wp_NavigationManagement_PageManager_Post::TYPE_AUTH == $this->_iPostTypeId ) {
 				
 				$bMatch = ( $this->_iAuthorId == $wp_query->post->post_author );
 				$iMatchId = $this->_iAuthorId;
-			
+
+			} elseif ( Geko_Wp_NavigationManagement_PageManager_Post::TYPE_CPT == $this->_iPostTypeId ) {
+				
+				$bMatch = is_singular( $this->_sCpt );
+				$iMatchId = $this->_sCpt;
+				
 			} else {
 				
 				$bMatch = NULL;

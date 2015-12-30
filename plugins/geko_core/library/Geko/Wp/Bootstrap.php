@@ -527,7 +527,7 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 			
 			$oNavmngLang = Geko_Wp_NavigationManagement_Language::getInstance();
 			
-			$aPlugins = array( 'Uri', 'Page', 'Category', 'Post', 'Role' );
+			$aPlugins = array( 'Uri', 'Page', 'Category', 'CustomType', 'Post', 'Role' );
 			
 			call_user_func_array( array( $oNavmngLang, 'registerPlugins' ), $aPlugins );
 			

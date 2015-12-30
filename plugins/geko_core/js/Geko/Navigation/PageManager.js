@@ -1,3 +1,11 @@
+/*
+ * "geko_core/js/Geko/Navigation/PageManager.js"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
+
 ;( function ( $ ) {
 	
 	//
@@ -15,9 +23,12 @@
 			}
 		},
 		offsetCss: function( prop, offsetValue ) {
+			
 			var val = this.cssValue( prop );
+			
 			val = val + offsetValue;
-			this.css( prop, val + 'px' );
+			this.css( prop, '%spx'.printf( val ) );
+			
 			return this;
 		},
 		targetLi: function() {
@@ -49,8 +60,29 @@
 		
 		
 		
+		// load
+		this.load = function( oParams ) {
+			
+			var oGetParams = oParams.get_params;
+			
+			$.get(
+				oParams.script.process,
+				oGetParams,
+				function ( res ) {
+					
+					var oData = res.data;
+					
+					_this.init( oData, oParams.script, oGetParams );
+					
+				},
+				'json'
+			);
+			
+		};
+		
+		
 		// initialize
-		this.init = function( options ) {
+		this.init = function( options, oScript, oGetParams ) {
 			
 			// 
 			
@@ -59,30 +91,35 @@
 			}, options );
 			
 			
+			
 			//// assignment
 			
 			var aNav = opts.nav_data;
 			var aManage = opts.mgmt_data;
+			var oOpts = opts.opts;
 			var iDefaultTypeIdx = opts.default_idx;
+			
+			
+			var sPrefix = oOpts.prefix;
 			
 			
 			
 			//// element references
 			
-			var navIf = $( '#' + opts.opts.form_id );
-			var navIfTrash = navIf.find( '.' + opts.opts.trash );
-			var navIfList = navIf.find( '.' + opts.opts.list );
-			var navIfTmpl = navIf.find( '.' + opts.opts.template );
+			var eNavIf = $( '#%s'.printf( oOpts.form_id ) );
+			var eNavIfTrash = eNavIf.find( '.%s'.printf( oOpts.trash ) );
+			var eNavIfList = eNavIf.find( '.%s'.printf( oOpts.list ) );
+			var eNavIfTmpl = eNavIf.find( '.%s'.printf( oOpts.template ) );
 			
-			var navDlg = $( '#' + opts.opts.dialog );
+			var eNavDlg = $( '#%s'.printf( oOpts.dialog ) );
 			
 			
 			var elemsPlugin = {
-				navIf: navIf,
-				navIfTrash: navIfTrash,
-				navIfList: navIfList,
-				navIfTmpl: navIfTmpl,
-				navDlg: navDlg
+				navIf: eNavIf,
+				navIfTrash: eNavIfTrash,
+				navIfList: eNavIfList,
+				navIfTmpl: eNavIfTmpl,
+				navDlg: eNavDlg
 			};
 			
 			
@@ -92,7 +129,7 @@
 			// prep the type management data
 			$.each( aManage, function( i ) {
 				
-				aManage[ i ].__opts = opts.opts;							// general options
+				aManage[ i ].__opts = oOpts;							// general options
 				aManage[ i ].__elems = elemsPlugin;							// references to $ elements
 				
 			} );
@@ -105,20 +142,20 @@
 			var Indentation = function() {
 				
 				this.getNegativeOffset = function() {
-					return -opts.opts.indent_width;
+					return -oOpts.indent_width;
 				}
 		
 				this.getPositiveOffset = function() {
-					return opts.opts.indent_width;
+					return oOpts.indent_width;
 				}
 				
 				// currently unused
 				this.getMinWidth = function() {
-					return opts.opts.max_width - ( opts.opts.indent_width * opts.opts.indent_levels );
+					return oOpts.max_width - ( oOpts.indent_width * oOpts.indent_levels );
 				}
 				
 				this.getIndentLevels = function( elemWidth ) {
-					return ( opts.opts.max_width - elemWidth ) / opts.opts.indent_width;
+					return ( oOpts.max_width - elemWidth ) / oOpts.indent_width;
 				}
 				
 			};
@@ -128,13 +165,13 @@
 			
 			var sTypeCssClasses = '';
 			$.each( aManage, function( i ) {
-				sTypeCssClasses += 'type-' + i + ' ';
+				sTypeCssClasses += 'type-%d '.printf( i );
 			} );
 			
 			
 			
 			//
-			var fTriggerPlugins = function() {
+			var cTriggerPlugins = function() {
 				
 				var args = [];
 				$.each( arguments, function() { args.push( this ); } );
@@ -153,8 +190,8 @@
 					
 					$.each( aPlugins, function() {
 						
-						var fPluginEvent = this[ sEvent ];
-						if ( fPluginEvent ) fPluginEvent.apply( mgmt, args );
+						var cPluginEvent = this[ sEvent ];
+						if ( cPluginEvent ) cPluginEvent.apply( mgmt, args );
 						
 					} );
 					
@@ -169,90 +206,90 @@
 			// disable/enable parts of the interface
 			
 			//
-			if ( opts.opts.remove_drag_template ) {
+			if ( oOpts.remove_drag_template ) {
 				// remove the drag item template
-				navIf.find( '.' + opts.opts.prefix + 'tmpl_outer' ).remove();
+				eNavIf.find( '.%stmpl_outer'.printf( sPrefix ) ).remove();
 			} else {
 				// make the drag template div draggable
-				navIf.find( '.' + opts.opts.prefix + 'tmpl_outer' ).draggable( {
-					handle: '.' + opts.opts.prefix + 'drag_handle'
+				eNavIf.find( '.%stmpl_outer'.printf( sPrefix ) ).draggable( {
+					handle: '.%sdrag_handle'.printf( sPrefix )
 				} );			
 			}
 			
 			//
-			if ( opts.opts.remove_outdent ) {
-				navIfTmpl.find( 'a.outdent' ).remove();
+			if ( oOpts.remove_outdent ) {
+				eNavIfTmpl.find( 'a.outdent' ).remove();
 			}
 			
 			//
-			if ( opts.opts.remove_indent ) {
-				navIfTmpl.find( 'a.indent' ).remove();
+			if ( oOpts.remove_indent ) {
+				eNavIfTmpl.find( 'a.indent' ).remove();
 			}
 			
 			//
-			if ( opts.opts.remove_options ) {
-				navIfTmpl.find( 'a.options' ).remove();
+			if ( oOpts.remove_options ) {
+				eNavIfTmpl.find( 'a.options' ).remove();
 			}
 			
 			//
-			if ( opts.opts.remove_remove ) {
-				navIfTmpl.find( 'a.remove' ).remove();
+			if ( oOpts.remove_remove ) {
+				eNavIfTmpl.find( 'a.remove' ).remove();
 			}
 			
 			//
-			if ( opts.opts.remove_go_to_link ) {
-				navIfTmpl.find( 'a.link' ).remove();
+			if ( oOpts.remove_go_to_link ) {
+				eNavIfTmpl.find( 'a.link' ).remove();
 			}
 			
 			//
-			if ( opts.opts.remove_toggle_visibility ) {
-				navIfTmpl.find( 'a.visibility' ).remove();
+			if ( oOpts.remove_toggle_visibility ) {
+				eNavIfTmpl.find( 'a.visibility' ).remove();
 			}
 			
 			//
-			if ( opts.opts.remove_trash ) {
-				navIf.find( '.' + opts.opts.trash ).remove();
+			if ( oOpts.remove_trash ) {
+				eNavIf.find( '.%s'.printf( oOpts.trash ) ).remove();
 			}
 			
 			//
-			if ( opts.opts.disable_default_params ) {
+			if ( oOpts.disable_default_params ) {
 			
-				navDlg.find( '#' + opts.opts.prefix + 'type' ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
-				navDlg.find( '.opt-common label[for=' + opts.opts.prefix + 'type]' ).css( 'color', 'gray' );
+				eNavDlg.find( '#%stype'.printf( sPrefix ) ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
+				eNavDlg.find( '.opt-common label[for=%stype]'.printf( sPrefix ) ).css( 'color', 'gray' );
 				
-				navDlg.find( '#' + opts.opts.prefix + 'target' ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
-				navDlg.find( '.opt-common label[for=' + opts.opts.prefix + 'target]' ).css( 'color', 'gray' );
+				eNavDlg.find( '#%starget'.printf( sPrefix ) ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
+				eNavDlg.find( '.opt-common label[for=%starget]'.printf( sPrefix ) ).css( 'color', 'gray' );
 				
-				navDlg.find( '#' + opts.opts.prefix + 'css_class' ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
-				navDlg.find( '.opt-common label[for=' + opts.opts.prefix + 'css_class]' ).css( 'color', 'gray' );
+				eNavDlg.find( '#%scss_class'.printf( sPrefix ) ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
+				eNavDlg.find( '.opt-common label[for=%scss_class]'.printf( sPrefix ) ).css( 'color', 'gray' );
 				
-				navDlg.find( '#' + opts.opts.prefix + 'inactive' ).attr( 'disabled', 'disabled' );
-				navDlg.find( '.opt-common label[for=' + opts.opts.prefix + 'inactive]' ).css( 'color', 'gray' );
+				eNavDlg.find( '#%sinactive'.printf( sPrefix ) ).attr( 'disabled', 'disabled' );
+				eNavDlg.find( '.opt-common label[for=%sinactive]'.printf( sPrefix ) ).css( 'color', 'gray' );
 				
-				navDlg.find( '#' + opts.opts.prefix + 'hide' ).attr( 'disabled', 'disabled' );
-				navDlg.find( '.opt-common label[for=' + opts.opts.prefix + 'hide]' ).css( 'color', 'gray' );
+				eNavDlg.find( '#%shide'.printf( sPrefix ) ).attr( 'disabled', 'disabled' );
+				eNavDlg.find( '.opt-common label[for=%shide]'.printf( sPrefix ) ).css( 'color', 'gray' );
 			
 			}
 			
-			fTriggerPlugins( 'init' );
+			cTriggerPlugins( 'init' );
 			
 			
 			//// Nav Interface Stuff ---------------------------------------------------------------
 			
 			//// functions
-						
+			
 			//
-			var fIndent = function() {
+			var cIndent = function() {
 				
-				var li = $( this ).targetLi();
-				var nav_params = li.data( 'nav_params' );
+				var eLi = $( this ).targetLi();
+				var nav_params = eLi.data( 'nav_params' );
 								
-				if ( nav_params.indent < opts.opts.indent_levels ) {
+				if ( nav_params.indent < oOpts.indent_levels ) {
 					
-					var prev_nav_params = li.prev().data( 'nav_params' );
+					var prev_nav_params = eLi.prev().data( 'nav_params' );
 					if ( prev_nav_params && ( nav_params.indent <= prev_nav_params.indent ) ) {
 						nav_params.indent++;
-						li.data( 'nav_params', nav_params ).trigger( 'update' );
+						eLi.data( 'nav_params', nav_params ).trigger( 'update' );
 					} else {
 						alert( 'Cannot indent' );
 					}
@@ -265,16 +302,16 @@
 			};
 			
 			//
-			var fOutdent = function() {
+			var cOutdent = function() {
 				
-				var li = $( this ).targetLi();
-				var nav_params = li.data( 'nav_params' );
+				var eLi = $( this ).targetLi();
+				var nav_params = eLi.data( 'nav_params' );
 				
 				if ( nav_params.indent > 0 ) {
-					var next_nav_params = li.next().data( 'nav_params' );
+					var next_nav_params = eLi.next().data( 'nav_params' );
 					if ( ( null == next_nav_params ) || ( nav_params.indent >= next_nav_params.indent ) ) {
 						nav_params.indent--;
-						li.data( 'nav_params', nav_params ).trigger( 'update' );
+						eLi.data( 'nav_params', nav_params ).trigger( 'update' );
 					} else {
 						alert( 'Cannot outdent' );
 					}
@@ -286,52 +323,52 @@
 			};
 			
 			//
-			var fItemTitle = function() {
-				var li = $( this ).targetLi();
-				navDlg.data( 'selected_li', li ).dialog( 'open' );
+			var cItemTitle = function() {
+				var eLi = $( this ).targetLi();
+				eNavDlg.data( 'selected_li', eLi ).dialog( 'open' );
 				return false;
 			};
 			
 			//
-			var fOptions = function() {
-				var li = $( this ).targetLi();
-				navDlg.data( 'selected_li', li ).dialog( 'open' );
+			var cOptions = function() {
+				var eLi = $( this ).targetLi();
+				eNavDlg.data( 'selected_li', eLi ).dialog( 'open' );
 				return false;
 			};
 			
 			//
-			var fVisibility = function() {
-				var li = $( this ).targetLi();
-				var nav_params = li.data( 'nav_params' );
+			var cVisibility = function() {
+				var eLi = $( this ).targetLi();
+				var nav_params = eLi.data( 'nav_params' );
 				if ( nav_params.hide ) {
 					nav_params.hide = false;
 				} else {
 					nav_params.hide = true;				
 				}
-				li.data( 'nav_params', nav_params ).trigger( 'update' );
+				eLi.data( 'nav_params', nav_params ).trigger( 'update' );
 				return false;
 			};
 			
 			//
-			var fRemove = function() {
+			var cRemove = function() {
 				
-				var li = $( this ).targetLi();
+				var eLi = $( this ).targetLi();
 				
 				if ( confirm( 'Are you sure you want to remove this item?' ) ) {
-					li.remove();
+					eLi.remove();
 				}
 				
 				return false;
 			};
 			
 			//
-			var fUpdate = function() {
+			var cUpdate = function() {
 				
 				var nav_params = $( this ).data( 'nav_params' );
 				
 				// update the ui
 				$( this ).find( 'span.item_title' ).css(
-					'width', opts.opts.inner_span_width + 'px'
+					'width', '%spx'.printf( oOpts.inner_span_width )
 				).offsetCss(
 					'width', oIndent.getNegativeOffset() * nav_params.indent
 				).find( 'a' ).html( nav_params.label );
@@ -339,11 +376,11 @@
 				$( this ).find( 'div.item_icon' ).removeClass(
 					sTypeCssClasses
 				).addClass(
-					'type-' + nav_params.type
+					'type-%s'.printf( nav_params.type )
 				);
 				
 				$( this ).css(
-					'width', opts.opts.max_width + 'px'
+					'width', '%spx'.printf( oOpts.max_width )
 				).css(
 					'margin-left', '5px'
 				).offsetCss(
@@ -364,23 +401,23 @@
 			
 			
 			// add functionality to a cloned <li>
-			var fSetupLi = function( li, bPartial ) {
+			var cSetupLi = function( eLi, bPartial ) {
 				
 				if ( !bPartial ) {
-					li.find( 'a.indent' ).click( fIndent );
-					li.find( 'a.outdent' ).click( fOutdent );
-					li.find( 'a.remove' ).click( fRemove );				
+					eLi.find( 'a.indent' ).click( cIndent );
+					eLi.find( 'a.outdent' ).click( cOutdent );
+					eLi.find( 'a.remove' ).click( cRemove );				
 				}
 				
-				li.find( 'span.item_title a' ).click( fItemTitle );
-				li.find( 'a.options' ).click( fOptions );
-				li.find( 'a.visibility' ).click( fVisibility );
+				eLi.find( 'span.item_title a' ).click( cItemTitle );
+				eLi.find( 'a.options' ).click( cOptions );
+				eLi.find( 'a.visibility' ).click( cVisibility );
 				
-				li.bind( 'update', fUpdate );
+				eLi.bind( 'update', cUpdate );
 				
-				fTriggerPlugins( 'setup_li', li );
+				cTriggerPlugins( 'setup_li', eLi );
 				
-				return li;
+				return eLi;
 			}
 						
 			//
@@ -405,31 +442,31 @@
 			
 			
 			//// pre-init stuff
-						
+			
 			// populate sortable
 			$.each( aNav, function( i, nav_params ) {
 				
 				nav_params.item_idx = i;
 				nav_params = mergeDefaultParams( nav_params.type, nav_params );
 				
-				var clonedLi = navIfTmpl.clone( true );
+				var eClonedLi = eNavIfTmpl.clone( true );
 				
-				clonedLi.removeClass(
-					'ui-state-highlight ' + opts.opts.template
+				eClonedLi.removeClass(
+					'ui-state-highlight %s'.printf( oOpts.template )
 				).addClass(
 					'ui-state-default'
 				).data(
 					'nav_params', nav_params
 				)
 				
-				fSetupLi( clonedLi );			// add functionality to buttons
+				cSetupLi( eClonedLi );			// add functionality to buttons
 				
-				clonedLi.appendTo( navIfList );
+				eClonedLi.appendTo( eNavIfList );
 				
 			} );
 			
 			// add (partial) functionality to buttons on the template
-			fSetupLi( navIfTmpl, true );
+			cSetupLi( eNavIfTmpl, true );
 			
 			
 			
@@ -437,24 +474,24 @@
 			//// assign functionality to elements
 			
 			//
-			if ( !opts.opts.remove_trash ) {	
-				navIfTrash.sortable( {
+			if ( !oOpts.remove_trash ) {	
+				eNavIfTrash.sortable( {
 					revert: true
 				} );
 			}
 			
 			
 			//
-			if ( !opts.opts.remove_sortable ) {
-				navIfList.sortable( {
+			if ( !oOpts.remove_sortable ) {
+				eNavIfList.sortable( {
 					revert: true,
-					connectWith: navIfTrash,
+					connectWith: eNavIfTrash,
 					remove: function( event, ui ) {
 						
-						var li = ui.item;
+						var eLi = ui.item;
 						
 						if ( confirm( 'Are you sure you want to remove this item?' ) ) {
-							li.remove();
+							eLi.remove();
 						} else {
 							return false;
 						}
@@ -462,30 +499,30 @@
 					update: function( event, ui ) {
 						
 						// prepare the cloned template li
-						var li = ui.item;
+						var eLi = ui.item;
 						
-						if ( li.hasClass( opts.opts.template ) ) li.removeClass( opts.opts.template );
-						if ( !li.data( 'nav_params' ) ) {
+						if ( eLi.hasClass( oOpts.template ) ) eLi.removeClass( oOpts.template );
+						if ( !eLi.data( 'nav_params' ) ) {
 							
-							var tmpl_nav_params = navIfTmpl.data( 'nav_params' );
+							var tmpl_nav_params = eNavIfTmpl.data( 'nav_params' );
 							var nav_params = $.extend( true, {},
 								( tmpl_nav_params ) ?
 									tmpl_nav_params :
 									mergeDefaultParams()
 							);
 							
-							li.data( 'nav_params', nav_params );
+							eLi.data( 'nav_params', nav_params );
 							
-							fSetupLi( li );			// add functionality to buttons
+							cSetupLi( eLi );			// add functionality to buttons
 						}
 					}
 				} );
 			}
 			
 			//
-			if ( !opts.opts.remove_sortable ) {
-				navIfTmpl.draggable( {
-					connectToSortable: navIfList,
+			if ( !oOpts.remove_sortable ) {
+				eNavIfTmpl.draggable( {
+					connectToSortable: eNavIfList,
 					helper: 'clone',
 					revert: 'invalid'
 				} );
@@ -493,17 +530,26 @@
 			
 			
 			//
-			navIf.submit(function() {
+			eNavIf.submit( function() {
 				
 				var aSaveNav = new Array();
 				
-				navIfList.find( 'li' ).each( function( i ) {
+				eNavIfList.find( 'li' ).each( function( i ) {
 					aSaveNav.push( $( this ).data( 'nav_params' ) );
 				} );
 				
-				$( '#' + opts.opts.result_field ).val( $.toJSON( aSaveNav ) );
+				$( '#%s'.printf( oOpts.result_field ) ).val( $.toJSON( aSaveNav ) );
 				
-				return true;
+				$.post(
+					oScript.process,
+					'%s&_service=%s&_action=save_data'.printf( eNavIf.serialize(), oGetParams[ '_service' ] ),
+					function() {
+						window.location = oScript.curpage;
+					},
+					'json'
+				);
+				
+				return false;
 				
 			} );
 	
@@ -511,31 +557,31 @@
 			
 			//// Dialog Stuff ----------------------------------------------------------------------
 						
-			navDlg.dialog( {
+			eNavDlg.dialog( {
 				bgiframe: true,
 				autoOpen: false,
-				height: opts.opts.dialog_height,
-				width: opts.opts.dialog_width,
+				height: oOpts.dialog_height,
+				width: oOpts.dialog_width,
 				modal: true,
 				buttons: {
 					Update: function() {
 						
-						var selectedLi = $( this ).data( 'selected_li' );
-						var nav_params = selectedLi.data( 'nav_params' );
+						var eSelectedLi = $( this ).data( 'selected_li' );
+						var nav_params = eSelectedLi.data( 'nav_params' );
 						
-						nav_params.type = $( this ).find( '#' + opts.opts.prefix + 'type' ).val();
-						nav_params.label = $( this ).find( '#' + opts.opts.prefix + 'label' ).val();
-						nav_params.title = $( this ).find( '#' + opts.opts.prefix + 'title' ).val();
-						nav_params.target = $( this ).find( '#' + opts.opts.prefix + 'target' ).val();
-						nav_params.css_class = $( this ).find( '#' + opts.opts.prefix + 'css_class' ).val();
-						nav_params.inactive = $( this ).find( '#' + opts.opts.prefix + 'inactive' ).attr( 'checked' );
-						nav_params.hide = $( this ).find( '#' + opts.opts.prefix + 'hide' ).attr( 'checked' );
+						nav_params.type = $( this ).find( '#%stype'.printf( sPrefix ) ).val();
+						nav_params.label = $( this ).find( '#%slabel'.printf( sPrefix ) ).val();
+						nav_params.title = $( this ).find( '#%stitle'.printf( sPrefix ) ).val();
+						nav_params.target = $( this ).find( '#%starget'.printf( sPrefix ) ).val();
+						nav_params.css_class = $( this ).find( '#%scss_class'.printf( sPrefix ) ).val();
+						nav_params.inactive = $( this ).find( '#%sinactive'.printf( sPrefix ) ).attr( 'checked' );
+						nav_params.hide = $( this ).find( '#%shide'.printf( sPrefix ) ).attr( 'checked' );
 						
-						selectedLi.trigger( 'pre_update' );
+						eSelectedLi.trigger( 'pre_update' );
 						
-						selectedLi.data( 'nav_params_copy', nav_params );			// set copy so that changes are not reverted
+						eSelectedLi.data( 'nav_params_copy', nav_params );			// set copy so that changes are not reverted
 						
-						selectedLi.trigger( 'update' );
+						eSelectedLi.trigger( 'update' );
 						
 						$( this ).dialog( 'close' );
 						
@@ -548,13 +594,13 @@
 				},
 				open: function() {
 					
-					var selectedLi = $( this ).data( 'selected_li' );
-					var nav_params = selectedLi.data( 'nav_params' );
+					var eSelectedLi = $( this ).data( 'selected_li' );
+					var nav_params = eSelectedLi.data( 'nav_params' );
 					
-					selectedLi.data( 'nav_params_copy' , $.extend( true, {}, nav_params ) );		// make a copy, in case reverting
+					eSelectedLi.data( 'nav_params_copy' , $.extend( true, {}, nav_params ) );		// make a copy, in case reverting
 					
-					if ( !selectedLi.data( 'nav_params_prev' ) ) {
-						selectedLi.data( 'nav_params_prev' , $.extend( true, {}, nav_params ) );
+					if ( !eSelectedLi.data( 'nav_params_prev' ) ) {
+						eSelectedLi.data( 'nav_params_prev' , $.extend( true, {}, nav_params ) );
 					}
 					
 					// trigger reset first then trigger open
@@ -565,27 +611,27 @@
 				close: function() {
 					
 					// revert
-					var selectedLi = $( this ).data( 'selected_li' );
-					var nav_params_copy = selectedLi.data( 'nav_params_copy' );
+					var eSelectedLi = $( this ).data( 'selected_li' );
+					var nav_params_copy = eSelectedLi.data( 'nav_params_copy' );
 					
 					$( this ).trigger( 'close' );
 					
-					selectedLi.data( 'nav_params', nav_params_copy );			// either keep or revert the data
+					eSelectedLi.data( 'nav_params', nav_params_copy );			// either keep or revert the data
 					
 					// more cleanup stuff
-					$( this ).find( '.opt-common label[for=' + opts.opts.prefix + 'label]' ).html( 'Label' );
-					$( this ).find( '.opt-common label[for=' + opts.opts.prefix + 'title]' ).html( 'Title' );
-					$( this ).find( '.opt-common label[for=' + opts.opts.prefix + 'target]' ).html( 'Target' );
-					$( this ).find( '.opt-common label[for=' + opts.opts.prefix + 'css_class]' ).html( 'Class' );
-					$( this ).find( '.opt-common label[for=' + opts.opts.prefix + 'inactive]' ).html( 'Force Inactive' );
-					$( this ).find( '.opt-common label[for=' + opts.opts.prefix + 'hide]' ).html( 'Hide' );
+					$( this ).find( '.opt-common label[for=%slabel]'.printf( sPrefix ) ).html( 'Label' );
+					$( this ).find( '.opt-common label[for=%stitle]'.printf( sPrefix ) ).html( 'Title' );
+					$( this ).find( '.opt-common label[for=%starget]'.printf( sPrefix ) ).html( 'Target' );
+					$( this ).find( '.opt-common label[for=%scss_class]'.printf( sPrefix ) ).html( 'Class' );
+					$( this ).find( '.opt-common label[for=%sinactive]'.printf( sPrefix ) ).html( 'Force Inactive' );
+					$( this ).find( '.opt-common label[for=%shide]'.printf( sPrefix ) ).html( 'Hide' );
 					
 				}
 			} );		
 			
 			
 			//
-			navDlg.bind( 'open', function( evt ) {
+			eNavDlg.bind( 'open', function( evt ) {
 				
 				var nav_params = $( this ).data( 'selected_li' ).data( 'nav_params' );
 				
@@ -595,42 +641,42 @@
 			} );
 			
 			//
-			navDlg.bind( 'reset', function( evt ) {
+			eNavDlg.bind( 'reset', function( evt ) {
 				
 				var nav_params = $( this ).data( 'selected_li' ).data( 'nav_params' );
 				
-				$( this ).find( '#' + opts.opts.prefix + 'type' ).val( nav_params.type );
-				$( this ).find( '#' + opts.opts.prefix + 'label' ).val( ( nav_params.label ) ? nav_params.label : '' );
-				$( this ).find( '#' + opts.opts.prefix + 'title' ).val( ( nav_params.title ) ? nav_params.title : '' );
-				$( this ).find( '#' + opts.opts.prefix + 'target' ).val( ( nav_params.target ) ? nav_params.target : '' );
-				$( this ).find( '#' + opts.opts.prefix + 'css_class' ).val( ( nav_params.css_class ) ? nav_params.css_class : '' );
-				$( this ).find( '#' + opts.opts.prefix + 'inactive' ).attr( 'checked', ( nav_params.inactive ) ? true : false );
-				$( this ).find( '#' + opts.opts.prefix + 'hide' ).attr( 'checked', ( nav_params.hide ) ? true : false );
+				$( this ).find( '#%stype'.printf( sPrefix ) ).val( nav_params.type );
+				$( this ).find( '#%slabel'.printf( sPrefix ) ).val( ( nav_params.label ) ? nav_params.label : '' );
+				$( this ).find( '#%stitle'.printf( sPrefix ) ).val( ( nav_params.title ) ? nav_params.title : '' );
+				$( this ).find( '#%starget'.printf( sPrefix ) ).val( ( nav_params.target ) ? nav_params.target : '' );
+				$( this ).find( '#%scss_class'.printf( sPrefix ) ).val( ( nav_params.css_class ) ? nav_params.css_class : '' );
+				$( this ).find( '#%sinactive'.printf( sPrefix ) ).attr( 'checked', ( nav_params.inactive ) ? true : false );
+				$( this ).find( '#%shide'.printf( sPrefix ) ).attr( 'checked', ( nav_params.hide ) ? true : false );
 				
 			} );
 			
 			//
-			navDlg.find( '#' + opts.opts.prefix + 'type' ).change( function() {
+			eNavDlg.find( '#%stype'.printf( sPrefix ) ).change( function() {
 	
-				var selectedLi = navDlg.data( 'selected_li' );
-				var nav_params = selectedLi.data( 'nav_params' );
+				var eSelectedLi = eNavDlg.data( 'selected_li' );
+				var nav_params = eSelectedLi.data( 'nav_params' );
 				
 				var nav_params_prev = $.extend( true, {}, nav_params );
-				selectedLi.data( 'nav_params_prev', nav_params_prev );
+				eSelectedLi.data( 'nav_params_prev', nav_params_prev );
 				
 				nav_params.type = $( this ).val();
 				
-				if ( selectedLi.parent().hasClass( opts.opts.prefix + 'template' ) ) {
+				if ( eSelectedLi.parent().hasClass( '%stemplate'.printf( sPrefix ) ) ) {
 					iDefaultTypeIdx = nav_params.type;
 				}
 				
 				nav_params = mergeDefaultParams( nav_params.type, nav_params );
 				
-				selectedLi.data( 'nav_params', nav_params );
+				eSelectedLi.data( 'nav_params', nav_params );
 				
 				// trigger type change event, then open event on the dialog
-				navDlg.trigger( 'type_change' );
-				navDlg.trigger( 'open' );
+				eNavDlg.trigger( 'type_change' );
+				eNavDlg.trigger( 'open' );
 				
 			} );
 			
@@ -642,7 +688,7 @@
 				/* /
 				var aSaveNav = new Array();
 				
-				navIfList.find( 'li' ).each(function(i) {
+				eNavIfList.find( 'li' ).each(function(i) {
 					aSaveNav.push( $( this ).data( 'nav_params' ) );
 				} );
 				/* */
@@ -650,15 +696,15 @@
 				// $.sygerDebug( 'aSaveNav', aSaveNav, ' ', 2 );
 				// alert( $.toJSON(aSaveNav) );
 				
-				// $( '#' + opts.opts.result_field ).val( $.toJSON(aSaveNav) );
+				// $( '#%s'.printf( oOpts.result_field ) ).val( $.toJSON(aSaveNav) );
 				
-				// alert( $( '#' + opts.opts.prefix + 'template li' ).html() );
+				// alert( $( '#%stemplate li'.printf( sPrefix ) ).html() );
 				// alert($.debug);
 				
 				// $.sygerDebug( 'aNav', aNav, ' ', 2 );
 				// $.sygerDebug( 'document', document, ' ', 1 );
 				
-				// $.sygerDebug( 'dialog', navDlg.html().htmlEntities() );
+				// $.sygerDebug( 'dialog', eNavDlg.html().htmlEntities() );
 				// $.sygerDebug( 'aManage', aManage, ' ', 2, true );
 				
 			} );
@@ -668,22 +714,22 @@
 			
 			//// Setup -----------------------------------------------------------------------------
 			
-			navIf.find( 'ul, li' ).disableSelection();
+			eNavIf.find( 'ul, li' ).disableSelection();
 			
 			// populate the draggable template
-			navIfTmpl.data( 'nav_params', mergeDefaultParams() );
+			eNavIfTmpl.data( 'nav_params', mergeDefaultParams() );
 			
 			
 			// update loaded nav elems
-			navIfTmpl.trigger( 'update' );
-			navIfList.find( 'li' ).trigger( 'update' );
+			eNavIfTmpl.trigger( 'update' );
+			eNavIfList.find( 'li' ).trigger( 'update' );
 			
-			navDlg.find( '.opt-group' ).hide();
+			eNavDlg.find( '.opt-group' ).hide();
 			
-			fTriggerPlugins( 'setup' );
+			cTriggerPlugins( 'setup' );
 			
 			
-			// navDlg.trigger( 'open' );
+			// eNavDlg.trigger( 'open' );
 			// alert( 'aaa' );
 			
 			// !!! TO DO:
@@ -692,11 +738,15 @@
 			/* /
 			var s = '';
 			$.each( _this.oPlugins, function( i ) {
-				s += i + '; ';
+				s += '%d; '.printf( i );
 			} );
 			alert( s );
 			/* */
 			
+			
+			eNavIf.find( '.gnp_ld' ).hide();
+			eNavIf.find( '.gnp_main' ).css( 'visibility', 'visible' );
+						
 		};
 		
 	};

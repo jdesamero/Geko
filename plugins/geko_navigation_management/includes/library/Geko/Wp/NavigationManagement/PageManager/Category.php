@@ -21,15 +21,26 @@ class Geko_Wp_NavigationManagement_PageManager_Category
 		
 		$aCatsNorm = array();
 		
-		$aParams = array(
-			// 'hide_empty' => FALSE,			// this really has no effect since we're using "use_non_native_query"
-			'use_non_native_query' => TRUE,
-			'any' => TRUE
-		);
+		
+		//// first, get a list of valid taxonomies so we can use it with native get_terms()
+
+		// category types
+		$aCatTypes = array();
+		
+		$aTaxonomies = get_taxonomies( array(), 'objects' );
+		foreach ( $aTaxonomies as $oTx ) {
+			$aCatTypes[ $oTx->name ] = $oTx->labels->singular_name;
+		}		
+		
+		
+		//// second, query all terms
+		
+		$aParams = array( 'taxonomy' => array_keys( $aCatTypes ) );
 		
 		$aParams = apply_filters( 'admin_geko_wp_nav_cat_query_params', $aParams );
 		
 		// normalized categories
+		
 		$aCats = new Geko_Wp_Category_Query( $aParams, FALSE );
 		$aUsedCats = array();
 		
@@ -49,21 +60,18 @@ class Geko_Wp_NavigationManagement_PageManager_Category
 		}
 		
 		
-		// category types
-		$aCatTypes = array();
+		//// lastly, get only used taxonomies
+		$aCatTypesUsed = array();
 		
 		$aTaxonomies = get_taxonomies( array(), 'objects' );
-		foreach ( $aTaxonomies as $oTx ) {
-			$sType = $oTx->name;
-			if ( in_array( $sType, $aUsedCats ) ) {
-				$aCatTypes[ $oTx->name ] = $oTx->labels->singular_name;
-			}
+		foreach ( $aUsedCats as $sType ) {
+			$aCatTypesUsed[ $sType ] = $aCatTypes[ $sType ];
 		}
 		
 		
 		$this->setCatParams( array(
 			'cats_norm' => $aCatsNorm,
-			'cat_types' => $aCatTypes
+			'cat_types' => $aCatTypesUsed
 		) );
 		
 	}

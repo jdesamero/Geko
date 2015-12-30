@@ -266,7 +266,7 @@ class Geko_Navigation_PageManager
 		
 		if ( trim( $sSerializedData ) ) {
 			
-			$aFlatParams = Zend_Json::decode( $sSerializedData );
+			$aFlatParams = Geko_Json::decode( $sSerializedData );
 			
 			if ( is_array( $aFlatParams ) ) {
 
@@ -318,7 +318,8 @@ class Geko_Navigation_PageManager
 				$sPageManagerClass &&
 				Geko_Class::isSubclassOf( $sPageManagerClass, 'Geko_Navigation_PageManager_PluginAbstract' )
 			) {
-				$this->_aPlugins[ $iType ] = new $sPageManagerClass( $iType );
+				
+				$this->_aPlugins[ $iType ] = new $sPageManagerClass( $iType, $aPageType );
 				$this->_aPageManagerTypeHash[ $sPageManagerClass ] = $iType;
 				
 				if ( $aPageType[ 'default' ] ) {
@@ -463,7 +464,7 @@ class Geko_Navigation_PageManager
 	//// javascript
 	
 	//
-	public function _outputInjectJs() {
+	public function getNavData() {
 		
 		$oIterator = new RecursiveIteratorIterator(
 			$this->_oNavContainer,
@@ -475,7 +476,7 @@ class Geko_Navigation_PageManager
 		// create a structure that contains nested nav data
 		
 		$aNav = array();
-		foreach ($oIterator as $oPage) {
+		foreach ( $oIterator as $oPage ) {
 			
 			$sPageClass = get_class( $oPage );
 			
@@ -523,18 +524,9 @@ class Geko_Navigation_PageManager
 			'opts' => $this->prefixParams( $this->_aJsOptions )
 		);
 		
-		?>
 		
-		jQuery( document ).ready( function( $ ) {
-			
-			//
-			$.gekoNavigationPageManager.init(
-				<?php echo Zend_Json::encode( $aParams, FALSE, array( 'enableJsonExprFinder' => TRUE ) ); ?>
-			);
-			
-		} );
-		
-		<?php
+		// output JSON data
+		return $aParams;
 	}
 	
 	
@@ -640,7 +632,7 @@ class Geko_Navigation_PageManager
 	
 	//
 	public function _outputInjectFormTagHtml() {
-		?><form id="##form_id##" method="post" action="##form_action##"><?php
+		?><form id="##form_id##"><?php
 	}
 	
 	//

@@ -37,7 +37,7 @@ class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 		add_filter( 'admin_geko_wp_nav_load_group', array( $this, 'modLoadNavGroup' ), 10, 2 );
 		add_filter( 'admin_geko_wp_nav_save_group', array( $this, 'modSaveNavGroup' ), 10, 2 );
 		
-		add_filter( 'admin_geko_wp_nav_ajax_url', array( $this, 'modAjaxUrl' ) );
+		add_filter( 'admin_geko_wp_nav_get_params', array( $this, 'modGetParams' ) );
 		add_filter( 'admin_geko_wp_nav_configure_page_manager', array( $this, 'modPageManager' ) );
 		add_filter( 'admin_geko_wp_nav_redirect', array( $this, 'modRedirect' ) );
 		
@@ -230,13 +230,13 @@ class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 	}
 	
 	//
-	public function modAjaxUrl( $sAjaxUrl ) {
+	public function modGetParams( $aGetParams ) {
 		
-		if ( $sAjaxUrl && ( $iLangId = $_REQUEST[ $this->sLangQueryVar ] ) ) {
-			$sAjaxUrl .= sprintf( '&%s=%d', $this->sLangQueryVar, $iLangId );
+		if ( $iLangId = $_REQUEST[ $this->sLangQueryVar ] ) {
+			$aGetParams[ $this->sLangQueryVar ] = $iLangId;
 		}
 		
-		return $sAjaxUrl;
+		return $aGetParams;
 	}
 	
 	//
@@ -301,9 +301,9 @@ class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 		
 		$aCodeHash = $this->_oNavMgmt->getCodeHash();
 		foreach ( $aCodeHash as $sKey ) {
-			$aParams = Zend_Json::decode( $this->_oNavMgmt->getOption( $sKey ) );
+			$aParams = Geko_Json::decode( $this->_oNavMgmt->getOption( $sKey ) );
 			$aParamsFmt = $this->getSiblings( $aParams );
-			$this->_oNavMgmt->updateOption( $sKey, Zend_Json::encode( $aParamsFmt ) );
+			$this->_oNavMgmt->updateOption( $sKey, Geko_Json::encode( $aParamsFmt ) );
 		}
 	}
 	
@@ -316,10 +316,10 @@ class Geko_Wp_NavigationManagement_Language extends Geko_Wp_Language_Manage
 		
 		$aCodeHash = $this->_oNavMgmt->getCodeHash();
 		foreach ( $aCodeHash as $sKey ) {
-			$aParams = Zend_Json::decode( $this->_oNavMgmt->getOption( $sKey ) );
+			$aParams = Geko_Json::decode( $this->_oNavMgmt->getOption( $sKey ) );
 			if ( isset( $aParams[ $sDefLangCode ] ) ) {
 				$aParamsFmt = $aParams[ $sDefLangCode ];
-				$this->_oNavMgmt->updateOption( $sKey, Zend_Json::encode( $aParamsFmt ) );
+				$this->_oNavMgmt->updateOption( $sKey, Geko_Json::encode( $aParamsFmt ) );
 			}
 		}
 	}

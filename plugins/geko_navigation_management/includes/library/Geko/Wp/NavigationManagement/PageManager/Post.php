@@ -13,7 +13,7 @@ class Geko_Wp_NavigationManagement_PageManager_Post
 {
 	const TYPE_CAT = 1;
 	const TYPE_AUTH = 2;
-	const TYPE_POST_TYPE = 3;
+	const TYPE_CPT = 3;
 	
 	
 	
@@ -21,6 +21,8 @@ class Geko_Wp_NavigationManagement_PageManager_Post
 	protected $_aPostTypeParams = array();
 	protected $_aCatParams = array();
 	protected $_aAuthorParams = array();
+	protected $_aCptParams = array();
+	
 	
 	
 	//
@@ -35,7 +37,7 @@ class Geko_Wp_NavigationManagement_PageManager_Post
 		$this->setPostTypeParams( array(
 			self::TYPE_CAT => array( 'slug' => 'category', 'title' => 'Category' ),
 			self::TYPE_AUTH => array( 'slug' => 'author', 'title' => 'Author' ),
-			self::TYPE_POST_TYPE => array( 'slug' => 'post_type', 'title' => 'Post Type' )			
+			self::TYPE_CPT => array( 'slug' => 'post_type', 'title' => 'Post Type' )			
 		) );
 		
 		
@@ -66,6 +68,13 @@ class Geko_Wp_NavigationManagement_PageManager_Post
 		
 		$this->setAuthorParams( $aAuthorsNorm );
 		
+		
+		//// custom post types normalized
+		
+		$oCptPlugin = $oPageManager->getPlugin( 'Geko_Wp_NavigationManagement_Page_CustomType' );
+		
+		$this->setCptParams( $oCptPlugin->getCptParams() );
+		
 	}
 
 	//
@@ -86,17 +95,26 @@ class Geko_Wp_NavigationManagement_PageManager_Post
 		return $this;
 	}
 	
+	//
+	public function setCptParams( $aCptParams ) {
+		$this->_aCptParams = $aCptParams;
+		return $this;
+	}
+	
 	
 	
 	//
 	public function getDefaultParams() {
 		
-		$aParams = parent::getDefaultParams();
-		$aParams[ 'post_type_id' ] = key( $this->_aPostTypeParams );
-		$aParams[ 'cat_id' ] = key( $this->_aCatParams );
-		$aParams[ 'author_id' ] = key( $this->_aAuthorParams );
-		$aParams[ 'hide' ] = TRUE;
-		
+		$aParams = array_merge( parent::getDefaultParams(), array(
+			'post_type_id' => key( $this->_aPostTypeParams ),
+			'cat_type' => key( $this->_aCatParams[ 'cat_types' ] ),
+			'cat_id' => key( $this->_aCatParams[ 'cats_norm' ] ),
+			'author_id' => key( $this->_aAuthorParams ),
+			'custom_post_type' => key( $this->_aCptParams ),
+			'hide' => TRUE
+		) );
+				
 		return $aParams;
 	}
 	
@@ -105,10 +123,12 @@ class Geko_Wp_NavigationManagement_PageManager_Post
 	//
 	public function getManagementData() {
 		
-		$aData = parent::getManagementData();
-		$aData[ 'post_types' ] = $this->_aPostTypeParams;
-		$aData[ 'cat_params' ] = $this->_aCatParams;
-		$aData[ 'author_params' ] = $this->_aAuthorParams;
+		$aData = array_merge( parent::getManagementData(), array(
+			'post_types' => $this->_aPostTypeParams,
+			'cat_params' => $this->_aCatParams,
+			'author_params' => $this->_aAuthorParams,
+			'cpt_params' => $this->_aCptParams
+		) );
 		
 		return $aData;
 	}
@@ -141,6 +161,9 @@ class Geko_Wp_NavigationManagement_PageManager_Post
 		
 		<label for="##nvpfx_type##author_id">Active on Matching Author</label>
 		<select name="##nvpfx_type##author_id" id="##nvpfx_type##author_id" class="text ui-widget-content ui-corner-all"></select>
+		
+		<label for="##nvpfx_type##custom_post_type">Active on Matching Custom Post Type</label>
+		<select name="##nvpfx_type##custom_post_type" id="##nvpfx_type##custom_post_type" class="text ui-widget-content ui-corner-all"></select>
 		<?php
 	}
 	

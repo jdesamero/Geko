@@ -134,6 +134,8 @@ class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 			->joinLeft( '##pfx##term_taxonomy', 'tx' )
 				->on( 'tx.term_id = t.term_id' )
 			
+			->joinLeft( $oCountQuery, 'wpthe' )
+				->on( 'wpthe.term_id = t.term_id' )
 		;
 		
 		if ( $sTaxonomy ) {
@@ -244,8 +246,8 @@ class Geko_Wp_Category_Query extends Geko_Wp_Entity_Query
 			
 		}
 		
-		return $oQuery;
 		
+		return $oQuery;
 	}
 	
 	

@@ -78,11 +78,19 @@
 			//
 			if ( this.disable_params ) {
 				
-				var sCatsDrpdwnSel = '#%scat_id'.printf( sTypePfx );
-				eNavDlg.find( sCatsDrpdwnSel ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
+				var sCatTypesDrpdwnSel = '#%scat_type'.printf( sTypePfx );
+				var sCatTypeLabelSel = 'label[for=%scat_type]'.printf( sTypePfx );
 				
+				var sCatsDrpdwnSel = '#%scat_id'.printf( sTypePfx );
 				var sCatsLabelSel = 'label[for=%scat_id]'.printf( sTypePfx );
+				
+				
+				eNavDlg.find( sCatTypesDrpdwnSel ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
+				eNavDlg.find( sCatTypeLabelSel ).css( 'color', 'gray' );
+				
+				eNavDlg.find( sCatsDrpdwnSel ).attr( 'disabled', 'disabled' ).css( 'color', 'gray' );
 				eNavDlg.find( sCatsLabelSel ).css( 'color', 'gray' );
+				
 			}
 			
 		},
@@ -98,7 +106,7 @@
 			var sCatTypesDrpdwnSel = '#%scat_type'.printf( sTypePfx );
 			var sCatsDrpdwnSel = '#%scat_id'.printf( sTypePfx );
 			
-			var oCatParams = _this.cat_params;
+			var oCatParams = this.cat_params;
 			var oCatTypes = oCatParams.cat_types;
 			var oCatsNorm = oCatParams.cats_norm;
 			
@@ -116,7 +124,7 @@
 					'<option value="%d" class="type-%s">%s (%d)</option>'.printf( i, val.type, val.title, i )
 				);
 			} );
-
+			
 			eCatTypesDrpdwn.on( 'change', function() {
 				
 				// trigger open event on the dialog
@@ -165,13 +173,13 @@
 				var iCurCatId = oNavParams.cat_id;
 				
 				eCatsDrpdwn.showSelOpts( '*' );				// get everyone first
-				eCatsDrpdwn.selValue( iCurCatId );
+				eCatsDrpdwn.val( iCurCatId );
 				
 				var eCurOpt = eCatsDrpdwn.find( ':selected' );
 				
 				if ( eCurOpt.length ) {
 					var sCurCatType = eCurOpt.attr( 'class' ).replace( 'type-', '' );
-					eCatTypesDrpdwn.selValue( sCurCatType );
+					eCatTypesDrpdwn.val( sCurCatType );
 				} else {
 					// set default type
 					eCatTypesDrpdwn.find( 'option:first-child' ).attr( 'selected', 'selected' );

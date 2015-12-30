@@ -4,28 +4,28 @@
 class Geko_Wp_NavigationManagement_Page_Page
 	extends Geko_Navigation_Page_ImplicitLabelAbstract
 {
-	protected $_pageId;
+	protected $_iPageId;
 	
 	
 	//// object methods
 	
 	//
-	public function setPageId( $pageId ) {
-		$this->_pageId = $pageId;
+	public function setPageId( $iPageId ) {
+		$this->_iPageId = $iPageId;
 		return $this;
 	}
 	
 	//
 	public function getPageId() {
-		return $this->_pageId;
+		return $this->_iPageId;
 	}
 	
 	//
 	public function getHref() {
 		return apply_filters(
 			sprintf( '%s::page', __METHOD__ ),
-			get_permalink( $this->_pageId ),
-			$this->_pageId,
+			get_permalink( $this->_iPageId ),
+			$this->_iPageId,
 			$this
 		);
 	}
@@ -34,8 +34,8 @@ class Geko_Wp_NavigationManagement_Page_Page
 	public function getImplicitLabel() {
 		return apply_filters(
 			sprintf( '%s::page', __METHOD__ ),
-			get_the_title( $this->_pageId ),
-			$this->_pageId,
+			get_the_title( $this->_iPageId ),
+			$this->_iPageId,
 			$this
 		);
 	}
@@ -45,16 +45,19 @@ class Geko_Wp_NavigationManagement_Page_Page
 	public function toArray() {
 		return array_merge(
 			parent::toArray(),
-			array( 'page_id' => $this->_pageId )
+			array( 'page_id' => $this->_iPageId )
 		);
 	}
 	
 	//
 	public function isCurrentPage() {
+		
+		$iPageId = $this->_iPageId;
+		
 		return apply_filters(
 			sprintf( '%s::page', __METHOD__ ),
-			is_page( $this->_pageId ),
-			$this->_pageId,
+			Geko_String::coalesce( is_page( $iPageId ), is_single( $iPageId ) ),
+			$iPageId,
 			$this
 		);
 	}

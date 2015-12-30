@@ -11,14 +11,18 @@
 abstract class Geko_Navigation_PageManager_PluginAbstract
 {
 	protected $_iIndex;
+	protected $_aParams = array();
 	protected $_aJsOptions = array();
 	
 	
 	//
-	public function __construct( $iIndex = 0 ) {
+	public function __construct( $iIndex = 0, $aParams = array() ) {
 		
-		$this->setIndex( $iIndex );
-		$this->init();
+		$this
+			->setIndex( $iIndex )
+			->setParams( $aParams )
+			->init()
+		;
 	}
 	
 	
@@ -35,11 +39,7 @@ abstract class Geko_Navigation_PageManager_PluginAbstract
 	}
 	
 	
-	//
-	public function getIndex() {
-		return $this->_iIndex;
-	}
-
+	
 	//
 	public function setIndex( $iIndex ) {
 		
@@ -47,6 +47,29 @@ abstract class Geko_Navigation_PageManager_PluginAbstract
 		
 		return $this;
 	}
+	
+	//
+	public function getIndex() {
+		return $this->_iIndex;
+	}
+
+	
+	
+	
+	//
+	public function setParams( $aParams ) {
+		
+		$this->_aParams = $aParams;
+		
+		return $this;		
+	}
+	
+	//
+	public function getParams() {
+		return $this->_aParams;
+	}
+	
+	
 	
 	
 	//

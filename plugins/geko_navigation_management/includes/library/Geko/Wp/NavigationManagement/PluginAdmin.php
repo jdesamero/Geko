@@ -80,6 +80,7 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 					array( 'type' => 'Geko_Wp_NavigationManagement_Page_Home' ),
 					array( 'type' => 'Geko_Wp_NavigationManagement_Page_Page' ),
 					array( 'type' => 'Geko_Wp_NavigationManagement_Page_Category' ),
+					array( 'type' => 'Geko_Wp_NavigationManagement_Page_CustomType' ),
 					array( 'type' => 'Geko_Wp_NavigationManagement_Page_Author' ),
 					array( 'type' => 'Geko_Wp_NavigationManagement_Page_Post' )
 				);
@@ -120,12 +121,10 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 			$aCheck = array();
 			foreach ( $aPageTypes as $aPageType ) {
 				
-				if ( !$aCheck[ $aPageType[ 'type' ] ] ) {
-					$this->_aPageTypes[] = $aPageType;
-					$aCheck[ $aPageType[ 'type' ] ] = TRUE;
-				}
+				$aCheck[ $aPageType[ 'type' ] ] = $aPageType;
 			}
 			
+			$this->_aPageTypes = array_values( $aCheck );
 			
 			
 			// page manager
@@ -153,19 +152,19 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 	}
 	
 	//
-	public function getRedirect() {
+	public function getRedirect( $sOp, $iNavGrpIdx ) {
 		
 		$oUrl = new Geko_Uri( parent::getUrl() );
 		
-		if ( isset( $_POST[ 'nav_group_idx' ] ) ) {
-			$oUrl->setVar( 'grp', $_POST[ 'nav_group_idx' ] );
+		if ( is_int( $iNavGrpIdx ) ) {
+			$oUrl->setVar( 'grp', $iNavGrpIdx );
 		}
 		
-		if ( 'delete' == strtolower( $_POST[ 'ops' ] ) ) {
+		if ( 'delete' == $sOp ) {
 			$oUrl->unsetVar( 'grp' );		
 		}
-
-		if ( 'add' == strtolower( $_POST[ 'ops' ] ) ) {
+		
+		if ( 'add' == $sOp ) {
 			$oUrl->setVar( 'grp', $this->_iAddIndex );		
 		}
 		
@@ -188,19 +187,6 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 		$this->initPageManager();
 		
 		wp_enqueue_style( 'geko-jquery-ui-wp' );
-		
-		wp_enqueue_script( 'geko-jquery-geko_util' );
-		wp_enqueue_script( 'geko-jquery-syger' );
-		
-		wp_enqueue_script( 'geko-jquery-ui-draggable' );
-		wp_enqueue_script( 'geko-jquery-ui-sortable' );
-		wp_enqueue_script( 'geko-jquery-ui-resizable' );
-		wp_enqueue_script( 'geko-jquery-ui-dialog' );
-
-		wp_enqueue_script( 'geko-jquery-fx-core' );
-		wp_enqueue_script( 'geko-jquery-fx-highlight' );
-
-		wp_enqueue_script( 'geko-jquery-bgiframe' );
 		
 		$aPlugins = $this->_oPageManager->getPlugin();
 		foreach ( $aPlugins as $oPlugin ) {
@@ -239,10 +225,13 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 	}
 	
 	//
-	public function outputAjaxJs() {
+	public function getNavData() {
+		
 		$this->outputInit();
-		$this->_oPageManager->outputJs();
+		
+		return $this->_oPageManager->getNavData();
 	}
+	
 	
 	
 	//
@@ -253,71 +242,65 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 		$this->outputInit();
 		
 		$this->_oPageManager->setInjectParam( array(
-			'form_action' => sprintf( '%s/proc.php', $this->getPluginUrl() ),
 			'transparent_img' => sprintf( '%s/styles/img/trans.png', $this->getPluginUrl() ),
 			'loader_img' => sprintf( '%s/styles/img/ajax-loader.gif', $this->getPluginUrl() )
 		) );
 		
-		?>
-			<link type="text/css" href="<?php echo $this->getPluginUrl(); ?>/styles/icons.css" rel="stylesheet" />
-			<style type="text/css">
-				
-				<?php $this->_oPageManager->outputStyle(); ?>
-				
-				.wrap a { text-decoration: none; }
-				.wrap a:hover { text-decoration: underline; }
-				.wrap .settings { width: 100%; }
-				.wrap .settings td { vertical-align: top; }
-				#gnp_lg td { vertical-align: middle; }
-				
-				.wrap div.note { font-style: italic; font-size: 11px; }
-				.wrap .page_types { width: 300px; height: 250px; }
-				
-			</style>
-		<?php
-
+		
+		
+		$aJsonParams = array( 'script' => Geko_Wp::getScriptUrls() );
+		
 		if ( isset( $_GET[ 'grp' ] ) ) {
-			
+
 			$iGrpId = intval( $_GET[ 'grp' ] );
 			
-			$sAjaxUrl = sprintf( '%s/ajax.js.php?grp=%d', $this->getPluginUrl(), $iGrpId );
-			$sAjaxUrl = apply_filters( 'admin_geko_wp_nav_ajax_url', $sAjaxUrl );
+			$aJsonGetParams = array( 'grp' => $iGrpId );
+			$aJsonGetParams = apply_filters( 'admin_geko_wp_nav_get_params', $aJsonGetParams );
 			
-			$aJsonParams = array(
-				'ajax_url' => $sAjaxUrl
-			);
-			
-			?>
-			<script type="text/javascript">
-				
-				jQuery( document ).ready( function( $ ) {
-					
-					var oParams = <?php echo Geko_Json::encode( $aJsonParams ); ?>;
-					
-					$( '#ops_delete' ).click( function () {
-						return confirm( 'Are you sure?' );
-					} );
-					
-					$.getScript(
-						oParams.ajax_url,
-						function () {
-							$( '#gnp_form .gnp_ld' ).hide();
-							$( '#gnp_form .gnp_main' ).css( 'visibility', 'visible' );
-						}
-					);
-					
-				} );
-				
-			</script>
-			<?php
+			$aJsonParams[ 'get_params' ] = $aJsonGetParams;
 		}
 		
+		
 		?>
+			
+		<link type="text/css" href="<?php echo $this->getPluginUrl(); ?>/styles/icons.css" rel="stylesheet" />
+		<style type="text/css">
+			
+			<?php $this->_oPageManager->outputStyle(); ?>
+			
+			.wrap a { text-decoration: none; }
+			.wrap a:hover { text-decoration: underline; }
+			.wrap .settings { width: 100%; }
+			.wrap .settings td { vertical-align: top; }
+			#gnp_lg td { vertical-align: middle; }
+			
+			.wrap div.note { font-style: italic; font-size: 11px; }
+			.wrap .page_types { width: 300px; height: 250px; }
+			
+		</style>
+		
 		<script type="text/javascript">
 			
 			jQuery( document ).ready( function( $ ) {
 				
-				$( '#nav_gs_toggle' ).click( function () {
+				var oParams = <?php echo Geko_Json::encode( $aJsonParams ); ?>;
+				var oGetParams = oParams.get_params;
+				
+				
+				// only do this if a group is selected
+				if ( oGetParams ) {
+					
+					oGetParams[ '_service' ] = 'Geko_Wp_NavigationManagement_Service';
+					oGetParams[ '_action' ] = 'load_data';
+					
+					$.gekoNavigationPageManager.load( oParams );
+				}	
+				
+				
+				
+				//// active all the time
+				
+				$( '#nav_gs_toggle' ).on( 'click', function() {
 					
 					var eToggle = $( this );
 					
@@ -329,11 +312,64 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 						eToggle.addClass( 'exp' ).removeClass( 'ctd' );					
 					}
 					
+					return false;
+				} );				
+				
+				
+				//// nav group form
+				
+				var eNavGrpForm = $( '#geko_manage_nav_group' );
+				
+				eNavGrpForm.submit( function( e ) {
+					
+					return false;
+					
 				} );
-			
+				
+				var cPerformOp = function( sOp ) {
+					
+					$.post(
+						oParams.script.process,
+						'%s&_service=Geko_Wp_NavigationManagement_Service&_action=nav_group&ops=%s'.printf( eNavGrpForm.serialize(), sOp ),
+						function( res ) {
+							window.location = res.redirect;
+						},
+						'json'
+					);
+					
+				};
+				
+				
+				// crud operations
+				
+				if ( oGetParams ) {
+					
+					eNavGrpForm.find( '#ops_delete' ).click( function() {
+						
+						if ( confirm( 'Are you sure?' ) ) {
+							cPerformOp( 'Delete' );
+						}
+						
+						return false;
+					} );
+
+					eNavGrpForm.find( '#ops_edit' ).click( function() {
+						cPerformOp( 'Edit' );
+						return false;
+					} );
+					
+				} else {
+					
+					eNavGrpForm.find( '#ops_add' ).click( function() {
+						cPerformOp( 'Add' );
+						return false;
+					} );					
+				}
+				
 			} );
 			
 		</script>
+		
 		<?php
 		
 		return $this;
@@ -345,10 +381,19 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 		
 		$aNavGroups = Geko_Json::decode( $this->getOption( 'groups' ) );
 		
+		$bHasGroup = FALSE;
+		$iGrpId = NULL;
+		
 		if ( isset( $_GET[ 'grp' ] ) ) {
-			$sCurGroupName = $aNavGroups[ $_GET[ 'grp' ] ][ 'label' ];
-			$sCurGroupCode = $aNavGroups[ $_GET[ 'grp' ] ][ 'code' ];
+			
+			$bHasGroup = TRUE;
+			$iGrpId = intval( $_GET[ 'grp' ] );
+			
+			$sCurGroupName = $aNavGroups[ $iGrpId ][ 'label' ];
+			$sCurGroupCode = $aNavGroups[ $iGrpId ][ 'code' ];
+		
 		} else {
+			
 			$sCurGroupName = '';
 			$sCurGroupCode = '';
 		}
@@ -377,13 +422,13 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 					
 					<br />
 					
-					<?php if ( isset( $_GET[ 'grp' ] ) ): ?>
+					<?php if ( $bHasGroup ): ?>
 						<h3>Edit Navigation Group</h3>
 					<?php else: ?>
 						<h3>Add Navigation Group</h3>
 					<?php endif; ?>
 					
-					<form method="post" action="<?php echo $this->getPluginUrl(); ?>/proc.php">
+					<form id="geko_manage_nav_group">
 						
 						Group Label: <input type="text" id="nav_group_label" name="nav_group_label" value="<?php echo $sCurGroupName; ?>" /><br />
 						Group Code: <input type="text" id="nav_group_code" name="nav_group_code" value="<?php echo $sCurGroupCode; ?>" /><br />
@@ -391,8 +436,8 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 						<br />
 						<br />
 						
-						<?php if ( isset( $_GET[ 'grp' ] ) ): ?>
-							<input type="hidden" id="nav_group_idx" name="nav_group_idx" value="<?php echo intval( $_GET[ 'grp' ] ); ?>" />
+						<?php if ( $bHasGroup ): ?>
+							<input type="hidden" id="nav_group_idx" name="nav_group_idx" value="<?php echo $iGrpId; ?>" />
 							<input type="submit" id="ops_edit" name="ops" value="Edit" /> &nbsp;  
 							<input type="submit" id="ops_delete" name="ops" value="Delete" /> &nbsp;  
 							<a href="<?php echo $this->getUrl(); ?>">Add New</a> 
@@ -404,7 +449,7 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 					
 					<br />
 					
-					<?php if ( isset( $_GET[ 'grp' ] ) ): ?>
+					<?php if ( $bHasGroup ): ?>
 					
 						<h3>Legend</h3>
 						<?php $this->_oPageManager->outputLegendHtml(); ?>
@@ -426,14 +471,18 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 					
 				</td>
 				<td>
-					<?php if ( isset( $_GET[ 'grp' ] ) ): ?>
+					<?php if ( $bHasGroup ): ?>
+						
 						<h3>Editing: <?php echo $sCurGroupName; ?></h3>
+						
 						<?php $this->_oPageManager->outputFormTagHtml(); ?>
 							<?php do_action( 'admin_geko_wp_nav_hidden_fields' ); ?>
-							<input type="hidden" id="nav_group_idx" name="nav_group_idx" value="<?php echo intval( $_GET[ 'grp' ] ); ?>" />
+							<input type="hidden" id="nav_group_idx" name="nav_group_idx" value="<?php echo $iGrpId; ?>" />
 							<?php $this->_oPageManager->outputDragSortHtml(); ?>
 						</form>
+						
 						<?php $this->_oPageManager->outputOptionsFormHtml(); ?>
+					
 					<?php else: ?>
 						Please select a navigation group.
 					<?php endif; ?>
@@ -456,92 +505,99 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 	
 	
 	
+	
+	
 	//
-	public function procSave() {
+	public function saveNavGroup( $sOp, $iNavGrpIdx, $sLabel, $sCode ) {
 		
 		$this->setMenuPlacement( self::MANAGEMENT );
 		
-		$iNavGrpIdx = $_POST[ 'nav_group_idx' ];
 		$sNavGrpIdxPfx = sprintf( 'gp_%d', $iNavGrpIdx );
 		
-		if ( isset( $_POST[ 'nav_group_label' ] ) ) {
+		$aNavGroups = Geko_Json::decode( $this->getOption( 'groups' ) );
+		
+		if ( !is_array( $aNavGroups ) ) {
+			$aNavGroups = array();
+		}
+		
+		$aParams = array(
+			'label' => $sLabel,
+			'code' => $sCode
+		);
+		
+		if ( 'edit' == $sOp ) {
 			
-			if (
-				!is_array( $aNavGroups = Geko_Json::decode( $this->getOption( 'groups' ) ) )
-			) {
-				$aNavGroups = array();
-			}
+			// edit a group entry
+			$aNavGroups[ $iNavGrpIdx ] = $aParams;
+		
+		} elseif ( 'add' == $sOp ) {
 			
-			$aParams = array(
-				'label' => $_POST[ 'nav_group_label' ],
-				'code' => $_POST[ 'nav_group_code' ]
+			// create a group entry
+			$aNavGroups[] = $aParams;
+			
+			// create a default group entry
+			end( $aNavGroups );
+			$iIndex = key( $aNavGroups );
+			
+			$aDefaultEntry = array( array(
+				'type' => 'Geko_Navigation_Page_Uri',
+				'uri' => '/index.php'
+			) );
+			
+			$aDefaultEntry = apply_filters(
+				'admin_geko_wp_nav_new_group',
+				$aDefaultEntry
 			);
 			
-			if ( 'edit' == strtolower( $_POST[ 'ops' ] ) ) {
-				
-				// edit a group entry
-				$aNavGroups[ $iNavGrpIdx ] = $aParams;
-			
-			} elseif ( 'add' == strtolower( $_POST[ 'ops' ] ) ) {
-				
-				// create a group entry
-				$aNavGroups[] = $aParams;
-				
-				// create a default group entry
-				end( $aNavGroups );
-				$iIndex = key( $aNavGroups );
-				
-				$aDefaultEntry = array(array(
-					'type' => 'Geko_Navigation_Page_Uri',
-					'uri' => '/index.php'
-				));
-				
-				$aDefaultEntry = apply_filters(
-					'admin_geko_wp_nav_new_group',
-					$aDefaultEntry
-				);
-				
-				$this->updateOption(
-					sprintf( 'gp_%d', $iIndex ),
-					Geko_Json::encode( $aDefaultEntry )
-				);
-				
-				// so that page re-directs to the newly added nav group
-				$this->_iAddIndex = $iIndex;
-				
-			} elseif ( 'delete' == strtolower( $_POST[ 'ops' ] ) ) {
-				
-				unset( $aNavGroups[ $iNavGrpIdx ] );
-				$this->deleteOption( $sNavGrpIdxPfx );
-				unset( $iNavGrpIdx );
-				
-			}
-			
-			$this->updateOption( 'groups', Geko_Json::encode( $aNavGroups ) );
-			
-		} elseif ( isset( $_POST[ 'serialized_data' ] ) ) {
-			
-			$this->initPageManager();
-			$this->_oPageManager
-				->procSerializedData( stripslashes( $_POST[ 'serialized_data' ] ) )
-			;
-			
-			$aNavParams = Geko_Json::decode( $this->getOption( $sNavGrpIdxPfx ) );
-			$aNavParams = apply_filters(
-				'admin_geko_wp_nav_save_group',
-				$this->_oPageManager->getNavParams(),
-				$aNavParams
+			$this->updateOption(
+				sprintf( 'gp_%d', $iIndex ),
+				Geko_Json::encode( $aDefaultEntry )
 			);
 			
-			$this->updateOption( $sNavGrpIdxPfx, Geko_Json::encode( $aNavParams ) );
+			// so that page re-directs to the newly added nav group
+			$this->_iAddIndex = $iIndex;
+			
+		} elseif ( 'delete' == $sOp ) {
+			
+			unset( $aNavGroups[ $iNavGrpIdx ] );
+			$this->deleteOption( $sNavGrpIdxPfx );
+			unset( $iNavGrpIdx );
 			
 		}
+		
+		$this->updateOption( 'groups', Geko_Json::encode( $aNavGroups ) );
+		
 		
 		// die();
 	}
 	
+	
+	//
+	public function saveNavData( $iNavGrpIdx, $sSerializedData ) {
+
+		$this->setMenuPlacement( self::MANAGEMENT );
+		
+		$sNavGrpIdxPfx = sprintf( 'gp_%d', $iNavGrpIdx );
+		
+		
+		$this->initPageManager();
+		$this->_oPageManager
+			->procSerializedData( $sSerializedData )
+		;
+		
+		$aNavParams = Geko_Json::decode( $this->getOption( $sNavGrpIdxPfx ) );
+		$aNavParams = apply_filters(
+			'admin_geko_wp_nav_save_group',
+			$this->_oPageManager->getNavParams(),
+			$aNavParams
+		);
+		
+		$this->updateOption( $sNavGrpIdxPfx, Geko_Json::encode( $aNavParams ) );
+		
+	}
+	
+	
+	
 }
-
-
 
 

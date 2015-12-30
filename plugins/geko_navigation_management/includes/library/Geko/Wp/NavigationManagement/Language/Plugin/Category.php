@@ -22,12 +22,12 @@ class Geko_Wp_NavigationManagement_Language_Plugin_Category
 		$aCatIds = array();
 		
 		foreach ( $aFlat as $aParam ) {
-			if ( $this->_sNavigationPageClass == $aParam['type'] ) {
-				$aCatIds[] = $aParam['cat_id'];
+			if ( $this->_sNavigationPageClass == $aParam[ 'type' ] ) {
+				$aCatIds[] = $aParam[ 'cat_id' ];
 			}
 		}
 		
-		$aSibParams['filter'][] = array(
+		$aSibParams[ 'filter' ][] = array(
 			'obj_id' => $aCatIds,
 			'type' => 'category'
 		);
@@ -39,9 +39,9 @@ class Geko_Wp_NavigationManagement_Language_Plugin_Category
 	//
 	public function rebuildParams( $aParam, $aSibsFmt, $sLang ) {
 		
-		if ( $this->_sNavigationPageClass == $aParam['type'] ) {
-			if ( $iCatId = $aSibsFmt['category'][ $aParam['cat_id'] ][ $sLang ] ) {
-				$aParam['cat_id'] = $iCatId;
+		if ( $this->_sNavigationPageClass == $aParam[ 'type' ] ) {
+			if ( $iCatId = $aSibsFmt[ 'category' ][ $aParam[ 'cat_id' ] ][ $sLang ] ) {
+				$aParam[ 'cat_id' ] = $iCatId;
 			}
 		}
 		
