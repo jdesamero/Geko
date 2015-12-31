@@ -3,12 +3,14 @@
 //
 class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 {
-	protected $sCurLang = '';
-	protected $sLangQueryVar = 'lang';
+	protected $_sCurLang = '';
+	protected $_sLangQueryVar = 'lang';
 	
-	protected $oLangMgm;
-	protected $sDefaultDomain;
-	protected $iFrontPage = FALSE;
+	protected $_oLangMgm;
+	protected $_iFrontPage = FALSE;
+	
+	protected $_sDefaultDomain = '';
+	protected $_sDefaultLangCode = '';
 	
 	
 	//
@@ -27,10 +29,15 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 			add_filter( 'Geko_Wp::getHomepageId', array( $this, 'getHomepageId' ), 10, 2 );
 			add_filter( 'Geko_Wp::getHomepageUrl', array( $this, 'getHomepageUrl' ), 10, 2 );
 			
-			$this->oLangMgm = Geko_Wp_Language_Manage::getInstance();
+			$oLangMgm = Geko_Wp_Language_Manage::getInstance();
 			
 			$oUrl = new Geko_Uri( Geko_Wp::getUrl( TRUE ) );
-			$this->sDefaultDomain = $oUrl->getHost();
+			
+			
+			$this->_oLangMgm = $oLangMgm;
+			$this->_sDefaultDomain = $oUrl->getHost();
+			$this->_sDefaultLangCode = $oLangMgm->getDefLangCode();
+			
 			
 			$bCalled = TRUE;
 		}
@@ -41,27 +48,37 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 	
 	//
 	public function getLangQueryVar() {
-		return $this->sLangQueryVar;
+		return $this->_sLangQueryVar;
 	}
 	
 	//
-	public function getCurLang( $bAllowReturnEmpty = TRUE ) {
+	public function getCurLang( $bReturnEmptyIfDefault = TRUE ) {
 		
-		// return value is possibly empty (if currently in the default language)
-		if ( $bAllowReturnEmpty ) return $this->sCurLang;
+		$sCurLang = $this->_sCurLang;
+		$sDefLang = $this->_sDefaultLangCode;
+		
+		if ( $bReturnEmptyIfDefault ) {
+			
+			if ( $sCurLang && ( $sCurLang == $sDefLang ) ) {
+				// force empty return
+				return '';
+			}
+			
+			return $sCurLang;
+		}
 		
 		// explicitly return the language code of the default language
-		return Geko_String::coalesce( $this->sCurLang, $this->oLangMgm->getDefLangCode() );
+		return Geko_String::coalesce( $sCurLang, $sDefLang );
 	}
 	
 	//
 	public function resolveAdmin() {
 		
 		if (
-			( $sLangCode = $_REQUEST[ $this->sLangQueryVar ] ) && 
-			( $oLang = $this->oLangMgm->getLanguage( $sLangCode ) )
+			( $sLangCode = $_REQUEST[ $this->_sLangQueryVar ] ) && 
+			( $oLang = $this->_oLangMgm->getLanguage( $sLangCode ) )
 		) {
-			$this->sCurLang = $oLang->getSlug();
+			$this->_sCurLang = $oLang->getSlug();
 		}
 	}
 	
@@ -151,32 +168,36 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 				( $oMember->isValid() ) && 
 				( !$oMember->getLangIsDefault() )
 			) {
-				$this->sCurLang = $sInherentLang = $oMember->getLangCode();
+				$this->_sCurLang = $sInherentLang = $oMember->getLangCode();
 			}
 			
 			// check for query var lang
 			if (
-				( $sLangCode = $_REQUEST[ $this->sLangQueryVar ] ) && 
+				( $sLangCode = $_REQUEST[ $this->_sLangQueryVar ] ) && 
 				( !$sInherentLang )
 			) {
-				$this->sCurLang = $this->oLangMgm->getLanguage( $sLangCode )->getSlug();
+				$this->_sCurLang = $this->_oLangMgm->getLanguage( $sLangCode )->getSlug();
 			}
 			
 			// check domain
-			if ( !$this->sCurLang && !$sInherentLang ) {
-				$oUrl = Geko_Uri::getGlobal();
-				$this->sCurLang = $this->oLangMgm->getLangCodeFromDomain( $oUrl->getHost() );
+			if ( !$this->_sCurLang && !$sInherentLang ) {
+				
+				$sCurHost = Geko_Uri::getGlobal()->getHost();
+				
+				if ( $sCurHost ) {
+					$this->_sCurLang = $this->_oLangMgm->getLangCodeFromDomain( $sCurHost );
+				}
 			}
 			
 			
 			
 			////// resolve entity
 			
-			// if $this->sCurLang is not empty (current language is not default)
+			// if $this->_sCurLang is not empty (current language is not default)
 			// then attempt to resolve it by finding it's siblings
-			if ( $this->sCurLang && ( $this->sCurLang != $sInherentLang ) ) {
+			if ( $this->_sCurLang && ( $this->_sCurLang != $sInherentLang ) ) {
 				
-				$aParams = array( 'lang' => $this->sCurLang );
+				$aParams = array( 'lang' => $this->_sCurLang );
 				
 				if ( $iPageId ) {
 					
@@ -200,7 +221,7 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 							), FALSE );
 							
 							if ( in_array( $iFrontPageId, $aSibs->gatherObjId() ) ) {
-								$this->iFrontPage = $iSiblingId;
+								$this->_iFrontPage = $iSiblingId;
 								$oWpQuery->is_home = 1;
 							}
 						}
@@ -242,9 +263,9 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 	public function resolveUrl( $mUrl, $iLangId ) {
 		
 		$oCurUrl = Geko_Uri::getGlobal();
-		$oLang = $this->oLangMgm->getLanguage( $iLangId );
+		$oLang = $this->_oLangMgm->getLanguage( $iLangId );
 		
-		$sLangDomain = Geko_String::coalesce( $oLang->getDomain(), $this->sDefaultDomain );
+		$sLangDomain = Geko_String::coalesce( $oLang->getDomain(), $this->_sDefaultDomain );
 		
 		if ( $oCurUrl->getHost() != $sLangDomain ) {
 			
@@ -268,7 +289,7 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 	
 	//
 	public function getPageOnFront( $mRet ) {
-		if ( $this->iFrontPage ) return $this->iFrontPage;
+		if ( $this->_iFrontPage ) return $this->_iFrontPage;
 		return $mRet;
 	}
 	
@@ -276,11 +297,11 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 	//
 	public function getHomepageId( $iPageId, $sInvokerClass ) {
 		
-		if ( $this->sCurLang ) {
+		if ( $this->_sCurLang ) {
 			
 			$aParams = array(
 				'sibling_id' => $iPageId,
-				'lang' => $this->sCurLang,
+				'lang' => $this->_sCurLang,
 				'type' => 'post'
 			);
 			
@@ -294,12 +315,12 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 	//
 	public function getHomepageUrl( $sUrl, $sInvokerClass ) {
 		
-		if ( $this->sCurLang ) {
+		if ( $this->_sCurLang ) {
 			
 			$oUrl = new Geko_Uri( $sUrl );
 			
-			if ( 1 !== $this->oLangMgm->getLangDomainCount( $oUrl->getHost() ) ) {
-				$oUrl->setVar( 'lang', $this->sCurLang );
+			if ( 1 !== $this->_oLangMgm->getLangDomainCount( $oUrl->getHost() ) ) {
+				$oUrl->setVar( 'lang', $this->_sCurLang );
 			}
 			
 			return strval( $oUrl );
@@ -313,8 +334,8 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 	
 	//
 	public function echoLangHiddenField() {
-		if ( $this->sCurLang ):
-			?><input name="lang" type="hidden" value="<?php echo $this->sCurLang; ?>" /><?php
+		if ( $this->_sCurLang ):
+			?><input name="lang" type="hidden" value="<?php echo $this->_sCurLang; ?>" /><?php
 		endif;
 	}
 	

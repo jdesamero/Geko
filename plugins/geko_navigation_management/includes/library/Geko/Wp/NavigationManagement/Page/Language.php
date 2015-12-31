@@ -59,7 +59,10 @@ class Geko_Wp_NavigationManagement_Page_Language
 		global $wp_query;
 		
 		if ( $sLang = $this->_sLang ) {
-
+			
+			$sTransUrl = '';					// the translated URL
+			
+			
 			$aParams = array( 'lang' => $sLang );
 			$sEntityClass = '';
 			
@@ -107,14 +110,24 @@ class Geko_Wp_NavigationManagement_Page_Language
 					( $iSiblingId = $oSib->getObjId() )
 				) {
 					$oEntity = new $sEntityClass( $iSiblingId );
-					return $oEntity->getUrl();
+					$sTransUrl = $oEntity->getUrl();
 				}			
 			}
 			
 			
 			// default, set "lang" query var to the current url
-			$oUrl = new Geko_Uri();
-			$oUrl->setVar( 'lang', $sLang );
+			$oUrl = new Geko_Uri( $sTransUrl );
+			
+			if (
+				( $oLang = $this->_oLang ) &&
+				( $sTransDomain = $oLang->getDomain() )
+			) {
+				$oUrl->setHost( $sTransDomain );
+			}
+			
+			if ( !$sTransUrl ) {
+				$oUrl->setVar( 'lang', $sLang );
+			}
 			
 			return strval( $oUrl );		
 		}
