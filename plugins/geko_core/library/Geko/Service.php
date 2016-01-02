@@ -34,6 +34,9 @@ class Geko_Service extends Geko_Singleton_Abstract
 	
 	protected $_aMapMethods = array();
 	
+	// known parameters are "cycleCheck", and "enableJsonExprFinder"
+	protected $_aJsonEncodeParams = array();
+	
 	
 	
 	
@@ -289,9 +292,19 @@ class Geko_Service extends Geko_Singleton_Abstract
 	
 	//
 	public function outputJson() {
-
+		
+		$aParams = $this->_aJsonEncodeParams;
+		
+		$bCycleCheck = FALSE;			// default
+		
+		if ( isset( $aParams[ 'cycleCheck' ] ) ) {
+			$bCycleCheck = $aParams[ 'cycleCheck' ];
+			unset( $aParams[ 'cycleCheck' ] );
+		}
+		
+		
 		// json, default
-		echo Zend_Json::encode( $this->_aAjaxResponse );
+		echo Geko_Json::encode( $this->_aAjaxResponse, $bCycleCheck, $aParams );
 		
 		return $this;
 	}

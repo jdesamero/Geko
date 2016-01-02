@@ -10,8 +10,15 @@
 //
 class Geko_Wp_NavigationManagement_Service extends Geko_Wp_Service
 {
-
-
+	
+	protected $_aJsonEncodeParams = array(
+		'enableJsonExprFinder' => TRUE
+	);
+	
+	
+	
+	
+	
 	//
 	public function processLoadData() {
 		
