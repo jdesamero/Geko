@@ -1,6 +1,6 @@
 <?php
 /*
- * "geko_navigation_management/includes/library/Geko/Wp/NavigationManagement/Integration/Page/Admin.php"
+ * "geko_core/library/Geko/Wp/NavigationManagement/Integration/Page/Admin.php"
  * https://github.com/jdesamero/Geko
  *
  * Copyright (c) 2013 Joel Desamero.
