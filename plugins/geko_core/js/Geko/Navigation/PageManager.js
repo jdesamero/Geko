@@ -390,9 +390,9 @@
 				);
 				
 				if ( nav_params.hide ) {
-					$( this ).find( 'a.visibility img' ).removeClass( 'vbl' ).addClass( 'hdn' );
+					$( this ).find( 'a.visibility' ).removeClass( 'vbl' ).addClass( 'hdn' );
 				} else {
-					$( this ).find( 'a.visibility img' ).removeClass( 'hdn' ).addClass( 'vbl' );
+					$( this ).find( 'a.visibility' ).removeClass( 'hdn' ).addClass( 'vbl' );
 				}
 				
 				$( this ).data( 'nav_params', nav_params );

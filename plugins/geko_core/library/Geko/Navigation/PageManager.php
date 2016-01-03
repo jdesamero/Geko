@@ -70,7 +70,6 @@ class Geko_Navigation_PageManager
 			'dialog_width' => 375,
 			'dialog_height' => 550,
 			
-			'transparent_img' => 'js/img/trans.png',
 			'loader_img' => 'js/img/ajax-loader.gif'
 			
 		);
@@ -538,7 +537,7 @@ class Geko_Navigation_PageManager
 		?>
 		<div class="demo">
 			
-			<div class="##loading##"><img src="##loader_img##" /></div>
+			<div class="##loading##"></div>
 			
 			<div class="##main##">
 				
@@ -548,12 +547,12 @@ class Geko_Navigation_PageManager
 						<li class="ui-state-highlight ##template##">
 							<div class="item_icon"></div><span class="item_title"><a href="#"></a></span>
 							<div class="item_ops">
-								<a href="#" class="outdent" title="Outdent"><img src="##transparent_img##" /></a>
-								<a href="#" class="indent" title="Indent"><img src="##transparent_img##" /></a>
-								<a href="#" class="options" title="Options"><img src="##transparent_img##" /></a>
-								<a href="#" class="remove" title="Remove"><img src="##transparent_img##" /></a>
-								<a href="#" class="link" target="_blank" title="Go to Link"><img src="##transparent_img##" /></a>
-								<a href="#" class="visibility" title="Toggle Visibility"><img class="vbl" src="##transparent_img##" /></a>
+								<a href="#" class="outdent" title="Outdent"></a>
+								<a href="#" class="indent" title="Indent"></a>
+								<a href="#" class="options" title="Options"></a>
+								<a href="#" class="remove" title="Remove"></a>
+								<a href="#" class="link" target="_blank" title="Go to Link"></a>
+								<a href="#" class="visibility" title="Toggle Visibility"></a>
 							</div>
 						</li>
 					</ul>

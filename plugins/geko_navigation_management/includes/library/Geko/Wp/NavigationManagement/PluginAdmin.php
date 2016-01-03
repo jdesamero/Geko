@@ -186,7 +186,7 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 		
 		$this->initPageManager();
 		
-		wp_enqueue_style( 'geko-jquery-ui-wp' );
+		wp_enqueue_style( 'geko_wp_navigationmanagement' );
 		
 		$aPlugins = $this->_oPageManager->getPlugin();
 		foreach ( $aPlugins as $oPlugin ) {
@@ -261,22 +261,11 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 		}
 		
 		
-		?>
-			
-		<link type="text/css" href="<?php echo $this->getPluginUrl(); ?>/styles/icons.css" rel="stylesheet" />
+		?>			
 		<style type="text/css">
 			
 			<?php $this->_oPageManager->outputStyle(); ?>
-			
-			.wrap a { text-decoration: none; }
-			.wrap a:hover { text-decoration: underline; }
-			.wrap .settings { width: 100%; }
-			.wrap .settings td { vertical-align: top; }
-			#gnp_lg td { vertical-align: middle; }
-			
-			.wrap div.note { font-style: italic; font-size: 11px; }
-			.wrap .page_types { width: 300px; height: 250px; }
-			
+						
 		</style>
 		
 		<script type="text/javascript">
@@ -459,7 +448,7 @@ class Geko_Wp_NavigationManagement_PluginAdmin extends Geko_Wp_Plugin_Admin
 						
 					<?php endif; ?>
 					
-					<h3>General Settings <a href="#" id="nav_gs_toggle" class="exp"><img src="<?php echo $this->getPluginUrl(); ?>/styles/img/trans.png" /></a></h3>
+					<h3>General Settings <a href="#" id="nav_gs_toggle" class="exp"></a></h3>
 					
 					<div id="nav_form_div">
 						<?php

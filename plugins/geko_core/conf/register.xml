@@ -412,6 +412,7 @@
 		
 		<!-- Geek Oracle PHP Extensions class-bound styles -->
 		<file id="geko_phpunit" src="##geko_core_uri##/styles/Geko/PhpUnit.css" dependencies="geko-basic" />
+		<file id="geko_wp_navigationmanagement" src="##geko_core_uri##/styles/Geko/Wp/NavigationManagement.css" dependencies="geko-jquery-ui-wp" />
 		
 	</styles>
 	
