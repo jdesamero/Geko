@@ -52,7 +52,8 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 				'setup' => TRUE,
 				'hooks' => TRUE,
 				'gf' => TRUE,
-				'opts.reg' => TRUE
+				'opts.reg' => TRUE,
+				'navmng' => TRUE
 				
 			) )
 			
