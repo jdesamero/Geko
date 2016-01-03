@@ -1,5 +1,6 @@
 <?php
 
+//
 class Geko_Wp_PasswordProtect extends Geko_Wp_Plugin
 {
 	
@@ -7,27 +8,27 @@ class Geko_Wp_PasswordProtect extends Geko_Wp_Plugin
 	
 	protected $_bAddTemplatePages = TRUE;
 	
-	protected $sCustomFormPath = '';
-	protected $bLoginFailed = FALSE;
-	protected $bIsAuth = FALSE;
+	protected $_sCustomFormPath = '';
+	protected $_bLoginFailed = FALSE;
+	protected $_bIsAuth = FALSE;
 	
 	
 	//// accessors
 	
 	//
 	public function setCustomFormPath( $sCustomFormPath ) {
-		$this->sCustomFormPath = $sCustomFormPath;
+		$this->_sCustomFormPath = $sCustomFormPath;
 		return $this;
 	}
 	
 	//
 	public function getLoginFailed() {
-		return $this->bLoginFailed;
+		return $this->_bLoginFailed;
 	}
 	
 	//
 	public function getIsAuth() {
-		return $this->bIsAuth;
+		return $this->_bIsAuth;
 	}
 	
 	
@@ -64,11 +65,11 @@ class Geko_Wp_PasswordProtect extends Geko_Wp_Plugin
 				die();
 				
 			} else {
-				$this->bLoginFailed = $bLoginFailed = TRUE;
+				$this->_bLoginFailed = $bLoginFailed = TRUE;
 			}
 		}
 		
-		if ( $_SESSION[ $sAuthKey ] ) $this->bIsAuth = TRUE;
+		if ( $_SESSION[ $sAuthKey ] ) $this->_bIsAuth = TRUE;
 		
 		//
 		if ( !$_SESSION[ $sAuthKey ] ) {
@@ -77,15 +78,15 @@ class Geko_Wp_PasswordProtect extends Geko_Wp_Plugin
 			
 			if ( $this->getOption( 'use_custom_form' ) ) {
 				
-				if ( $this->sCustomFormPath ) {
-					$sPath = $this->sCustomFormPath;
+				if ( $this->_sCustomFormPath ) {
+					$sPath = $this->_sCustomFormPath;
 				} else {
 					$sPath = sprintf( '%s/page_login.php', TEMPLATEPATH );
 				}
 				
 			} else {
 				
-				$sPath = sprintf( '%s/login_form.php', $this->getPluginDir() );
+				$sPath = sprintf( '%s/PasswordProtect/login_form.php', dirname( __FILE__ ) );
 			}
 			
 			//
