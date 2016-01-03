@@ -1,7 +1,14 @@
 <?php
+/*
+ * "geko_navigation_management/includes/library/Geko/Wp/NavigationManagement/Integration/PageManager/Category.php"
+ * https://github.com/jdesamero/Geko
+ *
+ * Copyright (c) 2013 Joel Desamero.
+ * Licensed under the MIT license.
+ */
 
 //
-class Geko_Wp_Integration_NavigationManagement_PageManager_Category
+class Geko_Wp_NavigationManagement_Integration_PageManager_Category
 	extends Geko_Wp_NavigationManagement_PageManager_Category
 	implements Geko_Integration_Client_SubscriberInterface, Geko_Integration_Service_ActionInterface
 {
