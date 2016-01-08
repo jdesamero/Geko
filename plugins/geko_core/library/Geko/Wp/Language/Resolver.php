@@ -195,7 +195,7 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 			
 			// if $this->_sCurLang is not empty (current language is not default)
 			// then attempt to resolve it by finding it's siblings
-			if ( $this->_sCurLang && ( $this->_sCurLang != $sInherentLang ) ) {
+			if ( $this->_sCurLang && $sInherentLang && ( $this->_sCurLang != $sInherentLang ) ) {
 				
 				$aParams = array( 'lang' => $this->_sCurLang );
 				
