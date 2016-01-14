@@ -86,8 +86,27 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 	public function resolveTheme( $oWpQuery ) {
 		
 		if ( $oWpQuery->is_main_query() ) {
-						
-			////// determine the current language
+			
+			
+			//// determine the current language based on 1) domain, 2) query string
+			
+			$sCurLang = '';
+			
+			// check domain
+			if ( $sCurHost = Geko_Uri::getGlobal()->getHost() ) {
+				$sCurLang = $this->_oLangMgm->getLangCodeFromDomain( $sCurHost );
+			}
+			
+			if (
+				( !$sCurLang ) && 
+				( $mLang = $_REQUEST[ $this->_sLangQueryVar ] )			// $mLang can be id or slug, also sanitizes bogus values
+			) {
+				$sCurLang = $this->_oLangMgm->getLanguage( $mLang )->getSlug();
+			}
+			
+			
+			
+			//// check the inherent lang of the queried object (post, page, category, etc.)
 			
 			$sInherentLang = '';
 			
@@ -106,7 +125,7 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 					'type' => 'post',
 					'obj_id' => $iPageId
 				);
-									
+							
 			} elseif ( is_single() ) {
 				
 				$iPostId = $oWpQuery->query_vars[ 'p' ];
@@ -165,39 +184,28 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 			if (
 				( count( $aParams ) > 0 ) && 
 				( $oMember = Geko_Wp_Language_Member::getOne( $aParams ) ) && 
-				( $oMember->isValid() ) && 
-				( !$oMember->getLangIsDefault() )
+				( $oMember->isValid() )
 			) {
-				$this->_sCurLang = $sInherentLang = $oMember->getLangCode();
+				
+				// !!! $oMember->getLangIsDefault(), old code, do we care ???
+				$sInherentLang = $oMember->getLangCode();
 			}
 			
-			// check for query var lang
-			if (
-				( $sLangCode = $_REQUEST[ $this->_sLangQueryVar ] ) && 
-				( !$sInherentLang )
-			) {
-				$this->_sCurLang = $this->_oLangMgm->getLanguage( $sLangCode )->getSlug();
-			}
-			
-			// check domain
-			if ( !$this->_sCurLang && !$sInherentLang ) {
-				
-				$sCurHost = Geko_Uri::getGlobal()->getHost();
-				
-				if ( $sCurHost ) {
-					$this->_sCurLang = $this->_oLangMgm->getLangCodeFromDomain( $sCurHost );
-				}
+			// if there is no current language, but there is an inherent language
+			// then set current language to inherent lang
+			if ( $sInherentLang && !$sCurLang ) {
+				$sCurLang = $sInherentLang;
 			}
 			
 			
 			
 			////// resolve entity
 			
-			// if $this->_sCurLang is not empty (current language is not default)
-			// then attempt to resolve it by finding it's siblings
-			if ( $this->_sCurLang && $sInherentLang && ( $this->_sCurLang != $sInherentLang ) ) {
+			// if both $sCurLang and $sInherentLang are set, but they don't match
+			// then find sibling of current entity for the current language
+			if ( $sCurLang && $sInherentLang && ( $sCurLang != $sInherentLang ) ) {
 				
-				$aParams = array( 'lang' => $this->_sCurLang );
+				$aParams = array( 'lang' => $sCurLang );
 				
 				if ( $iPageId ) {
 					
@@ -234,9 +242,10 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 					$aParams[ 'sibling_id' ] = $iPageId;
 					
 					if ( $iSiblingId = $this->getSiblingId( $aParams ) ) {
+						
 						$oWpQuery->queried_object = get_page( $iSiblingId );
 						$oWpQuery->queried_object_id = $iSiblingId;
-						$oWpQuery->query_vars[ 'p' ] = $iSiblingId;								// re-route to sibling!!!
+						$oWpQuery->query_vars[ 'p' ] = $iSiblingId;									// re-route to sibling!!!
 					}
 					
 				} elseif ( $iCatId ) {
@@ -245,7 +254,9 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 					$aParams[ 'sibling_id' ] = $iCatId;
 					
 					if ( $iSiblingId = $this->getSiblingId( $aParams ) ) {
+						
 						$oCat = Geko_Wp_Category( $iSiblingId );
+						
 						$oWpQuery->queried_object_id = $iSiblingId;
 						$oWpQuery->query_vars[ 'cat' ] = $iSiblingId;								// re-route to sibling!!!
 						$oWpQuery->query_vars[ 'category_name' ] = $oCat->getSlug();
@@ -253,7 +264,14 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 					}
 					
 				}			
-			}									
+			}
+			
+			
+			// set for easy access later
+			if ( $sCurLang ) {
+				$this->_sCurLang = $sCurLang;
+			}
+			
 		}
 		
 	}
