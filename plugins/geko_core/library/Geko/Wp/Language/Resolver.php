@@ -169,11 +169,11 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 				}
 				
 				$oTx = get_term_by( 'slug', $sTerm, $sTx );
-				$iCatId = $oTx->term_id;
+				$iTxId = $oTx->term_id;
 				
 				$aParams = array(
 					'type' => 'category',
-					'obj_id' => $iCatId
+					'obj_id' => $iTxId
 				);
 				
 			}
@@ -248,22 +248,37 @@ class Geko_Wp_Language_Resolver extends Geko_Wp_Plugin
 						$oWpQuery->query_vars[ 'p' ] = $iSiblingId;									// re-route to sibling!!!
 					}
 					
-				} elseif ( $iCatId ) {
+				} elseif ( $iCatId || $iTxId ) {
 					
 					$aParams[ 'type' ] = 'category';
 					$aParams[ 'sibling_id' ] = $iCatId;
 					
 					if ( $iSiblingId = $this->getSiblingId( $aParams ) ) {
 						
-						$oCat = Geko_Wp_Category( $iSiblingId );
+						$oCat = new Geko_Wp_Category( $iSiblingId );
+						$sCatSlug = $oCat->getSlug();
 						
 						$oWpQuery->queried_object_id = $iSiblingId;
-						$oWpQuery->query_vars[ 'cat' ] = $iSiblingId;								// re-route to sibling!!!
-						$oWpQuery->query_vars[ 'category_name' ] = $oCat->getSlug();
-						$oWpQuery->parse_tax_query( $oWpQuery->query_vars );
+						
+						if ( $iCatId ) {
+							
+							$oWpQuery->query_vars[ 'cat' ] = $iSiblingId;								// re-route to sibling!!!
+							$oWpQuery->query_vars[ 'category_name' ] = $sCatSlug;
+							$oWpQuery->parse_tax_query( $oWpQuery->query_vars );
+							
+						} elseif ( $iTxId ) {
+							
+							$oWpQuery->query[ $sTx ] = $sCatSlug;
+							$oWpQuery->query_vars[ $sTx ] = $sCatSlug;
+							$oWpQuery->parse_tax_query( $oWpQuery->query_vars );
+							
+						}
+						
 					}
 					
-				}			
+				}
+				
+				
 			}
 			
 			
