@@ -169,6 +169,12 @@ class Geko_Wp_Language_Manage extends Geko_Wp_Options_Manage
 				self::$aLangCodeHash[ $sLangSlug ] = $iLangId;
 				self::$aLangDomainHash[ $sLangDomain ] = $iLangId;
 				
+				// take care of www.
+				if ( 0 !== strpos( $sLangDomain, 'www.' ) ) {
+					$sWwwLangDomain = sprintf( 'www.%s', $sLangDomain );
+					self::$aLangDomainHash[ $sWwwLangDomain ] = $iLangId;			
+				}
+				
 				if ( !self::$aLangDomainCount[ $sLangDomain ] ) {
 					self::$aLangDomainCount[ $sLangDomain ] = 1;
 				} else {
