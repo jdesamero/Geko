@@ -202,9 +202,16 @@ class Geko_Entity_Record extends Geko_Delegate
 			$aValues[ 'date_modified' ] = $oDb->getTimestamp();
 		}
 		
-
+		
+		list( $aAllValues, $aValues, $aOtherValues ) = $this->formatInsertValues(
+			[ $aAllValues, $aValues, $aOtherValues ]
+		);
+		
+		
+		
 		// run validation hook
 		$this->throwValidate( $aAllValues );
+		
 		
 		
 		// try-catch any possible database errors
@@ -236,15 +243,19 @@ class Geko_Entity_Record extends Geko_Delegate
 	}
 	
 	//
+	public function formatInsertValues( $aValues ) {
+		return $aValues;
+	}
+	
+	
+	
+	//
 	public function update( $oTable, $aAllValues, $aValues, $aOtherValues, $aWhere ) {
 		
 		$oDb = Geko::get( 'db' );
 		
 		$sTableName = $oTable->getTableName();
-		
-		// run validation hook
-		$this->throwValidate( $aAllValues, 'update' );
-		
+				
 		
 		// implement some "auto" functionality
 		
@@ -255,6 +266,15 @@ class Geko_Entity_Record extends Geko_Delegate
 		if ( $oTable->hasField( 'date_modified' ) ) {
 			$aValues[ 'date_modified' ] = $oDb->getTimestamp();
 		}
+		
+		
+		list( $aAllValues, $aValues, $aOtherValues ) = $this->formatUpdateValues(
+			[ $aAllValues, $aValues, $aOtherValues ]
+		);
+
+		
+		// run validation hook
+		$this->throwValidate( $aAllValues, 'update' );
 		
 		
 		
@@ -276,6 +296,13 @@ class Geko_Entity_Record extends Geko_Delegate
 		}
 		
 	}
+	
+	//
+	public function formatUpdateValues( $aValues ) {
+		return $aValues;
+	}
+	
+	
 	
 	//
 	public function delete( $oTable, $aWhere ) {
