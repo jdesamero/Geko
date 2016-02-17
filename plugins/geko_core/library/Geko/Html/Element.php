@@ -324,6 +324,15 @@ class Geko_Html_Element
 	
 	
 	
+	
+	//
+	public function output() {
+		echo strval( $this );
+	}
+	
+	
+	
+	
 	//// magic methods
 	
 	// output the completed query

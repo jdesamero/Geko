@@ -281,8 +281,21 @@ class Geko_Html_Widget
 	
 	//
 	public function output() {
-		echo strval( $this->get() );
+		echo strval( $this );
 	}
+	
+	
+	
+	
+	
+	//// magic methods
+	
+	// output the completed query
+	public function __toString() {
+		
+		return strval( $this->get() );
+	}
+	
 	
 }
 

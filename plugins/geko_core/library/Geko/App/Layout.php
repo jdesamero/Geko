@@ -14,11 +14,9 @@ class Geko_App_Layout extends Geko_Layout
 	//
 	public function echoHead() {
 		
-		$oThis = $this;
-		
-		Geko_Once::run( __METHOD__, function() use ( $oThis ) {
-
-			$oThis
+		Geko_Once::run( __METHOD__, function() {
+			
+			$this
 				->renderStyleTags()
 				->renderScriptTags()
 			;
