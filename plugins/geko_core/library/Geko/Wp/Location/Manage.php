@@ -1134,10 +1134,20 @@ class Geko_Wp_Location_Manage extends Geko_Wp_Options_Manage
 		}
 		
 		// return bounds
-		return array(
-			array( $fMinLat, $fMinLng ),		// southwest bounds
-			array( $fMaxLat, $fMaxLng )			// northeast bounds
-		);
+		if (
+			( NULL !== $fMinLat ) && 
+			( NULL !== $fMaxLat ) && 
+			( NULL !== $fMinLng ) && 
+			( NULL !== $fMaxLng )
+		) {
+
+			return array(
+				array( $fMinLat, $fMinLng ),		// southwest bounds
+				array( $fMaxLat, $fMaxLng )			// northeast bounds
+			);		
+		}
+		
+		return NULL;
 	}
 	
 	

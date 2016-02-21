@@ -897,13 +897,18 @@ class Geko_Sql_Select
 	
 	
 	//
-	public function evaluateExpressionPair( $aExpressionPair ) {
+	public function evaluateExpressionPair() {
 		
 		$aArgs = func_get_args();
 		
 		if ( ( count( $aArgs ) == 1 ) && ( is_array( $aArgs[ 0 ] ) ) ) {
+			
+			// expression and args contained in an array
 			list( $sExpression, $mArgs ) = $aArgs[ 0 ];
+		
 		} elseif ( ( count( $aArgs ) == 2 ) && ( is_string( $aArgs[ 0 ] ) ) ) {
+			
+			// expression and args are separate arguments
 			$sExpression = $aArgs[ 0 ];
 			$mArgs = $aArgs[ 1 ];
 		}
