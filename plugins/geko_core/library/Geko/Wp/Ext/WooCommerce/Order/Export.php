@@ -3,8 +3,11 @@
 //
 class Geko_Wp_Ext_WooCommerce_Order_Export extends Geko_Wp_Entity_ExportExcelHelper
 {
+	
 	protected $_sExportedFileName = 'orders_##date##.xls';
-	protected $_sWorksheetName = 'Users All';
+	protected $_sWorksheetName = 'Orders';
+	
+	
 	
 	//
 	public function __construct( $aParams = array() ) {
