@@ -378,9 +378,25 @@ class Geko_Sql_Select
 	//
 	public function fieldKvp( $mValue, $sKey = NULL ) {
 		
+		$sFieldKey = '';
+		$sJoinKey = '';
+		
+		// see if there is a join key override, denoted by ":"
+		if ( FALSE !== strpos( $sKey, ':' ) ) {
+			
+			// field key and join key are different
+			list( $sFieldKey, $sJoinKey ) = explode( ':', $sKey );
+			
+		} else {
+			
+			// field key and join key are the same
+			$sFieldKey = $sKey;
+			$sJoinKey = $sKey;
+		}
+		
 		return $this
-			->field( $mValue, $sKey, self::KVP )
-			->join( $mValue, $sKey, 'KVP', self::KVP )			// invoke a kvp join
+			->field( $mValue, $sFieldKey, self::KVP )
+			->join( $mValue, $sJoinKey, 'KVP', self::KVP )			// invoke a kvp join
 		;
 	}
 	
