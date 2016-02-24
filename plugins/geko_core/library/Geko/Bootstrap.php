@@ -432,6 +432,37 @@ class Geko_Bootstrap extends Geko_Singleton_Abstract
 	
 	//// components
 	
+	
+	// file path/url configuration
+	// independent
+	public function compPath( $aArgs ) {
+		
+		// register global urls to services
+		
+		if ( defined( 'GEKO_CORE_URI' ) ) {
+			
+			Geko_Uri::setUrl( array(
+				'geko_export' => sprintf( '%s/srv/export.php', GEKO_CORE_URI ),
+				'geko_gmap_overlay' => sprintf( '%s/srv/gmap_overlay.php', GEKO_CORE_URI ),
+				'geko_pdf' => sprintf( '%s/srv/pdf.php', GEKO_CORE_URI ),
+				'geko_process' => sprintf( '%s/srv/process.php', GEKO_CORE_URI ),
+				'geko_scss' => sprintf( '%s/srv/scss.php', GEKO_CORE_URI ),
+				'geko_thumb' => sprintf( '%s/srv/thumb.php', GEKO_CORE_URI ),
+				'geko_upload' => sprintf( '%s/srv/upload.php', GEKO_CORE_URI ),
+				'geko_styles' => sprintf( '%s/styles', GEKO_CORE_URI ),
+				'geko_ext' => sprintf( '%s/external', GEKO_CORE_URI ),
+				'geko_ext_images' => sprintf( '%s/external/images', GEKO_CORE_URI ),
+				'geko_ext_styles' => sprintf( '%s/external/styles', GEKO_CORE_URI ),
+				'geko_ext_swf' => sprintf( '%s/external/swf', GEKO_CORE_URI )
+			) );
+		
+		}
+		
+	}
+
+	
+	
+	
 	// error handler/reporting
 	public function compError( $aArgs ) {
 		

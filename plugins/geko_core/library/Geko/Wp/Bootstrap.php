@@ -130,25 +130,9 @@ class Geko_Wp_Bootstrap extends Geko_Bootstrap
 			'wp_user_edit' => sprintf( '%s/wp-admin/user-edit.php', Geko_Wp::getUrl() )
 		) );
 		
-		 
-		if ( defined( 'GEKO_CORE_URI' ) ) {
-			
-			Geko_Uri::setUrl( array(
-				'geko_export' => sprintf( '%s/srv/export.php', GEKO_CORE_URI ),
-				'geko_gmap_overlay' => sprintf( '%s/srv/gmap_overlay.php', GEKO_CORE_URI ),
-				'geko_pdf' => sprintf( '%s/srv/pdf.php', GEKO_CORE_URI ),
-				'geko_process' => sprintf( '%s/srv/process.php', GEKO_CORE_URI ),
-				'geko_scss' => sprintf( '%s/srv/scss.php', GEKO_CORE_URI ),
-				'geko_thumb' => sprintf( '%s/srv/thumb.php', GEKO_CORE_URI ),
-				'geko_upload' => sprintf( '%s/srv/upload.php', GEKO_CORE_URI ),
-				'geko_styles' => sprintf( '%s/styles', GEKO_CORE_URI ),
-				'geko_ext' => sprintf( '%s/external', GEKO_CORE_URI ),
-				'geko_ext_images' => sprintf( '%s/external/images', GEKO_CORE_URI ),
-				'geko_ext_styles' => sprintf( '%s/external/styles', GEKO_CORE_URI ),
-				'geko_ext_swf' => sprintf( '%s/external/swf', GEKO_CORE_URI )
-			) );
-			
-		}
+		
+		parent::compPath( $aArgs ); 
+		
 		
 		// image thumbnailer
 		if ( defined( 'GEKO_IMAGE_THUMB_CACHE_DIR' ) ) {

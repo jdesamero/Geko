@@ -78,21 +78,14 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 	// independent
 	public function compPath( $aArgs ) {
 		
+		parent::compPath( $aArgs );
+		
+		
 		// register global urls to services
 		
-		if ( defined( 'GEKO_CORE_URI' ) ) {
+		if ( defined( 'GEKO_STANDALONE_URL' ) ) {
 			
 			Geko_Uri::setUrl( array(
-				'geko_export' => sprintf( '%s/srv/export.php', GEKO_CORE_URI ),
-				'geko_gmap_overlay' => sprintf( '%s/srv/gmap_overlay.php', GEKO_CORE_URI ),
-				'geko_pdf' => sprintf( '%s/srv/pdf.php', GEKO_CORE_URI ),
-				'geko_process' => sprintf( '%s/srv/process.php', GEKO_CORE_URI ),
-				'geko_scss' => sprintf( '%s/srv/scss.php', GEKO_CORE_URI ),
-				'geko_thumb' => sprintf( '%s/srv/thumb.php', GEKO_CORE_URI ),
-				'geko_upload' => sprintf( '%s/srv/upload.php', GEKO_CORE_URI ),
-				'geko_styles' => sprintf( '%s/styles', GEKO_CORE_URI ),
-				'geko_ext_styles' => sprintf( '%s/external/styles', GEKO_CORE_URI ),
-				'geko_ext_swf' => sprintf( '%s/external/swf', GEKO_CORE_URI ),
 				'geko_app_srv' => sprintf( '%s/srv', GEKO_STANDALONE_URL )
 			) );
 		

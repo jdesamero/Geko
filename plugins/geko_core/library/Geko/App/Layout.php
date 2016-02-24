@@ -47,6 +47,15 @@ class Geko_App_Layout extends Geko_Layout
 	}
 	
 	
+	//
+	public function getScriptUrls( $aOther = NULL ) {
+		
+		$aOther = parent::getScriptUrls( $aOther );
+		
+		return Geko_App::getScriptUrls( $aOther );
+	}
+	
+	
 	
 }
 

@@ -528,6 +528,9 @@ class Geko_Wp extends Geko
 	//
 	public static function getScriptUrls( $aOther = NULL ) {
 		
+		$aOther = parent::getScriptUrls( $aOther );
+		
+		
 		$oUrl = Geko_Uri::getGlobal();
 		
 		$sPluginDir = sprintf( '%s/wp-content/plugins', self::getUrl() );

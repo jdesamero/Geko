@@ -70,6 +70,14 @@ class Geko
 	}
 	
 	
+	//
+	public static function getScriptUrls( $aOther = NULL ) {
+		
+		// do nothing for now
+		return $aOther;
+	}
+	
+	
 }
 
 
