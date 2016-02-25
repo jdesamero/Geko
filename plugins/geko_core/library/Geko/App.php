@@ -13,7 +13,7 @@ class Geko_App extends Geko
 	
 	
 	//
-	public function getScriptUrls( $aOther = NULL ) {
+	public static function getScriptUrls( $aOther = NULL ) {
 		
 		$aOther = parent::getScriptUrls( $aOther );
 		
