@@ -20,6 +20,7 @@ abstract class Geko_Entity implements Geko_Json_Encodable
 	
 	protected $_sEntityClass = '';
 	protected $_sQueryClass = '';
+	protected $_sRecordClass = '';
 	protected $_sRewriteClass = '';
 	protected $_sManageClass = '';
 	protected $_sMetaClass = '';
@@ -73,6 +74,10 @@ abstract class Geko_Entity implements Geko_Json_Encodable
 		
 		$this->_sQueryClass = Geko_Class::resolveRelatedClass(
 			$this->_sEntityClass, '', '_Query', $this->_sQueryClass
+		);
+		
+		$this->_sRecordClass = Geko_Class::resolveRelatedClass(
+			$this->_sEntityClass, '', '_Record', $this->_sRecordClass
 		);
 		
 		$this->_sRewriteClass = Geko_Class::resolveRelatedClass(
@@ -176,6 +181,11 @@ abstract class Geko_Entity implements Geko_Json_Encodable
 	
 	// implement by sub-class to call setEntityMapping()
 	public function init() {
+		
+		if ( $this->_sRecordClass ) {
+			$this->addDelegate( $this->_sRecordClass );
+		}
+		
 		return $this;
 	}
 	

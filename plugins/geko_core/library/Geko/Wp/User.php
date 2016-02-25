@@ -46,7 +46,6 @@ class Geko_Wp_User extends Geko_Wp_Entity
 		parent::init();
 		
 		$this
-			->addDelegate( 'Geko_Wp_User_Record' )
 			->setEntityMapping( 'Geko_Wp_User_EntityMap' )
 		;
 		

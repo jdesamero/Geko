@@ -46,11 +46,6 @@ class Geko_Wp_Post_ExpirationDate extends Geko_Wp_Options
 	
 	
 	//
-	public function initEntity( $oPost ) {
-		$oPost->addDelegate( 'Geko_Wp_Post_ExpirationDate_Delegate' );
-	}
-	
-	//
 	public function initQuery( $oQuery ) {
 		$oQuery->addPlugin( 'Geko_Wp_Post_ExpirationDate_QueryPlugin' );
 	}

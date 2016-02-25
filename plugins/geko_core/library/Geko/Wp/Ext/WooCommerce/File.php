@@ -15,7 +15,6 @@ class Geko_Wp_Ext_WooCommerce_File extends Geko_Wp_Entity
 		parent::init();
 		
 		$this
-			->addDelegate( 'Geko_Wp_Ext_WooCommerce_File_Record' )
 			->setEntityMapping( 'id', 'file_id' )
 			->setEntityMapping( 'slug', 'file_key' )
 		;
