@@ -304,7 +304,6 @@
 		<file id="geko" src="##geko_core_uri##/js/Geko.js" dependencies="jquery" />
 		
 		<file id="geko_navigation_pagemanager" src="##geko_core_uri##/js/Geko/Navigation/PageManager.js" dependencies="geko-string_format geko-jquery-geko_util geko-jquery-syger geko-jquery-ui-draggable geko-jquery-ui-sortable geko-jquery-ui-resizable geko-jquery-ui-dialog geko-jquery-fx-core geko-jquery-fx-highlight geko-jquery-bgiframe" />
-		<file id="geko_navigation_pagemanager_custom" src="##geko_core_uri##/js/Geko/Navigation/PageManager/Custom.js" dependencies="geko_navigation_pagemanager" />
 		<file id="geko_navigation_pagemanager_uri" src="##geko_core_uri##/js/Geko/Navigation/PageManager/Uri.js" dependencies="geko_navigation_pagemanager" />
 		<file id="geko_navigation_pagemanager_implicitlabelabstract" src="##geko_core_uri##/js/Geko/Navigation/PageManager/ImplicitLabelAbstract.js" dependencies="geko_navigation_pagemanager" />
 		
@@ -348,6 +347,7 @@
 		<file id="geko_wp_navigationmanagement_pagemanager_admin" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/Admin.js" dependencies="geko_navigation_pagemanager_uri" />
 		<file id="geko_wp_navigationmanagement_pagemanager_author" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/Author.js" dependencies="geko_navigation_pagemanager_implicitlabelabstract" />
 		<file id="geko_wp_navigationmanagement_pagemanager_category" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/Category.js" dependencies="geko_navigation_pagemanager_implicitlabelabstract" />
+		<file id="geko_wp_navigationmanagement_pagemanager_custom" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/Custom.js" dependencies="geko_navigation_pagemanager_implicitlabelabstract" />
 		<file id="geko_wp_navigationmanagement_pagemanager_customtype" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/CustomType.js" dependencies="geko_navigation_pagemanager_implicitlabelabstract" />
 		<file id="geko_wp_navigationmanagement_pagemanager_home" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/Home.js" dependencies="geko_navigation_pagemanager_implicitlabelabstract" />
 		<file id="geko_wp_navigationmanagement_pagemanager_language" src="##geko_core_uri##/js/Geko/Wp/NavigationManagement/PageManager/Language.js" dependencies="geko_navigation_pagemanager_implicitlabelabstract" />

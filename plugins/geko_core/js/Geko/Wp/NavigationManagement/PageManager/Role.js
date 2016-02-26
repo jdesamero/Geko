@@ -105,7 +105,7 @@
 				var oNavParams = eDlg.data( 'selected_li' ).data( 'nav_params' );
 				var iCurRoleId = oNavParams.role_id;
 				
-				eDlg.find( sRoleDrpdwnSel ).selValue( iCurRoleId );
+				eDlg.find( sRoleDrpdwnSel ).val( iCurRoleId );
 				
 			} );
 						

@@ -1,6 +1,7 @@
 <?php
 
-class Geko_Navigation_Page_Custom
+//
+class Geko_Wp_NavigationManagement_Page_Custom
 	extends Geko_Navigation_Page_ImplicitLabelAbstract
 {
 

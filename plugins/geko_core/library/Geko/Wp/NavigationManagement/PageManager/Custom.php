@@ -1,7 +1,7 @@
 <?php
 
 //
-class Geko_Navigation_PageManager_Custom
+class Geko_Wp_NavigationManagement_PageManager_Custom
 	extends Geko_Navigation_PageManager_ImplicitLabelAbstract
 {	
 	
@@ -28,7 +28,7 @@ class Geko_Navigation_PageManager_Custom
 	
 	//
     public static function getDescription() {
-    	return 'Custom Navigation Item';
+    	return 'Wordpress Custom';
     }
 
 }
