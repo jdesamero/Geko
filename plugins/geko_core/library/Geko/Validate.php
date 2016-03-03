@@ -14,22 +14,22 @@ class Geko_Validate
 {
 
 	//
-	public function email( $sEmail ) {
+	public static function email( $sEmail ) {
 		return preg_match( '/^[a-z0-9\._-]+@([a-z0-9_-]+\.)+[a-z]{2,6}$/i', $sEmail );
 	}
 	
 	//
-	public function emptyMd5( $sMd5Hash ) {
+	public static function emptyMd5( $sMd5Hash ) {
 		return ( 'd41d8cd98f00b204e9800998ecf8427e' == $sMd5Hash ) ? TRUE : FALSE ;
 	}
 	
 	//
-	public function md5( $sMd5Hash ) {
+	public static function md5( $sMd5Hash ) {
 		return preg_match( '/^[a-f0-9]{32}$/i', $sMd5Hash );
 	}
 	
 	//
-	public function duplicateDbValues( $mTable, $mField, $mValue ) {
+	public static function duplicateDbValues( $mTable, $mField, $mValue ) {
 		
 		$oDb = Geko::get( 'db' );
 		
