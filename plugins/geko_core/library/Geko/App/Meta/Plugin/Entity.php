@@ -32,7 +32,7 @@ class Geko_App_Meta_Plugin_Entity extends Geko_Entity_Plugin
 			$sEntityTypeSlug = $oPrimaryTable->getNoPrefixTableName();
 			
 			$aKeys = Geko_App_Meta_Key::getKeys( $sEntityTypeSlug );
-						
+			
 			//
 			$oEntity
 				->setData( 'meta', $aMeta )

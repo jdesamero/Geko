@@ -1,6 +1,6 @@
 <?php
 /*
- * "geko_core/library/Geko/App/Entity/MetaKey/Manage.php"
+ * "geko_core/library/Geko/App/Meta/Key/Record.php"
  * https://github.com/jdesamero/Geko
  *
  * Copyright (c) 2013 Joel Desamero.
@@ -10,7 +10,7 @@
  */
 
 //
-class Geko_App_Entity_MetaKey_Record extends Geko_Entity_Record
+class Geko_App_Meta_Key_Record extends Geko_Entity_Record
 {
 
 	
