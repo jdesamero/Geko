@@ -31,7 +31,7 @@ class Geko_App_Meta_Plugin_Entity extends Geko_Entity_Plugin
 			// the entity type slug is same as the table name, minus the prefix
 			$sEntityTypeSlug = $oPrimaryTable->getNoPrefixTableName();
 			
-			$aKeys = Geko_App_Meta_Key::getKeys( $sEntityTypeSlug );
+			$aKeys = Geko_App_Meta_Key::getKeys( $sEntityTypeSlug, TRUE );
 			
 			//
 			$oEntity

@@ -20,17 +20,29 @@ class Geko_App_Meta_Key extends Geko_App_Entity
 	
 	//// static methods
 	
-	//
-	public static function getKeys( $mEntityType ) {
+	// $bForceTypeId if set to TRUE, it will force the creation of $iRelTypeId if it does not exist
+	public static function getKeys( $mEntityType, $bForceTypeId = FALSE ) {
 		
 		if ( NULL === self::$aKeys ) {
 			self::$aKeys = new Geko_App_Meta_Key_Query( array(), FALSE );
 		}
 		
-		if ( $iRelTypeId = Geko_App_Entity_Type::_assertId( $mEntityType ) ) {
+		$iRelTypeId = Geko_App_Entity_Type::_assertId( $mEntityType );
+		
+		if ( !$iRelTypeId && $bForceTypeId ) {
+			
+			// is is assumed that $mEntityType is a string, or more importantly
+			// it should be the value of $oSomeDbTable->getNoPrefixTableName()
+			// which is an instance of Geko_Sql_Table
+			
+			$iRelTypeId = Geko_App_Entity_Type::_createEntityType( $mEntityType );
+		}
+		
+		if ( $iRelTypeId ) {
 			return self::$aKeys->subsetRelTypeId( $iRelTypeId );
 		}
 		
+		return NULL;
 	}
 	
 	//
@@ -60,6 +72,7 @@ class Geko_App_Meta_Key extends Geko_App_Entity
 			return $oMetaKey;
 		}
 		
+		return NULL;
 	}
 	
 	

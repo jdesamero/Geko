@@ -23,12 +23,23 @@ class Geko_App_Entity_Type extends Geko_App_Entity
 			$aTypes = new Geko_App_Entity_Type_Query( array(), FALSE );
 			
 			foreach ( $aTypes as $oType ) {
-				self::$aIdSlugHash[ $oType->getId() ] = $oType->getSlug();
-				self::$aSlugIdHash[ $oType->getSlug() ] = $oType->getId();
+				
+				self::_createHashEntries( $oType->getId(), $oType->getSlug() );
 			}
+			
 		}
 		
 	}
+	
+	
+	
+	//
+	public static function _createHashEntries( $iTypeId, $sTypeSlug ) {
+
+		self::$aIdSlugHash[ $iTypeId ] = $sTypeSlug;
+		self::$aSlugIdHash[ $sTypeSlug ] = $iTypeId;	
+	}
+	
 	
 	//
 	public static function _getId( $sSlug ) {
@@ -59,6 +70,34 @@ class Geko_App_Entity_Type extends Geko_App_Entity
 	}
 	
 	
+	//
+	public static function _createEntityType( $sEntityTypeSlug ) {
+		
+		// From: Geko_App_Meta_Plugin_Record::constructEnd
+		// the entity type slug is same as the table name, minus the prefix
+		
+		$sName = ucwords( str_replace( '_', ' ', $sEntityTypeSlug ) );
+		
+		$oEntityType = new Geko_App_Entity_Type();
+		
+		$oEntityType
+			
+			->setName( $sName )
+			->setSlug( $sEntityTypeSlug )
+			
+			->save()
+		;
+		
+		$iEntityTypeId = $oEntityType->getId();
+		
+		// update the hash
+		self::_createHashEntries( $iEntityTypeId, $sEntityTypeSlug );
+		
+		return $iEntityTypeId;
+	}
+	
+	
 }
+
 
 
