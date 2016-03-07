@@ -275,7 +275,9 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 		
 		$oRouter = new $sRouterClass( GEKO_STANDALONE_URL );
 		
-		$this->set( 'router', $oRouter );	
+		$this->set( 'router', $oRouter );
+		$this->set( 'router.path', $oRouter->getPath() );
+		
 	}
 	
 	

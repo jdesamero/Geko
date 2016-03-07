@@ -7,7 +7,6 @@ class Geko_Router_Route_Layout extends Geko_Router_Route
 	protected $_aSkip = array( 'Aux' );
 	
 	protected $_sBestMatch = '';
-	protected $_aLeftovers = array();
 	
 	protected $_sDefaultLayout = '';
 	protected $_sNotFoundLayout = '';
@@ -42,31 +41,41 @@ class Geko_Router_Route_Layout extends Geko_Router_Route
 	
 	//
 	public function setPrefixes( $aPrefixes ) {
+		
 		$this->_aPrefixes = $aPrefixes;	
+		
 		return $this;
 	}
 	
 	//
 	public function setDefault( $sClass ) {
+		
 		$this->_sDefaultLayout = $sClass;
+		
 		return $this;
 	}
 	
 	//
 	public function setNotFound( $sClass ) {
+		
 		$this->_sNotFoundLayout = $sClass;	
+		
 		return $this;
 	}
 	
 	//
 	public function setBase( $aBase ) {
+		
 		$this->_aBaseLayouts = $aBase;
+		
 		return $this;
 	}
 	
 	//
 	public function setRenderer( $sRenderer ) {
+		
 		$this->_sRenderer = $sRenderer;	
+		
 		return $this;
 	}
 	
@@ -79,6 +88,7 @@ class Geko_Router_Route_Layout extends Geko_Router_Route
 	public function isMatch() {
 		
 		$oRouter = $this->_oRouter;
+		$oPath = $oRouter->getPath();
 		
 		// print_r( $oRouter->getPathItems() );
 		
@@ -87,7 +97,7 @@ class Geko_Router_Route_Layout extends Geko_Router_Route
 			return TRUE;	// for security
 		}
 		
-		$aPathItems = $aPathLeft = $oRouter->getPathItems();
+		$aPathItems = $aPathLeft = $oPath->getPathItems();
 		
 		$sClass = '';
 		$sBestMatch = '';
@@ -114,7 +124,9 @@ class Geko_Router_Route_Layout extends Geko_Router_Route
 		}
 		
 		$this->_sBestMatch = $sBestMatch;
-		$this->_aLeftovers = $aBestMatch;
+		
+		$oPath->setLeftovers( $aBestMatch );
+		
 		
 		if ( $this->_sDefaultLayout && ( 0 == count( $aPathItems ) ) ) {
 			$this->_sBestMatch = $this->_sDefaultLayout;
@@ -124,9 +136,27 @@ class Geko_Router_Route_Layout extends Geko_Router_Route
 			$this->_sBestMatch = $this->_sNotFoundLayout;
 		}
 		
-		return ( $this->_sBestMatch ) ? TRUE : FALSE ;
+		
+		
+		//
+		if ( $this->_sBestMatch ) {
+			
+			$oRouter->setCurrentRoute( $this );
+			
+			return TRUE;
+		}
+		
+		return FALSE;
 	}
 		
+	
+	//
+	public function getTarget() {
+		
+		return $this->_sBestMatch;
+	}
+	
+	
 	
 	
 	//
@@ -137,39 +167,60 @@ class Geko_Router_Route_Layout extends Geko_Router_Route
 		//// base layouts
 		
 		foreach ( $this->_aBaseLayouts as $aBase ) {
+			
 			$sLayoutClass = call_user_func_array( array( $this, 'getBestMatch' ), $aBase );
+			
 			if ( $sLayoutClass ) {
+				
 				Geko_Singleton_Abstract::getInstance( $sLayoutClass )
 					->init()
-					->setLeftovers( $this->_aLeftovers )
 				;			
 			}
+			
 		}
+		
+		
 		
 		//// routed layout
 		
 		if ( $sBestMatch = $this->_sBestMatch ) {
-			Geko_Singleton_Abstract::getInstance( $sBestMatch )
-				->setLeftovers( $this->_aLeftovers )
-				->init()
-			;
+			
+			$oLayout = Geko_Singleton_Abstract::getInstance( $sBestMatch );
+			
+			$oLayout->init();
+			
+			if ( $oLayout instanceof Geko_Router_Adjust ) {
+				
+				$oLayout->adjustRouter( $oRouter );
+			}
+			
+			
 		} else {
+			
 			throw new Exception( 'A valid layout class was not found!' );
 		}
+		
+		
 		
 		//// renderer
 		
 		if ( !$sRendererClass = $this->_sRenderer ) {
-			$sRendererClass = Geko_Class::getBestMatch( array( 'Gloc_', 'Geko_App_', 'Geko_' ), array( 'Layout_Renderer' ) );
+			
+			$sRendererClass = $this->getBestMatch( 'Renderer' );
 		}
 		
 		if ( $sRendererClass ) {
+			
 			Geko_Singleton_Abstract::getInstance( $sRendererClass )->render();
+		
 		} else {
+			
 			throw new Exception( 'A valid layout renderer class was not found!' );
 		}
 		
+		
 		$oRouter->setStopRunning( TRUE );
+		
 	}
 	
 	

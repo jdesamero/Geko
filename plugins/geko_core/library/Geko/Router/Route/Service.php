@@ -4,27 +4,33 @@
 class Geko_Router_Route_Service extends Geko_Router_Route
 {
 
+	protected $_sBestMatch = '';
+	
+	
+	
 	//// functionality
 	
 	//
 	public function isMatch() {
 		
 		$oRouter = $this->_oRouter;
+		$oPath = $oRouter->getPath();
 		
-		$aPathItems = $aPathLeft = $oRouter->getPathItems();
+		$aPathItems = $aPathLeft = $oPath->getPathItems();
 		
 		if ( 'srv' == $aPathItems[ 0 ] ) {
 			
 			if ( TRUE == $oRouter->getToken( 'AUTH_REQUIRED' ) ) {
+				
 				$this->_sBestMatch = $this->getBestMatch( 'Aux_Auth', 'Auth' );
+				
 				return TRUE;	// for security			
 			}
+			
 			
 			$sClass = '';
 			$sBestMatch = '';
 			$aBestMatch = array();
-			
-			$aLeftovers = array();
 			
 			foreach ( $aPathItems as $i => $sItem ) {
 				
@@ -48,14 +54,36 @@ class Geko_Router_Route_Service extends Geko_Router_Route
 				
 			}
 			
-			$this->_sBestMatch = $sBestMatch;
-			$this->_aLeftovers = $aBestMatch;
 			
-			return ( $this->_sBestMatch ) ? TRUE : FALSE ;
+			$this->_sBestMatch = $sBestMatch;
+			
+			
+			// do this because of "<url>/srv"
+			array_shift( $aBestMatch );
+			
+			$oPath->setLeftovers( $aBestMatch );
+			
+			
+			//
+			if ( $this->_sBestMatch ) {
+				
+				$oRouter->setCurrentRoute( $this );
+				
+				return TRUE;
+			}
+			
+			return FALSE;
 		}
 		
 		return FALSE;
 	}
+	
+	//
+	public function getTarget() {
+		
+		return $this->_sBestMatch;
+	}
+	
 	
 	
 	//
@@ -69,18 +97,27 @@ class Geko_Router_Route_Service extends Geko_Router_Route
 			
 			if ( $sBestMatch = $this->_sBestMatch ) {
 				
-				Geko_Singleton_Abstract::getInstance( $sBestMatch )
-					->setLeftovers( $this->_aLeftovers )
-					->init()
+				$oService = Geko_Singleton_Abstract::getInstance( $sBestMatch );
+				
+				$oService->init();
+				
+				if ( $oService instanceof Geko_Router_Adjust ) {
+					
+					$oService->adjustRouter( $oRouter );
+				}
+				
+				$oService
 					->process()
 					->output()
 				;
 				
 			} else {
+				
 				throw new Exception( 'A valid service class was not found!' );
 			}
 	
 		} catch ( Exception $e ) {
+			
 			$this->outputException( $e );
 		}
 		
@@ -92,7 +129,8 @@ class Geko_Router_Route_Service extends Geko_Router_Route
 	
 	// format exception for JSON output
 	public function outputException( $e ) {
-		echo Zend_Json::encode( array(
+		
+		echo Geko_Json::encode( array(
 			'context' => 'exception',
 			'error' => TRUE,
 			'type' => get_class( $e ),

@@ -4,6 +4,8 @@
 class Geko_Router_Route
 {
 	
+	protected $_sRouteName = '';
+	
 	protected $_aPrefixes = array( 'Geko_' );
 	protected $_aSkip = array();
 	
@@ -12,9 +14,10 @@ class Geko_Router_Route
 	
 	
 	//
-	public function setRouter( $oRouter ) {
+	public function setRouter( $oRouter, $sRouteName ) {
 		
 		$this->_oRouter = $oRouter;
+		$this->_sRouteName = $sRouteName;
 		
 		return $this;
 	}
@@ -22,8 +25,10 @@ class Geko_Router_Route
 	
 	// implement by sub-class
 	public function isMatch() {
+		
 		return FALSE;
 	}
+	
 	
 	
 	//
@@ -59,7 +64,17 @@ class Geko_Router_Route
 		return Geko_Class::getBestMatch( $this->_aPrefixes, $aSuffixes );
 	}
 	
+	//
+	public function getTarget() {
+		
+		return NULL;
+	}
 	
+	//
+	public function getRouteName() {
+		
+		return $this->_sRouteName;
+	}
 	
 }
 

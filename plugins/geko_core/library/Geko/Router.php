@@ -11,10 +11,11 @@
 class Geko_Router
 {
 	
-	protected $_sBaseUrl;
-	protected $_aPathItems = array();
+	protected $_oPath = NULL;
 	
 	protected $_aRoutes = array();
+	protected $_oCurrentRoute = NULL;
+	
 	protected $_aTokens = array();
 	
 	protected $_bStopRunning = FALSE;
@@ -24,37 +25,24 @@ class Geko_Router
 	//
 	public function __construct( $sBaseUrl ) {
 		
-		$this->_sBaseUrl = $sBaseUrl;
+		$oPath = new Geko_Router_Path( $sBaseUrl );
 		
-		$oUrl = Geko_Uri::getGlobal();
-		
-		// echo sprintf( '%s<br />', $oUrl->getHost() );
-		// echo sprintf( '%s<br />', $oUrl->getPath() );
-		
-		$sPath = $oUrl->getPath();
-		
-		$sBaseUrlChop = str_replace( array( 'http://', 'https://' ), '', $sBaseUrl );
-		
-		$aRegs = array();
-		if ( preg_match( '/\/.*/', $sBaseUrlChop, $aRegs ) ) {
-			$sPrePath = $aRegs[ 0 ];
-			if ( 0 === strpos( $sPath, $sPrePath ) ) {
-				$sPath = substr( $sPath, strlen( $sPrePath ) );
-			}
-		}
-		
-		$this->_aPathItems = Geko_Array::explodeTrimEmpty( '/', $sPath );
-		
-		// print_r( $this->_aPathItems );
+		$this->_oPath = $oPath;
 		
 	}
+	
+	
+	
+	
 	
 	//// accessors
 	
 	//
-	public function getPathItems() {
-		return $this->_aPathItems;
+	public function getPath() {
+		
+		return $this->_oPath;
 	}
+	
 	
 	//
 	public function addRoute( $oRoute, $iPriority = 1000, $sKey = NULL ) {
@@ -71,43 +59,67 @@ class Geko_Router
 			'idx' => $i++
 		);
 		
-		$oRoute->setRouter( $this );
+		$oRoute->setRouter( $this, $sKey );
 		
 		return $this;
 	}
 	
 	//
+	public function setCurrentRoute( $oRoute ) {
+		
+		$oPath = $this->_oPath;
+		
+		$this->_oCurrentRoute = $oRoute;
+		
+		$oPath->setTarget( $oRoute->getTarget() );
+		$oPath->setRouteName( $oRoute->getRouteName() );
+		
+	}
+	
+	
+	//
 	public function removeRoute( $sKey ) {
+		
 		unset( $this->_aRoutes[ $sKey ] );
+		
 		return $this;
 	}
 	
 	//
 	public function setStopRunning( $bStopRunning ) {
+		
 		$this->_bStopRunning = $bStopRunning;
+		
 		return $this;
 	}
 	
 	//
 	public function stopRunning() {
+		
 		return $this->_bStopRunning;
 	}
 	
 	// messaging tokens
 	public function setToken( $sKey, $mValue ) {
+		
 		$this->_aTokens[ $sKey ] = $mValue;
+		
 		return $this;
 	}
 	
 	//
 	public function getToken( $sKey ) {
+		
 		return $this->_aTokens[ $sKey ];
 	}
 	
 	//
 	public function hasToken( $sKey ) {
+		
 		return array_key_exists( $sKey, $this->_aTokens ) ? TRUE : FALSE ;
 	}
+	
+	
 	
 	
 	

@@ -41,6 +41,7 @@ class Geko_Match
 	public function addRule( $oRule, $sKey = NULL ) {
 		
 		if ( NULL === $sKey ) {
+			
 			// use the rule's name if none was provided
 			$sKey = $oRule->getRuleName();
 		}
@@ -57,17 +58,25 @@ class Geko_Match
 		// cond:val1,val2|other:some,other
 		
 		if ( is_string( $mParams ) ) {
+			
 			$aParams = Geko_Array::explodeTrimEmpty( '|', $mParams );
+			
 			foreach ( $aParams as $i => $sSubParam ) {
+				
 				$aSubParam = Geko_Array::explodeTrimEmpty( ':', $sSubParam );
+				
 				if ( $aSubParam[ 1 ] ) {
 					$aSubParam[ 1 ] = Geko_Array::explodeTrimEmpty( ',', $aSubParam[ 1 ] );
 				}
+				
 				$aParams[ $i ] = $aSubParam;
 			}
+			
 		} else {
+			
 			$aParams = $mParams;
 		}
+		
 		
 		foreach ( $aParams as $aSubParam ) {
 			

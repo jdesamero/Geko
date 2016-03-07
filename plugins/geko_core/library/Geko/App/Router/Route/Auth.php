@@ -23,7 +23,9 @@ class Geko_App_Router_Route_Auth extends Geko_Router_Route
 	
 	//
 	public function addRule( $sRule ) {
+		
 		$this->_aRules[] = $sRule;
+		
 		return $this;
 	}
 	
@@ -40,7 +42,9 @@ class Geko_App_Router_Route_Auth extends Geko_Router_Route
 	
 	//
 	public function clearRules() {
+		
 		$this->_aRules = array();
+		
 		return $this;
 	}
 	
@@ -49,8 +53,9 @@ class Geko_App_Router_Route_Auth extends Geko_Router_Route
 	public function isMatch() {
 		
 		$oRouter = $this->_oRouter;
+		$oPath = $oRouter->getPath();
 		
-		$aPathItems = $oRouter->getPathItems();
+		$aPathItems = $oPath->getPathItems();
 		
 		$bAllow = FALSE;
 

@@ -38,13 +38,14 @@ class Geko_Layout extends Geko_Singleton_Abstract
 		
 	protected $_aTemplates = array();
 	
+	protected $_sAjaxSection = NULL;
+	
+	
 	
 	
 	
 	//
 	public function init( $bUnshift = FALSE ) {
-		
-		Geko_Http_Var::formatHttpRawPostData();
 		
 		$this->_bUnshift = $bUnshift;
 		
@@ -93,6 +94,21 @@ class Geko_Layout extends Geko_Singleton_Abstract
 			$oRenderer->addLayout( $this );
 		}
 		
+	}
+	
+	
+	// implement hook method
+	public function start() {
+		
+		parent::start();
+		
+		Geko_Http_Var::formatHttpRawPostData();
+		
+		$oRenderer = Geko_Singleton_Abstract::getInstance( $this->_sRenderer );
+		
+		if ( $oRenderer->isAjaxContent() ) {
+			$this->resolveAjaxSection();
+		}
 	}
 	
 	
@@ -365,13 +381,17 @@ class Geko_Layout extends Geko_Singleton_Abstract
 	
 	//
 	public function renderStyleTags() {
+		
 		Geko_Loader_ExternalFiles::getInstance()->renderStyleTags();
+		
 		return $this;		
 	}
 	
 	//
 	public function renderScriptTags() {
+		
 		Geko_Loader_ExternalFiles::getInstance()->renderScriptTags();
+		
 		return $this;		
 	}
 	
@@ -385,13 +405,13 @@ class Geko_Layout extends Geko_Singleton_Abstract
 		
 		$aAjaxResponse = NULL;
 		
-		$sSection = trim( $_GET[ 'section' ] );
+		$sSection = $this->_sAjaxSection;
 		$sMethod = '';
 		
 		// check for matching method
 		if (
 			( $sSection ) && 
-			( $sMethod = sprintf( 'get%sAjax', Geko_Inflector::camelize( $sSection ) ) ) && 
+			( $sMethod = $this->resolveAjaxSectionMethod( $sSection ) ) && 
 			( method_exists( $this, $sMethod ) )
 		) {
 			$aAjaxResponse = $this->$sMethod();		
@@ -403,9 +423,35 @@ class Geko_Layout extends Geko_Singleton_Abstract
 		}
 		
 		if ( $aAjaxResponse ) {
-			echo Zend_Json::encode( $aAjaxResponse );		
+			echo Geko_Json::encode( $aAjaxResponse );		
 		}
 	}
+	
+	//
+	public function resolveAjaxSectionMethod( $sSection ) {
+		
+		return sprintf( 'get%sAjax', Geko_Inflector::camelize( $sSection ) );
+	}
+	
+	
+	//
+	public function resolveAjaxSection() {
+		
+		if ( NULL === $this->_sAjaxSection ) {
+			
+			$this->_sAjaxSection = trim( $_REQUEST[ 'section' ] );
+		}
+		
+		return $this->_sAjaxSection;
+	}
+	
+	
+	//
+	public function getAjaxSection() {
+		
+		return $this->_sAjaxSection;
+	}
+
 	
 	
 	

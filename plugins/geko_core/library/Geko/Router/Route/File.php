@@ -22,9 +22,8 @@ class Geko_Router_Route_File extends Geko_Router_Route
 	
 		$oRouter = $this->_oRouter;
 		
-		$aPathItems = $oRouter->getPathItems();
-		
-		$sFile = implode( '/', $aPathItems );
+		// $oRouter->getPath() returns an instance of Geko_Router_Path
+		$sFile = strval( $oRouter->getPath() );
 		
 		$sExt = strtolower( pathinfo( $sFile, PATHINFO_EXTENSION ) );
 		
@@ -36,6 +35,8 @@ class Geko_Router_Route_File extends Geko_Router_Route
 			
 			$this->_sFile = $sFile;
 			$this->_sMime = $this->_aAllowedExtensions[ $sExt ];
+			
+			$oRouter->setCurrentRoute( $this );
 			
 			return TRUE;
 		}
@@ -62,6 +63,11 @@ class Geko_Router_Route_File extends Geko_Router_Route
 		
 	}
 	
+	//
+	public function getTarget() {
+		
+		return $this->_sFile;
+	}
 	
 	
 }

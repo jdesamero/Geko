@@ -15,10 +15,15 @@ class Geko_Service extends Geko_Singleton_Abstract
 	
 	protected $_aPrefixes = array( 'Geko_' );
 	
-	protected $_aLeftovers = array();
+	
+	
+	protected $_sAction = NULL;
+	
 	protected $_aAjaxResponse = array(
 		'context' => 'service'
 	);
+	
+	
 	
 	protected $_aFileOutput = array(
 		'_headers' => array(
@@ -36,6 +41,7 @@ class Geko_Service extends Geko_Singleton_Abstract
 	
 	// known parameters are "cycleCheck", and "enableJsonExprFinder"
 	protected $_aJsonEncodeParams = array();
+	
 	
 	
 	
@@ -90,6 +96,7 @@ class Geko_Service extends Geko_Singleton_Abstract
 		
 		Geko_Http_Var::formatHttpRawPostData();
 		
+		$this->resolveAction();
 	}
 	
 	
@@ -109,7 +116,7 @@ class Geko_Service extends Geko_Singleton_Abstract
 				
 				// see if matching method is defined
 				
-				$sActionMethod = sprintf( 'process%s', Geko_Inflector::camelize( $sAction ) );
+				$sActionMethod = $this->resolveActionMethod( $sAction );
 				
 				if ( method_exists( $this, $sActionMethod ) ) {
 					$this->$sActionMethod();		// perform the action
@@ -130,6 +137,13 @@ class Geko_Service extends Geko_Singleton_Abstract
 		return $this;
 	}
 	
+	//
+	public function resolveActionMethod( $sAction ) {
+		
+		return sprintf( 'process%s', Geko_Inflector::camelize( $sAction ) );
+	}
+	
+	
 	
 	// hook for default actions
 	public function processDefault() { }
@@ -149,15 +163,11 @@ class Geko_Service extends Geko_Singleton_Abstract
 	
 	// hook
 	public function modifyParams( $aParams ) {
+		
 		return $aParams;
 	}
 	
-	//
-	public function setLeftovers( $aLeftovers ) {
-		 $this->_aLeftovers = $aLeftovers;
-		 return $this;
-	}
-	
+		
 	
 	
 	
@@ -169,21 +179,34 @@ class Geko_Service extends Geko_Singleton_Abstract
 	
 	
 	//
-	public function getAction() {
+	public function resolveAction() {
 		
-		if ( isset( $_REQUEST[ '_action' ] ) ) {
-			// new way of doing things
-			$sAction = $_REQUEST[ '_action' ];
-		} else {
-			// old way
-			$sAction = $_REQUEST[ 'subaction' ];
+		if ( NULL === $this->_sAction ) {
+
+			$sAction = trim( $_REQUEST[ '_action' ] );
+			
+			if ( !$sAction ) {
+				$sAction = trim( $_REQUEST[ 'subaction' ] );
+			}
+			
+			$this->_sAction = $sAction;
 		}
 		
-		return $sAction;
+		return $this->_sAction;
 	}
+	
+	
+	//
+	public function getAction() {
+		
+		return $this->_sAction;
+	}
+	
+	
 	
 	// TO DO: HACKISH!!!!!!!!
 	public function isAction( $sAction ) {
+		
 		return ( $sAction == $this->getAction() ) ? TRUE : FALSE ;
 	}
 	
@@ -239,10 +262,14 @@ class Geko_Service extends Geko_Singleton_Abstract
 		//    Use static::STAT_ERROR instead
 		
 		if ( defined( 'static::STAT_ERROR' ) ) {
+			
 			return constant( 'static::STAT_ERROR' );
+		
 		} else {
+			
 			// PHP 5.2.x backwards compatibility
 			$sConst = sprintf( '%s::STAT_ERROR', get_class( $this ) );
+			
 			if ( defined( $sConst ) ) {
 				return constant( $sConst );
 			}
