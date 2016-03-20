@@ -159,43 +159,6 @@ class Geko_Wp_Enumeration_Query extends Geko_Wp_Entity_Query
 	
 	
 	
-	//// get <a value> from <b value>
-	
-	//
-	public function getFrom( $sValue, $sBaseKey, $sReturnKey ) {
-		
-		foreach ( $this as $oEntity ) {
-			if ( $sValue == $oEntity->getEntityPropertyValue( $sBaseKey ) ) {
-				return $oEntity->getEntityPropertyValue( $sReturnKey );
-			}
-		}
-		
-		return NULL;
-	}
-	
-	
-	
-	//// magic methods
-	
-	//
-	public function __call( $sMethod, $aArgs ) {
-		
-		$aRegs = array();
-		
-		if ( preg_match( '/^get([A-Za-z]+)From([A-Za-z]+)/', $sMethod, $aRegs ) ) {
-			
-			$sToFld = strtolower( $aRegs[ 1 ] );
-			$sFromFld = strtolower( $aRegs[ 2 ] );
-			
-			return call_user_func( array( $this, 'getFrom' ), $aArgs[ 0 ], $sFromFld, $sToFld );
-		}
-		
-		throw new Exception( sprintf( 'Invalid method %s::%s() called.', __CLASS__, $sMethod ) );
-	}
-	
-
-
-	
 	
 }
 

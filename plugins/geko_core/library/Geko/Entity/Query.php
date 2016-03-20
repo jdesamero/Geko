@@ -961,7 +961,27 @@ abstract class Geko_Entity_Query
 	}
 	
 	
+	
+	
+	
+	// get <a value> from <b value>
+	
+	//
+	public function getFrom( $mValue, $sBaseKey, $sReturnKey ) {
+		
+		$sSubsetOneMethod = sprintf( 'subsetone%s', $sReturnKey );
+		$sGetMethod = sprintf( 'get%s', $sBaseKey );
+		
+		$oItem = $this->$sSubsetOneMethod( $mValue );
+		
+		return $oItem->$sGetMethod();
+	}
+
+	
+	
+	
 	//// magic methods
+	
 	
 	//
 	public function __call( $sMethod, $aArgs ) {
@@ -969,32 +989,43 @@ abstract class Geko_Entity_Query
 		//// gather/implode
 		
 		if ( 0 === strpos( strtolower( $sMethod ), 'gather' ) ) {
+			
 			$sField = substr_replace( $sMethod, '', 0, 6 );
 			$sCallMethod = 'gather';
 		}
 		
 		if ( 0 === strpos( strtolower( $sMethod ), 'implode' ) ) {
+			
 			$sField = substr_replace( $sMethod, '', 0, 7 );
 			$sCallMethod = 'implode';
 		}
 		
 		if ( $sField ) {
+			
 			if ( count( $this ) > 0 ) {
 				
 				$sPattern = sprintf( '##%s##', $sField );
 				$mPattern = array_shift( $aArgs );
 				
 				if ( is_null( $mPattern ) ) {
+					
 					$mPattern = $sPattern; 
+				
 				} elseif ( is_string( $mPattern ) ) {
+					
 					if ( FALSE !== strpos( $mPattern, '%s' ) ) {
+						
 						$mPattern = array( $mPattern, '' );
+					
 					} else {
+						
 						$mPattern = array( $sPattern, $mPattern );
 					}
 				}
 				
+				
 				if ( is_array( $mPattern ) && FALSE !== strpos( $mPattern[ 0 ], '%s' ) ) {
+					
 					$mPattern[ 0 ] = sprintf( $mPattern[ 0 ], $sPattern );
 				}
 				
@@ -1033,13 +1064,20 @@ abstract class Geko_Entity_Query
 			array_unshift( $aArgs, array( $sField, $sSuffix ) );
 			
 			return call_user_func_array( array( $this, 'subset' ), $aArgs );
+			
+		} elseif ( preg_match( '/^get([A-Za-z]+)From([A-Za-z]+)/', $sMethod, $aRegs ) ) {
+			
+			return call_user_func( array( $this, 'getFrom' ), $aArgs[ 0 ], $aRegs[ 1 ], $aRegs[ 2 ] );
 		}
+
 		
 		throw new Exception( sprintf( 'Invalid method %s::%s() called.', get_class( $this ), $sMethod ) );
 	}
 	
+	
 	//
 	public function __toString() {
+		
 		return $this->implode( '%s' );
 	}
 	

@@ -27,7 +27,9 @@ class Geko_App_Taxonomy_Item_Query extends Geko_App_Entity_Query
 		
 		return $oQuery;
 	}
-
+	
+	
+	
 }
 
 

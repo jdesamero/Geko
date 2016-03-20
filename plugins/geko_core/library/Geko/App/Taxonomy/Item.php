@@ -11,6 +11,23 @@
 class Geko_App_Taxonomy_Item extends Geko_App_Entity
 {
 	
+	protected $_sEntityIdVarName = 'id';
+	
+	
+	//// instance methods
+	
+	//
+	public function init() {
+		
+		parent::init();
+		
+		
+		$this
+			->setEntityMapping( 'title', 'label' )
+		;
+		
+		return $this;
+	}
 	
 	
 
