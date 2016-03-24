@@ -242,86 +242,147 @@ abstract class Geko_Entity_Query
 		
 		$mPattern = array_shift( $aArgs );
 		
+		
+		$sKeyPattern = '';
+		$sValuePattern = '';
+		
+		
 		if ( is_array( $mPattern ) ) {
 			
 			// the delimiter is not needed
-			$sPattern = $mPattern[ 0 ];
+			if ( array_key_exists( 0, $mPattern ) ) {
+				
+				$sValuePattern = $mPattern[ 0 ];			
+				
+			} else {
+				
+				$sKeyPattern = key( $mPattern );
+				$sValuePattern = current( $mPattern );
+				
+			}
 			
 		} else {
-			$sPattern = $mPattern;
+			
+			$sValuePattern = $mPattern;
+		
 		}
 		
-		if ( FALSE !== strpos( $sPattern, '%s' ) ) {
-			$sPattern = sprintf( $sPattern, sprintf( '##%s##', $this->_sDefaultField ) );
+		if ( FALSE !== strpos( $sValuePattern, '%s' ) ) {
+			$sValuePattern = sprintf( $sValuePattern, sprintf( '##%s##', $this->_sDefaultField ) );
 		}
 		
-		if ( preg_match_all( '/##([a-zA-Z0-9_]+)##/s', $sPattern, $aRegs ) ) {
-			$aReplace = $aRegs[ 0 ];
-			$aSuffixes = $aRegs[ 1 ];
+		
+		// parse all value pattern placeholders
+		if ( preg_match_all( '/##([a-zA-Z0-9_]+)##/s', $sValuePattern, $aRegs ) ) {
+			
+			$aValueReplace = $aRegs[ 0 ];
+			$aValueSuffixes = $aRegs[ 1 ];
+			
 			$bSimple = FALSE;
 		}
 		
 		
 		
+		if (
+			( $sKeyPattern ) && 
+			( preg_match_all( '/##([a-zA-Z0-9_]+)##/s', $sKeyPattern, $aRegs2 ) )
+		) {
+
+			$aKeyReplace = $aRegs2[ 0 ];
+			$aKeySuffixes = $aRegs2[ 1 ];
+			
+		}
+		
+		
+		
 		// gather
+		$i = 0;
+		
 		foreach ( $this as $oEntity ) {
+			
+			$sValue = '';
 			
 			if ( $bSimple ) {
 				
 				if ( method_exists( $oEntity, $this->_sDefaultField ) ) {
 					
-					$sOut = call_user_func_array(
+					$sValue = call_user_func_array(
 						array( $oEntity, $this->_sDefaultField ),
 						$aArgs[ 0 ]
 					);
 					
 				} else {
-					$sOut = '';
+					$sValue = '';
 				}
 			
 			} else {
 				
-				$sOut = $sPattern;
+				$sValue = $this->resolveGatherValue( $oEntity, $aArgs, $aValueSuffixes, $aValueReplace, $sValuePattern );
 				
-				foreach ( $aSuffixes as $i => $sSuffix ) {
+				$mKey = NULL;
+				
+				if ( $sKeyPattern ) {
 					
-					$sMethod = sprintf( 'get%s', $sSuffix );
-					$sEntityProperty = Geko_Inflector::underscore( $sSuffix );
+					// TO DO: supply arguments for key
+					$mKey = $this->resolveGatherValue( $oEntity, array(), $aKeySuffixes, $aKeyReplace, $sKeyPattern );
 					
-					$bReplace = TRUE;
+				} else {
 					
-					if (
-						( method_exists( $oEntity, $sMethod ) ) && 
-						( 'value' != $sEntityProperty )
-					) {
-						
-						$aMethodArgs = is_array( $aArgs[ $i ] ) ? $aArgs[ $i ] : array() ;
-						$sReplacement = call_user_func_array( array( $oEntity, $sMethod ), $aMethodArgs );
-						
-					} elseif ( $oEntity->hasEntityProperty( $sEntityProperty ) ) {
-						
-						// see if a corresponding entity value can be found
-						$sReplacement = $oEntity->getEntityPropertyValue( $sEntityProperty );
-					
-					} else {
-						
-						$bReplace = FALSE;
-					}
-					
-					
-					if ( $bReplace ) {
-						$aArgs[ $i ] = ( is_array( $aArgs[ $i ] ) ) ? $aArgs[ $i ] : array();
-						$sOut = str_replace( $aReplace[ $i ], $sReplacement, $sOut );
-					}
-					
+					$mKey = $i;
+					$i++;
 				}
+				
 			}
 			
-			$aRet[] = $sOut;
+			
+			$aRet[ $mKey ] = $sValue;
 		}
 		
 		return $aRet;
 	}
+	
+	//
+	public function resolveGatherValue( $oEntity, $aArgs, $aSuffixes, $aReplace, $sPattern ) {
+		
+		$sOut = $sPattern;
+		
+		foreach ( $aSuffixes as $i => $sSuffix ) {
+			
+			$sMethod = sprintf( 'get%s', $sSuffix );
+			$sEntityProperty = Geko_Inflector::underscore( $sSuffix );
+			
+			$bReplace = TRUE;
+			
+			if (
+				( method_exists( $oEntity, $sMethod ) ) && 
+				( 'value' != $sEntityProperty )
+			) {
+				
+				$aMethodArgs = $aArgs[ $i ];
+				if ( !is_array( $aMethodArgs ) ) $aMethodArgs = array();
+				
+				$sReplacement = call_user_func_array( array( $oEntity, $sMethod ), $aMethodArgs );
+				
+			} elseif ( $oEntity->hasEntityProperty( $sEntityProperty ) ) {
+				
+				// see if a corresponding entity value can be found
+				$sReplacement = $oEntity->getEntityPropertyValue( $sEntityProperty );
+			
+			} else {
+				
+				$bReplace = FALSE;
+			}
+			
+			
+			if ( $bReplace ) {
+				$sOut = str_replace( $aReplace[ $i ], $sReplacement, $sOut );
+			}
+			
+		}
+		
+		return $sOut;
+	}
+	
 	
 	
 	//
