@@ -29,7 +29,6 @@ class Geko_App_Taxonomy_Manage extends Geko_App_Entity_Manage
 			->fieldLongText( 'label' )
 			->fieldVarChar( 'slug', array( 'size' => 256 ) )
 			->fieldSmallInt( 'rel_type_id', array( 'unsgnd', 'notnull' ) )
-			->fieldSmallInt( 'lang_id', array( 'unsgnd', 'notnull' ) )
 			->fieldBool( 'is_system', array( 'default' => 1 ) )
 		;
 		
