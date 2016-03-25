@@ -15,6 +15,19 @@ class Geko_App_Taxonomy_Item_Query extends Geko_App_Entity_Query
 	
 	
 	//
+	public function init() {
+	
+		$this->addPlugin( 'Geko_App_Meta_Plugin_Query', array(
+			'entity_key' => 'taxonomy_item_id'
+		) );
+		
+		parent::init();
+		
+		return $this;
+	}
+	
+	
+	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
 		// apply super-class manipulations

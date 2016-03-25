@@ -13,6 +13,15 @@
 class Geko_App_Taxonomy_Record extends Geko_Entity_Record
 {
 
+	//
+	public function init() {
+	
+		$this->addPlugin( 'Geko_App_Meta_Plugin_Record' );
+		
+		parent::init();
+		
+		return $this;
+	}
 	
 	
 }

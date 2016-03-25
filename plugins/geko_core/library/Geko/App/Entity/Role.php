@@ -11,9 +11,17 @@
 class Geko_App_Entity_Role extends Geko_App_Entity
 {
 	
+	//
+	public function init() {
+		
+		parent::init();
+		
+		$this->addPlugin( 'Geko_App_Meta_Plugin_Entity' );
+		
+		return $this;
+	}
 	
 	
-
 }
 
 

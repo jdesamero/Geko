@@ -15,6 +15,19 @@ class Geko_App_Entity_Role_Query extends Geko_App_Entity_Query
 	
 	
 	//
+	public function init() {
+	
+		$this->addPlugin( 'Geko_App_Meta_Plugin_Query', array(
+			'entity_key' => 'entity_role_id'
+		) );
+		
+		parent::init();
+		
+		return $this;
+	}
+	
+	
+	//
 	public function modifyQuery( $oQuery, $aParams ) {
 		
 		// apply super-class manipulations

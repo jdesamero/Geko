@@ -23,7 +23,11 @@ class Geko_App_Taxonomy_Item extends Geko_App_Entity
 		
 		
 		$this
+			
+			->addPlugin( 'Geko_App_Meta_Plugin_Entity' )
+			
 			->setEntityMapping( 'title', 'label' )
+			
 		;
 		
 		return $this;
