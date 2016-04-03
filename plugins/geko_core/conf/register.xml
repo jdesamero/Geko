@@ -273,6 +273,7 @@
 		<file id="geko-jquery-geko_carousel" src="##geko_core_uri##/js/jquery.geko_carousel.js" dependencies="geko-jquery-jcarousel" />
 		<file id="geko-jquery-geko_center_in_client" src="##geko_core_uri##/js/jquery.geko_center_in_client.js" dependencies="jquery" />
 		<file id="geko-jquery-geko_clock" src="##geko_core_uri##/js/jquery.geko_clock.js" dependencies="jquery" />
+		<file id="geko-jquery-geko_conclave" src="##geko_core_uri##/js/jquery.geko_conclave.js" dependencies="jquery" />
 		<file id="geko-jquery-geko_default_value" src="##geko_core_uri##/js/jquery.geko_default_value.js" dependencies="jquery" />
 		<file id="geko-jquery-geko-facebook" src="##geko_core_uri##/js/jquery.geko_facebook.js" dependencies="jquery geko-facebook-connect" />
 		<file id="geko-jquery-geko_get_class_from_list" src="##geko_core_uri##/js/jquery.geko_get_class_from_list.js" dependencies="jquery" />
@@ -410,6 +411,7 @@
 		<file id="geko-jquery-weekcalendar" src="##geko_core_uri##/external/styles/weekcalendar/style.css" />
 		
 		<file id="geko-basic" src="##geko_core_uri##/styles/basic/style.css" />
+		<file id="geko-jquery-geko_conclave" src="##geko_core_uri##/styles/conclave/style.css" />
 		<file id="geko-jquery-wpadmin" src="##geko_core_uri##/styles/wpadmin/style.css" />
 		
 		<!-- Geek Oracle PHP Extensions class-bound styles -->
