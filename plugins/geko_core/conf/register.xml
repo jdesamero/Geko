@@ -143,7 +143,7 @@
 			
 			<!-- third-party jquery plugins -->
 			<file id="geko-jquery-qtip" src="##geko_core_uri##/external/js/jquery.qtip-1.0-rev55.min.js" dependencies="jquery" jquery-ui-version="1.4.2" />
-			<file id="geko-jquery-uploadify" src="##geko_core_uri##/external/js/jquery.uploadify.v2.1.4.min.js" dependencies="geko-swf-object jquery" jquery-ui-version="1.4.2" />
+			<file id="geko-jquery-uploadify" src="##geko_core_uri##/external/js/jquery.uploadify.min.js" dependencies="geko-swf-object jquery" jquery-ui-version="1.4.2" />
 			
 			
 		<!-- for default jQuery UI version 1.9.2 -->
@@ -196,7 +196,7 @@
 			
 			<!-- third-party jquery plugins -->
 			<file id="geko-jquery-qtip" src="##geko_core_uri##/external/js/jquery.qtip-1.0-rev55.min.js" dependencies="jquery" jquery-ui-version="1.9.2" />
-			<file id="geko-jquery-uploadify" src="##geko_core_uri##/external/js/jquery.uploadify.v2.1.4.min.js" dependencies="geko-swf-object jquery" jquery-ui-version="1.9.2" />
+			<file id="geko-jquery-uploadify" src="##geko_core_uri##/external/js/jquery.uploadify.min.js" dependencies="geko-swf-object jquery" jquery-ui-version="1.9.2" />
 		
 		
 		<!-- third-party jquery plugins -->
@@ -259,6 +259,7 @@
 		<file id="geko-jquery-tinysort_charorder" src="##geko_core_uri##/external/js/jquery.tinysort.charorder.min.js" dependencies="geko-jquery-tinysort" />
 		<file id="geko-jquery-tmpl" src="##geko_core_uri##/external/js/jquery.tmpl.js" dependencies="jquery" />
 		<file id="geko-jquery-touchswipe" src="##geko_core_uri##/external/js/jquery.touchSwipe-1.6.5.js" dependencies="jquery" />
+		<file id="geko-jquery-uploadifive" src="##geko_core_uri##/external/js/jquery.uploadifive.min.js" dependencies="jquery" />
 		<file id="geko-jquery-uri" src="##geko_core_uri##/external/js/jquery.uri.js" dependencies="jquery" />
 		<file id="geko-jquery-url_encode" src="##geko_core_uri##/external/js/jquery.url_encode.js" dependencies="jquery" />
 		<file id="geko-jquery-validate" src="##geko_core_uri##/external/js/jquery.validate.js" dependencies="jquery" />
@@ -405,6 +406,7 @@
 		<file id="geko-jquery-scrollpath" src="##geko_core_uri##/external/styles/scrollpath/style.css" />
 		<file id="geko-jquery-smoothzoom" src="##geko_core_uri##/external/styles/smoothZoom/style.css" />
 		<file id="geko-jquery-supersized" src="##geko_core_uri##/external/styles/supersized/style.css" />
+		<file id="geko-jquery-uploadifive" src="##geko_core_uri##/external/styles/uploadifive/style.css" />
 		<file id="geko-jquery-weekcalendar" src="##geko_core_uri##/external/styles/weekcalendar/style.css" />
 		
 		<file id="geko-basic" src="##geko_core_uri##/styles/basic/style.css" />

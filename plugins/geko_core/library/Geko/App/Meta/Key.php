@@ -53,7 +53,7 @@ class Geko_App_Meta_Key extends Geko_App_Entity
 			// check if $sMetaKey already exists
 			$aEntityKeys = self::getKeys( $mEntityType );			// get the keys for the particular entity
 			
-			if ( !$oMetaKey = $aEntityKeys->subsetOneSlug( $sMetaKey ) ) {
+			if ( !$oMetaKey = $aEntityKeys->subsetoneSlug( $sMetaKey ) ) {
 			
 				if ( !$sLabel ) $sLabel = Geko_Inflector::humanize( $sMetaKey );
 				

@@ -28,9 +28,9 @@ class Geko_App_Taxonomy_Item_Manage extends Geko_App_Entity_Manage
 			->fieldBigInt( 'id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldInt( 'taxonomy_id', array( 'unsgnd', 'notnull' ) )
 			->fieldLongText( 'label' )
-			->fieldVarChar( 'slug', array( 'size' => 256, 'unq' ) )
+			->fieldVarChar( 'slug', array( 'size' => 255 ) )
 			->fieldLongText( 'value' )
-			->fieldBigInt( 'parent_id', array( 'unsgnd', 'notnull' ) )
+			->fieldBigInt( 'parent_id', array( 'unsgnd' ) )
 		;
 		
 		

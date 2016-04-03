@@ -234,13 +234,16 @@ class Geko_Sql_Table implements Geko_Json_Encodable
 		$aRet = array();
 		
 		if ( $oPkf = $this->getPrimaryKeyField() ) {
+			
 			$aRet[] = $oPkf;
+		
 		} elseif ( count( $this->_aIndexUnq ) > 0 ) {
 			
 			// get first registered unique index
 			foreach ( $this->_aIndexUnq as $aFields ) break;
 
 			foreach ( $aFields as $sFieldName ) {
+				
 				$aRet[] = new Geko_Sql_Table_Field(
 					$sFieldName, $this->_aFields[ $sFieldName ]
 				);
@@ -248,10 +251,13 @@ class Geko_Sql_Table implements Geko_Json_Encodable
 		}
 		
 		if ( $bUseKey ) {
+			
 			$aRetFmt = array();
+			
 			foreach ( $aRet as $oField ) {
 				$aRetFmt[ $oField->getFieldName() ] = $oField;
 			}
+			
 			return $aRetFmt;
 		}
 		
@@ -389,7 +395,7 @@ class Geko_Sql_Table implements Geko_Json_Encodable
 			if ( $this->hasFlag( 'unq', $aParams ) ) $aParams[ 'unq' ] = $sFieldName;
 			
 			if ( $sIndexName = $aParams[ 'unq' ] ) {
-				$sOutput .= sprintf( ' , UNIQUE KEY %s(%s)', $sIndexName, $sFieldName );			
+				$sOutput .= sprintf( ' , UNIQUE %s(%s)', $sIndexName, $sFieldName );			
 			}
 			
 			// key
@@ -409,7 +415,7 @@ class Geko_Sql_Table implements Geko_Json_Encodable
 		
 		//
 		foreach ( $this->_aIndexUnq as $sIndexName => $aParams ) {
-			$sOutput .= sprintf( ' , UNIQUE KEY %s(%s)', $sIndexName, implode( ', ', $aParams ) );
+			$sOutput .= sprintf( ' , UNIQUE %s(%s)', $sIndexName, implode( ', ', $aParams ) );
 		}
 		
 		$sOutput .= ' ) ';

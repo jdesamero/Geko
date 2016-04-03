@@ -27,7 +27,7 @@ class Geko_App_Meta_Key_Manage extends Geko_App_Entity_Manage
 			->create( '##pfx##meta_key', 'mk' )
 			->fieldInt( 'id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldLongText( 'label' )
-			->fieldVarChar( 'slug', array( 'size' => 256 ) )
+			->fieldVarChar( 'slug', array( 'size' => 255 ) )
 			->fieldSmallInt( 'rel_type_id' )
 			->fieldSmallInt( 'lang_id' )
 			->fieldBool( 'is_multiple' )

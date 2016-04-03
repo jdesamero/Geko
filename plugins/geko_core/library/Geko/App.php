@@ -29,11 +29,17 @@ class Geko_App extends Geko
 		$sAjaxContent = strval( $oUrl ); 
 		
 		$aRet = array(
-			'url' => GEKO_STANDALONE_URL,
+			
+			'styles' => Geko_Uri::getUrl( 'geko_styles' ),
+			'ext_styles' => Geko_Uri::getUrl( 'geko_ext_styles' ),
+			'ext_swf' => Geko_Uri::getUrl( 'geko_ext_swf' ),
+			
+			'ajax_content' => $sAjaxContent,
 			'curpage' => $sCurPage,
 			'curpath' => $sCurPath,
-			'ajax_content' => $sAjaxContent,
+			'url' => GEKO_STANDALONE_URL,
 			'srv' => Geko_Uri::getUrl( 'geko_app_srv' )
+			
 		);
 		
 		if ( is_array( $aOther ) ) {

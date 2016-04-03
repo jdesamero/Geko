@@ -91,6 +91,18 @@ class Geko_App_Bootstrap extends Geko_Bootstrap
 		
 		}
 		
+		
+		// register upload paths, if provided
+		if ( is_array( $aUploadPaths = $aArgs[ 'uploads' ] ) ) {
+
+			if ( !in_array( GEKO_UPLOAD_PATH, $aUploadPaths ) ) {
+				array_unshift( $aUploadPaths, GEKO_UPLOAD_PATH );
+			}
+			
+			$this->set( 'upload_paths', $aUploadPaths );
+			
+		}
+		
 	}
 	
 	

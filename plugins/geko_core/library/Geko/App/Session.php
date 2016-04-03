@@ -10,6 +10,7 @@ class Geko_App_Session extends Geko_Singleton_Abstract
 	
 	
 	protected $_iSessionId;
+	protected $_sSessionName;
 	protected $_sSessionKey;
 	protected $_bNewSession = FALSE;
 	
@@ -28,7 +29,13 @@ class Geko_App_Session extends Geko_Singleton_Abstract
 	public function start() {
 		
 		parent::start();
-			
+		
+		$this->_sSessionName = $sSessionName = session_name();
+		
+		if ( $sSessId = $_REQUEST[ $sSessionName ] ) {
+			Zend_Session::setId( $sSessId );
+		}
+		
 		Zend_Session::start();
 					
 		$this->_sSessionKey = Zend_Session::getId();
@@ -159,14 +166,31 @@ class Geko_App_Session extends Geko_Singleton_Abstract
 	
 	//
 	public function getSessionKey() {
+		
 		$this->initDb();
+		
 		return $this->_sSessionKey;
 	}
 	
 	//
 	public function getSessionId() {
+		
 		$this->initDb();
+		
 		return $this->_iSessionId;
+	}
+	
+	//
+	public function getSessionName() {
+		
+		return $this->_sSessionName;
+	}
+	
+	
+	//
+	public function getSessionQueryStringParam() {
+		
+		return sprintf( '%s=%s', $this->_sSessionName, $this->_sSessionKey );
 	}
 	
 	
@@ -354,10 +378,15 @@ class Geko_App_Session extends Geko_Singleton_Abstract
 	public function encode( $mValue, $iEncode ) {
 
 		if ( self::ENCODE_JSON === $iEncode ) {
-			$sValue = Zend_Json::encode( $mValue );
+			
+			$sValue = Geko_Json::encode( $mValue );
+		
 		} elseif ( self::ENCODE_SERIALIZE === $iEncode ) {
+			
 			$sValue = serialize( $mValue );
+		
 		} else {
+			
 			$sValue = $mValue;
 		}
 		
@@ -368,10 +397,15 @@ class Geko_App_Session extends Geko_Singleton_Abstract
 	public function decode( $sValue, $iEncode ) {
 
 		if ( self::ENCODE_JSON === $iEncode ) {
-			$mValue = Zend_Json::decode( $sValue );
+			
+			$mValue = Geko_Json::decode( $sValue );
+		
 		} elseif ( self::ENCODE_SERIALIZE === $iEncode ) {
+			
 			$mValue = unserialize( $sValue );
+		
 		} else {
+			
 			$mValue = $sValue;
 		}
 		

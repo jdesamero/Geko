@@ -31,6 +31,6 @@ ob_end_clean();
 if ( $oService ) {
 	$oService->output();
 } else {
-	echo Zend_Json::encode( sprintf( 'Invalid action was specified: %s', $sServiceClass ) );
+	echo Geko_Json::encode( sprintf( 'Invalid action was specified: %s', $sServiceClass ) );
 }
 

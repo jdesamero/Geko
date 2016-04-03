@@ -28,7 +28,7 @@ class Geko_App_Language_Manage extends Geko_App_Entity_Manage
 			->fieldSmallInt( 'id', array( 'unsgnd', 'notnull', 'autoinc', 'prky' ) )
 			->fieldLongText( 'name' )
 			->fieldVarChar( 'slug', array( 'size' => 255 ) )
-			->fieldBool( 'is_default', array( 'default' => 0 ) )
+			->fieldBool( 'is_default' )
 		;
 		
 		

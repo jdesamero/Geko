@@ -30,7 +30,7 @@ class Geko_App_Taxonomy_Meta_Manage extends Geko_App_Entity_Manage
 			->fieldInt( 'meta_key_id', array( 'unsgnd', 'notnull' ) )
 			->fieldLongText( 'value' )
 			->fieldLongText( 'sub_key' )
-			->fieldInt( 'sub_key_order', array( 'unsgnd', 'notnull' ) )
+			->fieldInt( 'sub_key_order', array( 'unsgnd' ) )
 		;
 		
 		Geko_Once::run(

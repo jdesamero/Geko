@@ -72,6 +72,7 @@ class Geko_File
 		return '';
 	}
 	
+	
 	//
 	public static function getUniqueName( $sFilename, $sDir ) {
 		
@@ -110,6 +111,43 @@ class Geko_File
 		
 		return sprintf( '%s-%d.%s', $aPath[ 'filename' ], count( $aMatches ), $aPath[ 'extension' ] );
 	}
+	
+	
+	// similar to getUniqueName(), slightly different implementation
+	public static function getNextAvailableFullFilePath( $sFullFilePath ) {
+		
+		//
+		if ( file_exists( $sFullFilePath ) ) {
+		
+			$aPathInfo = pathinfo( $sFullFilePath );
+			
+			$sDirName = $aPathInfo[ 'dirname' ];
+			$sFileName = $aPathInfo[ 'filename' ];
+			$sExt = $aPathInfo[ 'extension' ];
+			
+			$sNewFileName = '';
+			$iUniqueIdx = 0;
+			
+			do {
+				
+				$iUniqueIdx++;
+				
+				$sNewFileName = sprintf( '%s/%s.%d', $sDirName, $sFileName, $iUniqueIdx );	
+				
+				if ( Geko_File_MimeType::isValidExt( $sExt ) ) {
+					$sNewFileName .= sprintf( '.%s', $sExt );
+				}
+				
+			} while ( file_exists( $sNewFileName ) );
+			
+			
+			return $sNewFileName;
+		}
+		
+		// if file name is available, return false
+		return FALSE;
+	}
+	
 	
 	
 	// filter out . and ..

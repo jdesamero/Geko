@@ -12,11 +12,8 @@ if ( !empty( $_FILES ) ) {
 	
 	$sTempFile = $_FILES[ 'Filedata' ][ 'tmp_name' ];
 	
-	// $sTargetPath = $_SERVER[ 'DOCUMENT_ROOT' ] . $_REQUEST[ 'folder' ] . '/';
-	// $sTargetFile =  str_replace( '//', '/', $sTargetPath ) . $_FILES[ 'Filedata' ][ 'name' ];
-	
-	$sTargetPath = ( defined( 'GEKO_UPLOADIFY_TARGET_PATH' ) ) ? GEKO_UPLOADIFY_TARGET_PATH : '/tmp/';
-	$sTargetFile = $sTargetPath . 'uploadify-' . basename( $sTempFile );
+	$sTargetPath = ( defined( 'GEKO_UPLOADIFY_TARGET_PATH' ) ) ? GEKO_UPLOADIFY_TARGET_PATH : '/tmp/' ;
+	$sTargetFile = sprintf( '%suploadify-%s', $sTargetPath, basename( $sTempFile ) );
 	
 	$bRes = move_uploaded_file( $sTempFile, $sTargetFile );
 	
@@ -26,7 +23,7 @@ if ( !empty( $_FILES ) ) {
 	if ( !defined( 'GEKO_UPLOADIFY_SKIP_GEKO_MIME_CHECK' ) ) {
 		$aRet[ 'type' ] = Geko_File_MimeType::get( $sTargetFile );
 	}
-	
+		
 	if (
 		( 'application/octet-stream' == $aRet[ 'type' ] ) || 
 		( !$aRet[ 'type' ] )
@@ -35,8 +32,9 @@ if ( !empty( $_FILES ) ) {
 		$aRet[ 'type' ] = $aCheck[ 'type' ];
 	}
 	
+	
 	// echo str_replace( $_SERVER[ 'DOCUMENT_ROOT' ], '', $sTargetFile );
-	echo Zend_Json::encode( $aRet );
+	echo Geko_Json::encode( $aRet );
 	
 }
 

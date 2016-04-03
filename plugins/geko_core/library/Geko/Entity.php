@@ -669,11 +669,6 @@ abstract class Geko_Entity implements Geko_Json_Encodable
 		return $this->getTitle();
 	}
 	
-	// alias of getContent
-	public function getDescription() {
-		return $this->getContent();
-	}
-	
 	// getContent() with the_content filters applied
 	public function getTheContent() {
 		return $this->getContent();

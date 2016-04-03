@@ -30,6 +30,7 @@ class Geko_App_Entity_Rel_Manage extends Geko_App_Entity_Manage
 			->fieldBigInt( 'subject_rel_id', array( 'unsgnd', 'notnull' ) )
 			->fieldSmallInt( 'subject_role_id', array( 'unsgnd', 'notnull' ) )
 			->fieldLongText( 'temp_comment' )
+			->indexUnq( 'unique_rel', array( 'entity_rel_id', 'entity_rel_type_id', 'subject_rel_id', 'subject_role_id' ) )
 		;
 		
 		
