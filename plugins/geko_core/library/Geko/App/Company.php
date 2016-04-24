@@ -1,6 +1,6 @@
 <?php
 /*
- * "geko_core/library/Geko/App/Match.php"
+ * "geko_core/library/Geko/App/Company.php"
  * https://github.com/jdesamero/Geko
  *
  * Copyright (c) 2013 Joel Desamero.
@@ -8,9 +8,11 @@
  */
 
 //
-class Geko_App_Match extends Geko_Match
+class Geko_App_Company extends Geko_App_Entity
 {
-
+	
+	
+	
 
 }
 
