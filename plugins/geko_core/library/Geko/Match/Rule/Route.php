@@ -24,7 +24,9 @@ class Geko_Match_Rule_Route extends Geko_Match_Rule
 		foreach ( $aRuleParams as $sRoute ) {
 			
 			$aMatch = Geko_Array::explodeTrimEmpty( '/', $sRoute );
-			$aPathItems = $oRouter->getPathItems();
+			$oPath = $oRouter->getPath();
+			
+			$aPathItems = $oPath->getPathItems();
 			
 			if ( in_array( '*', $aMatch ) ) {
 				
