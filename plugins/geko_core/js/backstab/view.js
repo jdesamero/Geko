@@ -60,7 +60,8 @@
 			var sels = [
 				'.%s'.printf( prop ),
 				'#%s'.printf( prop ),
-				'input[name="%s"]'.printf( prop )
+				'input[name="%s"]'.printf( prop ),
+				'[data-field="%s"]'.printf( prop )
 			];
 			
 			$.each( sels, function( i, sel2 ) {
