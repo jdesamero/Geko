@@ -89,7 +89,7 @@ class Geko_Wp_Options_Registry extends Geko_Singleton_Abstract
 		
 		foreach ( $aInitialized as $sMaybeSingleton ) {
 			
-			if ( is_a( $sMaybeSingleton, 'Geko_Singleton_Abstract', TRUE ) ) {
+			if ( is_subclass_of( $sMaybeSingleton, 'Geko_Singleton_Abstract' ) ) {
 				
 				$oSingleton = Geko_Singleton_Abstract::getInstance( $sMaybeSingleton );
 				

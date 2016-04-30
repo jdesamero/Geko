@@ -204,7 +204,7 @@ class Geko_Entity_Record extends Geko_Delegate
 		
 		
 		list( $aAllValues, $aValues, $aOtherValues ) = $this->formatInsertValues(
-			[ $aAllValues, $aValues, $aOtherValues ]
+			array( $aAllValues, $aValues, $aOtherValues )
 		);
 		
 		
@@ -269,7 +269,7 @@ class Geko_Entity_Record extends Geko_Delegate
 		
 		
 		list( $aAllValues, $aValues, $aOtherValues ) = $this->formatUpdateValues(
-			[ $aAllValues, $aValues, $aOtherValues ]
+			array( $aAllValues, $aValues, $aOtherValues )
 		);
 
 		
