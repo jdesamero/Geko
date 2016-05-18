@@ -85,6 +85,13 @@ hr {
 
 
 
+table.plain > tbody > tr:nth-child(even) > td {
+	background-color: #fff;
+}
+
+
+
+
 
 /* general */
 
@@ -102,6 +109,54 @@ span.loading {
 	display: inline-block;
 }
 
+.bold {
+	font-weight: bold;
+}
 
+.center {
+	text-align: center;
+}
+
+.right {
+	text-align: right;
+}
+
+
+
+.fsz-12px {
+	font-size: 12px;
+}
+
+.fsz-13px {
+	font-size: 13px;
+}
+
+.fsz-14px {
+	font-size: 14px;
+}
+
+.fsz-15px {
+	font-size: 15px;
+}
+
+.fsz-16px {
+	font-size: 16px;
+}
+
+.fsz-17px {
+	font-size: 17px;
+}
+
+.fsz-18px {
+	font-size: 18px;
+}
+
+.fsz-19px {
+	font-size: 19px;
+}
+
+.fsz-20px {
+	font-size: 20px;
+}
 
 

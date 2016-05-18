@@ -480,6 +480,10 @@
 				
 				initialize: function( options2 ) {
 					
+					if ( fvPrms.status ) {
+						this.status = new fvPrms.status( this.$el );
+					}
+					
 					if ( fvPrms.postInit ) {
 						fvPrms.postInit.call( this, options2 );
 					}

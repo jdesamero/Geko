@@ -417,7 +417,32 @@
 			this.trigger( 'afterMatch', oToMatch, bMatched );
 			
 			return this;
+		},
+		
+		
+		
+		// find a matching model based on the given hash key, then replace with hash value
+		findAndSet: function( oHash, sKey, bParseKeyAsInt ) {
+			
+			var _this = this;
+			
+			if ( oHash ) {
+				
+				$.each( oHash, function( k, v ) {
+					
+					var oWhere = {};
+					oWhere[ sKey ] = ( bParseKeyAsInt ) ? parseInt( k ) : k ;
+					
+					var oUpdateModel = _this.findWhere( oWhere );
+					
+					if ( oUpdateModel ) oUpdateModel.set( sKey, v );
+					
+				} );
+			
+			}
+			
 		}
+		
 		
 		
 	} ) );
